@@ -584,10 +584,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="b5-result-sub">必買商品：蛋糕🎂 和 飲料🧃</div>
                         </div>`;
                 } else {
+                    // 計算建議移除的選購商品（最貴的、移除後不超支）
+                    const overBy = total - g.budget;
+                    const selectedOptionals = g.items
+                        .filter(i => !i.must && g.selectedIds.has(i.id))
+                        .sort((a, b) => b.price - a.price);
+                    const suggestion = selectedOptionals.find(i => total - i.price <= g.budget);
+                    const suggestionHTML = suggestion
+                        ? `<div class="b5-removal-hint">💡 試試取消勾選「${suggestion.icon} ${suggestion.name}」（${suggestion.price}元）！</div>`
+                        : '';
                     resultArea.innerHTML = `
                         <div class="b5-result-banner fail">
                             💸 超出預算了！請重新選擇
-                            <div class="b5-result-sub">超出 ${total - g.budget} 元</div>
+                            <div class="b5-result-sub">超出 ${overBy} 元</div>
+                            ${suggestionHTML}
                         </div>`;
                 }
             }

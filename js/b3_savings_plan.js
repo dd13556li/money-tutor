@@ -1721,6 +1721,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 除法提示（答錯後顯示計算公式）───────────────────────
+        _showDivisionHint(question) {
+            if (document.querySelector('.b3-div-hint')) return;
+            const section = document.querySelector('.b3-numpad-section');
+            if (!section) return;
+            const hint = document.createElement('div');
+            hint.className = 'b3-div-hint';
+            hint.innerHTML = `<span class="b3-hint-label">💡 計算方式：</span>`
+                + `${question.item.price} 元 <span class="b3-hint-op">÷</span> `
+                + `${question.weekly} 元/週 `
+                + `<span class="b3-hint-op">≈</span> `
+                + `<span class="b3-hint-ans">${question.answer}</span> 週（無條件進位）`;
+            section.appendChild(hint);
+        },
+
         _handleNumpadAnswer(question) {
             if (this.state.isProcessing) return;
             const input = parseInt(this.state.quiz.currentInput);
@@ -1744,9 +1759,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500, 'turnTransition');
             } else {
                 this.audio.play('error');
+                this._showDivisionHint(question); // 答錯即顯示除法公式
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，再試一次`);
+                    Game.Speech.speak(`不對喔，參考提示再試一次`);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.quiz.currentInput = '';
@@ -1758,14 +1774,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
                     Game.Speech.speak(`正確答案是${question.answer}週`);
-                    const section = document.querySelector('.b3-numpad-section');
-                    if (section) {
-                        const hint = document.createElement('div');
-                        hint.className = 'b3-correct-hint';
-                        hint.textContent = `正確答案是 ${question.answer} 週`;
-                        section.appendChild(hint);
-                    }
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2200, 'turnTransition');
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
         },
