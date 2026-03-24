@@ -813,19 +813,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const entries = Array.from(document.querySelectorAll('.b2-event-row'));
             if (entries.length === 0) { answerArea.style.visibility = ''; return; }
 
+            // 建立逐項小計顯示
+            const runEl = document.createElement('div');
+            runEl.id = 'b2-running-total';
+            runEl.className = 'b2-running-total';
+            runEl.innerHTML = `<span class="b2-rt-label">目前小計</span><span class="b2-rt-val" id="b2-rt-val">${question.startAmount} 元</span>`;
+            const startRow = document.querySelector('.b2-start-row');
+            if (startRow) startRow.insertAdjacentElement('afterend', runEl);
+
             entries.forEach(r => r.classList.add('b2-entry-dim'));
+
+            // 預先計算每步餘額
+            let balance = question.startAmount;
+            const balances = question.events.map(e => {
+                balance = e.type === 'income' ? balance + e.amount : balance - e.amount;
+                return balance;
+            });
 
             entries.forEach((row, i) => {
                 Game.TimerManager.setTimeout(() => {
                     if (i > 0) entries[i - 1].classList.remove('b2-entry-active');
                     row.classList.remove('b2-entry-dim');
                     row.classList.add('b2-entry-active');
+                    // 更新小計顯示
+                    const valEl = document.getElementById('b2-rt-val');
+                    if (valEl) {
+                        valEl.textContent = `${balances[i]} 元`;
+                        valEl.className = 'b2-rt-val ' + (question.events[i].type === 'income' ? 'b2-rt-up' : 'b2-rt-down');
+                        valEl.style.animation = 'none';
+                        void valEl.offsetWidth; // 觸發 reflow
+                        valEl.style.animation = 'b2RtPop 0.3s ease';
+                    }
                 }, 500 + i * 800, 'ui');
             });
 
             const showDelay = 500 + entries.length * 800 + 500;
             Game.TimerManager.setTimeout(() => {
                 entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
+                if (runEl.parentNode) runEl.remove();
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');

@@ -3,6 +3,7 @@
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-24（第七輪：B5_SCENARIOS easy/normal 8→12 組，共 32 組）
 > **更新日期**：2026-03-25（第九輪：超支時智慧移除建議 `_handleConfirm` 超支分支改版）
+> **更新日期**：2026-03-25（第十三輪：關卡轉場卡 `_showRoundTransition`，C6 transitionText pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）
 > **系列**：B 預算規劃
@@ -121,6 +122,30 @@ const suggestion = selectedOptionals
 - 提示按鈕插入 `b5-result-area` 前、確認按鈕上方
 - `g.submitted` 守衛（結果已送出後不觸發）
 - `TimerManager.setTimeout` 2500ms 自動移除 `.b5-hint-glow`
+
+### 2.8 關卡轉場卡（`_showRoundTransition`）—— 2026-03-25 新增
+
+`nextRound()` 不再直接呼叫 `renderRound()`，而是先顯示全屏**轉場覆蓋卡**，1.1s 後淡出並進入下一關。
+
+**視覺設計**：
+```
+╔══════════════════════╗
+│   準備好了嗎？         │
+│   第 3 關             │  ← 白色大字（3rem）
+│   🎂                  │
+╚══════════════════════╝
+```
+- 紫色半透明背景（`rgba(99,102,241,0.88)`）
+- 卡片彈出動畫：`b5RtIn`（0.4s，scale 0.75→1.06→1）
+- 1.1s 後加 `.b5-rt-fade` class（`transition: opacity 0.3s`）淡出，300ms 後移除並呼叫 callback
+
+**靈感來源**：C6「進入第X關」過渡語音 + `nextQuestionScheduled` 節奏設計 — 防止關卡之間切換過於突兀，給學生短暫的心理準備時間。
+
+**技術細節**：
+- 使用 callback pattern：`_showRoundTransition(roundNum, callback)`，`callback = () => this.renderRound()`
+- 附加至 `document.body`（覆蓋整個視窗）
+- 兩層 `TimerManager.setTimeout`：第一層 1100ms 觸發淡出；第二層 300ms 後移除並觸發 callback
+- 兩層均使用 `'turnTransition'` 類別，切換時自動清除
 
 ---
 

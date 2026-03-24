@@ -333,6 +333,37 @@
     box-shadow: 0 0 0 2px #fde047;
 }
 
+/* ── Easy 逐項小計顯示（F5 視覺化 pattern）───────────────────── */
+@keyframes b2RtPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
+}
+.b2-running-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0f9ff;
+    border: 2px solid #bae6fd;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin: 6px 0;
+    animation: b2FadeIn 0.3s ease;
+}
+.b2-rt-label {
+    font-size: 13px;
+    color: #0369a1;
+    font-weight: bold;
+}
+.b2-rt-val {
+    font-size: 17px;
+    font-weight: bold;
+    color: #0369a1;
+    transition: color 0.2s;
+}
+.b2-rt-val.b2-rt-up   { color: #059669; }
+.b2-rt-val.b2-rt-down { color: #dc2626; }
+
 /* ── 動畫 ─────────────────────────────────────────────────── */
 @keyframes b2Shake {
     0%, 100% { transform: translateX(0); }

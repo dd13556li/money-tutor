@@ -623,6 +623,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
+            // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
+            Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
         },
 
         removeCoin(uid) {

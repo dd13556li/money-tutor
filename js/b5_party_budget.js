@@ -687,8 +687,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.game.currentRound >= this.state.game.totalRounds) {
                 this.showResults();
             } else {
-                this.renderRound();
+                this._showRoundTransition(this.state.game.currentRound + 1, () => this.renderRound());
             }
+        },
+
+        _showRoundTransition(roundNum, callback) {
+            const existing = document.getElementById('b5-round-transition');
+            if (existing) existing.remove();
+            const card = document.createElement('div');
+            card.id = 'b5-round-transition';
+            card.className = 'b5-round-transition';
+            card.innerHTML = `
+                <div class="b5-rt-inner">
+                    <div class="b5-rt-label">準備好了嗎？</div>
+                    <div class="b5-rt-round">第 ${roundNum} 關</div>
+                    <div class="b5-rt-icon">🎂</div>
+                </div>`;
+            document.body.appendChild(card);
+            Game.TimerManager.setTimeout(() => {
+                card.classList.add('b5-rt-fade');
+                Game.TimerManager.setTimeout(() => {
+                    if (document.body.contains(card)) card.remove();
+                    callback();
+                }, 300, 'turnTransition');
+            }, 1100, 'turnTransition');
         },
 
         // ── 12. 完成畫面 ──────────────────────────────────────

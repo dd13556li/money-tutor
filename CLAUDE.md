@@ -460,6 +460,9 @@ toolbarConfig: {
 | B6 攤位需求件數徽章（2026-03-25）| B6 | `_renderShoppingUI` stallTabsHTML：依 `mission.items.filter(i=>i.stall===k)` 計算每攤位待收件數；紅色數字 `.b6-stall-badge`（有剩）/ 綠色 ✓ `.b6-stall-badge-done`（全收完）；切換攤位重繪自動更新；C5 指示燈 pattern |
 | B4 完成畫面累計節省（2026-03-25）| B4 | `quiz.totalSaved`（init/reset/startGame 三處歸零）；`handleDiffAnswer` 答對時 `+= correctDiff`；`showResults` 以 `.b4-savings-banner` 黃色橫幅顯示「你總共省了 X 元」；A4 交易摘要 pattern |
 | B3 月曆進度里程碑（2026-03-25）| B3 | `_completeDragSession` 存入後偵測 25/50/75% 閾值（`prevPct < m && newPct >= m`）；`_showMilestoneBadge(pct)` 顯示中央浮動徽章（`b3MilestonePop`+`b3MilestoneFade` 2.2s）；F2 里程碑音效 + A3 任務彈窗 pattern |
+| B5 關卡轉場卡（2026-03-25）| B5 | `_showRoundTransition(roundNum, callback)`：`nextRound()` 改呼叫此方法；紫色全屏覆蓋卡「第X關」1.1s + 淡出 0.3s + callback；`b5RtIn` 彈出動畫；C6 transitionText pattern |
+| B2 easy 逐項小計顯示（2026-03-25）| B2 | `_animateEasyEntries` 插入 `#b2-running-total` 卡；每步高亮同步更新餘額；`b2-rt-up`（綠，收入）/`b2-rt-down`（紅，支出）；`b2RtPop` 彈出動畫；F5 視覺化 pattern |
+| B1 放幣語音反饋（2026-03-25）| B1 | `addCoin(denom)` 末尾加 `TimerManager.setTimeout(() => Speech.speak(\`${denom}元\`), 80, 'ui')`；coin.mp3 先播完再語音；F4 instant feedback + C1 coin recognition pattern |
 
 ---
 

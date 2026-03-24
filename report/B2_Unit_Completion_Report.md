@@ -2,6 +2,7 @@
 
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-25（第十一輪：easy 模式逐項動畫高亮 `_animateEasyEntries`，C2 逐一計數 pattern）
+> **更新日期**：2026-03-25（第十三輪：easy 模式逐項小計顯示 `b2-running-total`，F5 視覺化 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
 > **系列**：B 預算規劃
@@ -106,6 +107,30 @@ B2 easy 模式的教學目標是「看日記條目，選出正確餘額」。新
 - `visibility: hidden`（不是 `display:none`）保留版面空間，避免 layout shift
 - `TimerManager.setTimeout` 管理全部計時，切換題目時自動清除（`clearAll` in `renderQuestion`）
 - CSS：`.b2-entry-dim`（opacity 0.25）/ `.b2-entry-active`（黃底 + `box-shadow: 0 0 0 2px #fde047`）
+
+### 2.7 Easy 模式逐項小計顯示（`b2-running-total`）—— 2026-03-25 新增
+
+在 `_animateEasyEntries` 每個事件行高亮的同時，日記卡片「開始有 X 元」下方插入**即時小計顯示卡**：
+
+```
+目前小計   [120 元]   ← 綠色（收入後）
+目前小計   [90 元]    ← 紅色（支出後）
+```
+
+**設計邏輯**：
+- `_animateEasyEntries` 開頭預先計算所有步驟餘額（`balances[]` 陣列）
+- 每步高亮時更新 `#b2-rt-val` 文字，並切換 `b2-rt-up`（綠）/ `b2-rt-down`（紅）class
+- 觸發 `void offsetWidth` 強制 reflow 後重設 `b2RtPop` 彈出動畫，每步都有彈跳視覺
+- 動畫結束後（選項淡入時）自動移除小計卡（`runEl.remove()`）
+
+**靈感來源**：F5 量比較視覺化橫條 — 幫助視覺型學習者直觀感受「數字在每次操作後如何變化」，不必心算全部加減再回溯。
+
+**教學效果**：
+- 學生能即時看到「收入讓數字變大（綠）、支出讓數字變小（紅）」
+- 搭配逐項動畫節奏，形成「看事件 → 看數字變化」的完整回饋迴路
+- 最終選項出現時，學生已在腦中形成正確答案的預期
+
+**CSS**（`b2_allowance_diary.css`）：`.b2-running-total`（藍框卡）、`.b2-rt-label`、`.b2-rt-val`、`.b2-rt-up`（綠）、`.b2-rt-down`（紅）、`@keyframes b2RtPop`
 
 ---
 
