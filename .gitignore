@@ -8,8 +8,8 @@ __pycache__/
 *.pyc
 *.pyo
 
-# 暫存資料夾
-pdf/tmp/
+# PDF 文件（只留本機）
+pdf/
 
 # 編輯器
 .vscode/
