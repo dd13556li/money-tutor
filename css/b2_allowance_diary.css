@@ -1,0 +1,276 @@
+/* =================================================================
+   FILE: css/b2_allowance_diary.css — B2 零用錢日記 專屬樣式
+   ================================================================= */
+
+/* ── 日記本容器 ─────────────────────────────────────────────── */
+.b2-diary {
+    background: #fffef7;
+    border: 3px solid #fde68a;
+    border-radius: 16px;
+    overflow: hidden;
+    animation: bFadeIn 0.35s ease;
+    box-shadow: 2px 4px 12px rgba(0,0,0,0.08);
+}
+
+.b2-diary-header {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.b2-diary-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.b2-diary-icon {
+    font-size: 28px;
+}
+
+/* ── 起始金額列 ─────────────────────────────────────────────── */
+.b2-start-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #fef3c7;
+    background: #fffbeb;
+}
+
+.b2-start-label {
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: bold;
+}
+
+.b2-start-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #374151;
+}
+
+/* ── 收支事件列 ─────────────────────────────────────────────── */
+.b2-event-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px dashed #e5e7eb;
+    gap: 10px;
+    animation: bFadeIn 0.3s ease both;
+}
+
+.b2-event-row:last-child { border-bottom: none; }
+
+.b2-event-icon { font-size: 22px; flex-shrink: 0; }
+
+.b2-event-name {
+    font-size: 15px;
+    color: #374151;
+    font-weight: 500;
+    flex: 1;
+}
+
+.b2-event-amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 80px;
+    text-align: right;
+}
+
+.b2-event-amount.income {
+    color: #059669;
+}
+
+.b2-event-amount.income::before { content: '▲ +'; }
+
+.b2-event-amount.expense {
+    color: #dc2626;
+}
+
+.b2-event-amount.expense::before { content: '▼ -'; }
+
+/* ── 問題列（最後一行）─────────────────────────────────────── */
+.b2-question-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-top: 2px solid #fde68a;
+    gap: 10px;
+}
+
+.b2-question-label {
+    font-size: 17px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.b2-question-blank {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #d97706;
+    border-bottom: 3px solid #d97706;
+    min-width: 80px;
+    text-align: center;
+    padding-bottom: 2px;
+}
+
+/* ── 答題區卡片 ─────────────────────────────────────────────── */
+.b2-answer-card {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(245,158,11,0.12);
+    animation: bFadeIn 0.3s ease 0.15s both;
+}
+
+.b2-answer-prompt {
+    font-size: 14px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+
+/* ── 選擇題（簡單模式）─────────────────────────────────────── */
+.b2-choices {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: bFadeIn 0.4s ease 0.2s both;
+}
+
+.b2-choice-btn {
+    padding: 14px 24px;
+    background: #fffbeb;
+    border: 3px solid #fde68a;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #d97706;
+    cursor: pointer;
+    transition: all 0.18s;
+    min-width: 90px;
+    text-align: center;
+    user-select: none;
+}
+
+.b2-choice-btn:hover {
+    border-color: #f59e0b;
+    background: #fef3c7;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(245,158,11,0.25);
+}
+
+.b2-choice-btn:active { transform: scale(0.95); }
+
+.b2-choice-btn.correct {
+    background: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+    pointer-events: none;
+}
+
+.b2-choice-btn.wrong {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #dc2626;
+    animation: b2Shake 0.4s ease;
+    pointer-events: none;
+}
+
+.b2-choice-btn:disabled { pointer-events: none; }
+
+.b2-choice-suffix {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: normal;
+    display: block;
+    margin-top: 2px;
+}
+
+/* ── 數字鍵盤（普通/困難）──────────────────────────────────── */
+.b2-numpad-section {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 14px;
+    padding: 14px;
+    animation: bFadeIn 0.4s ease 0.2s both;
+}
+
+.b2-input-display {
+    background: #1f2937;
+    color: #f59e0b;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: right;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 56px;
+    letter-spacing: 2px;
+}
+
+.b2-input-display .b2-unit-hint {
+    font-size: 1rem;
+    color: #9ca3af;
+    margin-left: 4px;
+}
+
+.b2-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.b2-numpad-btn {
+    padding: 13px 8px;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    user-select: none;
+}
+
+.b2-numpad-btn:hover  { background: #fef3c7; border-color: #f59e0b; }
+.b2-numpad-btn:active { transform: scale(0.93); }
+.b2-numpad-btn.btn-del  { color: #ef4444; }
+.b2-numpad-btn.btn-ok   { background: #10b981; border-color: #10b981; color: #fff; font-size: 18px; }
+.b2-numpad-btn.btn-ok:hover { background: #059669; }
+.b2-numpad-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+.b2-correct-hint {
+    text-align: center;
+    font-size: 15px;
+    color: #059669;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* ── 動畫 ─────────────────────────────────────────────────── */
+@keyframes b2Shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    60%      { transform: translateX(8px); }
+}
+
+/* ── RWD ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .b2-diary-title   { font-size: 16px; }
+    .b2-event-name    { font-size: 13px; }
+    .b2-choice-btn    { padding: 12px 18px; font-size: 19px; }
+    .b2-numpad-btn    { padding: 11px 4px; font-size: 17px; }
+    .b2-question-label { font-size: 15px; }
+}

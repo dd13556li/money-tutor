@@ -1,0 +1,296 @@
+/* =================================================================
+   FILE: css/b4_sale_comparison.css — B4 特賣比一比 專屬樣式
+   ================================================================= */
+
+/* ── 商品主視覺 ───────────────────────────────────────────────── */
+.b4-item-hero {
+    text-align: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 2px solid #fde68a;
+    border-radius: 16px;
+    animation: bFadeIn 0.35s ease;
+}
+
+.b4-item-icon {
+    font-size: 56px;
+    line-height: 1;
+    display: block;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.b4-item-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.b4-question-label {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ── 比較網格 ─────────────────────────────────────────────────── */
+.b4-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    align-items: center;
+    animation: bFadeIn 0.4s ease 0.1s both;
+}
+
+.b4-vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.4);
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+}
+
+/* ── 選項卡 ───────────────────────────────────────────────────── */
+.b4-option-card {
+    background: #fff;
+    border: 3px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.b4-option-card:hover {
+    border-color: #f59e0b;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(245,158,11,0.25);
+}
+
+.b4-option-card:active { transform: scale(0.97); }
+
+.b4-option-card.selected-correct {
+    border-color: #10b981;
+    background: #d1fae5;
+    transform: none;
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.25);
+    pointer-events: none;
+}
+
+.b4-option-card.selected-wrong {
+    border-color: #ef4444;
+    background: #fee2e2;
+    animation: b4Shake 0.4s ease;
+    pointer-events: none;
+}
+
+.b4-option-card.reveal-correct {
+    border-color: #10b981;
+    background: #d1fae5;
+    pointer-events: none;
+}
+
+/* 正確/錯誤標記 */
+.b4-result-mark {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    animation: b4Pop 0.3s ease;
+    z-index: 1;
+}
+.b4-result-mark.correct { background: #10b981; }
+.b4-result-mark.wrong   { background: #ef4444; }
+
+.b4-store-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #6b7280;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.b4-store-icon { font-size: 32px; }
+
+.b4-store-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.b4-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #d97706;
+    line-height: 1;
+}
+
+.b4-price.cheaper {
+    color: #059669;
+}
+
+.b4-price-unit {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* 便宜標籤 */
+.b4-cheaper-tag {
+    background: #10b981;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    animation: b4Pop 0.3s ease 0.2s both;
+}
+
+/* ── 差額問題（普通/困難）────────────────────────────────────── */
+.b4-diff-section {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 16px;
+    padding: 18px;
+    animation: bFadeIn 0.4s ease;
+}
+
+.b4-diff-question {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 14px;
+}
+
+.b4-diff-sub {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* 3選1選項 */
+.b4-diff-options {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.b4-diff-opt {
+    padding: 12px 24px;
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #d97706;
+    cursor: pointer;
+    transition: all 0.18s;
+    min-width: 90px;
+    text-align: center;
+}
+.b4-diff-opt:hover {
+    border-color: #f59e0b;
+    background: #fef3c7;
+    transform: translateY(-2px);
+}
+.b4-diff-opt.correct-ans {
+    background: #d1fae5;
+    border-color: #10b981;
+    color: #059669;
+}
+.b4-diff-opt.wrong-ans {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #dc2626;
+}
+
+/* ── 數字鍵盤（困難模式）────────────────────────────────────── */
+.b4-input-display {
+    background: #1f2937;
+    color: #f59e0b;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: right;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    min-height: 60px;
+    letter-spacing: 2px;
+}
+.b4-input-display .b4-unit-text {
+    font-size: 1rem;
+    color: #9ca3af;
+    margin-left: 4px;
+}
+
+.b4-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.b4-numpad-btn {
+    padding: 14px 8px;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    user-select: none;
+}
+.b4-numpad-btn:hover  { background: #fef3c7; border-color: #f59e0b; }
+.b4-numpad-btn:active { transform: scale(0.93); }
+.b4-numpad-btn.btn-del  { color: #ef4444; }
+.b4-numpad-btn.btn-ok   { background: #10b981; border-color: #10b981; color:#fff; font-size:18px; }
+.b4-numpad-btn.btn-ok:hover { background: #059669; }
+
+/* ── 動畫 ─────────────────────────────────────────────────────── */
+@keyframes b4Shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-8px); }
+    60%     { transform: translateX(8px); }
+}
+
+@keyframes b4Pop {
+    0%  { transform: scale(0.5); opacity:0; }
+    70% { transform: scale(1.15); }
+    100%{ transform: scale(1); opacity:1; }
+}
+
+/* ── RWD ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .b4-compare-grid { gap: 4px; }
+    .b4-vs-divider   { width: 28px; height: 28px; font-size: 11px; }
+    .b4-option-card  { padding: 14px 8px; }
+    .b4-price        { font-size: 1.6rem; }
+    .b4-item-icon    { font-size: 44px; }
+    .b4-item-name    { font-size: 18px; }
+    .b4-diff-opt     { padding: 10px 16px; font-size: 18px; }
+    .b4-numpad-btn   { padding: 12px 4px; font-size: 18px; }
+}

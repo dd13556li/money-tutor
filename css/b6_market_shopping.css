@@ -1,0 +1,391 @@
+/* =================================================================
+   FILE: css/b6_market_shopping.css — B6 菜市場買菜 專屬樣式
+   ================================================================= */
+
+/* ── 購物清單（左側固定）─────────────────────────────────────── */
+.b6-list-card {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 14px;
+    overflow: hidden;
+    animation: bFadeIn 0.35s ease;
+}
+
+.b6-list-header {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.b6-replay-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 8px;
+    color: #fff;
+    padding: 3px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.b6-replay-btn:hover {
+    background: rgba(255,255,255,0.35);
+    border-color: #fff;
+    transform: scale(1.1);
+}
+
+.b6-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px dashed #e5e7eb;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.b6-list-item:last-child { border-bottom: none; }
+
+.b6-list-item.checked {
+    background: #d1fae5;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.b6-list-icon { font-size: 22px; flex-shrink: 0; }
+
+.b6-list-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
+}
+
+.b6-list-check {
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.b6-list-item.checked .b6-list-check { opacity: 1; }
+
+/* ── 攤位區域 ────────────────────────────────────────────────── */
+.b6-stall-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    animation: bFadeIn 0.4s ease 0.1s both;
+}
+
+.b6-stall-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px 4px;
+    background: #f3f4f6;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #6b7280;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    user-select: none;
+}
+
+.b6-stall-tab.active {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.b6-stall-tab:hover:not(.active) {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.b6-stall-panel {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 14px;
+    overflow: hidden;
+    animation: bFadeIn 0.3s ease;
+}
+
+.b6-stall-panel-header {
+    padding: 10px 14px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #fffbeb;
+    border-bottom: 2px solid #fde68a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── 商品格子 ────────────────────────────────────────────────── */
+.b6-products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px;
+}
+
+.b6-product-btn {
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.b6-product-btn:hover:not(.collected) {
+    border-color: #f59e0b;
+    background: #fef3c7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(245,158,11,0.2);
+}
+
+.b6-product-btn.collected {
+    background: #d1fae5;
+    border-color: #10b981;
+    cursor: default;
+}
+
+.b6-product-btn.not-in-list {
+    opacity: 0.5;
+}
+
+.b6-product-icon { font-size: 28px; }
+
+.b6-product-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.b6-product-price {
+    font-size: 13px;
+    font-weight: bold;
+    color: #d97706;
+}
+
+.b6-product-unit {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* ── 購物籃 ─────────────────────────────────────────────────── */
+.b6-basket-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1f2937;
+    color: #f59e0b;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.b6-basket-total { font-size: 1.2rem; }
+
+.b6-checkout-btn {
+    padding: 8px 16px;
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.b6-checkout-btn:hover:not(:disabled) { background: #059669; }
+.b6-checkout-btn:disabled { background: #6b7280; cursor: not-allowed; }
+
+/* ── 付款頁 ─────────────────────────────────────────────────── */
+.b6-payment-section {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 14px;
+    padding: 16px;
+    animation: bFadeIn 0.35s ease;
+}
+
+.b6-payment-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.b6-payment-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #d97706;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.b6-bill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.b6-bill-btn {
+    padding: 10px 4px;
+    background: #fff;
+    border: 2.5px solid var(--bill-color, #9ca3af);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.b6-bill-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bill-color, #374151);
+}
+
+.b6-bill-value {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.b6-bill-btn:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+.b6-bill-btn:active { transform: scale(0.95); }
+
+.b6-paid-display {
+    background: #1f2937;
+    color: #f59e0b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    min-height: 50px;
+}
+
+.b6-pay-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.b6-clear-btn {
+    flex: 1;
+    padding: 12px;
+    background: #fee2e2;
+    border: 2px solid #ef4444;
+    border-radius: 10px;
+    color: #dc2626;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.b6-clear-btn:hover { background: #fca5a5; }
+
+.b6-pay-btn {
+    flex: 2;
+    padding: 12px;
+    background: #10b981;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.b6-pay-btn:hover:not(:disabled) { background: #059669; }
+.b6-pay-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+/* ── 找零結果 ─────────────────────────────────────────────────── */
+.b6-change-section {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    animation: bPop 0.4s ease;
+}
+
+.b6-change-icon { font-size: 48px; margin-bottom: 8px; }
+
+.b6-change-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #065f46;
+}
+
+.b6-change-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #059669;
+    margin: 8px 0;
+}
+
+/* ── 錯誤提示浮層 ─────────────────────────────────────────────── */
+#b6-wrong-tip {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 500;
+    white-space: nowrap;
+}
+
+/* ── 動畫 ─────────────────────────────────────────────────────── */
+@keyframes b6ItemCollect {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* ── RWD ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .b6-products-grid  { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .b6-product-icon   { font-size: 22px; }
+    .b6-product-name   { font-size: 11px; }
+    .b6-bill-grid      { grid-template-columns: repeat(3, 1fr); }
+    .b6-stall-tab      { font-size: 12px; padding: 6px 4px; }
+}

@@ -1,0 +1,243 @@
+/* =================================================================
+   FILE: css/b5_party_budget.css — B5 生日派對預算 專屬樣式
+   ================================================================= */
+
+/* ── 預算橫幅 ────────────────────────────────────────────────── */
+.b5-budget-banner {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-align: center;
+    color: #fff;
+    animation: bFadeIn 0.35s ease;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+}
+
+.b5-budget-label {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.b5-budget-amount {
+    font-size: 2.4rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* ── 即時金額顯示條 ─────────────────────────────────────────── */
+.b5-total-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.3s, color 0.3s;
+    border: 2px solid transparent;
+}
+
+.b5-total-bar.ok {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #10b981;
+}
+
+.b5-total-bar.near {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #f59e0b;
+}
+
+.b5-total-bar.over {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #ef4444;
+    animation: b5Pulse 0.5s ease;
+}
+
+.b5-total-amount { font-size: 1.3rem; }
+.b5-remaining    { font-size: 14px; opacity: 0.8; }
+
+/* ── 商品清單 ────────────────────────────────────────────────── */
+.b5-items-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    animation: bFadeIn 0.4s ease 0.1s both;
+}
+
+.b5-item-card {
+    background: #fff;
+    border: 3px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.b5-item-card:hover:not(.locked):not(.disabled) {
+    border-color: #f59e0b;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(245,158,11,0.2);
+}
+
+.b5-item-card.selected {
+    border-color: #10b981;
+    background: #d1fae5;
+}
+
+.b5-item-card.locked {
+    border-color: #6366f1;
+    background: #ede9fe;
+    cursor: default;
+}
+
+.b5-item-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.b5-item-icon { font-size: 32px; }
+
+.b5-item-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #374151;
+}
+
+.b5-item-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #d97706;
+}
+
+/* 必買標記 */
+.b5-must-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #6366f1;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* 勾選標記 */
+.b5-check-mark {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 20px;
+    display: none;
+}
+
+.b5-item-card.selected .b5-check-mark,
+.b5-item-card.locked .b5-check-mark {
+    display: block;
+}
+
+/* ── 確認按鈕 ─────────────────────────────────────────────── */
+.b5-confirm-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.b5-confirm-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16,185,129,0.35);
+}
+
+.b5-confirm-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── 結果回饋 ────────────────────────────────────────────────── */
+.b5-result-banner {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    animation: bPop 0.4s ease;
+}
+
+.b5-result-banner.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 2px solid #10b981;
+}
+
+.b5-result-banner.fail {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #ef4444;
+}
+
+.b5-result-sub {
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 6px;
+    opacity: 0.8;
+}
+
+/* ── 下一題按鈕 ──────────────────────────────────────────────── */
+.b5-next-btn {
+    width: 100%;
+    padding: 14px;
+    background: #6366f1;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.b5-next-btn:hover { background: #4f46e5; }
+
+/* ── 進度標題 ────────────────────────────────────────────────── */
+.b5-round-info {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ── 動畫 ──────────────────────────────────────────────────── */
+@keyframes b5Pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.02); }
+}
+
+/* ── RWD ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .b5-budget-amount { font-size: 2rem; }
+    .b5-items-grid    { gap: 8px; }
+    .b5-item-card     { padding: 10px 8px; }
+    .b5-item-icon     { font-size: 26px; }
+    .b5-item-name     { font-size: 12px; }
+    .b5-item-price    { font-size: 1rem; }
+}

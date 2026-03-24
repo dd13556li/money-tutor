@@ -1,0 +1,1001 @@
+// =============================================================
+// FILE: js/b2_allowance_diary.js — B2 零用錢日記
+// =============================================================
+'use strict';
+
+// ── 日記範本資料庫 ────────────────────────────────────────────
+const B2_TEMPLATES = {
+    easy: [
+        { startAmount: 100, events: [
+            { type: 'income',  name: '媽媽給零用錢', amount: 50,  icon: '💰' },
+            { type: 'expense', name: '買飲料',       amount: 30,  icon: '🧋' },
+        ]},  // 答案：120
+        { startAmount: 50, events: [
+            { type: 'income',  name: '幫忙洗碗',     amount: 20,  icon: '🍽️' },
+            { type: 'expense', name: '買糖果',       amount: 15,  icon: '🍬' },
+        ]},  // 答案：55
+        { startAmount: 200, events: [
+            { type: 'expense', name: '買文具',       amount: 80,  icon: '✏️' },
+            { type: 'income',  name: '爸爸獎勵',     amount: 50,  icon: '🌟' },
+        ]},  // 答案：170
+        { startAmount: 80, events: [
+            { type: 'income',  name: '過年紅包',     amount: 100, icon: '🧧' },
+            { type: 'expense', name: '買玩具',       amount: 120, icon: '🎮' },
+        ]},  // 答案：60
+        { startAmount: 150, events: [
+            { type: 'expense', name: '買早餐',       amount: 40,  icon: '🥐' },
+            { type: 'income',  name: '幫忙買菜',     amount: 20,  icon: '🛒' },
+        ]},  // 答案：130
+        { startAmount: 60, events: [
+            { type: 'income',  name: '阿嬤零用錢',   amount: 50,  icon: '💝' },
+            { type: 'expense', name: '買貼紙',       amount: 25,  icon: '🌸' },
+        ]},  // 答案：85
+        { startAmount: 300, events: [
+            { type: 'expense', name: '買書',         amount: 150, icon: '📚' },
+            { type: 'expense', name: '買點心',       amount: 30,  icon: '🍪' },
+        ]},  // 答案：120
+        { startAmount: 120, events: [
+            { type: 'income',  name: '幫忙打掃',     amount: 30,  icon: '🧹' },
+            { type: 'expense', name: '買冰淇淋',     amount: 45,  icon: '🍦' },
+        ]},  // 答案：105
+        { startAmount: 70, events: [
+            { type: 'income',  name: '阿姨送禮',     amount: 30,  icon: '🎁' },
+            { type: 'expense', name: '買糖果',       amount: 20,  icon: '🍬' },
+        ]},  // 答案：80
+        { startAmount: 90, events: [
+            { type: 'expense', name: '買零食',       amount: 25,  icon: '🍿' },
+            { type: 'income',  name: '爸爸給',       amount: 35,  icon: '👨' },
+        ]},  // 答案：100
+        { startAmount: 250, events: [
+            { type: 'expense', name: '買漫畫書',     amount: 60,  icon: '📔' },
+            { type: 'income',  name: '幫忙整理',     amount: 40,  icon: '🗂️' },
+        ]},  // 答案：230
+        { startAmount: 35, events: [
+            { type: 'income',  name: '媽媽零用錢',   amount: 80,  icon: '💰' },
+            { type: 'expense', name: '買飲料',       amount: 45,  icon: '🧃' },
+        ]},  // 答案：70
+    ],
+    normal: [
+        { startAmount: 200, events: [
+            { type: 'income',  name: '爸爸給零用錢', amount: 100, icon: '💰' },
+            { type: 'expense', name: '買文具',       amount: 45,  icon: '✏️' },
+            { type: 'expense', name: '買零食',       amount: 35,  icon: '🍿' },
+            { type: 'income',  name: '幫忙家事',     amount: 20,  icon: '🧹' },
+        ]},  // 答案：240
+        { startAmount: 150, events: [
+            { type: 'income',  name: '生日紅包',     amount: 200, icon: '🧧' },
+            { type: 'expense', name: '買玩具',       amount: 120, icon: '🎮' },
+            { type: 'expense', name: '看電影',       amount: 80,  icon: '🎬' },
+            { type: 'expense', name: '買飲料',       amount: 35,  icon: '🧋' },
+        ]},  // 答案：115
+        { startAmount: 300, events: [
+            { type: 'expense', name: '買運動鞋',     amount: 180, icon: '👟' },
+            { type: 'income',  name: '幫鄰居送報',   amount: 50,  icon: '📰' },
+            { type: 'expense', name: '買午餐',       amount: 60,  icon: '🍱' },
+            { type: 'income',  name: '媽媽零用錢',   amount: 100, icon: '💝' },
+        ]},  // 答案：210
+        { startAmount: 500, events: [
+            { type: 'expense', name: '買書包',       amount: 350, icon: '🎒' },
+            { type: 'income',  name: '爺爺紅包',     amount: 100, icon: '🧧' },
+            { type: 'expense', name: '買文具',       amount: 75,  icon: '✏️' },
+            { type: 'income',  name: '節省獎勵',     amount: 50,  icon: '🌟' },
+        ]},  // 答案：225
+        { startAmount: 100, events: [
+            { type: 'income',  name: '媽媽零用錢',   amount: 150, icon: '💰' },
+            { type: 'expense', name: '買零食',       amount: 45,  icon: '🍬' },
+            { type: 'income',  name: '幫忙澆花',     amount: 20,  icon: '🌱' },
+            { type: 'expense', name: '買飲料',       amount: 30,  icon: '🧋' },
+        ]},  // 答案：195
+        { startAmount: 250, events: [
+            { type: 'expense', name: '買故事書',     amount: 90,  icon: '📖' },
+            { type: 'expense', name: '買彩色筆',     amount: 65,  icon: '🖍️' },
+            { type: 'income',  name: '幫忙洗車',     amount: 80,  icon: '🚗' },
+            { type: 'expense', name: '買冰淇淋',     amount: 40,  icon: '🍦' },
+        ]},  // 答案：135
+        { startAmount: 400, events: [
+            { type: 'income',  name: '爸媽雙倍獎勵', amount: 200, icon: '🎉' },
+            { type: 'expense', name: '買玩具組',     amount: 280, icon: '🧩' },
+            { type: 'expense', name: '買點心',       amount: 55,  icon: '🍪' },
+            { type: 'income',  name: '幫忙掃地',     amount: 30,  icon: '🧹' },
+        ]},  // 答案：295
+        { startAmount: 180, events: [
+            { type: 'income',  name: '老師獎勵',     amount: 50,  icon: '📝' },
+            { type: 'expense', name: '買午餐',       amount: 65,  icon: '🍜' },
+            { type: 'income',  name: '姐姐給',       amount: 30,  icon: '💕' },
+            { type: 'expense', name: '坐公車',       amount: 20,  icon: '🚌' },
+        ]},  // 答案：175
+        { startAmount: 350, events: [
+            { type: 'expense', name: '買水彩組',     amount: 90,  icon: '🎨' },
+            { type: 'income',  name: '幫忙鄰居',     amount: 50,  icon: '🏡' },
+            { type: 'expense', name: '買飲料',       amount: 30,  icon: '🧃' },
+            { type: 'income',  name: '媽媽獎勵',     amount: 100, icon: '💝' },
+        ]},  // 答案：380
+        { startAmount: 120, events: [
+            { type: 'income',  name: '生日禮金',     amount: 150, icon: '🎂' },
+            { type: 'expense', name: '買玩具',       amount: 95,  icon: '🎲' },
+            { type: 'income',  name: '幫忙家事',     amount: 20,  icon: '🧹' },
+            { type: 'expense', name: '看電影',       amount: 70,  icon: '🎬' },
+        ]},  // 答案：125
+        { startAmount: 450, events: [
+            { type: 'expense', name: '買書包',       amount: 220, icon: '🎒' },
+            { type: 'income',  name: '爸媽給零用錢', amount: 200, icon: '💰' },
+            { type: 'expense', name: '買零食',       amount: 55,  icon: '🍬' },
+            { type: 'income',  name: '回收獎勵',     amount: 30,  icon: '♻️' },
+        ]},  // 答案：405
+        { startAmount: 250, events: [
+            { type: 'income',  name: '暑期工讀',     amount: 300, icon: '💼' },
+            { type: 'expense', name: '買球鞋',       amount: 180, icon: '👟' },
+            { type: 'expense', name: '買書',         amount: 75,  icon: '📚' },
+            { type: 'income',  name: '存款利息',     amount: 20,  icon: '🏦' },
+        ]},  // 答案：315
+    ],
+    hard: [
+        { startAmount: 500, events: [
+            { type: 'income',  name: '媽媽零用錢',   amount: 300, icon: '💰' },
+            { type: 'expense', name: '買運動服',     amount: 280, icon: '👕' },
+            { type: 'income',  name: '幫忙搬家具',   amount: 100, icon: '🛋️' },
+            { type: 'expense', name: '買書',         amount: 145, icon: '📚' },
+            { type: 'expense', name: '看表演',       amount: 200, icon: '🎭' },
+            { type: 'income',  name: '過年紅包',     amount: 500, icon: '🧧' },
+        ]},  // 答案：775
+        { startAmount: 800, events: [
+            { type: 'expense', name: '買腳踏車配件', amount: 350, icon: '🚴' },
+            { type: 'income',  name: '比賽獎金',     amount: 200, icon: '🏆' },
+            { type: 'expense', name: '買運動鞋',     amount: 480, icon: '👟' },
+            { type: 'income',  name: '爺爺奶奶紅包', amount: 600, icon: '🧧' },
+            { type: 'expense', name: '買生日禮物',   amount: 250, icon: '🎁' },
+            { type: 'expense', name: '吃大餐',       amount: 185, icon: '🍽️' },
+        ]},  // 答案：335
+        { startAmount: 1000, events: [
+            { type: 'income',  name: '暑期打工',     amount: 500, icon: '💼' },
+            { type: 'expense', name: '買智慧手錶',   amount: 890, icon: '⌚' },
+            { type: 'income',  name: '幫忙補習',     amount: 300, icon: '📖' },
+            { type: 'expense', name: '買球鞋',       amount: 395, icon: '👟' },
+            { type: 'income',  name: '獎學金',       amount: 200, icon: '🎓' },
+            { type: 'expense', name: '買文具組',     amount: 120, icon: '✏️' },
+        ]},  // 答案：595
+        { startAmount: 300, events: [
+            { type: 'income',  name: '爸爸月零用錢', amount: 600, icon: '💰' },
+            { type: 'expense', name: '買科學玩具',   amount: 450, icon: '🔬' },
+            { type: 'expense', name: '補習費',       amount: 200, icon: '📝' },
+            { type: 'income',  name: '鄰居除草費',   amount: 150, icon: '🌿' },
+            { type: 'expense', name: '買零食飲料',   amount: 85,  icon: '🍿' },
+            { type: 'income',  name: '回收獎勵',     amount: 40,  icon: '♻️' },
+        ]},  // 答案：355
+        { startAmount: 600, events: [
+            { type: 'expense', name: '買樂器',       amount: 380, icon: '🎸' },
+            { type: 'income',  name: '表演收入',     amount: 250, icon: '🎤' },
+            { type: 'expense', name: '買樂譜',       amount: 95,  icon: '🎵' },
+            { type: 'income',  name: '爸媽獎勵',     amount: 300, icon: '🌟' },
+            { type: 'expense', name: '買書',         amount: 180, icon: '📚' },
+            { type: 'expense', name: '吃冰淇淋',     amount: 60,  icon: '🍦' },
+        ]},  // 答案：435
+        { startAmount: 750, events: [
+            { type: 'income',  name: '春節紅包',     amount: 800, icon: '🧧' },
+            { type: 'expense', name: '買遊戲',       amount: 560, icon: '🎮' },
+            { type: 'income',  name: '幫忙照顧寵物', amount: 120, icon: '🐶' },
+            { type: 'expense', name: '買零食',       amount: 75,  icon: '🍬' },
+            { type: 'income',  name: '幫忙送貨',     amount: 200, icon: '📦' },
+            { type: 'expense', name: '看電影',       amount: 160, icon: '🎬' },
+        ]},  // 答案：1075
+        { startAmount: 400, events: [
+            { type: 'income',  name: '幫忙家教',     amount: 350, icon: '📚' },
+            { type: 'expense', name: '買腳踏車',     amount: 680, icon: '🚲' },
+            { type: 'income',  name: '媽媽補貼',     amount: 500, icon: '💝' },
+            { type: 'expense', name: '電影加餐廳',   amount: 220, icon: '🍕' },
+            { type: 'income',  name: '叔叔生日紅包', amount: 300, icon: '🎂' },
+            { type: 'expense', name: '買衣服',       amount: 180, icon: '👗' },
+        ]},  // 答案：470
+        { startAmount: 1200, events: [
+            { type: 'expense', name: '買平板電腦',   amount: 880, icon: '💻' },
+            { type: 'income',  name: '過年紅包',     amount: 600, icon: '🧧' },
+            { type: 'expense', name: '買書包',       amount: 350, icon: '🎒' },
+            { type: 'income',  name: '幫忙翻譯',     amount: 200, icon: '🌍' },
+            { type: 'expense', name: '買文具',       amount: 95,  icon: '✏️' },
+            { type: 'income',  name: '節省獎金',     amount: 100, icon: '🌟' },
+        ]},  // 答案：775
+        { startAmount: 250, events: [
+            { type: 'income',  name: '阿公零用錢',   amount: 400, icon: '👴' },
+            { type: 'expense', name: '買球鞋',       amount: 320, icon: '👟' },
+            { type: 'income',  name: '幫忙洗車',     amount: 80,  icon: '🚗' },
+            { type: 'expense', name: '買手機殼',     amount: 45,  icon: '📱' },
+            { type: 'income',  name: '賣舊玩具',     amount: 120, icon: '🧸' },
+            { type: 'expense', name: '買飲料',       amount: 35,  icon: '🧃' },
+        ]},  // 答案：450
+        { startAmount: 900, events: [
+            { type: 'expense', name: '暑期夏令營',   amount: 550, icon: '⛺' },
+            { type: 'income',  name: '比賽獎金',     amount: 300, icon: '🏅' },
+            { type: 'expense', name: '買新手機',     amount: 720, icon: '📱' },
+            { type: 'income',  name: '爸爸獎勵',     amount: 400, icon: '👨' },
+            { type: 'expense', name: '買衣服',       amount: 180, icon: '👗' },
+            { type: 'income',  name: '幫忙家務',     amount: 50,  icon: '🏠' },
+        ]},  // 答案：200
+        { startAmount: 650, events: [
+            { type: 'income',  name: '生日紅包',     amount: 500, icon: '🎂' },
+            { type: 'expense', name: '買電動遊戲機', amount: 980, icon: '🎮' },
+            { type: 'income',  name: '賣舊書',       amount: 120, icon: '📚' },
+            { type: 'expense', name: '買零食',       amount: 65,  icon: '🍿' },
+            { type: 'income',  name: '幫忙鄰居',     amount: 80,  icon: '🏡' },
+            { type: 'expense', name: '買手環',       amount: 95,  icon: '⌚' },
+        ]},  // 答案：210
+        { startAmount: 2000, events: [
+            { type: 'expense', name: '暑期旅遊費',   amount: 1200, icon: '✈️' },
+            { type: 'income',  name: '打工收入',     amount: 800,  icon: '💼' },
+            { type: 'expense', name: '買相機',       amount: 650,  icon: '📸' },
+            { type: 'income',  name: '叔叔紅包',     amount: 400,  icon: '🧧' },
+            { type: 'expense', name: '買衣服鞋子',   amount: 380,  icon: '👗' },
+            { type: 'income',  name: '退費',         amount: 120,  icon: '💵' },
+        ]},  // 答案：1090
+    ],
+};
+
+// ── 金額語音轉換（安全版）──────────────────────────────────────
+const toTWD = v => typeof convertToTraditionalCurrency === 'function'
+    ? convertToTraditionalCurrency(v) : `${v}元`;
+
+// ── Game 物件 ────────────────────────────────────────────────────
+let Game;
+
+document.addEventListener('DOMContentLoaded', () => {
+    Game = {
+
+        // ── 1. Debug ──────────────────────────────────────────
+        Debug: {
+            FLAGS: { all: false, init: false, speech: false, question: false, error: true },
+            log(cat, ...a)  { if (this.FLAGS.all || this.FLAGS[cat]) console.log(`[B2-${cat}]`, ...a); },
+            warn(cat, ...a) { if (this.FLAGS.all || this.FLAGS[cat]) console.warn(`[B2-${cat}]`, ...a); },
+            error(...a)     { console.error('[B2-ERROR]', ...a); },
+        },
+
+        // ── 2. TimerManager ───────────────────────────────────
+        TimerManager: {
+            timers: new Map(), timerIdCounter: 0,
+            setTimeout(callback, delay, category = 'default') {
+                const id = ++this.timerIdCounter;
+                const timerId = window.setTimeout(() => { this.timers.delete(id); callback(); }, delay);
+                this.timers.set(id, { timerId, category });
+                return id;
+            },
+            clearTimeout(id) {
+                const t = this.timers.get(id);
+                if (t) { window.clearTimeout(t.timerId); this.timers.delete(id); }
+            },
+            clearAll() { this.timers.forEach(t => window.clearTimeout(t.timerId)); this.timers.clear(); },
+            clearByCategory(cat) {
+                this.timers.forEach((t, id) => {
+                    if (t.category === cat) { window.clearTimeout(t.timerId); this.timers.delete(id); }
+                });
+            },
+        },
+
+        // ── 3. EventManager ───────────────────────────────────
+        EventManager: {
+            listeners: [],
+            on(el, type, fn, opts = {}, cat = 'default') {
+                if (!el) return -1;
+                el.addEventListener(type, fn, opts);
+                return this.listeners.push({ element: el, type, handler: fn, options: opts, category: cat }) - 1;
+            },
+            removeAll() {
+                this.listeners.forEach(l => {
+                    try { l?.element?.removeEventListener(l.type, l.handler, l.options); } catch(e) {}
+                });
+                this.listeners = [];
+            },
+            removeByCategory(cat) {
+                this.listeners.forEach((l, i) => {
+                    if (l?.category === cat) {
+                        try { l.element?.removeEventListener(l.type, l.handler, l.options); } catch(e) {}
+                        this.listeners[i] = null;
+                    }
+                });
+            },
+        },
+
+        // ── 4. Audio ──────────────────────────────────────────
+        audio: {
+            sounds: {},
+            init() {
+                ['correct', 'success', 'error', 'click'].forEach(name => {
+                    const el = document.getElementById(`${name}-sound`);
+                    if (el) this.sounds[name] = el;
+                });
+            },
+            play(name) {
+                const s = this.sounds[name];
+                if (!s) return;
+                try { s.currentTime = 0; s.play().catch(() => {}); } catch(e) {}
+            },
+        },
+
+        // ── 5. Speech ─────────────────────────────────────────
+        Speech: {
+            cachedVoice: null,
+            _loadVoice() {
+                if (!window.speechSynthesis) return;
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    Game.TimerManager.setTimeout(() => Game.Speech._loadVoice(), 500, 'speech');
+                    return;
+                }
+                this.cachedVoice =
+                    voices.find(v => v.name.startsWith('Microsoft Yating')) ||
+                    voices.find(v => v.name.startsWith('Microsoft Hanhan')) ||
+                    voices.find(v => v.name === 'Google 國語（臺灣）') ||
+                    voices.find(v => v.lang === 'zh-TW') ||
+                    voices.find(v => v.lang.startsWith('zh')) ||
+                    voices[0] ||
+                    null;
+            },
+            speak(text, callback) {
+                if (!window.speechSynthesis) { callback?.(); return; }
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = this.cachedVoice?.lang || 'zh-TW'; u.rate = 1.0;
+                if (this.cachedVoice) u.voice = this.cachedVoice;
+                let callbackExecuted = false;
+                const safeCallback = () => { if (callbackExecuted) return; callbackExecuted = true; callback?.(); };
+                u.onend = safeCallback;
+                u.onerror = (e) => { if (e.error !== 'interrupted') Game.Debug.warn('speech', '語音錯誤', e.error); safeCallback(); };
+                Game.TimerManager.setTimeout(safeCallback, 10000, 'speech');
+                try {
+                    window.speechSynthesis.speak(u);
+                } catch(e) {
+                    Game.Debug.warn('speech', '語音播放失敗', e);
+                    safeCallback();
+                }
+            },
+        },
+
+        // ── 6. State ──────────────────────────────────────────
+        state: {
+            settings: { difficulty: null, questionCount: null, retryMode: null },
+            quiz: {
+                currentQuestion: 0,
+                totalQuestions: 10,
+                correctCount: 0,
+                questions: [],
+                startTime: null,
+                currentInput: '',
+            },
+            isEndingGame: false,
+            isProcessing: false,
+        },
+
+        // ── 7. Init ───────────────────────────────────────────
+        init() {
+            Game.TimerManager.clearAll();
+            Game.EventManager.removeAll();
+            this.injectGlobalAnimationStyles();
+            this.audio.init();
+            Game.Speech._loadVoice();
+            if (window.speechSynthesis?.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => Game.Speech._loadVoice();
+            }
+            this.showSettings();
+        },
+
+        injectGlobalAnimationStyles() {
+            if (document.getElementById('b2-global-animations')) return;
+            const style = document.createElement('style');
+            style.id = 'b2-global-animations';
+            style.textContent = `
+                @keyframes b2RowIn {
+                    from { opacity: 0; transform: translateX(-12px); }
+                    to   { opacity: 1; transform: translateX(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        },
+
+        resetGameState() {
+            const q = this.state.quiz;
+            q.currentQuestion = 0;
+            q.totalQuestions  = this.state.settings.questionCount;
+            q.correctCount    = 0;
+            q.questions       = [];
+            q.startTime       = null;
+            q.currentInput    = '';
+            this.state.isEndingGame = false;
+            this.state.isProcessing  = false;
+            Game.Debug.log('init', '🔄 [B2] 遊戲狀態已重置');
+        },
+
+        // ── 8. 設定頁 ─────────────────────────────────────────
+        showSettings() {
+            Game.TimerManager.clearAll();
+            Game.EventManager.removeByCategory('gameUI');
+            this.resetGameState();
+            document.getElementById('app').innerHTML = this._renderSettingsHTML();
+            this._bindSettingsEvents();
+        },
+
+        _renderSettingsHTML() {
+            return `
+            <div class="unit-welcome">
+                <div class="welcome-content">
+                    <div class="settings-title-row">
+                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                             class="settings-mascot-img" onerror="this.style.display='none'">
+                        <h1>單元B2：零用錢日記</h1>
+                    </div>
+                    <div class="game-settings">
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">難度：</label>
+                            <div class="b-btn-group" id="diff-group">
+                                <button class="b-sel-btn b-diff-easy"   data-val="easy">簡單</button>
+                                <button class="b-sel-btn b-diff-normal" data-val="normal">普通</button>
+                                <button class="b-sel-btn b-diff-hard"   data-val="hard">困難</button>
+                            </div>
+                            <div class="b-diff-desc" id="diff-desc"></div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">題數：</label>
+                            <div class="b-btn-group" id="count-group">
+                                <button class="b-sel-btn" data-val="1">1題</button>
+                                <button class="b-sel-btn" data-val="5">5題</button>
+                                <button class="b-sel-btn" data-val="10">10題</button>
+                                <button class="b-sel-btn" data-val="15">15題</button>
+                                <button class="b-sel-btn" data-val="20">20題</button>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">🔄 作答模式：</label>
+                            <div class="b-btn-group" id="mode-group">
+                                <button class="b-sel-btn" data-val="retry">重試模式</button>
+                                <button class="b-sel-btn" data-val="proceed">繼續模式</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                重試：答錯可以再試 ｜ 繼續：顯示答案後繼續
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">📝 作業單：</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-worksheet-link" class="b-sel-btn"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    產生作業單
+                                </a>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">🎁 獎勵系統：</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-reward-link" class="b-sel-btn"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    開啟獎勵系統
+                                </a>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
+                                ✨ 看每週的收入和支出，計算最後剩下多少錢<br>
+                                簡單：選擇答案；普通/困難：數字輸入
+                            </label>
+                        </div>
+                    </div>
+                    <div class="game-buttons">
+                        <button class="back-btn" onclick="Game.backToMenu()">← 返回主選單</button>
+                        <button class="start-btn" id="start-btn" disabled>開始練習</button>
+                    </div>
+                </div>
+            </div>`;
+        },
+
+        _diffDescriptions: {
+            easy:   '簡單：從選項中選出正確的餘額，每題只有一項收入或支出',
+            normal: '普通：用數字鍵盤輸入餘額，題目包含收入和支出',
+            hard:   '困難：複雜的多項收支計算，需正確加減所有項目',
+        },
+
+        _bindSettingsEvents() {
+            Game.EventManager.removeByCategory('settings');
+            document.querySelectorAll('#diff-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#diff-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.difficulty = btn.dataset.val;
+                    const desc = document.getElementById('diff-desc');
+                    if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#count-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#count-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.questionCount = parseInt(btn.dataset.val);
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#mode-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#mode-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.retryMode = btn.dataset.val;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            const rewardLink = document.getElementById('settings-reward-link');
+            Game.EventManager.on(rewardLink, 'click', (e) => {
+                e.preventDefault();
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'settings');
+
+            // 作業單
+            Game.EventManager.on(document.getElementById('settings-worksheet-link'), 'click', (e) => {
+                e.preventDefault();
+                const params = new URLSearchParams({ unit: 'b2' });
+                window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
+            }, {}, 'settings');
+
+            Game.EventManager.on(document.getElementById('start-btn'), 'click', () => this.startGame(), {}, 'settings');
+        },
+
+        _checkCanStart() {
+            const btn = document.getElementById('start-btn');
+            if (btn) btn.disabled = !this.state.settings.difficulty || !this.state.settings.questionCount || !this.state.settings.retryMode;
+        },
+
+        // ── 9. 遊戲開始 ───────────────────────────────────────
+        startGame() {
+            Game.EventManager.removeByCategory('settings');
+            Game.TimerManager.clearAll();
+
+            const s = this.state.settings;
+            const q = this.state.quiz;
+            q.currentQuestion = 0;
+            q.totalQuestions  = s.questionCount;
+            q.correctCount    = 0;
+            q.startTime       = Date.now();
+            q.questions       = this._generateQuestions(s.questionCount);
+            q.currentInput    = '';
+
+            this.state.isEndingGame = false;
+            this.state.isProcessing  = false;
+
+            this.renderQuestion();
+        },
+
+        // ── 10. 題目產生 ──────────────────────────────────────
+        _generateQuestions(count) {
+            const diff      = this.state.settings.difficulty;
+            const templates = B2_TEMPLATES[diff].slice().sort(() => Math.random() - 0.5);
+            const result    = [];
+
+            for (let i = 0; i < count; i++) {
+                const tmpl   = templates[i % templates.length];
+                const answer = this._calcAnswer(tmpl);
+                const choices = diff === 'easy' ? this._generateChoices(answer) : null;
+                result.push({ ...tmpl, answer, choices });
+            }
+            return result;
+        },
+
+        _calcAnswer(tmpl) {
+            let balance = tmpl.startAmount;
+            tmpl.events.forEach(e => {
+                balance += e.type === 'income' ? e.amount : -e.amount;
+            });
+            return balance;
+        },
+
+        _generateChoices(correct) {
+            // Generate distractors far enough apart to be meaningfully different
+            const opts = new Set([correct]);
+            const deltas = [20, 30, 50, 40, 60, 25, 35, 45];
+            let di = 0;
+            while (opts.size < 3 && di < deltas.length * 2) {
+                const delta = deltas[di % deltas.length];
+                const candidate = di % 2 === 0 ? correct + delta : Math.max(0, correct - delta);
+                if (candidate !== correct) opts.add(candidate);
+                di++;
+            }
+            return Array.from(opts).sort(() => Math.random() - 0.5);
+        },
+
+        // ── 11. 題目渲染 ──────────────────────────────────────
+        renderQuestion() {
+            Game.TimerManager.clearAll();
+            Game.EventManager.removeByCategory('gameUI');
+            this.state.isProcessing  = false;
+            this.state.quiz.currentInput = '';
+
+            const q   = this.state.quiz;
+            const app = document.getElementById('app');
+            app.innerHTML = this._renderQuestionHTML(q.questions[q.currentQuestion]);
+            this._bindQuestionEvents(q.questions[q.currentQuestion]);
+
+            // 語音引導
+            const currentQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
+            const diff = this.state.settings.difficulty;
+            Game.TimerManager.setTimeout(() => {
+                const speechMap = {
+                    easy:   `看看日記，計算最後剩下多少錢？`,
+                    normal: `看看每筆收入和支出，算出最後的金額。`,
+                    hard:   `仔細看每筆記錄，輸入最後剩下多少元。`,
+                };
+                this.state.quiz.lastSpeechText = speechMap[diff];
+                Game.Speech.speak(speechMap[diff]);
+            }, 500, 'speech');
+        },
+
+        _renderQuestionHTML(question) {
+            const diff = this.state.settings.difficulty;
+            const q    = this.state.quiz;
+            const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
+
+            const eventsHTML = question.events.map((e, idx) => `
+                <div class="b2-event-row" style="animation-delay:${0.05 * (idx + 1)}s">
+                    <span class="b2-event-icon">${e.icon}</span>
+                    <span class="b2-event-name">${e.name}</span>
+                    <span class="b2-event-amount ${e.type}">${e.amount} 元</span>
+                </div>`).join('');
+
+            return `
+            <div class="b-header">
+                <div class="b-header-left">
+                    <span class="b-header-unit">📒 零用錢日記</span>
+                </div>
+                <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
+                </div>
+            </div>
+            <div class="game-container">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width:${pct}%"></div>
+                </div>
+                <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
+
+                <div class="b2-diary">
+                    <div class="b2-diary-header">
+                        <span class="b2-diary-icon">📒</span>
+                        <span class="b2-diary-title">本週零用錢記錄</span>
+                        <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
+                    </div>
+                    <div class="b2-start-row">
+                        <span class="b2-start-label">💼 開始有</span>
+                        <span class="b2-start-amount">${question.startAmount} 元</span>
+                    </div>
+                    ${eventsHTML}
+                    <div class="b2-question-row">
+                        <span class="b2-question-label">💰 現在剩下</span>
+                        <span class="b2-question-blank">___ 元</span>
+                    </div>
+                </div>
+
+                <div class="b2-answer-card" id="b2-answer-area">
+                    <div class="b2-answer-prompt">請選擇或輸入最後剩下的金額：</div>
+                    ${diff === 'easy'
+                        ? this._renderChoicesHTML(question)
+                        : this._renderNumpadHTML()}
+                </div>
+            </div>`;
+        },
+
+        _renderChoicesHTML(question) {
+            const btns = question.choices.map(c => `
+                <button class="b2-choice-btn" data-val="${c}">
+                    ${c}
+                    <span class="b2-choice-suffix">元</span>
+                </button>`).join('');
+            return `<div class="b2-choices">${btns}</div>`;
+        },
+
+        _renderNumpadHTML() {
+            const digits = [7, 8, 9, 4, 5, 6, 1, 2, 3];
+            return `
+            <div class="b2-numpad-section">
+                <div class="b2-input-display" id="b2-input-display">
+                    <span id="b2-input-value">＿</span><span class="b2-unit-hint">元</span>
+                </div>
+                <div class="b2-numpad">
+                    ${digits.map(n => `<button class="b2-numpad-btn" data-digit="${n}">${n}</button>`).join('')}
+                    <button class="b2-numpad-btn btn-del" data-action="del">⌫</button>
+                    <button class="b2-numpad-btn" data-digit="0">0</button>
+                    <button class="b2-numpad-btn btn-ok" data-action="ok">確認</button>
+                </div>
+            </div>`;
+        },
+
+        // ── 12. 事件綁定 ──────────────────────────────────────
+        _bindQuestionEvents(question) {
+            const diff = this.state.settings.difficulty;
+            if (diff === 'easy') {
+                document.querySelectorAll('.b2-choice-btn').forEach(btn => {
+                    Game.EventManager.on(btn, 'click', () => {
+                        this._handleChoiceAnswer(parseInt(btn.dataset.val), question);
+                    }, {}, 'gameUI');
+                });
+            } else {
+                document.querySelectorAll('.b2-numpad-btn').forEach(btn => {
+                    Game.EventManager.on(btn, 'click', () => {
+                        if (this.state.isProcessing) return;
+                        this.audio.play('click');
+                        const action = btn.dataset.action;
+                        const digit  = btn.dataset.digit;
+                        if (digit !== undefined) {
+                            if (this.state.quiz.currentInput.length < 5) {
+                                this.state.quiz.currentInput += digit;
+                            }
+                        } else if (action === 'del') {
+                            this.state.quiz.currentInput = this.state.quiz.currentInput.slice(0, -1);
+                        } else if (action === 'ok') {
+                            this._handleNumpadAnswer(question);
+                            return;
+                        }
+                        this._updateInputDisplay();
+                    }, {}, 'gameUI');
+                });
+            }
+            // 語音重播
+            const replayBtn = document.getElementById('replay-speech-btn');
+            if (replayBtn) {
+                Game.EventManager.on(replayBtn, 'click', () => {
+                    const text = this.state.quiz.lastSpeechText;
+                    if (text) Game.Speech.speak(text);
+                }, {}, 'gameUI');
+            }
+        },
+
+        _updateInputDisplay() {
+            const el = document.getElementById('b2-input-value');
+            if (el) el.textContent = this.state.quiz.currentInput || '＿';
+        },
+
+        _showCenterFeedback(icon, text = '') {
+            document.querySelector('.b-center-feedback')?.remove();
+            const overlay = document.createElement('div');
+            overlay.className = 'b-center-feedback';
+            overlay.innerHTML = `<span class="b-cf-icon">${icon}</span>${text ? `<span class="b-cf-text">${text}</span>` : ''}`;
+            document.body.appendChild(overlay);
+            Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
+        },
+
+        // ── 13. 答題處理 ──────────────────────────────────────
+        _handleChoiceAnswer(chosen, question) {
+            if (this.state.isProcessing) return;
+            this.state.isProcessing = true;
+
+            const isCorrect = chosen === question.answer;
+
+            document.querySelectorAll('.b2-choice-btn').forEach(btn => {
+                btn.disabled = true;
+                const v = parseInt(btn.dataset.val);
+                if (v === question.answer) btn.classList.add('correct');
+                else if (v === chosen && !isCorrect) btn.classList.add('wrong');
+            });
+
+            if (isCorrect) {
+                this.state.quiz.correctCount++;
+                this.audio.play('correct');
+                this._showCenterFeedback('✅', '答對了！');
+                Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+            } else {
+                this.audio.play('error');
+                if (this.state.settings.retryMode === 'retry') {
+                    this._showCenterFeedback('❌', '再試一次！');
+                    Game.Speech.speak(`不對喔，再想想看`);
+                    Game.TimerManager.setTimeout(() => {
+                        this.state.isProcessing = false;
+                        document.querySelectorAll('.b2-choice-btn').forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('wrong');
+                        });
+                    }, 1600, 'turnTransition');
+                } else {
+                    this._showCenterFeedback('❌', '答錯了！');
+                    Game.Speech.speak(`正確答案是${toTWD(question.answer)}`);
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
+                }
+            }
+        },
+
+        _handleNumpadAnswer(question) {
+            if (this.state.isProcessing) return;
+            const input = parseInt(this.state.quiz.currentInput);
+            if (isNaN(input) || input < 0) return;
+            this.state.isProcessing = true;
+
+            const isCorrect = input === question.answer;
+
+            const displayEl = document.getElementById('b2-input-display');
+            if (displayEl) displayEl.style.background = isCorrect ? '#064e3b' : '#7f1d1d';
+
+            document.querySelectorAll('.b2-numpad-btn').forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                this.state.quiz.correctCount++;
+                this.audio.play('correct');
+                this._showCenterFeedback('✅', '答對了！');
+                Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+            } else {
+                this.audio.play('error');
+                if (this.state.settings.retryMode === 'retry') {
+                    this._showCenterFeedback('❌', '再試一次！');
+                    Game.Speech.speak(`不對喔，再試一次`);
+                    Game.TimerManager.setTimeout(() => {
+                        this.state.isProcessing = false;
+                        this.state.quiz.currentInput = '';
+                        this._updateInputDisplay();
+                        const displayEl = document.getElementById('b2-input-display');
+                        if (displayEl) displayEl.style.background = '';
+                        document.querySelectorAll('.b2-numpad-btn').forEach(btn => btn.disabled = false);
+                    }, 1800, 'turnTransition');
+                } else {
+                    this._showCenterFeedback('❌', '答錯了！');
+                    Game.Speech.speak(`正確答案是${toTWD(question.answer)}`);
+                    const section = document.querySelector('.b2-numpad-section');
+                    if (section) {
+                        const hint = document.createElement('div');
+                        hint.className = 'b2-correct-hint';
+                        hint.textContent = `正確答案是 ${question.answer} 元`;
+                        section.appendChild(hint);
+                    }
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2200, 'turnTransition');
+                }
+            }
+        },
+
+        // ── 14. 下一題 ────────────────────────────────────────
+        nextQuestion() {
+            this.state.quiz.currentQuestion++;
+            if (this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions) {
+                this.showResults();
+            } else {
+                this.renderQuestion();
+            }
+        },
+
+        // ── 15. 完成畫面 ──────────────────────────────────────
+        showResults() {
+            if (this.state.isEndingGame) return;
+            this.state.isEndingGame = true;
+
+            Game.TimerManager.clearByCategory('turnTransition');
+            Game.EventManager.removeByCategory('gameUI');
+
+            const q        = this.state.quiz;
+            const elapsed  = q.startTime ? (Date.now() - q.startTime) : 0;
+            const mins     = Math.floor(elapsed / 60000);
+            const secs     = Math.floor((elapsed % 60000) / 1000);
+            const accuracy = q.totalQuestions > 0
+                ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
+
+            let badge, badgeColor;
+            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+
+            const app = document.getElementById('app');
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+            app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
+
+            app.innerHTML = `
+<div class="b-res-wrapper">
+    <div class="b-res-screen">
+        <div class="b-res-header">
+            <div class="b-res-trophy">🏆</div>
+            <div class="b-res-title-row">
+                <img src="../images/index/educated_money_bag_character.png"
+                     class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
+                <h1 class="b-res-title">🎉 記帳達人 🎉</h1>
+                <span class="b-res-mascot-spacer"></span>
+            </div>
+        </div>
+
+        <div class="b-res-reward-wrap">
+            <a href="#" id="endgame-reward-link" class="b-res-reward-link">
+                🎁 開啟獎勵系統（可加 ${q.correctCount} 分）
+            </a>
+        </div>
+
+        <div class="b-res-container">
+            <div class="b-res-grid">
+                <div class="b-res-card b-res-card-1">
+                    <div class="b-res-icon">✅</div>
+                    <div class="b-res-label">答對題數</div>
+                    <div class="b-res-value">${q.correctCount}/${q.totalQuestions}</div>
+                </div>
+                <div class="b-res-card b-res-card-2">
+                    <div class="b-res-icon">📊</div>
+                    <div class="b-res-label">正確率</div>
+                    <div class="b-res-value">${accuracy}%</div>
+                </div>
+                <div class="b-res-card b-res-card-3">
+                    <div class="b-res-icon">⏱️</div>
+                    <div class="b-res-label">完成時間</div>
+                    <div class="b-res-value">${mins > 0 ? mins + '分' : ''}${secs}秒</div>
+                </div>
+            </div>
+
+            <div class="b-res-perf-section">
+                <h3>📊 表現評價</h3>
+                <div class="b-res-perf-badge">${badge}</div>
+            </div>
+
+            <div class="b-res-achievements">
+                <h3>🏆 學習成果</h3>
+                <div class="b-res-ach-list">
+                    <div class="b-res-ach-item">✅ 分辨收入與支出</div>
+                    <div class="b-res-ach-item">✅ 計算收支後的餘額</div>
+                    <div class="b-res-ach-item">✅ 閱讀記帳日記格式</div>
+                </div>
+            </div>
+
+            <div class="b-res-btns">
+                <button id="play-again-btn" class="b-res-play-btn">
+                    <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
+                </button>
+                <button id="back-settings-btn" class="b-res-back-btn">
+                    <span class="btn-icon">⚙️</span><span class="btn-text">返回設定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+            Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
+                () => this.startGame(), {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
+                () => this.showSettings(), {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
+                e.preventDefault();
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+
+            Game.TimerManager.setTimeout(() => {
+                document.getElementById('success-sound')?.play();
+                this._fireConfetti();
+            }, 100, 'confetti');
+
+            // 完成語音
+            Game.TimerManager.setTimeout(() => {
+                const accuracy = q.totalQuestions > 0
+                    ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
+                let msg;
+                if (accuracy === 100)    msg = '太厲害了，全部答對了！';
+                else if (accuracy >= 80) msg = `很棒喔，答對了${q.correctCount}題！`;
+                else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
+                else                     msg = '要再加油喔，多練習幾次！';
+                Game.Speech.speak(msg);
+            }, 800, 'speech');
+        },
+
+        _fireConfetti() {
+            if (typeof confetti !== 'function') return;
+            const duration = 3000, end = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1001 };
+            const rand = (a, b) => Math.random() * (b - a) + a;
+            const fire = () => {
+                const t = end - Date.now();
+                if (t <= 0) return;
+                const n = 50 * (t / duration);
+                confetti({ ...defaults, particleCount: n, origin: { x: rand(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount: n, origin: { x: rand(0.7, 0.9), y: Math.random() - 0.2 } });
+                Game.TimerManager.setTimeout(fire, 250, 'confetti');
+            };
+            fire();
+        },
+
+        backToMenu() {
+            Game.TimerManager.clearAll();
+            Game.EventManager.removeAll();
+            window.location.href = '../index.html#part4';
+        },
+    };
+
+    Game.init();
+});
