@@ -457,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindQuestionEvents(curr);
+            this._showTaskModal(curr, diff);
 
             // 語音播報
             Game.TimerManager.setTimeout(() => {
@@ -837,6 +838,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     ghost.remove(); ghost = null; touchDenom = null;
                 }, { passive: true }, 'gameUI');
             });
+        },
+
+        // ── 開題任務說明彈窗（C4 instruction modal 模式）──────────
+        _showTaskModal(curr, diff) {
+            const existing = document.getElementById('b1-task-modal');
+            if (existing) existing.remove();
+            const totalText = (diff !== 'hard')
+                ? `<div class="b1-task-amount">${toTWD(curr.total)}</div>`
+                : `<div class="b1-task-amount-q">？ 元</div>`;
+            const modal = document.createElement('div');
+            modal.id = 'b1-task-modal';
+            modal.className = 'b1-task-modal';
+            modal.innerHTML = `
+                <div class="b1-task-modal-inner">
+                    <div class="b1-task-modal-icon">${curr.icon}</div>
+                    <div class="b1-task-modal-dest">今天要去 ${curr.label}</div>
+                    ${totalText}
+                    <div class="b1-task-modal-tap">點任意處繼續</div>
+                </div>`;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', () => modal.remove());
+            Game.TimerManager.setTimeout(() => {
+                if (document.body.contains(modal)) modal.remove();
+            }, 2000, 'ui');
         },
 
         // ── Hint ───────────────────────────────────────────────

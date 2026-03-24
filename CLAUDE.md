@@ -448,6 +448,9 @@ toolbarConfig: {
 | B6 困難模式找零三選一（2026-03-24）| B6 | `_showChange` 路由困難模式至 `_showChangeQuiz(paid,total,change)`；生成 ±偏移干擾項；答對→`.b6-change-opt-correct`+語音+800ms→`_showChangeResult`；答錯 retry→disable 該選項；答錯 proceed→顯示正確答案+1400ms→`_showChangeResult`；`g.correctCount++` 移至 `_showChangeResult`；CSS 新增 `.b6-change-question/.b6-change-opts/.b6-change-opt/-correct/-wrong` |
 | B3 週數計算除法提示（2026-03-25）| B3 | `_showDivisionHint(question)`：答錯時在 `.b3-numpad-section` 末尾顯示「X元 ÷ Y元/週 ≈ Z週（無條件進位）」；`.b3-div-hint` 黃底琥珀框 `b3FadeIn`；proceed timeout 2200→2500ms |
 | B5 超支智慧移除建議（2026-03-25）| B5 | `_handleConfirm` 超支分支：`selectedOptionals.sort(desc).find(i => total-i.price<=budget)` 貪婪單步建議；`suggestionHTML` 插入 `.b5-result-banner.fail`；`.b5-removal-hint` 黃底琥珀框 |
+| B1 開題任務說明彈窗（2026-03-25）| B1 | `_showTaskModal(curr, diff)`：每題渲染後顯示全屏半透明彈窗；easy/normal 顯示目標金額（黃色大字）；hard 顯示「？元」；2000ms 自動關閉或點任意處關閉；C4 `_showInstructionModal` pattern |
+| B4 視覺價差比例條（2026-03-25）| B4 | `_renderPriceBars(curr)`：在 `_renderDiffSection` 頂部顯示雙欄比例橫條；optA 紅漸層（貴）/ optB 綠漸層（便宜）；寬度依實際比例；`.b4-pbar-*` CSS；F5 量比較 pattern |
+| B5 預算提示鈕（2026-03-25）| B5 | `_showBudgetHint()`：高亮可負擔未選商品（`.b5-hint-glow` 脈動 2 次）+ 語音「還剩X元可加選Y」；`.b5-hint-btn` 黃框按鈕；B1 `_showCoinHint` pattern |
 | B2 計算過程提示（2026-03-25）| B2 | `_showCalcBreakdown(question)`：普通/困難鍵盤模式答錯即顯示逐步算式（起/±事件/＝結果）；防重複守衛；retry 模式算式保留可參考重試；CSS：`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income`（綠）/`.b2-bd-op.expense`（紅）/`.b2-bd-result` |
 | B4 差額算式提示（2026-03-25）| B4 | `_showDiffFormulaHint()`：Diff 階段答錯即在選項上方顯示「XXX − YYY = ？ 元」；`state.currentDiffItem` 進入 diff 前保存（`handleSelectClick`）；防重複守衛；CSS：`.b4-diff-hint-formula`/`.b4-hint-label`/`.b4-hint-op`/`.b4-hint-blank` |
 | B6 付款最佳面額提示（2026-03-25）| B6 | `_showPaymentHint(total)`：簡單/普通模式付款畫面新增「💡 提示」按鈕；貪婪演算法算出最少面額；`.b6-bill-hint` 高亮+脈動；`.b6-hint-toast` 文字提示+語音；6秒後自動清除；困難模式隱藏按鈕 |

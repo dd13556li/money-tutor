@@ -308,6 +308,37 @@
 .b4-hint-op { color: #b45309; margin: 0 4px; }
 .b4-hint-blank { color: #dc2626; font-size: 22px; }
 
+/* ── 視覺價差比例條（F5 量比較 pattern）─────────────────────────── */
+.b4-price-bars {
+    margin-bottom: 14px;
+    animation: b4FadeIn 0.4s ease;
+}
+@keyframes b4FadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.b4-pbar-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.b4-pbar-label {
+    font-size: 12px; width: 72px;
+    text-align: right; flex-shrink: 0; color: #374151;
+}
+.b4-pbar-track {
+    flex: 1; height: 16px;
+    background: #f1f5f9; border-radius: 8px; overflow: hidden;
+}
+.b4-pbar-fill {
+    height: 100%; border-radius: 8px;
+    transition: width 0.7s cubic-bezier(.4,0,.2,1);
+}
+.b4-pbar-high { background: linear-gradient(90deg, #ef4444, #fca5a5); }
+.b4-pbar-low  { background: linear-gradient(90deg, #10b981, #6ee7b7); }
+.b4-pbar-price {
+    font-size: 13px; font-weight: bold;
+    width: 52px; flex-shrink: 0; color: #374151;
+}
+
 /* ── RWD ───────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .b4-compare-grid { gap: 4px; }

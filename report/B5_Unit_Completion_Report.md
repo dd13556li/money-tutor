@@ -104,6 +104,24 @@ const suggestion = selectedOptionals
 
 **教學設計對齊**：源自 B5 超支 → A1/A4 找零步驟提示的「回饋引導」模式，提供具體行動建議而非單純否定。
 
+### 2.7 預算提示鈕（`_showBudgetHint`）—— 2026-03-25 新增
+
+選購畫面加入「💡 還能選什麼？」按鈕（黃框，always visible）：
+
+| 行為 | 說明 |
+|------|------|
+| 計算剩餘預算 | `budget - getTotal()` |
+| 高亮可選商品 | 篩選 `!must && !selected && price ≤ remaining` → `.b5-hint-glow`（金色脈動光暈 × 2 次）|
+| 語音提示 | 「還剩 X 元，可以加選 Y 或 Z」|
+| 無可選時 | 「還剩 X 元，沒有可以加選的商品了」|
+
+**靈感來源**：B1 `_showCoinHint`（高亮可用錢幣）模式，從「提示付款組合」延伸為「提示可選商品」。
+
+**技術細節**：
+- 提示按鈕插入 `b5-result-area` 前、確認按鈕上方
+- `g.submitted` 守衛（結果已送出後不觸發）
+- `TimerManager.setTimeout` 2500ms 自動移除 `.b5-hint-glow`
+
 ---
 
 ## 三、題庫內容詳解（`B5_SCENARIOS`）

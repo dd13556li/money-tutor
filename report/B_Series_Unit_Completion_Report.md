@@ -41,6 +41,7 @@
 > **更新日期**：2026-03-24（第七輪豐富化：B3_ALL_ITEMS 14→20 件（easy 3→6/normal 11→15/hard 14→20）、B5_SCENARIOS easy/normal 8→12 組；新增六十三～六十五節：A6 找零面額分解→B6 視覺化找零展示、C3 換錢多輪→B3 月曆里程碑系統、A1 coinFirst 解鎖→B5 必買解鎖/B6 攤位漸進解鎖設計規格）
 > **更新日期**：2026-03-25（第八輪豐富化：B2 計算過程提示（`_showCalcBreakdown`）、B4 差額算式提示（`_showDiffFormulaHint`）、B6 付款最佳面額提示（`_showPaymentHint`）三項功能實作；B6 困難模式找零三選一 CSS 補全；對應 B2/B4/B6 個別報告更新）
 > **更新日期**：2026-03-25（第九輪豐富化：B3 週數計算模式除法公式提示（`_showDivisionHint`）、B5 超支智慧移除建議（`_handleConfirm` 超支分支改版）；對應 B3/B5 個別報告更新）
+> **更新日期**：2026-03-25（第十輪豐富化：B1 開題任務說明彈窗（`_showTaskModal`，C4 pattern）、B4 視覺價差比例條（`_renderPriceBars`，F5 pattern）、B5 預算提示鈕（`_showBudgetHint`，B1 hint pattern））
 > **系列**：B 預算規劃（B1～B6）
 > **開發原則**：從 C 系列移植最佳實踐，對齊 A 系列完成度標準
 >

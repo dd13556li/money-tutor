@@ -473,6 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div id="b5-result-area"></div>
 
+                <button class="b5-hint-btn" id="b5-hint-btn">💡 還能選什麼？</button>
                 <button class="b5-confirm-btn" id="b5-confirm-btn">✅ 確認購買！</button>
             </div>`;
         },
@@ -502,6 +503,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (g.submitted) return;
                 this._handleConfirm();
             }, {}, 'gameUI');
+            // 預算提示按鈕
+            const hintBtn = document.getElementById('b5-hint-btn');
+            if (hintBtn) {
+                Game.EventManager.on(hintBtn, 'click', () => this._showBudgetHint(), {}, 'gameUI');
+            }
             // 語音重播
             const replayBtn = document.getElementById('replay-speech-btn');
             if (replayBtn) {
@@ -509,6 +515,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     const text = this.state.game.lastSpeechText;
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
+            }
+        },
+
+        // ── 預算提示鈕（B1 _showCoinHint pattern）────────────────
+        _showBudgetHint() {
+            const g = this.state.game;
+            if (g.submitted) return;
+            const remaining = g.budget - this._getTotal();
+            const affordable = g.items.filter(i =>
+                !i.must && !g.selectedIds.has(i.id) && i.price <= remaining
+            );
+            // 高亮可選商品
+            document.querySelectorAll('.b5-item-card:not(.locked):not(.selected)').forEach(card => {
+                const id = card.dataset.id;
+                if (affordable.some(a => a.id === id)) {
+                    card.classList.add('b5-hint-glow');
+                    Game.TimerManager.setTimeout(
+                        () => card.classList.remove('b5-hint-glow'), 2500, 'ui'
+                    );
+                }
+            });
+            if (affordable.length === 0) {
+                Game.Speech.speak(`還剩${toTWD(remaining)}，沒有可以加選的商品了`);
+            } else {
+                const names = affordable.map(i => i.name).join('或');
+                Game.Speech.speak(`還剩${toTWD(remaining)}，可以加選${names}`);
             }
         },
 

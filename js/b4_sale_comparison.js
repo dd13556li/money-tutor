@@ -568,17 +568,43 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── Diff Phase ─────────────────────────────────────────
+        // ── 視覺價差比例條（F5 量比較 pattern）─────────────────────
+        _renderPriceBars(curr) {
+            const maxP = Math.max(curr.optA.price, curr.optB.price);
+            const pctA = Math.round(curr.optA.price / maxP * 100);
+            const pctB = Math.round(curr.optB.price / maxP * 100);
+            return `
+            <div class="b4-price-bars">
+                <div class="b4-pbar-row">
+                    <span class="b4-pbar-label">${curr.optA.storeIcon} ${curr.optA.store}</span>
+                    <div class="b4-pbar-track">
+                        <div class="b4-pbar-fill b4-pbar-high" style="width:${pctA}%"></div>
+                    </div>
+                    <span class="b4-pbar-price">${curr.optA.price} 元</span>
+                </div>
+                <div class="b4-pbar-row">
+                    <span class="b4-pbar-label">${curr.optB.storeIcon} ${curr.optB.store}</span>
+                    <div class="b4-pbar-track">
+                        <div class="b4-pbar-fill b4-pbar-low" style="width:${pctB}%"></div>
+                    </div>
+                    <span class="b4-pbar-price">${curr.optB.price} 元</span>
+                </div>
+            </div>`;
+        },
+
         _renderDiffSection(curr, diff) {
             Game.EventManager.removeByCategory('diffUI');
             const section = document.getElementById('diff-section');
             if (!section) return;
 
             const correctDiff = curr.diff; // optA.price - optB.price
+            const barsHTML = this._renderPriceBars(curr);
 
             if (diff === 'normal') {
                 const options = this._getDiffOptions(correctDiff);
                 section.innerHTML = `
                 <div class="b4-diff-section" style="animation:b4SlideUp 0.3s ease">
+                    ${barsHTML}
                     <div class="b4-diff-question">
                         便宜了多少元？
                         <div class="b4-diff-sub">點選正確的差額</div>
@@ -607,6 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 困難：數字鍵盤
                 section.innerHTML = `
                 <div class="b4-diff-section" style="animation:b4SlideUp 0.3s ease">
+                    ${barsHTML}
                     <div class="b4-diff-question">
                         便宜了多少元？
                         <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
