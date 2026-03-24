@@ -59,8 +59,8 @@ class ThemeSystem {
             // 載入儲存的主題設定
             this.loadThemeFromStorage();
             
-            // 檢測系統偏好設定
-            this.detectSystemPreference();
+            // 檢測系統偏好設定（暫停：預設固定為正常模式）
+            // this.detectSystemPreference();
             
             // 應用主題
             this.applyTheme(this.currentTheme);
@@ -71,23 +71,19 @@ class ThemeSystem {
             // 監聽存儲變化（跨頁面同步）
             this.watchStorageChange();
             
-            // 延遲建立主題切換器，確保 DOM 完全載入
-            if (document.readyState === 'complete') {
-                // DOM 已完全載入
-                this.createThemeSwitcher();
-            } else {
-                // 等待 DOM 完全載入
-                window.addEventListener('load', () => {
-                    this.createThemeSwitcher();
-                });
-                
-                // 備用方案：延時建立
-                setTimeout(() => {
-                    if (!document.querySelector('.theme-switcher') && !document.getElementById('theme-fallback-btn')) {
-                        this.createThemeSwitcher();
-                    }
-                }, 500);
-            }
+            // 主題切換器面板暫停顯示
+            // if (document.readyState === 'complete') {
+            //     this.createThemeSwitcher();
+            // } else {
+            //     window.addEventListener('load', () => {
+            //         this.createThemeSwitcher();
+            //     });
+            //     setTimeout(() => {
+            //         if (!document.querySelector('.theme-switcher') && !document.getElementById('theme-fallback-btn')) {
+            //             this.createThemeSwitcher();
+            //         }
+            //     }, 500);
+            // }
             
             // console.log('主題系統初始化完成，當前主題:', this.currentTheme);
             
@@ -516,8 +512,8 @@ class ThemeSystem {
             // 綁定最小化按鈕事件
             this.bindMinimizeEvents();
             
-            // 初始化拖拽功能
-            this.initializeDragFunctionality();
+            // 初始化拖拽功能（暫停）
+            // this.initializeDragFunctionality();
             
             // 初始化吸管工具
             this.initializeColorPicker();
