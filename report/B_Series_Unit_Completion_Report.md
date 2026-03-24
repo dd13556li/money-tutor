@@ -43,6 +43,7 @@
 > **更新日期**：2026-03-25（第九輪豐富化：B3 週數計算模式除法公式提示（`_showDivisionHint`）、B5 超支智慧移除建議（`_handleConfirm` 超支分支改版）；對應 B3/B5 個別報告更新）
 > **更新日期**：2026-03-25（第十輪豐富化：B1 開題任務說明彈窗（`_showTaskModal`，C4 pattern）、B4 視覺價差比例條（`_renderPriceBars`，F5 pattern）、B5 預算提示鈕（`_showBudgetHint`，B1 hint pattern））
 > **更新日期**：2026-03-25（第十一輪豐富化：B2 easy 逐項動畫高亮（`_animateEasyEntries`，C2 pattern）、B6 正確商品彈出價格動畫（`_showPricePopup`，A4 pattern）、B1 困難模式隱藏個別費用（C1 audio-only pattern））
+> **更新日期**：2026-03-25（第十二輪豐富化：B6 攤位需求件數徽章（C5 指示燈 pattern）、B4 完成畫面累計節省統計（A4 交易摘要 pattern）、B3 月曆進度里程碑徽章（F2/A3 pattern））
 > **系列**：B 預算規劃（B1～B6）
 > **開發原則**：從 C 系列移植最佳實踐，對齊 A 系列完成度標準
 >

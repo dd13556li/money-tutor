@@ -2,6 +2,7 @@
 
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-25（第十一輪：正確商品彈出價格動畫 `_showPricePopup`，A4 交易摘要 pattern）
+> **更新日期**：2026-03-25（第十二輪：攤位分頁需求件數徽章，C5 指示燈 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B6 — 菜市場買菜（Market Shopping）
 > **系列**：B 預算規劃
@@ -92,6 +93,32 @@ Phase 3: Change（找零）
 - 使用 `position: fixed` + `getBoundingClientRect()` 定位（相對視窗，不受滾動影響）
 - `Math.min(rect.right + 4, window.innerWidth - 80)` 防止標籤超出螢幕邊界
 - `TimerManager.setTimeout` 1100ms 後自動移除 DOM 節點
+
+### 2.7 攤位分頁需求件數徽章 —— 2026-03-25 新增
+
+每個攤位分頁按鈕右上角顯示徽章，即時反映該攤位還有幾件任務商品待收集。
+
+**狀態邏輯**（`_renderShoppingUI`）：
+```javascript
+const stallNeedIds  = mission.items.filter(i => i.stall === k).map(i => i.id);
+const remaining     = stallNeedIds.filter(id => !g.collectedIds.has(id)).length;
+// remaining > 0 → 紅色數字；remaining === 0 && stallNeedIds.length > 0 → 綠色 ✓
+```
+
+| 徽章狀態 | 樣式 | 語意 |
+|---------|------|------|
+| 紅色數字（e.g. `2`） | `.b6-stall-badge` | 此攤位有 N 件待收集 |
+| 綠色 ✓ | `.b6-stall-badge-done` | 此攤位任務全完成 |
+| 無徽章 | — | 此攤位本關無任務商品 |
+
+**設計目標**：
+- 不用看購物清單，直接從分頁就能知道「去哪個攤位」
+- 全綠後一目瞭然知道可以結帳
+- 每次切換攤位（`_renderShoppingUI` 重繪）自動更新徽章
+
+**靈感來源**：C5「夠不夠」中用紅/綠指示燈快速傳遞「是/否」狀態 — 攤位徽章以計數擴展同一概念。
+
+**CSS**（`b6_market_shopping.css`）：`.b6-stall-badge`（紅）、`.b6-stall-badge-done`（綠覆寫）
 
 ---
 

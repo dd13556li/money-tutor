@@ -292,6 +292,44 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── 里程碑徽章 ──────────────────────────────────────────────── */
+@keyframes b3MilestonePop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+    80%  { transform: translate(-50%, -50%) scale(0.96); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes b3MilestoneFade {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -60%); }
+}
+.b3-milestone-badge {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    z-index: 9500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 3px solid #f59e0b;
+    border-radius: 40px;
+    padding: 14px 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #92400e;
+    box-shadow: 0 8px 28px rgba(245,158,11,0.4);
+    pointer-events: none;
+    animation: b3MilestonePop 0.4s ease forwards,
+               b3MilestoneFade 2.2s ease forwards;
+}
+.b3-milestone-pct {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #b45309;
+}
+
 /* ── 動畫 ─────────────────────────────────────────────────────── */
 @keyframes b3CoinDrop {
     0%   { transform: translateY(-18px) scale(0.5); opacity: 0; }

@@ -564,10 +564,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
 
             const stallKeys = Object.keys(B6_STALLS);
-            const stallTabsHTML = stallKeys.map(k => `
+            const stallTabsHTML = stallKeys.map(k => {
+                const stallNeedIds  = mission.items.filter(i => i.stall === k).map(i => i.id);
+                const remaining     = stallNeedIds.filter(id => !g.collectedIds.has(id)).length;
+                const badge = stallNeedIds.length > 0
+                    ? (remaining > 0
+                        ? `<span class="b6-stall-badge">${remaining}</span>`
+                        : `<span class="b6-stall-badge b6-stall-badge-done">✓</span>`)
+                    : '';
+                return `
                 <button class="b6-stall-tab ${g.activeStall === k ? 'active' : ''}" data-stall="${k}">
-                    ${B6_STALLS[k].icon} ${B6_STALLS[k].name}
-                </button>`).join('');
+                    ${B6_STALLS[k].icon} ${B6_STALLS[k].name}${badge}
+                </button>`;
+            }).join('');
 
             const stallItems = B6_STALLS[g.activeStall].items;
             const needIds    = new Set(mission.items.map(i => i.id));

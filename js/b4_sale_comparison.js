@@ -170,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentQuestion: 0,
                 totalQuestions: 10,
                 correctCount: 0,
+                totalSaved: 0,
                 questions: [],
                 startTime: null
             },
@@ -210,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion = 0;
             q.totalQuestions  = this.state.settings.questionCount;
             q.correctCount    = 0;
+            q.totalSaved      = 0;
             q.questions       = [];
             q.startTime       = null;
             this.state.phase        = 'select';
@@ -372,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion = 0;
             q.totalQuestions  = s.questionCount;
             q.correctCount    = 0;
+            q.totalSaved      = 0;
             q.startTime       = Date.now();
             q.questions       = this._generateQuestions(q.totalQuestions);
 
@@ -723,6 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 this.state.quiz.correctCount++;
+                this.state.quiz.totalSaved += correctDiff;
                 Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
             } else {
                 this.audio.play('error');
@@ -847,6 +851,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 計算兩價格的差額</div>
                 </div>
             </div>
+
+            ${q.totalSaved > 0 ? `
+            <div class="b4-savings-banner">
+                <div class="b4-savings-icon">🤑</div>
+                <div class="b4-savings-text">這次比價你總共省了</div>
+                <div class="b4-savings-amount">${q.totalSaved} 元</div>
+            </div>` : ''}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

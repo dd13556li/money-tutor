@@ -457,6 +457,9 @@ toolbarConfig: {
 | B2 計算過程提示（2026-03-25）| B2 | `_showCalcBreakdown(question)`：普通/困難鍵盤模式答錯即顯示逐步算式（起/±事件/＝結果）；防重複守衛；retry 模式算式保留可參考重試；CSS：`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income`（綠）/`.b2-bd-op.expense`（紅）/`.b2-bd-result` |
 | B4 差額算式提示（2026-03-25）| B4 | `_showDiffFormulaHint()`：Diff 階段答錯即在選項上方顯示「XXX − YYY = ？ 元」；`state.currentDiffItem` 進入 diff 前保存（`handleSelectClick`）；防重複守衛；CSS：`.b4-diff-hint-formula`/`.b4-hint-label`/`.b4-hint-op`/`.b4-hint-blank` |
 | B6 付款最佳面額提示（2026-03-25）| B6 | `_showPaymentHint(total)`：簡單/普通模式付款畫面新增「💡 提示」按鈕；貪婪演算法算出最少面額；`.b6-bill-hint` 高亮+脈動；`.b6-hint-toast` 文字提示+語音；6秒後自動清除；困難模式隱藏按鈕 |
+| B6 攤位需求件數徽章（2026-03-25）| B6 | `_renderShoppingUI` stallTabsHTML：依 `mission.items.filter(i=>i.stall===k)` 計算每攤位待收件數；紅色數字 `.b6-stall-badge`（有剩）/ 綠色 ✓ `.b6-stall-badge-done`（全收完）；切換攤位重繪自動更新；C5 指示燈 pattern |
+| B4 完成畫面累計節省（2026-03-25）| B4 | `quiz.totalSaved`（init/reset/startGame 三處歸零）；`handleDiffAnswer` 答對時 `+= correctDiff`；`showResults` 以 `.b4-savings-banner` 黃色橫幅顯示「你總共省了 X 元」；A4 交易摘要 pattern |
+| B3 月曆進度里程碑（2026-03-25）| B3 | `_completeDragSession` 存入後偵測 25/50/75% 閾值（`prevPct < m && newPct >= m`）；`_showMilestoneBadge(pct)` 顯示中央浮動徽章（`b3MilestonePop`+`b3MilestoneFade` 2.2s）；F2 里程碑音效 + A3 任務彈窗 pattern |
 
 ---
 

@@ -1351,8 +1351,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const pigBank = document.getElementById('b3-pig-bank');
             this._spawnCoinParticles(pigBank, c.dailyAmount);
 
+            const prevAccum = c.accumulated;
             c.accumulated += c.dailyAmount;
             c.clickedDays++;
+
+            // 里程碑偵測（25 / 50 / 75 %）
+            const prevPct = Math.floor(prevAccum / c.item.price * 100);
+            const newPct  = Math.floor(c.accumulated / c.item.price * 100);
+            const crossed = [25, 50, 75].find(m => prevPct < m && newPct >= m);
+            if (crossed) this._showMilestoneBadge(crossed);
 
             // 更新 denomPile（不做自動兌換，逐枚加入）
             const changedDenoms = {};
@@ -1393,6 +1400,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._updateCalendarUI(true); // pig already updated
                 }
             });
+        },
+
+        _showMilestoneBadge(pct) {
+            const existing = document.getElementById('b3-milestone-badge');
+            if (existing) existing.remove();
+            const labels = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
+            const badge = document.createElement('div');
+            badge.id = 'b3-milestone-badge';
+            badge.className = 'b3-milestone-badge';
+            badge.innerHTML = `<span class="b3-milestone-pct">${pct}%</span><span>${labels[pct]}</span>`;
+            document.body.appendChild(badge);
+            Game.TimerManager.setTimeout(() => {
+                if (document.body.contains(badge)) badge.remove();
+            }, 2200, 'ui');
         },
 
         _onCalendarGoalReached() {

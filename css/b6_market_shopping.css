@@ -110,6 +110,22 @@
     border-color: #d1d5db;
 }
 
+.b6-stall-badge {
+    display: inline-block;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 1px 6px;
+    margin-left: 4px;
+    vertical-align: middle;
+    line-height: 1.4;
+}
+.b6-stall-badge-done {
+    background: #10b981;
+}
+
 .b6-stall-panel {
     background: #fff;
     border: 2px solid #fde68a;
