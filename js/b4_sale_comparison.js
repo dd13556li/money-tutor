@@ -536,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.phase = 'diff';
+                        this.state.currentDiffItem = curr;   // 保存供提示使用
                         this._renderDiffSection(curr, diff);
                     }, 700, 'turnTransition');
                 }
@@ -672,6 +673,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return [...opts].sort(() => Math.random() - 0.5);
         },
 
+        // ── Diff Formula Hint ───────────────────────────────────
+        _showDiffFormulaHint() {
+            const item = this.state.currentDiffItem;
+            if (!item) return;
+            if (document.querySelector('.b4-diff-hint-formula')) return; // 防重複
+            const section = document.querySelector('.b4-diff-section');
+            if (!section) return;
+            const hint = document.createElement('div');
+            hint.className = 'b4-diff-hint-formula';
+            hint.innerHTML = `<span class="b4-hint-label">💡 算式提示：</span>`
+                + `${item.optA.price} <span class="b4-hint-op">−</span> ${item.optB.price}`
+                + ` <span class="b4-hint-op">=</span> <span class="b4-hint-blank">？</span> 元`;
+            const anchor = section.querySelector('.b4-diff-options') || section.querySelector('.b4-numpad');
+            if (anchor) section.insertBefore(hint, anchor);
+            else section.appendChild(hint);
+        },
+
         // ── Diff Answer Handler ─────────────────────────────────
         handleDiffAnswer(isCorrect, correctDiff) {
             if (isCorrect) {
@@ -681,6 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
             } else {
                 this.audio.play('error');
+                this._showDiffFormulaHint(); // 答錯即顯示算式提示
                 if (this.state.settings.retryMode === 'proceed') {
                     this._showCenterFeedback('❌', '答錯了！');
                     Game.Speech.speak(`差額是${toTWD(correctDiff)}，繼續下一題`);

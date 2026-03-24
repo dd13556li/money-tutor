@@ -799,6 +799,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 計算過程提示（答錯後顯示逐步算式）─────────────────
+        _showCalcBreakdown(question) {
+            if (document.querySelector('.b2-calc-breakdown')) return; // 防重複
+            const section = document.querySelector('.b2-numpad-section');
+            if (!section) return;
+            let cur = question.startAmount;
+            const steps = question.events.map(e => {
+                const prev = cur;
+                cur = e.type === 'income' ? cur + e.amount : cur - e.amount;
+                const op = e.type === 'income' ? '＋' : '－';
+                return `<div class="b2-bd-row">
+                    <span class="b2-bd-op ${e.type}">${op}</span>
+                    <span class="b2-bd-name">${e.name}</span>
+                    <span class="b2-bd-val">${e.amount} 元</span>
+                </div>`;
+            }).join('');
+            const box = document.createElement('div');
+            box.className = 'b2-calc-breakdown';
+            box.innerHTML = `
+                <div class="b2-bd-title">💡 計算過程</div>
+                <div class="b2-bd-row b2-bd-start">
+                    <span class="b2-bd-op">起</span>
+                    <span class="b2-bd-name">開始有</span>
+                    <span class="b2-bd-val">${question.startAmount} 元</span>
+                </div>
+                ${steps}
+                <div class="b2-bd-row b2-bd-result">
+                    <span class="b2-bd-op">＝</span>
+                    <span class="b2-bd-name">結果</span>
+                    <span class="b2-bd-val">${question.answer} 元</span>
+                </div>`;
+            section.appendChild(box);
+        },
+
         _handleNumpadAnswer(question) {
             if (this.state.isProcessing) return;
             const input = parseInt(this.state.quiz.currentInput);
@@ -820,9 +854,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
             } else {
                 this.audio.play('error');
+                this._showCalcBreakdown(question); // 答錯即顯示計算過程
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，再試一次`);
+                    Game.Speech.speak(`不對喔，參考算式再試一次`);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.quiz.currentInput = '';
@@ -834,14 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
                     Game.Speech.speak(`正確答案是${toTWD(question.answer)}`);
-                    const section = document.querySelector('.b2-numpad-section');
-                    if (section) {
-                        const hint = document.createElement('div');
-                        hint.className = 'b2-correct-hint';
-                        hint.textContent = `正確答案是 ${question.answer} 元`;
-                        section.appendChild(hint);
-                    }
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2200, 'turnTransition');
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
         },

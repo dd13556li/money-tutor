@@ -259,6 +259,66 @@
     margin-top: 10px;
 }
 
+/* ── 計算過程提示（答錯後顯示）──────────────────────────────── */
+.b2-calc-breakdown {
+    background: #fef9c3;
+    border: 2px solid #fde047;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    animation: b2FadeIn 0.3s ease;
+}
+
+.b2-bd-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #78350f;
+    margin-bottom: 6px;
+}
+
+.b2-bd-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 14px;
+    color: #374151;
+    border-bottom: 1px dashed #fde68a;
+}
+
+.b2-bd-row:last-child { border-bottom: none; }
+
+.b2-bd-op {
+    width: 22px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.b2-bd-op.income  { color: #059669; }
+.b2-bd-op.expense { color: #dc2626; }
+
+.b2-bd-name { flex: 1; color: #6b7280; }
+
+.b2-bd-val  { font-weight: bold; color: #1f2937; }
+
+.b2-bd-start  { background: #fffbeb; border-radius: 6px; }
+
+.b2-bd-result {
+    background: #ecfdf5;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.b2-bd-result .b2-bd-val { color: #059669; font-size: 17px; }
+
+@keyframes b2FadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── 動畫 ─────────────────────────────────────────────────── */
 @keyframes b2Shake {
     0%, 100% { transform: translateX(0); }

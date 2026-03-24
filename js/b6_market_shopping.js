@@ -772,6 +772,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="b6-pay-actions">
                         <button class="b6-clear-btn" id="b6-clear-btn">清除</button>
+                        ${this.state.settings.difficulty !== 'hard'
+                            ? '<button class="b6-hint-btn" id="b6-hint-btn">💡 提示</button>'
+                            : ''}
                         <button class="b6-pay-btn" id="b6-pay-btn" disabled>付款</button>
                     </div>
                 </div>
@@ -807,6 +810,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.isProcessing = true;
                 this._showChange(g.paidAmount, total);
             }, {}, 'gameUI');
+
+            const hintBtn = document.getElementById('b6-hint-btn');
+            if (hintBtn) {
+                Game.EventManager.on(hintBtn, 'click', () => {
+                    this._showPaymentHint(total);
+                }, {}, 'gameUI');
+            }
+        },
+
+        // ── 付款提示（貪婪最少面額組合）─────────────────────────
+        _showPaymentHint(total) {
+            const used = {};
+            let rem = total;
+            for (const b of B6_BILLS) {
+                const cnt = Math.floor(rem / b.value);
+                if (cnt > 0) { used[b.value] = cnt; rem -= cnt * b.value; }
+            }
+            const parts = B6_BILLS
+                .filter(b => used[b.value])
+                .map(b => `${b.label} × ${used[b.value]}`);
+
+            // 高亮面額按鈕
+            document.querySelectorAll('.b6-bill-btn').forEach(btn => {
+                const v = parseInt(btn.dataset.value);
+                btn.classList.toggle('b6-bill-hint', !!used[v]);
+            });
+
+            // 提示訊息
+            const existing = document.querySelector('.b6-hint-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'b6-hint-toast';
+            toast.innerHTML = `<strong>💡 建議付法</strong><br>${parts.join(' + ')} = ${total} 元`;
+            document.querySelector('.b6-payment-section')?.appendChild(toast);
+
+            Game.Speech.speak(`建議付${parts.join('，再加')}`);
+
+            Game.TimerManager.setTimeout(() => {
+                toast.remove();
+                document.querySelectorAll('.b6-bill-btn').forEach(btn => btn.classList.remove('b6-bill-hint'));
+            }, 6000, 'ui');
         },
 
         _updatePaidDisplay(paid, total) {

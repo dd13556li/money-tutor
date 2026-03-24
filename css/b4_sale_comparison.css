@@ -283,6 +283,31 @@
     100%{ transform: scale(1); opacity:1; }
 }
 
+/* ── 差額算式提示 ──────────────────────────────────────────────── */
+.b4-diff-hint-formula {
+    background: #fef9c3;
+    border: 2px solid #fde047;
+    border-radius: 10px;
+    padding: 8px 16px;
+    margin: 8px 0 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #92400e;
+    text-align: center;
+    animation: b4Pop 0.3s ease;
+}
+
+.b4-hint-label {
+    display: block;
+    font-size: 13px;
+    font-weight: normal;
+    color: #78350f;
+    margin-bottom: 4px;
+}
+
+.b4-hint-op { color: #b45309; margin: 0 4px; }
+.b4-hint-blank { color: #dc2626; font-size: 22px; }
+
 /* ── RWD ───────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .b4-compare-grid { gap: 4px; }
