@@ -830,22 +830,107 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.removeByCategory('gameUI');
 
             const change = paid - total;
-            const g      = this.state.game;
 
-            g.correctCount++;
-            this.audio.play('correct');
-            this._showCenterFeedback('✅', '買菜成功！');
-            Game.Speech.speak(`你付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);
+            // 困難模式：三選一找零驗算
+            if (this.state.settings.difficulty === 'hard') {
+                this._showChangeQuiz(paid, total, change);
+                return;
+            }
+
+            // 簡單 / 普通模式：直接顯示找零結果
+            this._showChangeResult(paid, change);
+        },
+
+        _showChangeQuiz(paid, total, change) {
+            const g = this.state.game;
+
+            Game.Speech.speak(`你付了${toTWD(paid)}，買菜共花了${toTWD(total)}元，應該找回多少元？`);
+
+            // 產生干擾項（±5~30，避免出現負數或 0）
+            const offsets = [5, 10, 15, 20, 25, 30];
+            const decoys = [];
+            for (const d of offsets) {
+                if (change - d > 0 && !decoys.includes(change - d)) { decoys.push(change - d); break; }
+            }
+            for (const d of offsets) {
+                if (change + d !== change && !decoys.includes(change + d)) { decoys.push(change + d); break; }
+            }
+            const options = [change, ...decoys].sort(() => Math.random() - 0.5);
+
+            const optionsHTML = options.map(v => `
+                <button class="b6-change-opt" data-value="${v}">${v} 元</button>
+            `).join('');
 
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left">
-                    <span class="b-header-unit">🛒 菜市場買菜</span>
+                <div class="b-header-left"><span class="b-header-unit">🛒 菜市場買菜</span></div>
+                <div class="b-header-center">困難模式</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
+                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
                 </div>
+            </div>
+            <div class="game-container">
+                <div class="b6-change-section">
+                    <div class="b6-change-icon">🤔</div>
+                    <div class="b6-change-text">付了 <strong>${paid}</strong> 元，買菜花了 <strong>${total}</strong> 元</div>
+                    <div class="b6-change-question">應該找回多少元？</div>
+                    <div class="b6-change-opts" id="b6-change-opts">${optionsHTML}</div>
+                </div>
+            </div>`;
+
+            document.querySelectorAll('.b6-change-opt').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const selected = parseInt(btn.dataset.value);
+                    if (selected === change) {
+                        // 答對
+                        document.querySelectorAll('.b6-change-opt').forEach(b => b.disabled = true);
+                        btn.classList.add('b6-change-opt-correct');
+                        this.audio.play('correct');
+                        this._showCenterFeedback('✅', `找回 ${change} 元！`);
+                        Game.Speech.speak(`對了！找回${toTWD(change)}，買菜成功！`, () => {
+                            Game.TimerManager.setTimeout(() => {
+                                this._showChangeResult(paid, change);
+                            }, 800, 'turnTransition');
+                        });
+                    } else {
+                        // 答錯
+                        btn.classList.add('b6-change-opt-wrong');
+                        this.audio.play('error');
+                        const retryMode = this.state.settings.retryMode;
+                        if (retryMode === 'retry') {
+                            btn.disabled = true;
+                            Game.Speech.speak('再想想看，找回多少元？');
+                        } else {
+                            document.querySelectorAll('.b6-change-opt').forEach(b => {
+                                b.disabled = true;
+                                if (parseInt(b.dataset.value) === change) b.classList.add('b6-change-opt-correct');
+                            });
+                            Game.Speech.speak(`正確答案是找回${toTWD(change)}`, () => {
+                                Game.TimerManager.setTimeout(() => {
+                                    this._showChangeResult(paid, change);
+                                }, 1400, 'turnTransition');
+                            });
+                        }
+                    }
+                }, {}, 'gameUI');
+            });
+        },
+
+        _showChangeResult(paid, change) {
+            const g = this.state.game;
+
+            g.correctCount++;
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            <div class="b-header">
+                <div class="b-header-left"><span class="b-header-unit">🛒 菜市場買菜</span></div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
                 <div class="b-header-right">
-                    <span class="b-progress">第 ${this.state.game.currentRound + 1} 關 / 共 ${this.state.game.totalRounds} 關</span>
+                    <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
                     <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
                     <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
                 </div>

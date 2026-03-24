@@ -445,6 +445,7 @@ toolbarConfig: {
 | B3 今日可存金錢卡常駐 + 撲滿結構重整（2026-03-23）| B3 | 今日可存金錢卡改為常駐（`renderCalendar` 直接含在佈局中）；點擊存錢格後填入金錢圖示、完成後清空恢復提示；撲滿頂部新增永久「存入金錢區」drop zone（`b3-pig-drop-zone` `display:none` 預設隱藏）；`🐷我的撲滿` 移至硬幣區上方（`.b3-pig-section-hd`）；`_updatePiggyBankCard` 改 target `#b3-pig-content`；`_completeDragSession` 拖曳完成即時更新撲滿（不等語音）；CSS：`b3-pig-drop-title`/`b3-pig-section-hd`/`b3-pig-section-title`/`b3-pig-section-total` |
 | theme-switcher 面板隱藏 + 預設正常模式（2026-03-24）| `theme-system.js` | `createThemeSwitcher` 三處呼叫註解停用（面板不顯示）；`detectSystemPreference` 註解停用（不跟隨系統深色模式，固定 `ai-robot` 主題）；修復 Edge+LiveServer 深色問題（系統偏好被偵測導致黑色背景）；`initializeDragFunctionality` 同步停用 |
 | B3 撲滿手動兌換（2026-03-23）| B3 | 移除自動兌換（`_decomposeToDenominations` 貪婪分解 → 改用 `c.denomPile` 逐枚記錄）；`EXCHANGE_RULES` 6條規則；每個面額行達兌換閾值時顯示綠色 `🔄 X個換1個Y元` 按鈕（`.b3-pig-exch-btn`）；`_handleExchange(from,count,to)` 更新 `denomPile`；`_bindCalendarEvents` 加委派點擊監聽；`_startCalendarSession` 補加 `denomPile:{}`/`drag:null` 欄位（修復 TypeError） |
+| B6 困難模式找零三選一（2026-03-24）| B6 | `_showChange` 路由困難模式至 `_showChangeQuiz(paid,total,change)`；生成 ±偏移干擾項；答對→`.b6-change-opt-correct`+語音+800ms→`_showChangeResult`；答錯 retry→disable 該選項；答錯 proceed→顯示正確答案+1400ms→`_showChangeResult`；`g.correctCount++` 移至 `_showChangeResult`；CSS 新增 `.b6-change-question/.b6-change-opts/.b6-change-opt/-correct/-wrong` |
 
 ---
 

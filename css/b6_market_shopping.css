@@ -332,6 +332,57 @@
 .b6-pay-btn:hover:not(:disabled) { background: #059669; }
 .b6-pay-btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
+/* ── 找零驗算（困難模式三選一）────────────────────────────────── */
+.b6-change-question {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 12px 0 16px;
+}
+
+.b6-change-opts {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.b6-change-opt {
+    min-width: 100px;
+    padding: 14px 20px;
+    background: #fff;
+    border: 2.5px solid #d97706;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #92400e;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+}
+
+.b6-change-opt:hover:not(:disabled) {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(245,158,11,0.25);
+}
+
+.b6-change-opt:disabled { cursor: not-allowed; opacity: 0.7; }
+
+.b6-change-opt-correct {
+    background: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.b6-change-opt-wrong {
+    background: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
 /* ── 找零結果 ─────────────────────────────────────────────────── */
 .b6-change-section {
     text-align: center;
