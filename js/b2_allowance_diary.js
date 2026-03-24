@@ -613,6 +613,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // 語音引導
             const currentQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
             const diff = this.state.settings.difficulty;
+
+            // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）
+            if (diff === 'easy') {
+                this._animateEasyEntries(currentQ);
+            }
             Game.TimerManager.setTimeout(() => {
                 const speechMap = {
                     easy:   `看看日記，計算最後剩下多少錢？`,
@@ -797,6 +802,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 }
             }
+        },
+
+        // ── Easy 模式逐項動畫（C2 逐一計數 pattern）─────────────
+        _animateEasyEntries(question) {
+            const answerArea = document.getElementById('b2-answer-area');
+            if (!answerArea) return;
+            answerArea.style.visibility = 'hidden';
+
+            const entries = Array.from(document.querySelectorAll('.b2-event-row'));
+            if (entries.length === 0) { answerArea.style.visibility = ''; return; }
+
+            entries.forEach(r => r.classList.add('b2-entry-dim'));
+
+            entries.forEach((row, i) => {
+                Game.TimerManager.setTimeout(() => {
+                    if (i > 0) entries[i - 1].classList.remove('b2-entry-active');
+                    row.classList.remove('b2-entry-dim');
+                    row.classList.add('b2-entry-active');
+                }, 500 + i * 800, 'ui');
+            });
+
+            const showDelay = 500 + entries.length * 800 + 500;
+            Game.TimerManager.setTimeout(() => {
+                entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
+                answerArea.style.visibility = '';
+                answerArea.style.animation = 'b2FadeIn 0.35s ease';
+            }, showDelay, 'ui');
         },
 
         // ── 計算過程提示（答錯後顯示逐步算式）─────────────────

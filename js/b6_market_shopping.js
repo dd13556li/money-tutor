@@ -682,9 +682,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('collected');
                     btn.disabled = true;
 
-                    // Update list item
+                    // Update list item + 彈出價格動畫（A4 transaction pattern）
                     const listItem = document.querySelector(`.b6-list-item[data-item-id="${itemId}"]`);
-                    if (listItem) listItem.classList.add('checked');
+                    if (listItem) {
+                        listItem.classList.add('checked', 'b6-list-bounce');
+                        Game.TimerManager.setTimeout(
+                            () => listItem.classList.remove('b6-list-bounce'), 600, 'ui'
+                        );
+                        const itemData = B6_STALLS[stall].items.find(i => i.id === itemId);
+                        if (itemData) this._showPricePopup(listItem, itemData.price);
+                    }
 
                     // Update total and checkout button
                     const total     = this._calcMissionTotal();
@@ -722,6 +729,18 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = `<span class="b-cf-icon">${icon}</span>${text ? `<span class="b-cf-text">${text}</span>` : ''}`;
             document.body.appendChild(overlay);
             Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
+        },
+
+        // ── 找到商品彈出價格動畫（A4 transaction tag pattern）────────
+        _showPricePopup(anchor, price) {
+            const rect = anchor.getBoundingClientRect();
+            const tag  = document.createElement('div');
+            tag.className = 'b6-price-popup';
+            tag.textContent = `+${price} 元`;
+            tag.style.left = Math.min(rect.right + 4, window.innerWidth - 80) + 'px';
+            tag.style.top  = (rect.top + rect.height / 2 - 12) + 'px';
+            document.body.appendChild(tag);
+            Game.TimerManager.setTimeout(() => tag.remove(), 1100, 'ui');
         },
 
         _calcMissionTotal() {

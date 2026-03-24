@@ -469,6 +469,31 @@
     100% { transform: scale(1); }
 }
 
+/* ── 找到商品彈出價格 + 清單彈跳（A4 transaction tag pattern）──── */
+@keyframes b6PriceFloat {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    80%  { opacity: 0.6; transform: translateY(-22px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-32px) scale(1); }
+}
+.b6-price-popup {
+    position: fixed;
+    background: #10b981;
+    color: #fff;
+    font-size: 15px; font-weight: bold;
+    padding: 3px 12px;
+    border-radius: 20px;
+    z-index: 8000;
+    pointer-events: none;
+    animation: b6PriceFloat 1.0s ease forwards;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+}
+@keyframes b6ListBounce {
+    0%, 100% { transform: scale(1); }
+    35%      { transform: scale(1.09); }
+    65%      { transform: scale(0.96); }
+}
+.b6-list-bounce { animation: b6ListBounce 0.5s ease; }
+
 /* ── RWD ───────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .b6-products-grid  { grid-template-columns: repeat(2, 1fr); gap: 6px; }

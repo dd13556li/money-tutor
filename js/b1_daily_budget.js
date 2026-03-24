@@ -494,10 +494,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderScheduleCard(q, showTotal) {
+            const isHard   = this.state.settings.difficulty === 'hard';
             const itemsHtml = q.items.map(it => `
                 <div class="b1-schedule-item">
                     <span class="b1-item-name">📌 ${it.name}</span>
-                    <span class="b1-item-cost">${it.cost} 元</span>
+                    ${isHard
+                        ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`
+                        : `<span class="b1-item-cost">${it.cost} 元</span>`
+                    }
                 </div>`).join('');
 
             const totalTag = showTotal

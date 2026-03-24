@@ -319,6 +319,20 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Easy 逐項動畫高亮（C2 逐一計數 pattern）──────────────────── */
+.b2-entry-dim {
+    opacity: 0.25;
+    transition: opacity 0.25s;
+}
+.b2-entry-active {
+    opacity: 1;
+    background: #fef9c3;
+    border-radius: 8px;
+    transform: scale(1.03);
+    transition: opacity 0.25s, background 0.25s, transform 0.25s;
+    box-shadow: 0 0 0 2px #fde047;
+}
+
 /* ── 動畫 ─────────────────────────────────────────────────── */
 @keyframes b2Shake {
     0%, 100% { transform: translateX(0); }

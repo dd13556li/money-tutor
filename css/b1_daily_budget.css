@@ -740,6 +740,13 @@
     .b1-denom-label            { font-size: 11px; }
 }
 
+/* ── 困難模式隱藏費用（C1 audio-only pattern）────────────────── */
+.b1-cost-hidden {
+    color: #94a3b8;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
 /* ── 開題任務說明彈窗 (C4 instruction modal pattern) ─────────── */
 .b1-task-modal {
     position: fixed; inset: 0;

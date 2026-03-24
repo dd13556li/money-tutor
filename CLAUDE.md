@@ -451,6 +451,9 @@ toolbarConfig: {
 | B1 開題任務說明彈窗（2026-03-25）| B1 | `_showTaskModal(curr, diff)`：每題渲染後顯示全屏半透明彈窗；easy/normal 顯示目標金額（黃色大字）；hard 顯示「？元」；2000ms 自動關閉或點任意處關閉；C4 `_showInstructionModal` pattern |
 | B4 視覺價差比例條（2026-03-25）| B4 | `_renderPriceBars(curr)`：在 `_renderDiffSection` 頂部顯示雙欄比例橫條；optA 紅漸層（貴）/ optB 綠漸層（便宜）；寬度依實際比例；`.b4-pbar-*` CSS；F5 量比較 pattern |
 | B5 預算提示鈕（2026-03-25）| B5 | `_showBudgetHint()`：高亮可負擔未選商品（`.b5-hint-glow` 脈動 2 次）+ 語音「還剩X元可加選Y」；`.b5-hint-btn` 黃框按鈕；B1 `_showCoinHint` pattern |
+| B2 easy 逐項動畫高亮（2026-03-25）| B2 | `_animateEasyEntries(question)`：easy 模式初始隱藏選項，逐項（每 800ms）高亮日記事件行（`.b2-entry-active` 黃底縮放）；全部完成後 500ms 淡出動畫顯示選項；C2 逐一計數 pattern |
+| B6 正確商品彈出價格（2026-03-25）| B6 | `_showPricePopup(anchor, price)`：找到商品後列表項目彈跳（`.b6-list-bounce`）+ 綠色「+X元」浮動標籤（`b6PriceFloat` 上飄消失）；A4 交易摘要 pattern |
+| B1 hard 模式隱藏費用（2026-03-25）| B1 | `_renderScheduleCard` isHard 分支：個別費用改顯示「??? 元」（`.b1-cost-hidden` 灰色斜體）；學生必須依賴語音聽到的金額計算；C1 困難模式僅聽聲音 pattern |
 | B2 計算過程提示（2026-03-25）| B2 | `_showCalcBreakdown(question)`：普通/困難鍵盤模式答錯即顯示逐步算式（起/±事件/＝結果）；防重複守衛；retry 模式算式保留可參考重試；CSS：`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income`（綠）/`.b2-bd-op.expense`（紅）/`.b2-bd-result` |
 | B4 差額算式提示（2026-03-25）| B4 | `_showDiffFormulaHint()`：Diff 階段答錯即在選項上方顯示「XXX − YYY = ？ 元」；`state.currentDiffItem` 進入 diff 前保存（`handleSelectClick`）；防重複守衛；CSS：`.b4-diff-hint-formula`/`.b4-hint-label`/`.b4-hint-op`/`.b4-hint-blank` |
 | B6 付款最佳面額提示（2026-03-25）| B6 | `_showPaymentHint(total)`：簡單/普通模式付款畫面新增「💡 提示」按鈕；貪婪演算法算出最少面額；`.b6-bill-hint` 高亮+脈動；`.b6-hint-toast` 文字提示+語音；6秒後自動清除；困難模式隱藏按鈕 |

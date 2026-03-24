@@ -1,6 +1,7 @@
 # B2 零用錢日記 — 單元完成報告書
 
 > **建立日期**：2026-03-24
+> **更新日期**：2026-03-25（第十一輪：easy 模式逐項動畫高亮 `_animateEasyEntries`，C2 逐一計數 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
 > **系列**：B 預算規劃
@@ -85,6 +86,26 @@ const deltas = [-40, -20, +20, +40];
 - `proceed` 模式：計算表顯示後 2.5 秒跳題（比原 2.2 秒略長，給足閱讀時間）
 - 防重複守衛：`document.querySelector('.b2-calc-breakdown')` 確保每題只顯示一次
 - CSS：`.b2-calc-breakdown`（黃色背景卡）、`.b2-bd-row`、`.b2-bd-op.income`（綠）、`.b2-bd-op.expense`（紅）
+
+### 2.6 Easy 模式逐項動畫高亮（`_animateEasyEntries`）—— 2026-03-25 新增
+
+**靈感來源**：C2 數錢「逐一點擊計數」互動——學生逐個點擊硬幣，累加金額；F5 普通模式點擊計數互動。
+
+B2 easy 模式的教學目標是「看日記條目，選出正確餘額」。新增動畫後：
+
+1. 題目渲染後，**選項區（answer area）先隱藏**
+2. 日記事件行**逐項高亮**（每 800ms 一項）：黃底 + 邊框 + 微縮放
+3. 全部高亮完成後，**500ms 後選項淡入出現**
+
+**教學效果**：
+- 引導學生按順序閱讀每一筆收支（而非一眼掃完就猜答案）
+- 視覺節奏對應「一項一項加減」的心算過程
+- 選項晚出現 → 確保學生先思考，再選答案
+
+**技術細節**：
+- `visibility: hidden`（不是 `display:none`）保留版面空間，避免 layout shift
+- `TimerManager.setTimeout` 管理全部計時，切換題目時自動清除（`clearAll` in `renderQuestion`）
+- CSS：`.b2-entry-dim`（opacity 0.25）/ `.b2-entry-active`（黃底 + `box-shadow: 0 0 0 2px #fde047`）
 
 ---
 
