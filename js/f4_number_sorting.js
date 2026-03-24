@@ -3369,9 +3369,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hint = slot.querySelector('.slot-hint');
                 if (hint) hint.style.display = 'none';
                 
-                // 播放數字語音（簡單模式／輔助點擊模式放置正確時）
-                this.Speech.speak(numberBox.dataset.value);
-                
                 // 不在這裡計分，等整題完成時再計分
             } else {
                 numberBox.classList.add('incorrect');

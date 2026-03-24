@@ -420,6 +420,7 @@ toolbarConfig: {
 | F1 getItemName 擴展40圖示 | F1 | `getItemName`, `f1AssistBounce`, fallback `\|\| icon` |
 | A 系列普通模式計時自動提示永久刪除（2026-03-20）| A1~A6 | `scheduleNormalModeHint`, `clearNormalModeHintTimer`, `normalHintDelay`, `normalModeHintTimer`, `normal-hint-delay-group` 全數移除；A5 `showATMEasyHint` 改用 `config.hintDelay` |
 | F4 正確放置播數字語音（2026-03-20）| F4 | `handleInstantFeedback` 正確分支：`playSound('correct')` → `Speech.speak(numberBox.dataset.value)`；簡單模式＋輔助點擊均適用 |
+| F4 簡單模式放置不重播語音（2026-03-24）| F4 | `handleInstantFeedback` 正確分支移除 `Speech.speak(numberBox.dataset.value)`；拖曳開始時播1次即可，放置時不再重播 |
 | A2 普通模式 step1 指定任務改彈窗（2026-03-20）| A2 | `showNormalModeHint` step1：移除 `difficulty==='hard'` 限制，指定任務（普通+困難）統一呼叫 `showTaskPopup()`；自選任務維持光暈動畫 |
 | A5 普通模式自動提示關閉（2026-03-20）| A5 | `DIFFICULTY_CONFIG.normal.autoShowHint: false`；`showATMEasyHint` 計時器條件加 `config.autoShowHint` 守衛，防止 `hintDelay > 0` 繞過設定直接啟動計時器 |
 | B 系列 CSS 死碼清除（2026-03-20）| `b-series.css` | 移除舊完成畫面系統：`.b-completion`/`.b-completion-header`/`.b-trophy`/`.b-perf-badge`/`.b-stats-grid`/`.b-stat-card`/`.b-comp-btns`/`.b-btn-again`/`.b-btn-settings` + `@keyframes bBounce`（共 ~85 行）；全 B 系列 JS grep 驗證 0 引用 |
