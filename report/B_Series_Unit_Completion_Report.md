@@ -45,6 +45,7 @@
 > **更新日期**：2026-03-25（第十一輪豐富化：B2 easy 逐項動畫高亮（`_animateEasyEntries`，C2 pattern）、B6 正確商品彈出價格動畫（`_showPricePopup`，A4 pattern）、B1 困難模式隱藏個別費用（C1 audio-only pattern））
 > **更新日期**：2026-03-25（第十二輪豐富化：B6 攤位需求件數徽章（C5 指示燈 pattern）、B4 完成畫面累計節省統計（A4 交易摘要 pattern）、B3 月曆進度里程碑徽章（F2/A3 pattern））
 > **更新日期**：2026-03-25（第十三輪豐富化：B5 關卡轉場卡（C6 transitionText pattern）、B2 easy 逐項小計顯示（F5 視覺化 pattern）、B1 放幣語音反饋（F4/C1 pattern））
+> **更新日期**：2026-03-26（第十六輪豐富化：B6 找到商品語音、B4 困難差額提示鈕、B2 起始金額彈窗、B6 付款足額語音；新增七十節）
 > **更新日期**：2026-03-26（第十五輪：參照 A/C/F 測驗特色代碼豐富化 — B5 轉場語音、B6 攤位切換語音+收集完成語音、B2 errorCount 3次自動計算提示、B4 selectErrorCount 3次高亮正確答案）
 > **更新日期**：2026-03-25（第十四輪：B3 月曆模式語音完整設計實作 — 彈窗標題、存錢目標語音、日期語音、最後拖放 callback、商品名稱修正、金幣顯示無上限；新增六十六～六十八節：B 系列測驗語音深化、實作對照表最終版、B vs A/C/F 測驗特色完整對比）
 > **系列**：B 預算規劃（B1～B6）
@@ -6800,6 +6801,69 @@ CSS：
 ```
 
 **搜尋關鍵字**：`_showRoundTransition Speech.speak`、`B6_STALLS.*name`、`allDone && !wasDone`、`quiz.errorCount`、`quiz.selectErrorCount`、`b4SelectHint`、`b4-select-hint`
+
+*報告更新時間：2026-03-26*
+*報告產生者：Claude Code (claude-sonnet-4-6)*
+
+---
+
+## 七十、B 系列第十六輪豐富化：四項互動語音設計移植（2026-03-26）
+
+### 實作清單
+
+| # | 單元 | 功能 | 靈感來源 | 核心改動 |
+|---|------|------|---------|---------|
+| 1 | B6 | 找到正確商品時播報名稱與價格 | A4 交易摘要語音 + B6 `_showPricePopup` | `_showPricePopup` 呼叫點後加 `Speech.speak(\`${name}，${price}元\`)` |
+| 2 | B4 | 困難模式差額鍵盤題增加 💡 提示按鈕 | B6 `_showPaymentHint` + B1 `_showCoinHint` | `_renderDiffSection` hard 分支插入 `b4-diff-hint-btn`；click 呼叫 `_showDiffFormulaHint()` + 語音「X減Y」 |
+| 3 | B2 | 每題開場顯示起始金額彈窗 | B1 `_showTaskModal` pattern（C4 instruction modal）| `_showTaskIntroModal(question)`：黃色大字起始金額；2.2s 自動關閉；語音「本週零用錢，起始X元」 |
+| 4 | B6 | 付款金額首次足夠時語音提示 | A6 確認付款狀態變更 + B6 `_updatePaidDisplay` | `wasSufficient` 守衛；剛好→「金額剛好，可以付款了！」；超過→「超過X元，找零後可以付款！」 |
+
+### 詳細說明
+
+#### B6 找到正確商品語音
+收集商品時，除了顯示 +X元 浮動標籤，同步播放「{商品名稱}，{價格}元」語音，強化商品與價格的聽覺連結。
+```javascript
+if (itemData) {
+    this._showPricePopup(listItem, itemData.price);
+    Game.Speech.speak(`${itemData.name}，${itemData.price}元`);
+}
+```
+
+#### B4 困難模式差額提示按鈕（B6 `_showPaymentHint` pattern）
+困難模式（數字鍵盤）差額題新增「💡 提示」黃色膠囊按鈕，位於題目與輸入框之間。點擊後：
+1. 顯示算式提示格（`_showDiffFormulaHint`：`XXX − YYY = ？ 元`）
+2. 語音說出「{A價格}減{B價格}」
+
+普通模式（三選一）答錯後自動顯示，困難模式需手動觸發，符合難度設計原則。
+
+```html
+<button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>
+```
+
+CSS：`.b4-diff-hint-btn` 黃底膠囊形，hover 提升並加深邊框色。
+
+#### B2 開題起始金額彈窗（B1 `_showTaskModal` pattern）
+每題渲染後顯示全屏半透明彈窗：
+- 📒 圖示 + 「起始金額」標籤 + 橘色大字金額（2.2rem）
+- 同步語音：「本週零用錢，起始X元」
+- 2200ms 自動關閉 / 點任意處關閉
+- 防重複守衛（`getElementById('b2-task-intro-modal')?.remove()`）
+
+幫助學生聚焦「起點金額」，再逐項記錄收支，與 B1 的「今天要去哪裡」彈窗設計一致。
+
+```javascript
+Game.Speech.speak(`本週零用錢，起始${question.startAmount}元`);
+```
+
+#### B6 付款足額語音（A6 狀態變更 pattern）
+在 `_updatePaidDisplay` 加入 `wasSufficient`（按鈕先前是否為可點擊），只在**首次從不足變足夠**時播放語音，避免每次點鈔票都重複說話：
+
+| 情況 | 語音 |
+|------|------|
+| 付款金額 = 應付金額 | 「金額剛好，可以付款了！」|
+| 付款金額 > 應付金額 | 「超過X元，找零後可以付款！」|
+
+**搜尋關鍵字**：`itemData.name.*元`、`b4-diff-hint-btn`、`_showTaskIntroModal`、`b2-task-intro-modal`、`wasSufficient`
 
 *報告更新時間：2026-03-26*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
