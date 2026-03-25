@@ -1,7 +1,7 @@
 # A5 ATM 提款機單元 — 完成經驗報告書
 
 > **建立日期**：2026-02-09（日）17:45
-> **更新日期**：2026-03-25（輔助點擊模式六項修復 + Pattern 6 跨輪狀態污染）
+> **更新日期**：2026-03-25（輔助點擊模式六項修復 + Pattern 6 跨輪狀態污染；標題列轉帳步驟計數修正）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：A5 — ATM 提款機模擬學習
 > **報告類型**：單元完成經驗與開發建議
@@ -1863,6 +1863,27 @@ z-index: ${this.state.settings.clickMode ? 10050 : 10200};
 **全專案掃描結果**：B/C/F 系列無此問題；A1~A4、A6 無在輔助點擊流程中出現的高 z-index 彈窗。A1 `_showRefundModal`（z-index: 10200）只在自選模式退幣時觸發，無 ClickMode 隊列對應，不需更改。
 
 **搜尋關鍵字**：`clickMode ? 10050 : 10200`
+
+---
+
+### 25.8 標題列步驟計數：轉帳任務顯示「7/5」或「8/5」
+
+**症狀**：轉帳任務進行到「確認轉帳資訊」或「最終確認」畫面時，標題列顯示「步驟 7 / 5」、「步驟 8 / 5」，分子超過分母，視覺錯誤。
+
+**根本原因**：`updateTitleBar(step, stepTitle)` 中分母寫死為 `5`。轉帳流程共 8 個步驟（步驟 4~8：輸入銀行代碼、輸入轉入帳號、輸入轉帳金額、確認轉帳資訊、最終確認），而提款/存款/查詢最多只到步驟 5。
+
+```javascript
+// 修復前
+progressInfoElement.textContent = `步驟 ${step} / 5`;
+
+// 修復後
+const totalSteps = this.getActualSessionType() === 'transfer' ? 8 : 5;
+progressInfoElement.textContent = `步驟 ${step} / ${totalSteps}`;
+```
+
+隨機模式也正確處理：`getActualSessionType()` 回傳 `currentRandomType`，抽到轉帳時自動使用 8。
+
+**搜尋關鍵字**：`updateTitleBar`, `totalSteps`, `getActualSessionType`
 
 ---
 

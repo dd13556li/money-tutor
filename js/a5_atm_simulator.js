@@ -3790,7 +3790,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (progressInfoElement) {
-                progressInfoElement.textContent = `步驟 ${step} / 5`;
+                const totalSteps = this.getActualSessionType() === 'transfer' ? 8 : 5;
+                progressInfoElement.textContent = `步驟 ${step} / ${totalSteps}`;
             }
         },
 

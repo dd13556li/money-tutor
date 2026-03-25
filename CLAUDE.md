@@ -469,6 +469,7 @@ toolbarConfig: {
 | A5 轉帳 hint-modal 列入點擊隊列（2026-03-25）| A5 | `transferBank`/`transferAccount`/`transferAmount` 隊列首位加 `closeModal`（`bank-code-hint-close-btn`/`account-hint-close-btn`/`transfer-amount-hint-close-btn`）；三個按鈕加 id；`autoCloseModal` 新增對應分支（查 `#hint-modal-overlay` → remove → executeNextAction）|
 | A5 takeReceipt 快速點擊凍結（2026-03-25）| A5 | `receiptTaken` 守衛加 `isExecuting = false`（防永久凍結）；`autoTakeReceipt` 提前在找到按鈕時設 `receiptTaken = true`（縮短競態視窗，原在 300ms timer 內）|
 | A5 取卡步驟快速點擊卡死（2026-03-25）| A5 | `transitionPhase` 安全網加 `safetyPhase` 相位守衛（`currentPhase === safetyPhase`，防舊階段 1.5s timer 跨相位觸發）；`autoTakeReceipt` poll 開頭加 `receiptTaken` 早退守衛（防兩個並行 poll 實例）；`autoTakeCard` 列印流程改為輪詢：點卡片圖片觸發動畫 → 輪詢等 `#take-card-btn`（1800ms 後出現）→ 點擊後才播煙火並繼續（原先 2000ms 固定等待導致提前轉 `takeReceipt`）|
+| A5 標題列轉帳步驟計數修正（2026-03-25）| A5 | `updateTitleBar` 分母改動態：`getActualSessionType()==='transfer'?8:5`；轉帳共 8 步，其他操作 5 步；隨機模式透過 `currentRandomType` 自動判斷 |
 
 ---
 
