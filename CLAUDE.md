@@ -470,6 +470,10 @@ toolbarConfig: {
 | A5 takeReceipt 快速點擊凍結（2026-03-25）| A5 | `receiptTaken` 守衛加 `isExecuting = false`（防永久凍結）；`autoTakeReceipt` 提前在找到按鈕時設 `receiptTaken = true`（縮短競態視窗，原在 300ms timer 內）|
 | A5 取卡步驟快速點擊卡死（2026-03-25）| A5 | `transitionPhase` 安全網加 `safetyPhase` 相位守衛（`currentPhase === safetyPhase`，防舊階段 1.5s timer 跨相位觸發）；`autoTakeReceipt` poll 開頭加 `receiptTaken` 早退守衛（防兩個並行 poll 實例）；`autoTakeCard` 列印流程改為輪詢：點卡片圖片觸發動畫 → 輪詢等 `#take-card-btn`（1800ms 後出現）→ 點擊後才播煙火並繼續（原先 2000ms 固定等待導致提前轉 `takeReceipt`）|
 | A5 標題列轉帳步驟計數修正（2026-03-25）| A5 | `updateTitleBar` 分母改動態：`getActualSessionType()==='transfer'?8:5`；轉帳共 8 步，其他操作 5 步；隨機模式透過 `currentRandomType` 自動判斷 |
+| B5 轉場卡語音「第N關」（2026-03-26）| B5 | `_showRoundTransition` 加 `Game.Speech.speak(\`第${roundNum}關\`)` |
+| B6 攤位切換語音（2026-03-26）| B6 | stall-tab click 加防重複守衛 + `Game.Speech.speak(B6_STALLS[stall].name)`；`所有商品收集完成，可以去結帳了！` 在 allDone 時觸發 |
+| B2 errorCount 機制（2026-03-26）| B2 | `quiz.errorCount` 計數；choice retry 答錯 ≥3 次自動呼叫 `_showCalcBreakdown`；`nextQuestion` 重置 |
+| B4 selectErrorCount 高亮提示（2026-03-26）| B4 | `quiz.selectErrorCount` 計數；select retry 答錯 ≥3 次語音說出正確店名 + `.b4-select-hint` CSS 脈動高亮；CSS：`b4SelectHint` |
 
 ---
 

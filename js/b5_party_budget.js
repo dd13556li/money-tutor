@@ -704,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5-rt-icon">🎂</div>
                 </div>`;
             document.body.appendChild(card);
+            Game.Speech.speak(`第${roundNum}關`);
             Game.TimerManager.setTimeout(() => {
                 card.classList.add('b5-rt-fade');
                 Game.TimerManager.setTimeout(() => {

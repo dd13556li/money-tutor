@@ -654,8 +654,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 攤位切換
             document.querySelectorAll('.b6-stall-tab').forEach(tab => {
                 Game.EventManager.on(tab, 'click', () => {
+                    if (g.activeStall === tab.dataset.stall) return;
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
+                    Game.Speech.speak(B6_STALLS[tab.dataset.stall].name);
                     this._renderShoppingUI();
                 }, {}, 'gameUI');
             });
@@ -709,7 +711,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const allDone   = g.mission.items.every(({ id }) => g.collectedIds.has(id));
                     const checkoutBtn = document.getElementById('b6-checkout-btn');
-                    if (checkoutBtn) checkoutBtn.disabled = !allDone;
+                    if (checkoutBtn) {
+                        const wasDone = !checkoutBtn.disabled;
+                        checkoutBtn.disabled = !allDone;
+                        if (allDone && !wasDone) Game.Speech.speak('所有商品收集完成，可以去結帳了！');
+                    }
                 }, {}, 'gameUI');
             });
 

@@ -368,3 +368,13 @@
     .b4-diff-opt     { padding: 10px 16px; font-size: 18px; }
     .b4-numpad-btn   { padding: 12px 4px; font-size: 18px; }
 }
+
+/* ── 3次選錯高亮提示（B1 _showCoinHint pattern）─────────────── */
+@keyframes b4SelectHint {
+    0%, 100% { box-shadow: 0 0 0 3px #f59e0b; transform: scale(1); }
+    50%       { box-shadow: 0 0 18px 6px #f59e0b; transform: scale(1.03); }
+}
+.b4-select-hint {
+    animation: b4SelectHint 0.85s ease 2 !important;
+    border: 3px solid #f59e0b !important;
+}

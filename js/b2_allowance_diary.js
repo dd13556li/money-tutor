@@ -354,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentQuestion: 0,
                 totalQuestions: 10,
                 correctCount: 0,
+                errorCount: 0,
                 questions: [],
                 startTime: null,
                 currentInput: '',
@@ -787,8 +788,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.audio.play('error');
                 if (this.state.settings.retryMode === 'retry') {
+                    this.state.quiz.errorCount++;
+                    const willShowHint = this.state.quiz.errorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
                     Game.Speech.speak(`不對喔，再想想看`);
+                    if (willShowHint) this._showCalcBreakdown(question);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         document.querySelectorAll('.b2-choice-btn').forEach(btn => {
@@ -933,6 +937,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 14. 下一題 ────────────────────────────────────────
         nextQuestion() {
+            this.state.quiz.errorCount = 0;
             this.state.quiz.currentQuestion++;
             if (this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions) {
                 this.showResults();

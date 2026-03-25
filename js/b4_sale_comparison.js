@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalQuestions: 10,
                 correctCount: 0,
                 totalSaved: 0,
+                selectErrorCount: 0,
                 questions: [],
                 startTime: null
             },
@@ -555,8 +556,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(`答錯了，${correctCard?.querySelector('.b4-store-name')?.textContent || '另一個'}才是比較便宜的`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
+                    this.state.quiz.selectErrorCount++;
+                    const autoHint = this.state.quiz.selectErrorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak('這邊比較貴喔，再看看另一邊');
+                    Game.Speech.speak(autoHint
+                        ? `這邊比較貴喔，${correctCard?.querySelector('.b4-store-name')?.textContent || '另一個'}才便宜`
+                        : '這邊比較貴喔，再看看另一邊');
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         ['left','right'].forEach(s => {
@@ -565,6 +570,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             const marks = c?.querySelectorAll('.b4-result-mark,.b4-cheaper-tag');
                             marks?.forEach(m => m.remove());
                         });
+                        if (autoHint) {
+                            // 高亮正確答案格（脈動 2 次，類似 b5-hint-glow）
+                            const hintCard = document.getElementById(`card-${correctSide}`);
+                            if (hintCard) {
+                                hintCard.classList.add('b4-select-hint');
+                                Game.TimerManager.setTimeout(() => hintCard.classList.remove('b4-select-hint'), 2400, 'ui');
+                            }
+                        }
                     }, 1500, 'turnTransition');
                 }
             }
@@ -762,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Next / Results ─────────────────────────────────────
         nextQuestion() {
             const q = this.state.quiz;
+            q.selectErrorCount = 0;
             q.currentQuestion++;
             if (q.currentQuestion >= q.totalQuestions) {
                 this.showResults();
