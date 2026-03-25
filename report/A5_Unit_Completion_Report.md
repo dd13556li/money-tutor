@@ -1844,5 +1844,27 @@ gs.clickModeState.receiptTaken = false;
 
 ---
 
+### 25.7 三個流程提示彈窗在輔助點擊模式下應低於遮罩
+
+**症狀**：簡單模式 + 輔助點擊模式下，`showTaskReminderModal`、`showAmountReminderModal`、`showTransferAmountReminderModal` 三個彈窗 z-index 為 10200（高於透明遮罩 10100），使用者可直接點擊「我知道了」按鈕，繞過 ClickMode 系統，導致 `autoCloseModal` 邏輯與 `confirmBtn.onclick` 雙重執行（已有 v1.2.39 的重複執行守衛緩解，但根本問題仍存在）。
+
+**根本原因**：25.1 的修復為了解決「彈窗按鈕無法點擊」，將 z-index 從 10000 提升至 10200。然而正確做法應是讓彈窗位於遮罩**下方**，由 ClickMode 統一攔截並透過 `autoCloseModal` 關閉，而非讓使用者直接操作按鈕。
+
+**修復**：三個彈窗的 z-index 改為條件式：
+- `clickMode = true`（輔助點擊模式）→ `z-index: 10050`（低於遮罩 10100）
+- `clickMode = false`（一般模式）→ `z-index: 10200`（維持原邏輯）
+
+```javascript
+z-index: ${this.state.settings.clickMode ? 10050 : 10200};
+```
+
+影響三個函數：`showTaskReminderModal`、`showAmountReminderModal`、`showTransferAmountReminderModal`。
+
+**全專案掃描結果**：B/C/F 系列無此問題；A1~A4、A6 無在輔助點擊流程中出現的高 z-index 彈窗。A1 `_showRefundModal`（z-index: 10200）只在自選模式退幣時觸發，無 ClickMode 隊列對應，不需更改。
+
+**搜尋關鍵字**：`clickMode ? 10050 : 10200`
+
+---
+
 *報告更新時間：2026-03-25*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
