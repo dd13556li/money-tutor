@@ -45,6 +45,7 @@
 > **更新日期**：2026-03-25（第十一輪豐富化：B2 easy 逐項動畫高亮（`_animateEasyEntries`，C2 pattern）、B6 正確商品彈出價格動畫（`_showPricePopup`，A4 pattern）、B1 困難模式隱藏個別費用（C1 audio-only pattern））
 > **更新日期**：2026-03-25（第十二輪豐富化：B6 攤位需求件數徽章（C5 指示燈 pattern）、B4 完成畫面累計節省統計（A4 交易摘要 pattern）、B3 月曆進度里程碑徽章（F2/A3 pattern））
 > **更新日期**：2026-03-25（第十三輪豐富化：B5 關卡轉場卡（C6 transitionText pattern）、B2 easy 逐項小計顯示（F5 視覺化 pattern）、B1 放幣語音反饋（F4/C1 pattern））
+> **更新日期**：2026-03-26（第十五輪：參照 A/C/F 測驗特色代碼豐富化 — B5 轉場語音、B6 攤位切換語音+收集完成語音、B2 errorCount 3次自動計算提示、B4 selectErrorCount 3次高亮正確答案）
 > **更新日期**：2026-03-25（第十四輪：B3 月曆模式語音完整設計實作 — 彈窗標題、存錢目標語音、日期語音、最後拖放 callback、商品名稱修正、金幣顯示無上限；新增六十六～六十八節：B 系列測驗語音深化、實作對照表最終版、B vs A/C/F 測驗特色完整對比）
 > **系列**：B 預算規劃（B1～B6）
 > **開發原則**：從 C 系列移植最佳實踐，對齊 A 系列完成度標準
@@ -6748,6 +6749,58 @@ function _unlockNextStall(completedIndex) {
 | 低 | B2 多模式（記帳/目標/比較）| F6 三種遊戲模式 | 設計規格已在 §五十六 |
 | 低 | B3 月曆跨月語音提示 | A6 自訂車站語音 | 目前跨月時無語音提示 |
 
-*報告更新時間：2026-03-25*
+---
+
+## 六十九、B 系列第十五輪豐富化：A/C/F Pattern 代碼移植（2026-03-26）
+
+### 實作清單
+
+| # | 單元 | 功能 | 靈感來源 | 核心改動 |
+|---|------|------|---------|---------|
+| 1 | B5 | 關卡轉場卡加語音「第N關」| C6 `transitionText` + B5 轉場卡設計 | `_showRoundTransition` 加 `Speech.speak` |
+| 2 | B6 | 攤位切換語音（說攤位名稱）| A6 步驟語音 + C 系列進題語音 | stall-tab click 加防重複 + `Speech.speak(B6_STALLS[stall].name)` |
+| 3 | B6 | 所有商品收集完成語音 | A4 步驟完成語音 + B6 checkout unlock | `allDone && !wasDone` 觸發「所有商品收集完成，可以去結帳了！」|
+| 4 | B2 | errorCount 3次後自動顯示計算過程 | A 系列 `stepErrorCounts` 3次提示機制 | `quiz.errorCount`；choice retry ≥3 呼叫 `_showCalcBreakdown`；`nextQuestion` 重置 |
+| 5 | B4 | selectErrorCount 3次後高亮正確答案 | B1 `_showCoinHint` 脈動 + C3 提示鈕 | `quiz.selectErrorCount`；retry ≥3 加語音「{店名}才便宜」+ `.b4-select-hint` 脈動 2次 |
+
+### 詳細說明
+
+#### B5 轉場卡語音
+每次關卡轉場卡出現時同步播放「第N關」，讓學生清楚知道現在進入幾關，無需靠視覺讀字。
+```javascript
+document.body.appendChild(card);
+Game.Speech.speak(`第${roundNum}關`);
+```
+
+#### B6 攤位切換語音
+切換攤位標籤時播放攤位名稱（「蔬菜攤」/「水果攤」/「雜貨攤」）。加防重複守衛（點已在攤位直接 return），避免重複語音。
+```javascript
+if (g.activeStall === tab.dataset.stall) return;
+Game.Speech.speak(B6_STALLS[tab.dataset.stall].name);
+```
+
+#### B6 購物完成語音
+收集最後一件清單商品，checkout 按鈕從 disabled 變 enabled 時播放「所有商品收集完成，可以去結帳了！」，明確告知下一步行動。
+
+#### B2 errorCount（A 系列 stepErrorCounts pattern）
+choice（三選一）答錯累計，第 3 次起自動呼叫 `_showCalcBreakdown(question)` 顯示逐步計算過程。proceed 模式不計數（每題只答一次）。换題時重置。
+
+#### B4 selectErrorCount（B1/C3 提示機制 pattern）
+Select 階段（選哪個比較便宜）retry 模式連錯 3 次後：
+1. 語音改為明確說出「{正確店名} 才便宜」
+2. 正確答案卡片顯示 `.b4-select-hint` 金色脈動動畫（2 次，1.7s）
+
+CSS：
+```css
+@keyframes b4SelectHint {
+    0%, 100% { box-shadow: 0 0 0 3px #f59e0b; transform: scale(1); }
+    50%       { box-shadow: 0 0 18px 6px #f59e0b; transform: scale(1.03); }
+}
+.b4-select-hint { animation: b4SelectHint 0.85s ease 2 !important; }
+```
+
+**搜尋關鍵字**：`_showRoundTransition Speech.speak`、`B6_STALLS.*name`、`allDone && !wasDone`、`quiz.errorCount`、`quiz.selectErrorCount`、`b4SelectHint`、`b4-select-hint`
+
+*報告更新時間：2026-03-26*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
 
