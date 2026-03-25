@@ -14134,7 +14134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="hint-modal-footer">
-                            <button class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
+                            <button id="bank-code-hint-close-btn" class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
                                 我知道了
                             </button>
                         </div>
@@ -14266,7 +14266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="hint-modal-footer">
-                            <button class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
+                            <button id="account-hint-close-btn" class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
                                 我知道了
                             </button>
                         </div>
@@ -14303,7 +14303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="hint-modal-footer">
-                            <button class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
+                            <button id="transfer-amount-hint-close-btn" class="hint-modal-close-btn" onclick="ATM.closeHintModal()">
                                 我知道了
                             </button>
                         </div>
@@ -14883,33 +14883,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
 
                 case 'transferBank':
-                    // 輸入銀行代碼
+                    // 輸入銀行代碼（先關閉銀行代碼提示彈窗）
                     const bankCode = gs.easyModeHints.assignedBankCode || '004';
-                    actionQueue = bankCode.split('').map(digit => ({
+                    actionQueue = [{ type: 'closeModal', modalId: 'bank-code-hint-close-btn' }];
+                    actionQueue = actionQueue.concat(bankCode.split('').map(digit => ({
                         type: 'pressKey',
                         key: digit
-                    }));
+                    })));
                     actionQueue.push({ type: 'pressKey', key: 'enter' });
                     break;
 
                 case 'transferAccount':
-                    // 輸入帳號
+                    // 輸入帳號（先關閉帳號提示彈窗）
                     const account = gs.easyModeHints.assignedAccountNumber || '12345678';
-                    actionQueue = account.split('').map(digit => ({
+                    actionQueue = [{ type: 'closeModal', modalId: 'account-hint-close-btn' }];
+                    actionQueue = actionQueue.concat(account.split('').map(digit => ({
                         type: 'pressKey',
                         key: digit
-                    }));
+                    })));
                     actionQueue.push({ type: 'pressKey', key: 'enter' });
                     break;
 
                 case 'transferAmount':
-                    // 輸入轉帳金額
+                    // 輸入轉帳金額（先關閉金額提示彈窗）
                     const transferAmount = gs.easyModeHints.assignedAmount;
                     const amountStr = transferAmount.toString();
-                    actionQueue = amountStr.split('').map(digit => ({
+                    actionQueue = [{ type: 'closeModal', modalId: 'transfer-amount-hint-close-btn' }];
+                    actionQueue = actionQueue.concat(amountStr.split('').map(digit => ({
                         type: 'pressKey',
                         key: digit
-                    }));
+                    })));
                     actionQueue.push({ type: 'pressKey', key: 'enter' });
                     break;
 
@@ -15759,6 +15762,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         gs.clickModeState.waitingForClick = true;
                     }, 500, 'clickMode');
                 }, 300, 'clickMode');
+                return;
+            }
+
+            // 針對轉帳流程的 hint-modal（銀行代碼/帳號/金額提示彈窗）
+            if (buttonId === 'bank-code-hint-close-btn' ||
+                buttonId === 'account-hint-close-btn' ||
+                buttonId === 'transfer-amount-hint-close-btn') {
+                const modal = document.getElementById('hint-modal-overlay');
+                if (!modal) {
+                    ATM.Debug.log('assist', '[ClickMode] 彈窗已關閉，跳過重複操作');
+                    this.TimerManager.setTimeout(() => {
+                        gs.clickModeState.isExecuting = false;
+                        this.executeNextAction();
+                    }, 300, 'clickMode');
+                    return;
+                }
+                modal.remove();
+                ATM.Debug.log('assist', `[ClickMode] 已關閉 ${buttonId} 提示彈窗`);
+                this.TimerManager.setTimeout(() => {
+                    gs.clickModeState.isExecuting = false;
+                    this.executeNextAction();
+                }, 600, 'clickMode');
                 return;
             }
 
