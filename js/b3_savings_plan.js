@@ -1544,6 +1544,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return Array.from(opts).sort(() => Math.random() - 0.5);
         },
 
+        // ── 存錢目標開題彈窗（B2 _showTaskIntroModal pattern）─────
+        _showSavingsGoalModal(question) {
+            document.getElementById('b3-goal-modal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'b3-goal-modal';
+            modal.className = 'b3-goal-modal';
+            modal.innerHTML = `
+                <div class="b3-goal-modal-inner">
+                    <div class="b3-goal-modal-icon">${this._itemIconHTML(question.item, '80px')}</div>
+                    <div class="b3-goal-modal-name">${question.item.name}</div>
+                    <div class="b3-goal-modal-price">${question.item.price} 元</div>
+                    <div class="b3-goal-modal-tap">點任意處繼續</div>
+                </div>`;
+            document.body.appendChild(modal);
+            Game.Speech.speak(`存錢目標：${question.item.name}，${question.item.price}元`);
+            modal.addEventListener('click', () => modal.remove());
+            Game.TimerManager.setTimeout(() => {
+                if (document.body.contains(modal)) modal.remove();
+            }, 2500, 'ui');
+        },
+
         // ── 11. 題目渲染 ──────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
@@ -1556,8 +1577,11 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = this._renderQuestionHTML(q.questions[q.currentQuestion]);
             this._bindQuestionEvents(q.questions[q.currentQuestion]);
 
-            // 語音引導
+            // 開題存錢目標彈窗（B2 _showTaskIntroModal pattern）
             const question = this.state.quiz.questions[this.state.quiz.currentQuestion];
+            this._showSavingsGoalModal(question);
+
+            // 語音引導
             const diff = this.state.settings.difficulty;
             Game.TimerManager.setTimeout(() => {
                 const price = question.item.price;

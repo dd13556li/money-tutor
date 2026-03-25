@@ -679,9 +679,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // 確認按鈕狀態
+            // 確認按鈕狀態（B6 wasSufficient pattern）
             const confirmBtn = document.getElementById('confirm-btn');
-            if (confirmBtn) confirmBtn.disabled = !enough;
+            const wasSufficient = confirmBtn && !confirmBtn.disabled;
+            if (confirmBtn) {
+                confirmBtn.disabled = !enough;
+                if (enough && !wasSufficient && total > 0) {
+                    Game.Speech.speak('金額足夠，可以出發了！');
+                }
+            }
 
             // 簡單模式：動態淡化超出剩餘所需的錢幣
             if (this.state.settings.difficulty === 'easy') {

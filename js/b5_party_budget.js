@@ -486,12 +486,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(card, 'click', () => {
                     if (g.submitted) return;
                     const id = card.dataset.id;
+                    const item = g.items.find(i => i.id === id);
                     if (g.selectedIds.has(id)) {
                         g.selectedIds.delete(id);
                         card.classList.remove('selected');
+                        if (item) Game.Speech.speak(`取消${item.name}`);
                     } else {
                         g.selectedIds.add(id);
                         card.classList.add('selected');
+                        if (item) Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
                     }
                     this.audio.play('click');
                     this._updateTotalBar();

@@ -478,6 +478,10 @@ toolbarConfig: {
 | B4 困難模式差額提示鈕（2026-03-26）| B4 | `_renderDiffSection` hard 分支加 `<button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>`；click 呼叫 `_showDiffFormulaHint()` + 語音 `${optA.price}減${optB.price}`；CSS：`.b4-diff-hint-btn` |
 | B2 開題起始金額彈窗（2026-03-26）| B2 | `_showTaskIntroModal(question)`：每題渲染後顯示全屏半透明彈窗，顯示起始金額橘色大字；2200ms 自動關閉或點任意處關閉；語音「本週零用錢，起始X元」；B1 `_showTaskModal` pattern；CSS：`.b2-task-intro-*` |
 | B6 付款足額語音（2026-03-26）| B6 | `_updatePaidDisplay` 加 `wasSufficient` 守衛；首次達到足額：剛好→「金額剛好，可以付款了！」；超過→「超過X元，找零後可以付款！」 |
+| B1 錢包足夠語音（2026-03-26）| B1 | `_updateWalletDisplay` 加 `wasSufficient` 守衛；`!wasSufficient && enough && total>0` 時說「金額足夠，可以出發了！」；B6 `wasSufficient` pattern |
+| B5 商品點選語音（2026-03-26）| B5 | `_bindRoundEvents` 卡片點擊後加語音：選擇→「{名稱}，{價格}元」；取消→「取消{名稱}」；A4 shopping speech pattern |
+| B3 quiz 存錢目標開題彈窗（2026-03-26）| B3 | `_showSavingsGoalModal(question)`：顯示物品圖示/名稱/價格；2500ms 自動關閉；語音「存錢目標：{名稱}，{價格}元」；B2 `_showTaskIntroModal` pattern；CSS：`.b3-goal-modal*` |
+| B4 比價語音含雙店價格（2026-03-26）| B4 | `renderQuestion` 語音改為 `{名稱}，{A店}X元，{B店}Y元，哪個比較便宜？`；對齊 A/C/F 讀出題目所有數字 pattern |
 
 ---
 

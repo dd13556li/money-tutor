@@ -442,13 +442,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
 
-            // 語音引導
+            // 語音引導（含雙店價格，對齊 A/C/F 讀出題目數字 pattern）
             Game.TimerManager.setTimeout(() => {
                 const diff = this.state.settings.difficulty;
+                const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
                 const speechMap = {
-                    easy:   `${curr.name}，哪個地方比較便宜？`,
-                    normal: `${curr.name}，哪個地方比較便宜？選出之後再回答便宜了多少元。`,
-                    hard:   `${curr.name}，哪個地方比較便宜？選出之後輸入差額。`,
+                    easy:   `${curr.name}，${priceInfo}，哪個比較便宜？`,
+                    normal: `${curr.name}，${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
+                    hard:   `${curr.name}，${priceInfo}，哪個比較便宜？選出後輸入差額。`,
                 };
                 this.state.quiz.lastSpeechText = speechMap[diff] || `${curr.name}，哪個地方比較便宜？`;
                 Game.Speech.speak(speechMap[diff] || `${curr.name}，哪個地方比較便宜？`);
