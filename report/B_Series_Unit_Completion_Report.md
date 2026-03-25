@@ -45,6 +45,7 @@
 > **更新日期**：2026-03-25（第十一輪豐富化：B2 easy 逐項動畫高亮（`_animateEasyEntries`，C2 pattern）、B6 正確商品彈出價格動畫（`_showPricePopup`，A4 pattern）、B1 困難模式隱藏個別費用（C1 audio-only pattern））
 > **更新日期**：2026-03-25（第十二輪豐富化：B6 攤位需求件數徽章（C5 指示燈 pattern）、B4 完成畫面累計節省統計（A4 交易摘要 pattern）、B3 月曆進度里程碑徽章（F2/A3 pattern））
 > **更新日期**：2026-03-25（第十三輪豐富化：B5 關卡轉場卡（C6 transitionText pattern）、B2 easy 逐項小計顯示（F5 視覺化 pattern）、B1 放幣語音反饋（F4/C1 pattern））
+> **更新日期**：2026-03-26（第十七輪豐富化：B1 錢包足夠語音、B5 商品點選語音、B3 quiz 存錢目標開場彈窗、B4 比價語音含雙店價格；新增七十一節）
 > **更新日期**：2026-03-26（第十六輪豐富化：B6 找到商品語音、B4 困難差額提示鈕、B2 起始金額彈窗、B6 付款足額語音；新增七十節）
 > **更新日期**：2026-03-26（第十五輪：參照 A/C/F 測驗特色代碼豐富化 — B5 轉場語音、B6 攤位切換語音+收集完成語音、B2 errorCount 3次自動計算提示、B4 selectErrorCount 3次高亮正確答案）
 > **更新日期**：2026-03-25（第十四輪：B3 月曆模式語音完整設計實作 — 彈窗標題、存錢目標語音、日期語音、最後拖放 callback、商品名稱修正、金幣顯示無上限；新增六十六～六十八節：B 系列測驗語音深化、實作對照表最終版、B vs A/C/F 測驗特色完整對比）
@@ -6864,6 +6865,71 @@ Game.Speech.speak(`本週零用錢，起始${question.startAmount}元`);
 | 付款金額 > 應付金額 | 「超過X元，找零後可以付款！」|
 
 **搜尋關鍵字**：`itemData.name.*元`、`b4-diff-hint-btn`、`_showTaskIntroModal`、`b2-task-intro-modal`、`wasSufficient`
+
+*報告更新時間：2026-03-26*
+*報告產生者：Claude Code (claude-sonnet-4-6)*
+
+---
+
+## 七十一、B 系列第十七輪豐富化：四項語音互動設計（2026-03-26）
+
+### 實作清單
+
+| # | 單元 | 功能 | 靈感來源 | 核心改動 |
+|---|------|------|---------|---------|
+| 1 | B1 | 錢包金額首次達標時語音「金額足夠，可以出發了！」| B6 `wasSufficient` pattern | `_updateWalletDisplay` 加 `wasSufficient` 守衛；`enough && !wasSufficient && total>0` 觸發語音 |
+| 2 | B5 | 商品卡片點選語音（選擇/取消）| A4 購物商品點擊語音 | `_bindRoundEvents` 點擊後：選擇→`{名稱}，{價格}元`；取消→`取消{名稱}` |
+| 3 | B3 | quiz 模式每題開場存錢目標彈窗 | B2 `_showTaskIntroModal` pattern | `_showSavingsGoalModal(question)`：物品圖示/名稱/價格；2500ms 關閉；語音「存錢目標：X，Y元」 |
+| 4 | B4 | 每題語音報告雙店價格 | A/C/F 讀出題目所有數字 | `renderQuestion` 語音改為 `{商品}，{A店}X元，{B店}Y元，哪個比較便宜？` |
+
+### 詳細說明
+
+#### B1 錢包足夠語音（B6 `_updatePaidDisplay` wasSufficient pattern）
+錢包金額剛好達到需要金額時，首次播報「金額足夠，可以出發了！」。`wasSufficient` 守衛防止多次觸發（每次拖入錢幣都會重新計算）。
+
+```javascript
+const wasSufficient = confirmBtn && !confirmBtn.disabled;
+if (confirmBtn) {
+    confirmBtn.disabled = !enough;
+    if (enough && !wasSufficient && total > 0) {
+        Game.Speech.speak('金額足夠，可以出發了！');
+    }
+}
+```
+
+這讓學生在湊足金額時立即獲得正向確認，不必等到按下確認按鈕。
+
+#### B5 商品點選語音（A4 shopping speech pattern）
+每次點擊商品卡片時播放語音：
+- **加入選擇**：`${item.name}，${toTWD(item.price)}`（例：「蛋糕，兩百元」）
+- **取消選擇**：`取消${item.name}`（例：「取消氣球」）
+
+必買商品（`.locked`）不可點擊，不觸發語音。這讓視覺障礙學生或低年級學生也能清楚知道選了什麼。
+
+#### B3 quiz 存錢目標彈窗（B2 `_showTaskIntroModal` pattern）
+每題 quiz 渲染後顯示 2.5 秒彈窗，讓學生在開始計算前先聚焦目標物品：
+
+```javascript
+_showSavingsGoalModal(question) {
+    // 物品圖示（80px）+ 名稱 + 橘色大字價格 + 「點任意處繼續」
+    Game.Speech.speak(`存錢目標：${question.item.name}，${question.item.price}元`);
+}
+```
+
+語音在彈窗出現時立即播放，讓學生聆聽商品名稱和目標金額後再作答。CSS 使用與 B2 相同的半透明背景 + 白色圓角卡片設計。
+
+#### B4 比價語音含雙店價格（A/C/F 讀出所有數字 pattern）
+原始語音只說「{商品}，哪個地方比較便宜？」，未讀出價格。現在改為讀出雙店價格：
+
+| 難度 | 新語音格式 |
+|------|----------|
+| 簡單 | `{商品}，{A店}{X}元，{B店}{Y}元，哪個比較便宜？` |
+| 普通 | `{商品}，{A店}{X}元，{B店}{Y}元，哪個比較便宜？選出之後再回答差額。` |
+| 困難 | `{商品}，{A店}{X}元，{B店}{Y}元，哪個比較便宜？選出後輸入差額。` |
+
+這讓學生在看到畫面前就能先用耳朵比較，對齊 C 系列「讀出所有幣值」和 A 系列「讀出所有操作金額」的設計原則。
+
+**搜尋關鍵字**：`wasSufficient.*金額足夠`、`取消.*item.name`、`_showSavingsGoalModal`、`b3-goal-modal`、`priceInfo.*哪個比較便宜`
 
 *報告更新時間：2026-03-26*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
