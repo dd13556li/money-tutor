@@ -45,6 +45,7 @@
 > **更新日期**：2026-03-25（第十一輪豐富化：B2 easy 逐項動畫高亮（`_animateEasyEntries`，C2 pattern）、B6 正確商品彈出價格動畫（`_showPricePopup`，A4 pattern）、B1 困難模式隱藏個別費用（C1 audio-only pattern））
 > **更新日期**：2026-03-25（第十二輪豐富化：B6 攤位需求件數徽章（C5 指示燈 pattern）、B4 完成畫面累計節省統計（A4 交易摘要 pattern）、B3 月曆進度里程碑徽章（F2/A3 pattern））
 > **更新日期**：2026-03-25（第十三輪豐富化：B5 關卡轉場卡（C6 transitionText pattern）、B2 easy 逐項小計顯示（F5 視覺化 pattern）、B1 放幣語音反饋（F4/C1 pattern））
+> **更新日期**：2026-03-26（第十八輪豐富化：B6 clear 語音、B5 超支高亮、B2 easy 逐項語音、B3 答對語音加強；新增七十二節）
 > **更新日期**：2026-03-26（第十七輪豐富化：B1 錢包足夠語音、B5 商品點選語音、B3 quiz 存錢目標開場彈窗、B4 比價語音含雙店價格；新增七十一節）
 > **更新日期**：2026-03-26（第十六輪豐富化：B6 找到商品語音、B4 困難差額提示鈕、B2 起始金額彈窗、B6 付款足額語音；新增七十節）
 > **更新日期**：2026-03-26（第十五輪：參照 A/C/F 測驗特色代碼豐富化 — B5 轉場語音、B6 攤位切換語音+收集完成語音、B2 errorCount 3次自動計算提示、B4 selectErrorCount 3次高亮正確答案）
@@ -6930,6 +6931,66 @@ _showSavingsGoalModal(question) {
 這讓學生在看到畫面前就能先用耳朵比較，對齊 C 系列「讀出所有幣值」和 A 系列「讀出所有操作金額」的設計原則。
 
 **搜尋關鍵字**：`wasSufficient.*金額足夠`、`取消.*item.name`、`_showSavingsGoalModal`、`b3-goal-modal`、`priceInfo.*哪個比較便宜`
+
+*報告更新時間：2026-03-26*
+*報告產生者：Claude Code (claude-sonnet-4-6)*
+
+---
+
+## 七十二、B 系列第十八輪豐富化：四項語音視覺設計（2026-03-26）
+
+### 實作清單
+
+| # | 單元 | 功能 | 靈感來源 | 核心改動 |
+|---|------|------|---------|---------|
+| 1 | B6 | 清除付款按鈕語音 | A1 退幣語音 + A6 重置語音 | `_bindPaymentEvents` clear 按鈕點擊後加 `Speech.speak('清除，重新選擇')` |
+| 2 | B5 | 超支時高亮建議移除商品 | B5 `_showBudgetHint` glow pattern | `_handleConfirm` 超支分支：800ms 後對 suggestion 卡片加 `b5-hint-glow` 2.4s |
+| 3 | B2 | easy 模式每個事件逐項語音 | C1 逐一識別計數 + F4 即時放置語音 | `_animateEasyEntries` 高亮同步 `Speech.speak('收入X元'/'花了X元')` |
+| 4 | B3 | quiz 答對語音含週存金額與商品 | A4 交易摘要語音 + C5 答對語音 | 答對語音改為 `每週存X元，需要Y週，就能買Z了！`（choice + numpad 兩處） |
+
+### 詳細說明
+
+#### B6 清除付款語音
+點擊「清除」按鈕後立即播放「清除，重新選擇」，讓學生明確知道操作已重置，與 A1 投幣退還語音設計一致。
+
+#### B5 超支高亮建議移除商品（B5 `_showBudgetHint` pattern）
+原本超支時只在文字框顯示「試試取消勾選{商品}」文字，現在同步在對應卡片上加 `b5-hint-glow` 脈動高亮（同 `_showBudgetHint` 的高亮模式），讓學生在卡片清單中直接看到哪個商品要移除。
+
+```javascript
+if (suggestion) {
+    Game.TimerManager.setTimeout(() => {
+        const card = document.querySelector(`.b5-item-card[data-id="${suggestion.id}"]`);
+        if (card) {
+            card.classList.add('b5-hint-glow');
+            Game.TimerManager.setTimeout(() => card.classList.remove('b5-hint-glow'), 2400, 'ui');
+        }
+    }, 800, 'ui');
+}
+```
+
+#### B2 easy 模式逐項語音（C1 逐一計數 pattern）
+`_animateEasyEntries` 每 800ms 高亮一個事件列時，同步播放語音：
+- 收入事件 → `收入${amount}元`
+- 支出事件 → `花了${amount}元`
+
+讓學生聽著語音觀看動畫，同時更新運行小計，三種感官（視覺動畫 + 語音 + 數字）同步強化記憶。
+
+```javascript
+const ev = question.events[i];
+const verb = ev.type === 'income' ? '收入' : '花了';
+Game.Speech.speak(`${verb}${ev.amount}元`);
+```
+
+#### B3 quiz 答對語音強化除法概念
+原始語音「答對了！需要X週」只說了答案，未說明計算過程。改為：
+
+> `每週存X元，需要Y週，就能買Z了！`
+
+例：「每週存50元，需要6週，就能買積木組了！」
+
+強化 **除法 = 多次累積** 的概念，讓語音成為計算公式的口頭化重述，與 B3 畫面中「除法公式提示」形成文字/語音雙重確認。此修改同時套用於三選一（choice）和鍵盤輸入（numpad）兩種答題方式。
+
+**搜尋關鍵字**：`清除，重新選擇`、`suggestion.*b5-hint-glow`、`verb.*收入.*花了`、`每週存.*需要.*週.*就能買`
 
 *報告更新時間：2026-03-26*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
