@@ -6530,7 +6530,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 10000;
+                z-index: 10200;
             `;
 
             modal.innerHTML = `
@@ -6607,7 +6607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 10000;
+                z-index: 10200;
             `;
 
             modal.innerHTML = `
@@ -6678,7 +6678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 10000;
+                z-index: 10200;
             `;
 
             modal.innerHTML = `

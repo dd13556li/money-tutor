@@ -463,6 +463,8 @@ toolbarConfig: {
 | B5 關卡轉場卡（2026-03-25）| B5 | `_showRoundTransition(roundNum, callback)`：`nextRound()` 改呼叫此方法；紫色全屏覆蓋卡「第X關」1.1s + 淡出 0.3s + callback；`b5RtIn` 彈出動畫；C6 transitionText pattern |
 | B2 easy 逐項小計顯示（2026-03-25）| B2 | `_animateEasyEntries` 插入 `#b2-running-total` 卡；每步高亮同步更新餘額；`b2-rt-up`（綠，收入）/`b2-rt-down`（紅，支出）；`b2RtPop` 彈出動畫；F5 視覺化 pattern |
 | B1 放幣語音反饋（2026-03-25）| B1 | `addCoin(denom)` 末尾加 `TimerManager.setTimeout(() => Speech.speak(\`${denom}元\`), 80, 'ui')`；coin.mp3 先播完再語音；F4 instant feedback + C1 coin recognition pattern |
+| A4 困難模式實付金額顯示0元（2026-03-25）| A4 | `proceedWithPaymentSuccess` speech callback 開頭加 `this.state.gameState.currentTransaction.amountPaid = paidAmount`；防止非同步期間 amountPaid 被清零導致 `renderCalculationSceneUI` 顯示錯誤；`changeExpected` 計算不受影響 |
+| A5 簡單+輔助模式彈窗無法點擊（2026-03-25）| A5 | `task-reminder-modal`/`amount-reminder-modal`/`transfer-amount-reminder-modal` z-index 從 10000 改為 10200；原因：`click-exec-overlay` z-index=10100 覆蓋彈窗，`event.target` 為遮罩非彈窗按鈕，click mode 攔截點擊 |
 
 ---
 

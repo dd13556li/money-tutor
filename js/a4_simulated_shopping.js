@@ -8734,6 +8734,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.audio.playCheckoutSound(() => {
                 this.speech.speak(`你總共付了${this.convertToTraditionalCurrency(paidAmount)}`, {
                     callback: () => {
+                        // 🔧 [修復] 確保 amountPaid 在場景切換前保持正確值（防止非同步期間被清零）
+                        this.state.gameState.currentTransaction.amountPaid = paidAmount;
                         if (transaction.changeExpected > 0) {
                             this.generateChange();
                         }
