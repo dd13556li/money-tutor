@@ -14353,6 +14353,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     isTransitioning: false  // 🔒 [v1.2.62] 防止階段轉換競態條件
                 };
             }
+            // 每輪重置明細表取走標記（防止上一輪的 true 污染下一輪）
+            gs.clickModeState.receiptTaken = false;
 
             // 設置當前操作類型
             gs.clickModeState.currentOperation = this.getActualSessionType();
@@ -15045,6 +15047,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (gs.clickModeState.receiptTaken) {
                             ATM.Debug.log('assist', '[ClickMode] 明細表已經取走過，跳過重複執行');
                             gs.clickModeState.currentStep++;
+                            gs.clickModeState.isExecuting = false;  // 🔧 釋放鎖，防止永久凍結
                             return;
                         }
                         this.autoTakeReceipt();
@@ -15410,10 +15413,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     // ⚠️ 安全網：如果 1.5 秒後還沒有任何 Hint/Modal 出現（例如 processing 畫面），才強制解鎖
                     // 這防止有些步驟沒有提示導致卡死
                     if (nextPhase.includes('Processing') || nextPhase.includes('takeCash') || nextPhase.includes('Receipt')) {
+                        // 🔧 捕捉當前階段，防止舊階段安全網在新階段觸發（快速點擊競態）
+                        const safetyPhase = nextPhase;
                         // 🔧 [Phase 3] 遷移至 TimerManager
                         this.TimerManager.setTimeout(() => {
-                            if (!gs.clickModeState.waitingForClick) {
-                                ATM.Debug.log('assist', '[ClickMode] ⚠️ 無視覺提示，啟動安全網解鎖');
+                            // 🔧 [Phase-aware] 只在仍處於同一階段時才解鎖，防止跨階段誤觸發
+                            if (!gs.clickModeState.waitingForClick &&
+                                gs.clickModeState.currentPhase === safetyPhase) {
+                                ATM.Debug.log('assist', '[ClickMode] ⚠️ 無視覺提示，啟動安全網解鎖（階段:', safetyPhase, '）');
                                 gs.clickModeState.waitingForClick = true;
                                 // 🔧 [v1.2.60] 設定 clickReadyTime 為過去時間，允許立即點擊（避免安全網解鎖後還要等 600ms）
                                 gs.clickModeState.clickReadyTime = Date.now() - 600;
@@ -15989,6 +15996,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const maxAttempts = 40; // 20秒 (40 * 500ms)，因為列印動畫需要時間
 
             const poll = () => {
+                // 🔧 防止並行實例重複操作（快速點擊可能啟動兩個 poll 循環）
+                if (gs.clickModeState.receiptTaken) {
+                    ATM.Debug.log('assist', '[ClickMode] autoTakeReceipt: 偵測到已取走，停止輪詢');
+                    return;
+                }
                 attempts++;
                 const receiptButton = document.querySelector('.take-receipt-btn');
 
@@ -15998,6 +16010,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 🔧 增加步驟計數（移到這裡，確保只有找到按鈕後才計數）
                     gs.clickModeState.currentStep++;
                     ATM.Debug.log('assist', '[ClickMode] 步驟已完成，當前:', gs.clickModeState.currentStep, '/', gs.clickModeState.actionQueue.length);
+
+                    // 🔧 提前標記，縮短競態視窗（防止 enableClickModeWithVisualDelay 提前解鎖後再次進入）
+                    gs.clickModeState.receiptTaken = true;
 
                     this.audio.playBeep();
                     this.playStepSuccess();
@@ -16011,9 +16026,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         receiptButton.dispatchEvent(mousedownEvent);
                         ATM.Debug.log('assist', '[ClickMode] 已觸發明細表按鈕 mousedown 事件');
-
-                        // 標記已執行
-                        gs.clickModeState.receiptTaken = true;
 
                         // 🔧 [v1.2.45] 點擊後彈窗會同步創建，等待事件綁定完成後注入隊列
                         // 按鈕在 showReceiptModal() 中同步創建，事件在 300ms 後綁定
@@ -16113,21 +16125,21 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.clickModeState.currentStep++;
             ATM.Debug.log('assist', '[ClickMode] 步驟已完成，當前:', gs.clickModeState.currentStep, '/', gs.clickModeState.actionQueue.length);
 
-            // 查找卡片或卡片按鈕
-            const cardButton = document.querySelector('.take-card-btn') ||
-                              document.querySelector('[data-action="take-card"]') ||
-                              document.querySelector('#atm-card') ||
-                              document.querySelector('.atm-card');
+            // 優先查找「取回卡片」按鈕（非列印流程按鈕已存在），否則找卡片圖片
+            const takeCardBtn = document.getElementById('take-card-btn') ||
+                               document.querySelector('.take-card-btn') ||
+                               document.querySelector('[data-action="take-card"]');
+            const cardImage = document.querySelector('#atm-card') ||
+                             document.querySelector('.atm-card');
 
-            if (cardButton) {
+            if (takeCardBtn) {
+                // 「取回卡片」按鈕已存在（非列印流程）：直接點擊
                 this.audio.playBeep();
                 this.playStepSuccess();
                 // 🔧 [Phase 3] 遷移至 TimerManager
                 this.TimerManager.setTimeout(() => {
-                    cardButton.click();
-                    ATM.Debug.log('assist', '[ClickMode] 卡片已取回');
-
-                    // 🔧 [v1.2.54] 所有流程統一自動執行下一步，階段轉換邏輯會處理解鎖
+                    takeCardBtn.click();
+                    ATM.Debug.log('assist', '[ClickMode] 卡片已取回（按鈕點擊）');
                     // 🔧 [Phase 3] 遷移至 TimerManager
                     this.TimerManager.setTimeout(() => {
                         ATM.Debug.log('assist', '[ClickMode] 取卡完成，自動執行下一步');
@@ -16135,9 +16147,47 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.executeNextAction();
                     }, 2000, 'clickMode');
                 }, 300, 'clickMode');
+            } else if (cardImage) {
+                // 🔧 列印流程：先點擊卡片圖片觸發退出動畫，再輪詢等待「取回卡片」按鈕出現後點擊
+                // 按鈕在動畫完成後（約 1800ms）才由 addCardClickListenerForPrint 建立
+                ATM.Debug.log('assist', '[ClickMode] 列印流程：點擊卡片圖片觸發動畫，等待「取回卡片」按鈕');
+                this.TimerManager.setTimeout(() => {
+                    cardImage.click();
+                    ATM.Debug.log('assist', '[ClickMode] 卡片圖片已點擊，開始輪詢「取回卡片」按鈕');
+
+                    let btnAttempts = 0;
+                    const maxBtnAttempts = 25; // 最多等待 5 秒（25 × 200ms）
+                    const pollForTakeCardBtn = () => {
+                        btnAttempts++;
+                        const btn = document.getElementById('take-card-btn') ||
+                                    document.querySelector('.take-card-btn');
+                        if (btn && btn.offsetParent !== null) {
+                            ATM.Debug.log('assist', `[ClickMode] ✅ 找到「取回卡片」按鈕（嘗試 ${btnAttempts} 次），執行點擊`);
+                            this.audio.playBeep();
+                            this.playStepSuccess();  // 🔧 煙火移到此處，按鈕出現後才播
+                            this.TimerManager.setTimeout(() => {
+                                btn.click();
+                                ATM.Debug.log('assist', '[ClickMode] 卡片已取回（按鈕點擊）');
+                                this.TimerManager.setTimeout(() => {
+                                    ATM.Debug.log('assist', '[ClickMode] 取卡完成，自動執行下一步');
+                                    gs.clickModeState.isExecuting = false;  // 🔓 解鎖
+                                    this.executeNextAction();
+                                }, 500, 'clickMode');
+                            }, 300, 'clickMode');
+                        } else if (btnAttempts >= maxBtnAttempts) {
+                            ATM.Debug.log('assist', '[ClickMode] 等待「取回卡片」按鈕超時，直接繼續');
+                            this.audio.playBeep();
+                            this.playStepSuccess();
+                            gs.clickModeState.isExecuting = false;  // 🔓 解鎖
+                            this.executeNextAction();
+                        } else {
+                            this.TimerManager.setTimeout(pollForTakeCardBtn, 200, 'clickMode');
+                        }
+                    };
+                    this.TimerManager.setTimeout(pollForTakeCardBtn, 200, 'clickMode');
+                }, 300, 'clickMode');
             } else {
                 ATM.Debug.log('assist', '[ClickMode] 找不到卡片元素，可能已自動彈出');
-                // 🔧 [v1.2.54] 所有流程統一自動執行下一步，階段轉換邏輯會處理解鎖
                 // 🔧 [Phase 3] 遷移至 TimerManager
                 this.TimerManager.setTimeout(() => {
                     ATM.Debug.log('assist', '[ClickMode] 卡片自動彈出完成，自動執行下一步');

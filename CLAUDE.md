@@ -466,6 +466,8 @@ toolbarConfig: {
 | A4 困難模式實付金額顯示0元（2026-03-25）| A4 | `proceedWithPaymentSuccess` speech callback 開頭加 `this.state.gameState.currentTransaction.amountPaid = paidAmount`；防止非同步期間 amountPaid 被清零導致 `renderCalculationSceneUI` 顯示錯誤；`changeExpected` 計算不受影響 |
 | A5 簡單+輔助模式彈窗無法點擊（2026-03-25）| A5 | `task-reminder-modal`/`amount-reminder-modal`/`transfer-amount-reminder-modal` z-index 從 10000 改為 10200；原因：`click-exec-overlay` z-index=10100 覆蓋彈窗，`event.target` 為遮罩非彈窗按鈕，click mode 攔截點擊 |
 | A5 轉帳 hint-modal 列入點擊隊列（2026-03-25）| A5 | `transferBank`/`transferAccount`/`transferAmount` 隊列首位加 `closeModal`（`bank-code-hint-close-btn`/`account-hint-close-btn`/`transfer-amount-hint-close-btn`）；三個按鈕加 id；`autoCloseModal` 新增對應分支（查 `#hint-modal-overlay` → remove → executeNextAction）|
+| A5 takeReceipt 快速點擊凍結（2026-03-25）| A5 | `receiptTaken` 守衛加 `isExecuting = false`（防永久凍結）；`autoTakeReceipt` 提前在找到按鈕時設 `receiptTaken = true`（縮短競態視窗，原在 300ms timer 內）|
+| A5 取卡步驟快速點擊卡死（2026-03-25）| A5 | `transitionPhase` 安全網加 `safetyPhase` 相位守衛（`currentPhase === safetyPhase`，防舊階段 1.5s timer 跨相位觸發）；`autoTakeReceipt` poll 開頭加 `receiptTaken` 早退守衛（防兩個並行 poll 實例）；`autoTakeCard` 列印流程改為輪詢：點卡片圖片觸發動畫 → 輪詢等 `#take-card-btn`（1800ms 後出現）→ 點擊後才播煙火並繼續（原先 2000ms 固定等待導致提前轉 `takeReceipt`）|
 
 ---
 

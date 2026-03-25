@@ -1,7 +1,7 @@
 # A5 ATM 提款機單元 — 完成經驗報告書
 
 > **建立日期**：2026-02-09（日）17:45
-> **更新日期**：2026-03-20（普通模式自動提示關閉）
+> **更新日期**：2026-03-25（輔助點擊模式六項修復 + Pattern 6 跨輪狀態污染）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：A5 — ATM 提款機模擬學習
 > **報告類型**：單元完成經驗與開發建議
@@ -1745,3 +1745,104 @@ window.addEventListener('error', function(event) {
 3. **`hideHintButton()`**：改為對 `#hint-btn-wrapper` 設 `display = 'none'`。
 
 **關鍵搜尋詞**：`hint-btn-wrapper`（`js/a5_atm_simulator.js`）
+
+---
+
+## 2026-03-25：輔助點擊模式六項修復
+
+本輪共修復六個輔助點擊模式問題，分兩輪除錯完成。
+
+---
+
+### 25.1 簡單/輔助模式彈窗無法點擊（z-index 衝突）
+
+**症狀**：簡單模式或輔助點擊模式中，任務提示彈窗（task-reminder-modal / amount-reminder-modal / transfer-amount-reminder-modal）出現後，點擊彈窗內按鈕無反應。
+
+**根本原因**：`click-exec-overlay`（z-index: 10100）覆蓋於彈窗上方，`event.target` 為遮罩而非彈窗按鈕，click mode 攔截後不知道應點擊哪個元素。
+
+**修復**：三個提示彈窗 z-index 從 10000 改為 10200（高於遮罩層）。
+
+**搜尋關鍵字**：`task-reminder-modal`, `amount-reminder-modal`, `transfer-amount-reminder-modal`
+
+---
+
+### 25.2 轉帳 hint-modal 按鈕未列入點擊隊列
+
+**症狀**：轉帳任務輔助點擊模式下，銀行代碼/帳號/轉帳金額提示彈窗出現後，輔助點擊沒有「關閉彈窗」這一步，導致流程卡住。
+
+**修復**：`transferBank` / `transferAccount` / `transferAmount` 隊列首位加入 `closeModal` 步驟；三個關閉按鈕加入對應 id（`bank-code-hint-close-btn` / `account-hint-close-btn` / `transfer-amount-hint-close-btn`）；`autoCloseModal` 函數新增對應分支（查 `#hint-modal-overlay` → remove → executeNextAction）。
+
+**搜尋關鍵字**：`autoCloseModal`, `bank-code-hint-close-btn`, `account-hint-close-btn`, `transfer-amount-hint-close-btn`
+
+---
+
+### 25.3 takeReceipt 快速點擊後系統凍結
+
+**症狀**：快速連點時，`autoTakeReceipt` 可能被啟動兩次。兩個 poll 實例各自執行，`receiptTaken` 守衛的早退路徑缺少 `isExecuting = false`，導致系統永久凍結。
+
+**修復**：
+1. `receiptTaken` 早退路徑加入 `isExecuting = false`（Pattern 4）
+2. `autoTakeReceipt` 在找到按鈕時提前設 `receiptTaken = true`（縮短競態視窗，Pattern 3）
+
+**搜尋關鍵字**：`receiptTaken`, `autoTakeReceipt`
+
+---
+
+### 25.4 autoTakeCard 固定延遲導致取卡步驟卡死
+
+**症狀**：輔助點擊模式取卡步驟，因使用固定 2000ms 延遲等待 `#take-card-btn` 出現，在效能差的環境下延遲不足，按鈕尚未出現時已嘗試點擊，導致後續步驟卡死。另外煙火在卡片還在滑出動畫中就提前觸發。
+
+**根本原因**：固定延遲對動畫觸發的 DOM 元素不可靠（Pattern 1）。
+
+**修復**：`autoTakeCard` 改為兩段式輪詢流程：
+1. 點擊卡片圖片觸發退卡動畫（不播反饋）
+2. 每 200ms 輪詢 `#take-card-btn`，出現後才播煙火並呼叫 `executeNextAction()`
+
+最多輪詢 25 次（5 秒上限），超時降級繼續。
+
+**搜尋關鍵字**：`autoTakeCard`, `take-card-btn`
+
+---
+
+### 25.5 transitionPhase 安全網計時器跨相位解鎖
+
+**症狀**：快速連點時，舊相位的 1500ms 安全網計時器尚在等待，`currentPhase` 已切換到新相位，計時器觸發後誤解鎖新相位的 `waitingForClick`。
+
+**根本原因**：計時器排程時未記錄當前相位，觸發時無法驗證相位是否仍有效（Pattern 2）。
+
+**修復**：`transitionPhase` 安全網計時器排程時快照 `safetyPhase = nextPhase`，觸發時加入 `gs.clickModeState.currentPhase === safetyPhase` 驗證。
+
+**搜尋關鍵字**：`safetyPhase`, `transitionPhase`
+
+---
+
+### 25.6 receiptTaken 跨輪狀態污染（Pattern 6）
+
+**症狀**：完成「餘額查詢」等任務後，切換到「轉帳」任務，`takeReceipt` 步驟直接被跳過（日誌顯示「明細表已經取走過，跳過重複執行」），隨後系統凍結無法繼續。
+
+**根本原因**：
+1. `unbindClickModeHandler()` 將 `_clickModeHandlerBound = false`，使下一輪走「第一輪初始化」路徑
+2. `initClickModeForATM()` 的 `if (!gs.clickModeState)` 守衛因物件已存在而跳過重建
+3. 上輪 `autoTakeReceipt()` 設置的 `receiptTaken: true` 殘留，下輪直接誤判「已取走」
+
+這是 **Pattern 6（跨輪狀態污染）** 的典型案例：`if (!obj)` 守衛只保護物件建立，不保護欄位重置。
+
+**修復**：`initClickModeForATM()` 的 `if (!gs.clickModeState)` 守衛之後，無條件加入：
+
+```javascript
+// 每輪重置明細表取走標記（防止上輪殘留污染）
+gs.clickModeState.receiptTaken = false;
+```
+
+**適用範圍**：一行修復覆蓋所有 4 種操作類型（提款/存款/餘額查詢/轉帳）。
+
+**未來新增的「已完成」旗標**（如 `cardTaken`、`cashTaken`）同樣需要加入此無條件重置清單。
+
+**搜尋關鍵字**：`initClickModeForATM`, `receiptTaken = false`
+
+**關聯文件**：`report/ClickMode_Animation_DOM_Patterns.md`（Pattern 6 完整說明）
+
+---
+
+*報告更新時間：2026-03-25*
+*報告產生者：Claude Code (claude-sonnet-4-6)*
