@@ -634,6 +634,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="b5-result-sub">超出 ${overBy} 元</div>
                             ${suggestionHTML}
                         </div>`;
+                    // 高亮建議移除的商品（B5 _showBudgetHint pattern）
+                    if (suggestion) {
+                        Game.TimerManager.setTimeout(() => {
+                            const card = document.querySelector(`.b5-item-card[data-id="${suggestion.id}"]`);
+                            if (card) {
+                                card.classList.add('b5-hint-glow');
+                                Game.TimerManager.setTimeout(
+                                    () => card.classList.remove('b5-hint-glow'), 2400, 'ui'
+                                );
+                            }
+                        }, 800, 'ui');
+                    }
                 }
             }
 

@@ -482,6 +482,10 @@ toolbarConfig: {
 | B5 商品點選語音（2026-03-26）| B5 | `_bindRoundEvents` 卡片點擊後加語音：選擇→「{名稱}，{價格}元」；取消→「取消{名稱}」；A4 shopping speech pattern |
 | B3 quiz 存錢目標開題彈窗（2026-03-26）| B3 | `_showSavingsGoalModal(question)`：顯示物品圖示/名稱/價格；2500ms 自動關閉；語音「存錢目標：{名稱}，{價格}元」；B2 `_showTaskIntroModal` pattern；CSS：`.b3-goal-modal*` |
 | B4 比價語音含雙店價格（2026-03-26）| B4 | `renderQuestion` 語音改為 `{名稱}，{A店}X元，{B店}Y元，哪個比較便宜？`；對齊 A/C/F 讀出題目所有數字 pattern |
+| B6 清除付款語音（2026-03-26）| B6 | `_bindPaymentEvents` clear 按鈕加 `Game.Speech.speak('清除，重新選擇')` |
+| B5 超支建議商品高亮（2026-03-26）| B5 | `_handleConfirm` 超支分支：`suggestion` 存在時 800ms 後加 `b5-hint-glow` 至建議移除的卡片（2400ms 後移除）；B5 `_showBudgetHint` pattern |
+| B2 easy 逐項事件語音（2026-03-26）| B2 | `_animateEasyEntries` 每步高亮時加 `Game.Speech.speak('收入X元'/'花了X元')`；C1 逐一計數 pattern |
+| B3 quiz 答對語音含週存與商品名（2026-03-26）| B3 | choice + numpad 答對語音改為 `每週存X元，需要Y週，就能買Z了！`；強化除法概念連結 |
 
 ---
 

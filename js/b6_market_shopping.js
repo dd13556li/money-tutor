@@ -839,6 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.on(document.getElementById('b6-clear-btn'), 'click', () => {
                 g.paidAmount = 0;
                 this._updatePaidDisplay(0, total);
+                Game.Speech.speak('清除，重新選擇');
             }, {}, 'gameUI');
 
             Game.EventManager.on(document.getElementById('b6-pay-btn'), 'click', () => {

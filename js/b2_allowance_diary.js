@@ -851,6 +851,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         void valEl.offsetWidth; // 觸發 reflow
                         valEl.style.animation = 'b2RtPop 0.3s ease';
                     }
+                    // 逐項語音（C1 逐一計數 pattern）
+                    const ev = question.events[i];
+                    const verb = ev.type === 'income' ? '收入' : '花了';
+                    Game.Speech.speak(`${verb}${ev.amount}元`);
                 }, 500 + i * 800, 'ui');
             });
 

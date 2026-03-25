@@ -1743,7 +1743,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.correctCount++;
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！需要${question.answer}週`);
+                Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
                 Game.TimerManager.setTimeout(() => {
                     this._showPiggyAnimation(question, () => this.nextQuestion());
                 }, 500, 'turnTransition');
@@ -1799,7 +1799,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.correctCount++;
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！需要${question.answer}週`);
+                Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
                 Game.TimerManager.setTimeout(() => {
                     this._showPiggyAnimation(question, () => this.nextQuestion());
                 }, 500, 'turnTransition');
