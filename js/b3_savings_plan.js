@@ -27,9 +27,9 @@ function b3CompressImage(file, maxWidth = 200, quality = 0.7) {
 
 // ── 商品資料庫（依難度篩選）─────────────────────────────────────
 const B3_ALL_ITEMS = [
-    { name: '美術套組',  price: 200,  icon: '🎨', img: 'icon-b3-art-set.png' },
+    { name: '食譜書',    price: 200,  icon: '📖', img: 'icon-b3-art-set.png' },
     { name: '拼圖遊戲',  price: 250,  icon: '🧩', img: 'icon-b3-puzzle.png' },
-    { name: '食譜書',    price: 280,  icon: '📖', img: 'icon-b3-recipe-book.png' },
+    { name: '兒童繪本',  price: 280,  icon: '📕', img: 'icon-b3-recipe-book.png' },
     { name: '玩具機器人', price: 300,  icon: '🤖', img: 'icon-b3-robot-toy.png' },
     { name: '望遠鏡',    price: 350,  icon: '🔭', img: 'icon-b3-telescope.png' },
     { name: '桌遊組',    price: 380,  icon: '🎲', img: 'icon-b3-board-game.png' },
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.className = 'b3-task-popup-overlay';
             overlay.innerHTML = `
         <div class="b3-task-popup">
-            <div class="b3-task-popup-title">🎯 今天的存錢目標</div>
+            <div class="b3-task-popup-title">🎯 存錢目標</div>
             <div class="b3-task-item-icon-wrap">${this._itemIconHTML(c.item, '128px')}</div>
             <div class="b3-task-item-name">${c.item.name}</div>
             <div class="b3-task-item-price">需要 <strong>${c.item.price}</strong> 元</div>
@@ -834,8 +834,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="b3-task-start-btn" id="b3-task-start">開始存錢！🐷</button>
         </div>`;
             document.body.appendChild(overlay);
+            Game.Speech.speak(`存錢目標，${c.item.name}，需要 ${c.item.price} 元`);
             document.getElementById('b3-task-start').addEventListener('click', () => {
                 overlay.remove();
+                Game.Speech.speak('開始存錢');
             });
         },
 
@@ -942,15 +944,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isBill    = denom >= 100;
                 const imgSize   = isBill ? '90px' : '55px';
                 const thumbSize = isBill ? '40px' : '28px';
-                const MAX_SHOW  = 10;
-                const shown     = Math.min(count, MAX_SHOW);
                 const isChanged = !!changedDenoms[denom];
                 let imgs = '';
-                for (let i = 0; i < shown; i++) {
-                    const isNew = isChanged && (i === shown - 1);
+                for (let i = 0; i < count; i++) {
+                    const isNew = isChanged && (i === count - 1);
                     imgs += `<span class="b3-pig-img-wrap${isNew ? ' b3-pig-img-new' : ''}"><img src="../images/money/${denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元"></span>`;
                 }
-                if (count > MAX_SHOW) imgs += `<span class="b3-pig-denom-overflow">+${count - MAX_SHOW}</span>`;
 
                 // 兌換按鈕
                 const rule = EXCHANGE_RULES.find(r => r.from === denom && count >= r.count);
@@ -1172,6 +1171,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isProcessing) return;
             this.state.isProcessing = true;
             this.audio.play('click');
+            const c = this.state.calendar;
+            const month = c.startDate.getMonth() + 1;
+            const dayNum = c.clickedDays + 1;
+            Game.Speech.speak(`${month}月${day}日，第${dayNum}天`);
             this._startDragSession(day);
         },
 
@@ -1335,9 +1338,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             c.drag.placedCount++;
             c.drag.placedAmount += denom;
-            Game.Speech.speak(`存入${toTWD(c.drag.placedAmount)}`);
-            if (c.drag.placedCount >= c.drag.items.length) {
-                Game.TimerManager.setTimeout(() => this._completeDragSession(), 500, 'turnTransition');
+            const isLast = c.drag.placedCount >= c.drag.items.length;
+            if (isLast) {
+                Game.Speech.speak(`存入${toTWD(c.drag.placedAmount)}`, () => {
+                    this._completeDragSession();
+                });
+            } else {
+                Game.Speech.speak(`存入${toTWD(c.drag.placedAmount)}`);
             }
         },
 
@@ -1384,22 +1391,16 @@ document.addEventListener('DOMContentLoaded', () => {
             this._updatePiggyBankCard(changedDenoms);
 
             const reached   = c.accumulated >= c.item.price;
-            const remaining = Math.max(0, c.item.price - c.accumulated);
-            let speechText;
             if (reached) {
-                speechText = `太棒了！存到${toTWD(c.accumulated)}了，可以買${c.item.name}了！`;
-            } else {
-                speechText = `共存了${toTWD(c.accumulated)}，還需要${toTWD(remaining)}`;
-            }
-            c.lastSpeech = speechText;
-            Game.Speech.speak(speechText, () => {
-                if (reached) {
+                const speechText = `太棒了！存到${toTWD(c.accumulated)}了，可以買${c.item.name}了！`;
+                c.lastSpeech = speechText;
+                Game.Speech.speak(speechText, () => {
                     this.state.isProcessing = false;
                     Game.TimerManager.setTimeout(() => this._onCalendarGoalReached(), 400, 'turnTransition');
-                } else {
-                    this._updateCalendarUI(true); // pig already updated
-                }
-            });
+                });
+            } else {
+                this._updateCalendarUI(true); // pig already updated
+            }
         },
 
         _showMilestoneBadge(pct) {

@@ -654,6 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         便宜了多少元？
                         <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
                     </div>
+                    <button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>
                     <div class="b4-input-display" id="numpad-display">
                         <span id="numpad-val">0</span><span class="b4-unit-text"> 元</span>
                     </div>
@@ -680,6 +681,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.numpadValue = this.state.numpadValue.slice(0, -1);
                     this._updateNumpadDisplay();
                 }, {}, 'diffUI');
+
+                const diffHintBtn = document.getElementById('b4-diff-hint-btn');
+                if (diffHintBtn) {
+                    Game.EventManager.on(diffHintBtn, 'click', () => {
+                        this._showDiffFormulaHint();
+                        Game.Speech.speak(`${curr.optA.price}減${curr.optB.price}`);
+                    }, {}, 'diffUI');
+                }
 
                 Game.EventManager.on(document.getElementById('btn-ok'), 'click', () => {
                     if (this.state.isProcessing) return;

@@ -615,6 +615,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
             const diff = this.state.settings.difficulty;
 
+            // 開題起始金額彈窗（B1 _showTaskModal pattern）
+            this._showTaskIntroModal(currentQ);
+
             // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）
             if (diff === 'easy') {
                 this._animateEasyEntries(currentQ);
@@ -858,6 +861,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');
+        },
+
+        // ── 開題起始金額彈窗（B1 _showTaskModal pattern）─────────
+        _showTaskIntroModal(question) {
+            document.getElementById('b2-task-intro-modal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'b2-task-intro-modal';
+            modal.className = 'b2-task-intro-modal';
+            modal.innerHTML = `
+                <div class="b2-task-intro-inner">
+                    <div class="b2-task-intro-icon">📒</div>
+                    <div class="b2-task-intro-label">起始金額</div>
+                    <div class="b2-task-intro-amount">${question.startAmount} 元</div>
+                    <div class="b2-task-intro-tap">點任意處繼續</div>
+                </div>`;
+            document.body.appendChild(modal);
+            Game.Speech.speak(`本週零用錢，起始${question.startAmount}元`);
+            modal.addEventListener('click', () => modal.remove());
+            Game.TimerManager.setTimeout(() => {
+                if (document.body.contains(modal)) modal.remove();
+            }, 2200, 'ui');
         },
 
         // ── 計算過程提示（答錯後顯示逐步算式）─────────────────

@@ -701,7 +701,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             () => listItem.classList.remove('b6-list-bounce'), 600, 'ui'
                         );
                         const itemData = B6_STALLS[stall].items.find(i => i.id === itemId);
-                        if (itemData) this._showPricePopup(listItem, itemData.price);
+                        if (itemData) {
+                            this._showPricePopup(listItem, itemData.price);
+                            Game.Speech.speak(`${itemData.name}，${itemData.price}元`);
+                        }
                     }
 
                     // Update total and checkout button
@@ -893,9 +896,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const payBtn = document.getElementById('b6-pay-btn');
             if (payBtn) {
+                const wasSufficient = !payBtn.disabled;
                 payBtn.disabled = paid < total;
                 if (paid >= total) {
                     payBtn.style.background = '#059669';
+                    if (!wasSufficient) {
+                        // 第一次達到足夠金額時語音提示（B6 pay-ready pattern）
+                        const change = paid - total;
+                        if (change === 0) {
+                            Game.Speech.speak('金額剛好，可以付款了！');
+                        } else {
+                            Game.Speech.speak(`超過${toTWD(change)}，找零後可以付款！`);
+                        }
+                    }
                 } else {
                     payBtn.style.background = '';
                 }

@@ -474,6 +474,10 @@ toolbarConfig: {
 | B6 攤位切換語音（2026-03-26）| B6 | stall-tab click 加防重複守衛 + `Game.Speech.speak(B6_STALLS[stall].name)`；`所有商品收集完成，可以去結帳了！` 在 allDone 時觸發 |
 | B2 errorCount 機制（2026-03-26）| B2 | `quiz.errorCount` 計數；choice retry 答錯 ≥3 次自動呼叫 `_showCalcBreakdown`；`nextQuestion` 重置 |
 | B4 selectErrorCount 高亮提示（2026-03-26）| B4 | `quiz.selectErrorCount` 計數；select retry 答錯 ≥3 次語音說出正確店名 + `.b4-select-hint` CSS 脈動高亮；CSS：`b4SelectHint` |
+| B6 找到商品語音（2026-03-26）| B6 | `_showPricePopup` 呼叫點加 `Game.Speech.speak(\`${itemData.name}，${itemData.price}元\`)` |
+| B4 困難模式差額提示鈕（2026-03-26）| B4 | `_renderDiffSection` hard 分支加 `<button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>`；click 呼叫 `_showDiffFormulaHint()` + 語音 `${optA.price}減${optB.price}`；CSS：`.b4-diff-hint-btn` |
+| B2 開題起始金額彈窗（2026-03-26）| B2 | `_showTaskIntroModal(question)`：每題渲染後顯示全屏半透明彈窗，顯示起始金額橘色大字；2200ms 自動關閉或點任意處關閉；語音「本週零用錢，起始X元」；B1 `_showTaskModal` pattern；CSS：`.b2-task-intro-*` |
+| B6 付款足額語音（2026-03-26）| B6 | `_updatePaidDisplay` 加 `wasSufficient` 守衛；首次達到足額：剛好→「金額剛好，可以付款了！」；超過→「超過X元，找零後可以付款！」 |
 
 ---
 

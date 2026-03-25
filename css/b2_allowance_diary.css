@@ -364,6 +364,31 @@
 .b2-rt-val.b2-rt-up   { color: #059669; }
 .b2-rt-val.b2-rt-down { color: #dc2626; }
 
+/* ── 開題起始金額彈窗（B1 task modal pattern）────────────── */
+.b2-task-intro-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    animation: b2FadeIn 0.2s ease;
+}
+.b2-task-intro-inner {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    min-width: 220px;
+}
+.b2-task-intro-icon  { font-size: 3rem; margin-bottom: 8px; }
+.b2-task-intro-label {
+    font-size: 1rem; color: #6b7280; font-weight: 500; margin-bottom: 4px;
+}
+.b2-task-intro-amount {
+    font-size: 2.2rem; font-weight: bold; color: #d97706; margin: 8px 0;
+}
+.b2-task-intro-tap   { font-size: 13px; color: #94a3b8; margin-top: 12px; }
+
 /* ── 動畫 ─────────────────────────────────────────────────── */
 @keyframes b2Shake {
     0%, 100% { transform: translateX(0); }
