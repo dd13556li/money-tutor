@@ -206,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentQuestion: 0,
                 totalQuestions: 0,
                 correctCount: 0,
+                streak: 0,
                 questions: [],
                 achievedGoals: [],
                 startTime: null,
@@ -280,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion  = 0;
             q.totalQuestions   = this.state.settings.questionCount || 0;
             q.correctCount     = 0;
+            q.streak           = 0;
             q.questions        = [];
             q.achievedGoals    = [];
             q.startTime        = null;
@@ -906,6 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 q.currentQuestion = 0;
                 q.totalQuestions  = s.questionCount;
                 q.correctCount    = 0;
+                q.streak          = 0;
                 q.startTime       = Date.now();
                 q.questions       = this._generateQuestions(s.questionCount);
                 q.currentInput    = '';
@@ -2199,14 +2202,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 this.state.quiz.achievedGoals.push({ item: question.item, weekly: question.weekly, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
                 Game.TimerManager.setTimeout(() => {
                     this._showPiggyAnimation(question, () => this.nextQuestion());
                 }, 500, 'turnTransition');
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
@@ -2256,14 +2264,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 this.state.quiz.achievedGoals.push({ item: question.item, weekly: question.weekly, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
                 Game.TimerManager.setTimeout(() => {
                     this._showPiggyAnimation(question, () => this.nextQuestion());
                 }, 500, 'turnTransition');
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showDivisionHint(question); // 答錯即顯示除法公式
                 if (this.state.settings.retryMode === 'retry') {
@@ -2283,6 +2296,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
+        },
+
+        // ── 連勝徽章 ──────────────────────────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b3-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b3-streak-badge';
+            badge.className = 'b3-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b3-sb-inner"><div class="b3-sb-label">${label}</div><div class="b3-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
+            Game.TimerManager.setTimeout(() => {
+                badge.classList.add('b3-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
         },
 
         // ── 14. 撲滿動畫 ──────────────────────────────────────

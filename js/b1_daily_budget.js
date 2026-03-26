@@ -690,7 +690,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmBtn) {
                 confirmBtn.disabled = !enough;
                 if (enough && !wasSufficient && total > 0) {
-                    Game.Speech.speak('金額足夠，可以出發了！');
+                    if (total === required) {
+                        this._showExactMatchToast();
+                        Game.Speech.speak('剛好！不需要找零，可以出發了！');
+                    } else {
+                        Game.Speech.speak('金額足夠，可以出發了！');
+                    }
                 }
             }
 
@@ -702,6 +707,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.classList.toggle('b1-coin-faded', total > 0 && remaining > 0 && d > remaining);
                 });
             }
+        },
+
+        // ── 剛好浮動提示 ────────────────────────────────────────
+        _showExactMatchToast() {
+            const existing = document.getElementById('b1-exact-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.id = 'b1-exact-toast';
+            toast.className = 'b1-exact-toast';
+            toast.textContent = '💯 剛好！不需要找零';
+            document.body.appendChild(toast);
+            Game.TimerManager.setTimeout(() => {
+                toast.classList.add('b1-toast-fade');
+                Game.TimerManager.setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
         },
 
         // ── Confirm ────────────────────────────────────────────

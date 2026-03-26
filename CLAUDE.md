@@ -506,6 +506,9 @@ toolbarConfig: {
 | B2 最大收支記錄（2026-03-27）| B2 | 完成畫面新增「📌 本期最大記錄」；從 `answeredHistory[].events[]` 求最大值；無新 state；CSS `.b2-res-max-records/.b2-max-item.income/expense` 加入 `b2_allowance_diary.css` |
 | B3 存錢目標清單（2026-03-26）| B3 | 完成畫面第二頁新增「🐷 存錢目標清單」：`state.quiz.achievedGoals[]`；答對時 `push({item,weekly,answer})`；第二畫面條件渲染 `.b3-res-goals` 卡片列（icon+名稱+售價+每週×週數）；CSS `.b3-res-goals/.b3-goal-row/.b3-goal-*` 加入 `b3_savings_plan.css` |
 | B4 比價歷程表（2026-03-26）| B4 | 完成畫面新增「🛒 比價歷程」4欄表格（商品/便宜/較貴/省下）：`state.quiz.comparisonHistory[]`；`handleDiffAnswer` 答對時從 `state.currentDiffItem` 取資料 push；`showResults()` 節省橫幅後渲染橘框斑馬表；CSS `.b4-res-compare/.b4-cmp-table/.b4-cmp-cheap/exp/saved` 加入 `b4_sale_comparison.css` |
+| B5 每關開場預算介紹卡（2026-03-27）| B5 | `renderRound()` 末尾呼叫 `_showRoundIntroCard(roundNum, budget)`；紫色半透明全屏蓋板 + 白卡顯示關卡/🎂/預算大字；語音整合（移除舊 400ms speech timer）；1800ms 或點擊後 fade；CSS `.b5-round-intro`/`b5RiIn`/`.b5-ri-*` 加入 `b5_party_budget.css` |
+| B3 quiz 答對連勝徽章（2026-03-27）| B3 | `state.quiz.streak` 計數；`_handleChoiceAnswer`/`_handleNumpadAnswer` 正確 `streak++`、錯誤 `streak=0`；達 3/5 題觸發 `_showStreakBadge(streak)`；橘金色 badge 置中彈出 + 語音；CSS `.b3-streak-badge`/`b3SbPop` 加入 `b3_savings_plan.css` |
+| B1 投幣剛好浮動提示（2026-03-27）| B1 | `_updateWalletDisplay` 加 `total === required` 判斷；剛好時呼叫 `_showExactMatchToast()` + 語音「剛好！不需要找零，可以出發了！」；底部深綠 toast `b1ToastUp` 升起；CSS `.b1-exact-toast`/`b1ToastUp` 加入 `b1_daily_budget.css` |
 
 ---
 

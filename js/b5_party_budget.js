@@ -412,18 +412,39 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = this._renderRoundHTML();
             this._bindRoundEvents();
             this._updateTotalBar();
+            this._showRoundIntroCard(g.currentRound + 1, scenario.budget);
+        },
 
-            // 語音引導
-            Game.TimerManager.setTimeout(() => {
-                const diff = this.state.settings.difficulty;
-                const speechMap = {
-                    easy:   `預算${scenario.budget}元，必買蛋糕和飲料，選一些你喜歡的東西吧！`,
-                    normal: `預算${scenario.budget}元，必買蛋糕和飲料，在預算內選購商品。`,
-                    hard:   `預算${scenario.budget}元，必買蛋糕和飲料，要精算才不會超支！`,
-                };
-                this.state.game.lastSpeechText = speechMap[diff];
-                Game.Speech.speak(speechMap[diff]);
-            }, 400, 'speech');
+        _showRoundIntroCard(roundNum, budget) {
+            const existing = document.getElementById('b5-round-intro');
+            if (existing) existing.remove();
+            const card = document.createElement('div');
+            card.id = 'b5-round-intro';
+            card.className = 'b5-round-intro';
+            card.innerHTML = `
+                <div class="b5-ri-inner">
+                    <div class="b5-ri-round">第 ${roundNum} 關</div>
+                    <div class="b5-ri-icon">🎂</div>
+                    <div class="b5-ri-label">本關預算</div>
+                    <div class="b5-ri-budget">${budget} 元</div>
+                    <div class="b5-ri-hint">點任意處開始</div>
+                </div>`;
+            document.body.appendChild(card);
+            const diff = this.state.settings.difficulty;
+            const speechMap = {
+                easy:   `第${roundNum}關，預算${budget}元，選一些你喜歡的東西吧！`,
+                normal: `第${roundNum}關，預算${budget}元，在預算內選購商品。`,
+                hard:   `第${roundNum}關，預算${budget}元，要精算才不會超支！`,
+            };
+            this.state.game.lastSpeechText = speechMap[diff];
+            Game.Speech.speak(speechMap[diff]);
+            const dismiss = () => {
+                if (!document.body.contains(card)) return;
+                card.classList.add('b5-ri-fade');
+                Game.TimerManager.setTimeout(() => { if (card.parentNode) card.remove(); }, 300, 'turnTransition');
+            };
+            card.addEventListener('click', dismiss, { once: true });
+            Game.TimerManager.setTimeout(dismiss, 1800, 'turnTransition');
         },
 
         _renderRoundHTML() {
