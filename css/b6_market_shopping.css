@@ -518,3 +518,41 @@
     .b6-bill-grid      { grid-template-columns: repeat(3, 1fr); }
     .b6-stall-tab      { font-size: 12px; padding: 6px 4px; }
 }
+
+/* ── 採購收據（完成畫面）──────────────────────────────── */
+.b6-res-receipt {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border: 2px solid #6ee7b7;
+    border-radius: 14px;
+}
+.b6-res-receipt h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #065f46;
+    text-align: center;
+}
+.b6-receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.b6-receipt-table th {
+    background: #d1fae5;
+    padding: 6px 4px;
+    text-align: center;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    font-weight: bold;
+}
+.b6-receipt-table td {
+    padding: 5px 4px;
+    border: 1px solid #a7f3d0;
+    vertical-align: middle;
+}
+.b6-receipt-row-even { background: #f0fdf4; }
+.b6-receipt-round    { text-align: center; font-weight: bold; color: #047857; white-space: nowrap; }
+.b6-receipt-items    { text-align: left; color: #374151; }
+.b6-receipt-num      { text-align: center; color: #374151; white-space: nowrap; }
+.b6-receipt-change   { text-align: center; color: #059669; font-weight: bold; white-space: nowrap; }

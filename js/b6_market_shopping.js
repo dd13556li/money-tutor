@@ -323,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 activeStall: 'vegetable',
                 phase: 'shopping', // 'shopping' | 'payment' | 'change'
                 paidAmount: 0,
+                receipts: [],
             },
             isEndingGame: false,
             isProcessing: false,
@@ -367,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.activeStall  = 'vegetable';
             g.phase        = 'shopping';
             g.paidAmount   = 0;
+            g.receipts     = [];
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B6] 遊戲狀態已重置');
@@ -1014,6 +1016,14 @@ document.addEventListener('DOMContentLoaded', () => {
         _showChangeResult(paid, change) {
             const g = this.state.game;
 
+            // 儲存本關收據（A3/A4 交易摘要模式）
+            const total = this._calcMissionTotal();
+            const items = g.mission.items.map(({ stall, id }) => {
+                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                return item ? { name: item.name, price: item.price } : null;
+            }).filter(Boolean);
+            g.receipts.push({ items, total, paid, change });
+
             g.correctCount++;
 
             const app = document.getElementById('app');
@@ -1074,6 +1084,30 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 採購收據（A3/A4 收據風格）
+            const receiptHTML = g.receipts.length > 0 ? `
+            <div class="b6-res-receipt">
+                <h3>🧾 採購收據</h3>
+                <table class="b6-receipt-table">
+                    <thead>
+                        <tr>
+                            <th>關卡</th><th>採購商品</th>
+                            <th>小計</th><th>付款</th><th>找零</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${g.receipts.map((r, i) => `
+                        <tr class="${i % 2 === 0 ? 'b6-receipt-row-even' : ''}">
+                            <td class="b6-receipt-round">第${i + 1}關</td>
+                            <td class="b6-receipt-items">${r.items.map(it => `${it.name}`).join('、')}</td>
+                            <td class="b6-receipt-num">${r.total}元</td>
+                            <td class="b6-receipt-num">${r.paid}元</td>
+                            <td class="b6-receipt-change">${r.change}元</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>` : '';
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
@@ -1130,6 +1164,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 選擇正確付款金額與找零</div>
                 </div>
             </div>
+
+            ${receiptHTML}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

@@ -195,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 budget: 0,
                 items: [],
                 submitted: false,
+                successfulRoundItems: [],
             },
             isEndingGame: false,
             isProcessing: false,
@@ -238,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.budget       = 0;
             g.items        = [];
             g.submitted    = false;
+            g.successfulRoundItems = [];
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B5] 遊戲狀態已重置');
@@ -651,6 +653,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 g.correctCount++;
+                // 記錄本關選購物品（A4 交易摘要模式）
+                g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
+                    if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
+                        g.successfulRoundItems.push(`${i.icon} ${i.name}`);
+                });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '太棒了！');
                 const rem = g.budget - total;
@@ -750,6 +757,16 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 派對物品回顧（A4 交易摘要模式）
+            const partyReviewHTML = g.successfulRoundItems.length > 0 ? `
+            <div class="b5-res-party-review">
+                <h3>🎉 本次派對採購物品</h3>
+                <div class="b5-party-tags">
+                    ${g.successfulRoundItems.map(item =>
+                        `<span class="b5-party-tag">${item}</span>`).join('')}
+                </div>
+            </div>` : '';
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
@@ -806,6 +823,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 控制花費不超出預算</div>
                 </div>
             </div>
+
+            ${partyReviewHTML}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

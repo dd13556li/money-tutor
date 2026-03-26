@@ -181,7 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalQuestions: 10,
                 correctCount: 0,
                 questions: [],
-                startTime: null
+                startTime: null,
+                denomStats: {}
             },
             wallet: [],       // [{denom, uid, isBanknote}]
             uidCounter: 0,
@@ -235,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.correctCount    = 0;
             q.questions       = [];
             q.startTime       = null;
+            q.denomStats      = {};
             this.state.wallet        = [];
             this.state.uidCounter    = 0;
             this.state.isEndingGame = false;
@@ -621,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.audio.play('coin');
             const uid = ++this.state.uidCounter;
             this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+            this.state.quiz.denomStats[denom] = (this.state.quiz.denomStats[denom] || 0) + 1;
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
             // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
@@ -946,6 +949,22 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 面額使用統計（C1 統計模式）
+            const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+            const denomStatsHTML = denomEntries.length > 0 ? `
+            <div class="b-res-denom-stats">
+                <h3>🪙 面額使用統計</h3>
+                <div class="b1-stat-grid">
+                    ${denomEntries.map(([d, c]) => `
+                    <div class="b1-stat-item">
+                        <img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                             style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'">
+                        <div class="b1-stat-denom">${d}元</div>
+                        <div class="b1-stat-count">× ${c}</div>
+                    </div>`).join('')}
+                </div>
+            </div>` : '';
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
@@ -1004,6 +1023,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 累計總金額達到目標</div>
                 </div>
             </div>
+
+            ${denomStatsHTML}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

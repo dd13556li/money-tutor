@@ -6992,6 +6992,83 @@ Game.Speech.speak(`${verb}${ev.amount}元`);
 
 **搜尋關鍵字**：`清除，重新選擇`、`suggestion.*b5-hint-glow`、`verb.*收入.*花了`、`每週存.*需要.*週.*就能買`
 
-*報告更新時間：2026-03-26*
+---
+
+## 第十九輪豐富化（2026-03-27）
+
+### 豐富化方向：參照 A/C/F 系列測驗特色，強化 B 系列完成畫面的學習回顧價值
+
+#### 設計依據
+
+| B 單元 | 參照來源 | 新增功能 |
+|--------|---------|---------|
+| B1 今天帶多少錢 | C1 硬幣認識（逐幣統計）、F 系列統計卡片 | 完成畫面「🪙 面額使用統計」 |
+| B5 生日派對預算 | A4 交易摘要、A3 商品列表 | 完成畫面「🎉 本次派對採購物品」 |
+| B6 菜市場買菜 | A3 取餐收據、A4 購物摘要 | 完成畫面「🧾 採購收據」表格 |
+
+---
+
+### B1 — 面額使用統計（C1 計數統計 pattern）
+
+完成畫面在「學習成果」後新增「🪙 面額使用統計」區塊，展示各面額共使用幾次，讓學習者回顧投幣習慣。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.quiz` | 新增 `denomStats: {}` |
+| `resetGameState()` | `q.denomStats = {}` |
+| `addCoin(denom)` | `denomStats[denom] = (denomStats[denom] \|\| 0) + 1` |
+| `showResults()` | 計算 `denomEntries`，渲染 `.b-res-denom-stats` 區塊 |
+| `css/b1_daily_budget.css` | `.b-res-denom-stats`、`.b1-stat-grid`、`.b1-stat-item`、`.b1-stat-denom`、`.b1-stat-count` |
+
+視覺：琥珀黃底框，每面額顯示錢幣圖片＋`X元`＋`× N 次`，大面額排左。
+
+**參照**：C1 逐幣計數、F5 統計卡片。**搜尋**：`denomStats`、`b-res-denom-stats`、`b1-stat-grid`
+
+---
+
+### B5 — 派對物品回顧（A4 交易摘要 pattern）
+
+完成畫面在「學習成果」後新增「🎉 本次派對採購物品」區塊，以粉色膠囊標籤展示本局所有答對關卡成功採購的物品（去重）。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.game` | 新增 `successfulRoundItems: []` |
+| `resetGameState()` | `g.successfulRoundItems = []` |
+| `_handleConfirm()` 答對分支 | 收集 `${icon} ${name}`（`includes` 去重），`push` |
+| `showResults()` | 渲染 `.b5-res-party-review` 標籤群 |
+| `css/b5_party_budget.css` | `.b5-res-party-review`、`.b5-party-tags`、`.b5-party-tag` |
+
+視覺：粉紅底框，emoji＋名稱膠囊，跨關卡去重只顯示一次。
+
+**參照**：A4 `showTransactionSummaryScreenWithData`、A3 `showCompletionSummary`。**搜尋**：`successfulRoundItems`、`b5-res-party-review`、`b5-party-tag`
+
+---
+
+### B6 — 採購收據（A3/A4 收據風格）
+
+完成畫面在「學習成果」後新增「🧾 採購收據」5 欄表格，逐關顯示：關卡 / 採購商品 / 小計 / 付款 / 找零。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.game` | 新增 `receipts: []` |
+| `resetGameState()` | `g.receipts = []` |
+| `_showChangeResult(paid, change)` | `correctCount++` 前儲存 `{items, total, paid, change}` |
+| `showResults()` | 渲染 `.b6-res-receipt` 斑馬條紋表格 |
+| `css/b6_market_shopping.css` | `.b6-res-receipt`、`.b6-receipt-table`、欄位樣式 |
+
+視覺：綠色底框，偶數列 `#f0fdf4`，找零欄翠綠加粗。
+
+**參照**：A3 收據式列表、A4 多欄摘要。**搜尋**：`g.receipts`、`b6-res-receipt`、`b6-receipt-table`
+
+---
+
+### 設計共通原則
+
+1. **狀態累積**：新增 state 欄位 → `resetGameState` 重置 → 遊戲中填充
+2. **條件渲染**：無資料時回傳 `''`，不渲染空區塊
+3. **純追加**：不修改原有遊戲流程，零副作用
+4. **單元 CSS**：加入單元專屬 CSS 檔，不汙染 `b-series.css`
+
+*報告更新時間：2026-03-27*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
 
