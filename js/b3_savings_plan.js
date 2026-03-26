@@ -2462,6 +2462,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
                     </div>`).join('')}
                 </div>
+            </div>
+            <div class="b3-goal-summary">
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">目標數量</span>
+                    <span class="b3-gs-val">${q.achievedGoals.length} 個</span>
+                </div>
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">合計目標金額</span>
+                    <span class="b3-gs-val">${q.achievedGoals.reduce((s, g) => s + g.item.price, 0)} 元</span>
+                </div>
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">平均需要週數</span>
+                    <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
+                </div>
             </div>` : ''}
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

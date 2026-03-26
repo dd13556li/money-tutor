@@ -829,6 +829,27 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 省錢排行榜（C1 統計 + A4 交易摘要 pattern）
+            const savingsRankHTML = (() => {
+                const hist = q.comparisonHistory;
+                if (!hist || hist.length === 0) return '';
+                const medals = ['🥇', '🥈', '🥉'];
+                const top = [...hist].sort((a, b) => b.saved - a.saved).slice(0, 3);
+                return `
+                <div class="b4-res-ranking">
+                    <h3>🏅 省錢排行榜</h3>
+                    <div class="b4-rank-list">
+                        ${top.map((h, i) => `
+                        <div class="b4-rank-row">
+                            <span class="b4-rank-medal">${medals[i]}</span>
+                            <span class="b4-rank-item">${h.icon} ${h.name}</span>
+                            <span class="b4-rank-store">${h.cheapStore}</span>
+                            <span class="b4-rank-saved">省 ${h.saved} 元</span>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            })();
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
@@ -894,6 +915,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-savings-text">這次比價你總共省了</div>
                 <div class="b4-savings-amount">${q.totalSaved} 元</div>
             </div>` : ''}
+
+            ${savingsRankHTML}
 
             ${q.comparisonHistory && q.comparisonHistory.length > 0 ? `
             <div class="b4-res-compare">

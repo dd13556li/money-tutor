@@ -556,3 +556,40 @@
 .b6-receipt-items    { text-align: left; color: #374151; }
 .b6-receipt-num      { text-align: center; color: #374151; white-space: nowrap; }
 .b6-receipt-change   { text-align: center; color: #059669; font-weight: bold; white-space: nowrap; }
+
+/* ── 攤位消費分析（完成畫面）────────────────────────────────── */
+.b6-res-stall-stats {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #fefce8;
+    border: 2px solid #fde047;
+    border-radius: 14px;
+}
+.b6-res-stall-stats h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #713f12;
+}
+.b6-stall-bars       { display: flex; flex-direction: column; gap: 9px; }
+.b6-stall-bar-row    {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+.b6-stall-icon  { font-size: 20px; flex-shrink: 0; }
+.b6-stall-name  { min-width: 56px; font-weight: bold; color: #374151; }
+.b6-stall-track {
+    flex: 1;
+    height: 14px;
+    background: #e5e7eb;
+    border-radius: 7px;
+    overflow: hidden;
+}
+.b6-stall-fill  {
+    height: 100%;
+    background: linear-gradient(90deg, #eab308, #facc15);
+    border-radius: 7px;
+    transition: width 0.4s ease;
+}
+.b6-stall-total { min-width: 52px; text-align: right; font-weight: bold; color: #713f12; }

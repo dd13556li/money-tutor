@@ -324,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 phase: 'shopping', // 'shopping' | 'payment' | 'change'
                 paidAmount: 0,
                 receipts: [],
+                stallStats: {},   // { stallKey: totalSpent }
             },
             isEndingGame: false,
             isProcessing: false,
@@ -369,6 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.phase        = 'shopping';
             g.paidAmount   = 0;
             g.receipts     = [];
+            g.stallStats   = {};
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B6] 遊戲狀態已重置');
@@ -1020,6 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const total = this._calcMissionTotal();
             const items = g.mission.items.map(({ stall, id }) => {
                 const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                if (item) g.stallStats[stall] = (g.stallStats[stall] || 0) + item.price;
                 return item ? { name: item.name, price: item.price } : null;
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
@@ -1083,6 +1086,35 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+
+            // 攤位消費分析（B5 roundStats pattern）
+            const stallBreakdownHTML = (() => {
+                const stats = g.stallStats;
+                if (!stats || Object.keys(stats).length === 0) return '';
+                const stallOrder = ['vegetable', 'fruit', 'grocery'];
+                const entries = stallOrder
+                    .filter(k => stats[k])
+                    .map(k => ({ key: k, name: B6_STALLS[k].name, icon: B6_STALLS[k].icon, total: stats[k] }));
+                if (entries.length === 0) return '';
+                const grandTotal = entries.reduce((s, e) => s + e.total, 0);
+                return `
+                <div class="b6-res-stall-stats">
+                    <h3>🏪 攤位消費分析</h3>
+                    <div class="b6-stall-bars">
+                        ${entries.map(e => {
+                            const pct = Math.round(e.total / grandTotal * 100);
+                            return `<div class="b6-stall-bar-row">
+                                <span class="b6-stall-icon">${e.icon}</span>
+                                <span class="b6-stall-name">${e.name}</span>
+                                <div class="b6-stall-track">
+                                    <div class="b6-stall-fill" style="width:${pct}%"></div>
+                                </div>
+                                <span class="b6-stall-total">${e.total}元</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            })();
 
             // 採購收據（A3/A4 收據風格）
             const receiptHTML = g.receipts.length > 0 ? `
@@ -1166,6 +1198,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             ${receiptHTML}
+
+            ${stallBreakdownHTML}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

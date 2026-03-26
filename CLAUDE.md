@@ -498,6 +498,9 @@ toolbarConfig: {
 | B1 行程費用清單（2026-03-27）| B1 | 完成畫面新增「📋 完成的行程」：`state.quiz.solvedSchedules[]`；`handleConfirm()` 答對時 `push(questions[currentQuestion])`；`showResults()` 渲染藍框列表（emoji+名稱+項目金額列表+合計）；CSS `.b1-res-schedules/.b1-schedule-row/.b1-sch-*` 加入 `b1_daily_budget.css` |
 | B2 本期收支總計（2026-03-27）| B2 | 完成畫面新增「💰 本期收支總計」：無新 state，從 `answeredHistory` 派生計算 totalIncome/totalExpense/net；`showResults()` 渲染灰框三欄（收入綠/支出紅/淨餘額藍或黃）；CSS `.b2-res-totals/.b2-totals-row/.b2-total-item` 加入 `b2_allowance_diary.css` |
 | B5 各關預算使用統計（2026-03-27）| B5 | 完成畫面新增「📊 各關預算使用」：`state.game.roundStats[]`；`_handleConfirm()` 答對時 `push({roundNum,budget,spent})`；`showResults()` 渲染綠框橫條圖（ok=綠/near=橙/over=紅）；CSS `.b5-res-budget-stats/.b5-budget-bars/.b5-bar-fill` 加入 `b5_party_budget.css` |
+| B3 存錢統計摘要（2026-03-27）| B3 | 完成畫面第二頁目標清單下新增三格摘要（目標數量/合計金額/平均週數）；無新 state，從 `achievedGoals` 派生；CSS `.b3-goal-summary/.b3-gs-item/.b3-gs-val` 加入 `b3_savings_plan.css` |
+| B4 省錢排行榜（2026-03-27）| B4 | 完成畫面新增「🏅 省錢排行榜」top-3 medals；無新 state，從 `comparisonHistory` 排序；`savingsRankHTML` 在比價歷程前渲染；CSS `.b4-res-ranking/.b4-rank-row/.b4-rank-medal` 加入 `b4_sale_comparison.css` |
+| B6 攤位消費分析（2026-03-27）| B6 | 完成畫面新增「🏪 攤位消費分析」橫條圖；`state.game.stallStats{}`；`_showChangeResult()` items 迴圈中累計；`showResults()` 渲染黃框比例條；CSS `.b6-res-stall-stats/.b6-stall-fill` 加入 `b6_market_shopping.css` |
 | B3 存錢目標清單（2026-03-26）| B3 | 完成畫面第二頁新增「🐷 存錢目標清單」：`state.quiz.achievedGoals[]`；答對時 `push({item,weekly,answer})`；第二畫面條件渲染 `.b3-res-goals` 卡片列（icon+名稱+售價+每週×週數）；CSS `.b3-res-goals/.b3-goal-row/.b3-goal-*` 加入 `b3_savings_plan.css` |
 | B4 比價歷程表（2026-03-26）| B4 | 完成畫面新增「🛒 比價歷程」4欄表格（商品/便宜/較貴/省下）：`state.quiz.comparisonHistory[]`；`handleDiffAnswer` 答對時從 `state.currentDiffItem` 取資料 push；`showResults()` 節省橫幅後渲染橘框斑馬表；CSS `.b4-res-compare/.b4-cmp-table/.b4-cmp-cheap/exp/saved` 加入 `b4_sale_comparison.css` |
 

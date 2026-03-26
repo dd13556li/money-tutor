@@ -1524,3 +1524,21 @@
 .b3-goal-name  { font-weight: bold; color: #581c87; flex: 1; }
 .b3-goal-price { font-weight: bold; color: #d97706; min-width: 52px; text-align: right; }
 .b3-goal-weeks { font-size: 12px; color: #6b7280; min-width: 110px; text-align: right; }
+
+/* ── 存錢統計摘要（完成畫面）────────────────────────────────── */
+.b3-goal-summary {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: space-between;
+}
+.b3-gs-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    background: #f5f3ff;
+    border: 1.5px solid #c4b5fd;
+    border-radius: 10px;
+}
+.b3-gs-label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 4px; }
+.b3-gs-val   { display: block; font-size: 16px; font-weight: bold; color: #581c87; }
