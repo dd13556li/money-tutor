@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 items: [],
                 submitted: false,
                 successfulRoundItems: [],
+                roundStats: [],
             },
             isEndingGame: false,
             isProcessing: false,
@@ -240,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.items        = [];
             g.submitted    = false;
             g.successfulRoundItems = [];
+            g.roundStats           = [];
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B5] 遊戲狀態已重置');
@@ -653,6 +655,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 g.correctCount++;
+                // 記錄各關預算使用（B6 receipts pattern）
+                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
                 // 記錄本關選購物品（A4 交易摘要模式）
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
@@ -757,6 +761,25 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 各關預算使用統計（F5 量比較 pattern）
+            const roundStatsHTML = g.roundStats && g.roundStats.length > 0 ? `
+            <div class="b5-res-budget-stats">
+                <h3>📊 各關預算使用</h3>
+                <div class="b5-budget-bars">
+                    ${g.roundStats.map(r => {
+                        const pct = Math.round(r.spent / r.budget * 100);
+                        const barClass = pct > 100 ? 'over' : pct >= 90 ? 'near' : 'ok';
+                        return `<div class="b5-bar-row">
+                            <span class="b5-bar-label">第${r.roundNum}關</span>
+                            <div class="b5-bar-track">
+                                <div class="b5-bar-fill ${barClass}" style="width:${Math.min(pct,100)}%"></div>
+                            </div>
+                            <span class="b5-bar-val">${r.spent}/${r.budget}元</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>` : '';
+
             // 派對物品回顧（A4 交易摘要模式）
             const partyReviewHTML = g.successfulRoundItems.length > 0 ? `
             <div class="b5-res-party-review">
@@ -823,6 +846,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 控制花費不超出預算</div>
                 </div>
             </div>
+
+            ${roundStatsHTML}
 
             ${partyReviewHTML}
 

@@ -396,6 +396,40 @@
     60%      { transform: translateX(8px); }
 }
 
+/* ── 本期收支總計（完成畫面）────────────────────────────────── */
+.b2-res-totals {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #fafafa;
+    border: 2px solid #d1d5db;
+    border-radius: 14px;
+}
+.b2-res-totals h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #374151;
+}
+.b2-totals-row {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+.b2-total-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 10px;
+}
+.b2-total-item.income  { background: #dcfce7; border: 1.5px solid #86efac; }
+.b2-total-item.expense { background: #fee2e2; border: 1.5px solid #fca5a5; }
+.b2-total-item.net.positive { background: #eff6ff; border: 1.5px solid #93c5fd; }
+.b2-total-item.net.negative { background: #fef9c3; border: 1.5px solid #fde047; }
+.b2-total-label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+.b2-total-item.income  .b2-total-val { font-size: 16px; font-weight: bold; color: #166534; }
+.b2-total-item.expense .b2-total-val { font-size: 16px; font-weight: bold; color: #991b1b; }
+.b2-total-item.net.positive .b2-total-val { font-size: 16px; font-weight: bold; color: #1e40af; }
+.b2-total-item.net.negative .b2-total-val { font-size: 16px; font-weight: bold; color: #854d0e; }
+
 /* ── 記帳日記回顧（完成畫面）────────────────────────────────── */
 .b2-res-diary {
     margin: 16px 0;

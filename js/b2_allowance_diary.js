@@ -999,6 +999,38 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 本期收支總計（B4 savings banner pattern）
+            const incomeTotalHTML = (() => {
+                const hist = q.answeredHistory;
+                if (!hist || hist.length === 0) return '';
+                let totalIncome = 0, totalExpense = 0;
+                hist.forEach(h => {
+                    h.events.forEach(e => {
+                        if (e.type === 'income')  totalIncome  += e.amount;
+                        else                       totalExpense += e.amount;
+                    });
+                });
+                const net = totalIncome - totalExpense;
+                return `
+                <div class="b2-res-totals">
+                    <h3>💰 本期收支總計</h3>
+                    <div class="b2-totals-row">
+                        <div class="b2-total-item income">
+                            <span class="b2-total-label">總收入</span>
+                            <span class="b2-total-val">＋${totalIncome}元</span>
+                        </div>
+                        <div class="b2-total-item expense">
+                            <span class="b2-total-label">總支出</span>
+                            <span class="b2-total-val">－${totalExpense}元</span>
+                        </div>
+                        <div class="b2-total-item net ${net >= 0 ? 'positive' : 'negative'}">
+                            <span class="b2-total-label">淨餘額</span>
+                            <span class="b2-total-val">${net >= 0 ? '＋' : ''}${net}元</span>
+                        </div>
+                    </div>
+                </div>`;
+            })();
+
             const historyHTML = (() => {
                 const hist = q.answeredHistory;
                 if (!hist || hist.length === 0) return '';
@@ -1081,6 +1113,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 閱讀記帳日記格式</div>
                 </div>
             </div>
+
+            ${incomeTotalHTML}
 
             ${historyHTML}
 

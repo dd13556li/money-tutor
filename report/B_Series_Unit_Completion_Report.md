@@ -7137,6 +7137,70 @@ Game.Speech.speak(`${verb}${ev.amount}元`);
 與第十九輪相同：狀態累積→條件渲染→零副作用→單元 CSS。
 B3 特別說明：`achievedGoals` 在整個 quiz 階段持續累積，在第二畫面（`b3-view-summary-btn` 點擊後）顯示。
 
-*報告更新時間：2026-03-26*
+---
+
+## 第二十一輪豐富化（2026-03-27）
+
+**主題**：B1 行程費用清單、B2 本期收支總計、B5 各關預算使用統計
+
+### B1 — 行程費用清單（B6 採購收據 pattern）
+
+完成畫面在「面額使用統計」前新增「📋 完成的行程」區塊，列出本局所有答對的行程：目的地圖示、名稱、費用明細（「項目N元・項目M元」）、合計。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.quiz` | 新增 `solvedSchedules: []` |
+| `resetGameState()` | `q.solvedSchedules = []` |
+| `handleConfirm()` 正確分支 | `push(questions[currentQuestion])`（含 `{icon,label,items,total}`）|
+| `showResults()` | 計算 `scheduleListHTML`，渲染 `.b1-res-schedules` 列表 |
+| `css/b1_daily_budget.css` | `.b1-res-schedules`、`.b1-schedule-rows`、`.b1-schedule-row`、`.b1-sch-*` |
+
+視覺：藍色底框，每列含目的地 emoji + 名稱 + 項目金額列表 + 合計橘色。
+
+**搜尋**：`solvedSchedules`、`b1-res-schedules`、`b1-sch-label`
+
+---
+
+### B2 — 本期收支總計（B4 savings banner pattern）
+
+完成畫面在「記帳日記回顧」表格前新增「💰 本期收支總計」三格橫排：總收入（綠）／總支出（紅）／淨餘額（藍/黃）。
+
+| 位置 | 修改內容 |
+|------|---------|
+| **無新增 state** | 直接從既有 `q.answeredHistory` 計算 |
+| `showResults()` | 計算 `incomeTotalHTML`，渲染 `.b2-res-totals` 三欄橫排 |
+| `css/b2_allowance_diary.css` | `.b2-res-totals`、`.b2-totals-row`、`.b2-total-item.income/expense/net.positive/negative` |
+
+視覺：灰框三欄，收入綠/支出紅/淨餘額依正負顯示藍或黃。
+
+**搜尋**：`incomeTotalHTML`、`b2-res-totals`、`b2-total-item`
+
+---
+
+### B5 — 各關預算使用統計（F5 量比較 pattern）
+
+完成畫面在「學習成果」後、「派對物品回顧」前，新增「📊 各關預算使用」橫條進度圖，每關一條：使用百分比視覺化（ok=綠/near=橙/over=紅）。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.game` | 新增 `roundStats: []` |
+| `resetGameState()` | `g.roundStats = []` |
+| `_handleConfirm()` 正確分支 | `push({ roundNum, budget, spent })`（`g.currentRound + 1`）|
+| `showResults()` | 計算 `roundStatsHTML`，渲染 `.b5-res-budget-stats` 條狀圖 |
+| `css/b5_party_budget.css` | `.b5-res-budget-stats`、`.b5-budget-bars`、`.b5-bar-row`、`.b5-bar-fill.ok/near/over` |
+
+視覺：綠框，每關一行：「第N關」+ 進度條（fill依比例）+ 「spent/budget元」。
+
+**搜尋**：`roundStats`、`b5-res-budget-stats`、`b5-bar-fill`
+
+---
+
+### 第二十一輪設計共通原則
+
+- B1/B5：狀態累積 → 條件渲染
+- B2：**無新 state**，從既有 `answeredHistory` 派生計算（最精簡模式）
+- 視覺語言統一：ok=綠、near=橙、over=紅（同 B5 in-game bar 配色）
+
+*報告更新時間：2026-03-27*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
 

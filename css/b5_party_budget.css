@@ -345,3 +345,37 @@
     font-weight: bold;
     color: #9d174d;
 }
+
+/* ── 各關預算使用（完成畫面）────────────────────────────────── */
+.b5-res-budget-stats {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 14px;
+}
+.b5-res-budget-stats h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #166534;
+}
+.b5-budget-bars { display: flex; flex-direction: column; gap: 8px; }
+.b5-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+.b5-bar-label  { min-width: 44px; font-weight: bold; color: #374151; }
+.b5-bar-track  {
+    flex: 1;
+    height: 14px;
+    background: #e5e7eb;
+    border-radius: 7px;
+    overflow: hidden;
+}
+.b5-bar-fill   { height: 100%; border-radius: 7px; transition: width 0.4s ease; }
+.b5-bar-fill.ok   { background: linear-gradient(90deg, #10b981, #34d399); }
+.b5-bar-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b5-bar-fill.over { background: linear-gradient(90deg, #ef4444, #f87171); }
+.b5-bar-val    { min-width: 88px; text-align: right; color: #374151; font-weight: bold; }

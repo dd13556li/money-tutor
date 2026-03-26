@@ -808,3 +808,33 @@
 }
 .b1-stat-denom { font-size: 13px; font-weight: bold; color: #78350f; margin-top: 4px; }
 .b1-stat-count  { font-size: 15px; font-weight: bold; color: #d97706; }
+
+/* ── 行程費用清單（完成畫面）────────────────────────────────── */
+.b1-res-schedules {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #eff6ff;
+    border: 2px solid #93c5fd;
+    border-radius: 14px;
+}
+.b1-res-schedules h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #1e40af;
+}
+.b1-schedule-rows { display: flex; flex-direction: column; gap: 7px; }
+.b1-schedule-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: #fff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+.b1-sch-icon   { font-size: 22px; flex-shrink: 0; }
+.b1-sch-label  { font-weight: bold; color: #1e3a8a; min-width: 70px; }
+.b1-sch-items  { flex: 1; color: #4b5563; font-size: 12px; }
+.b1-sch-total  { font-weight: bold; color: #d97706; white-space: nowrap; }

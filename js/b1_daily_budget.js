@@ -182,7 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctCount: 0,
                 questions: [],
                 startTime: null,
-                denomStats: {}
+                denomStats: {},
+                solvedSchedules: []
             },
             wallet: [],       // [{denom, uid, isBanknote}]
             uidCounter: 0,
@@ -237,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.questions       = [];
             q.startTime       = null;
             q.denomStats      = {};
+            q.solvedSchedules = [];
             this.state.wallet        = [];
             this.state.uidCounter    = 0;
             this.state.isEndingGame = false;
@@ -720,6 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (diff > 0) msg += `，找回${toTWD(diff)}`;
                 Game.Speech.speak(msg);
                 this.state.quiz.correctCount++;
+                this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
             } else {
                 this.audio.play('error');
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
@@ -949,6 +952,21 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            // 行程費用清單（B6 採購收據 pattern）
+            const scheduleListHTML = q.solvedSchedules && q.solvedSchedules.length > 0 ? `
+            <div class="b1-res-schedules">
+                <h3>📋 完成的行程</h3>
+                <div class="b1-schedule-rows">
+                    ${q.solvedSchedules.map(s => `
+                    <div class="b1-schedule-row">
+                        <span class="b1-sch-icon">${s.icon}</span>
+                        <span class="b1-sch-label">${s.label}</span>
+                        <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
+                        <span class="b1-sch-total">${s.total}元</span>
+                    </div>`).join('')}
+                </div>
+            </div>` : '';
+
             // 面額使用統計（C1 統計模式）
             const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
             const denomStatsHTML = denomEntries.length > 0 ? `
@@ -1023,6 +1041,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 累計總金額達到目標</div>
                 </div>
             </div>
+
+            ${scheduleListHTML}
 
             ${denomStatsHTML}
 
