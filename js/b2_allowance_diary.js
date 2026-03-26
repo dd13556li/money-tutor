@@ -1031,6 +1031,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             })();
 
+            // 最大收支記錄（C1 統計 + A4 highlight pattern）
+            const maxRecordsHTML = (() => {
+                const hist = q.answeredHistory;
+                if (!hist || hist.length === 0) return '';
+                let maxIncome = null, maxExpense = null;
+                hist.forEach(h => h.events.forEach(e => {
+                    if (e.type === 'income'  && (!maxIncome  || e.amount > maxIncome.amount))  maxIncome  = e;
+                    if (e.type === 'expense' && (!maxExpense || e.amount > maxExpense.amount)) maxExpense = e;
+                }));
+                if (!maxIncome && !maxExpense) return '';
+                return `
+                <div class="b2-res-max-records">
+                    <h3>📌 本期最大記錄</h3>
+                    <div class="b2-max-row">
+                        ${maxIncome ? `<div class="b2-max-item income">
+                            <span class="b2-max-icon">${maxIncome.icon || '💰'}</span>
+                            <span class="b2-max-label">最大收入</span>
+                            <span class="b2-max-name">${maxIncome.name}</span>
+                            <span class="b2-max-val">＋${maxIncome.amount}元</span>
+                        </div>` : ''}
+                        ${maxExpense ? `<div class="b2-max-item expense">
+                            <span class="b2-max-icon">${maxExpense.icon || '💸'}</span>
+                            <span class="b2-max-label">最大支出</span>
+                            <span class="b2-max-name">${maxExpense.name}</span>
+                            <span class="b2-max-val">－${maxExpense.amount}元</span>
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            })();
+
             const historyHTML = (() => {
                 const hist = q.answeredHistory;
                 if (!hist || hist.length === 0) return '';
@@ -1115,6 +1145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             ${incomeTotalHTML}
+
+            ${maxRecordsHTML}
 
             ${historyHTML}
 

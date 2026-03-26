@@ -467,3 +467,28 @@
 .b4-rank-item  { flex: 1; font-weight: bold; color: #374151; }
 .b4-rank-store { font-size: 12px; color: #6b7280; min-width: 60px; }
 .b4-rank-saved { font-weight: bold; color: #d97706; white-space: nowrap; }
+
+/* ── 省錢 toast（遊戲中浮動提示）────────────────────────────── */
+@keyframes b4ToastUp {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    20%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+}
+.b4-savings-toast {
+    position: fixed;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 24px;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.45);
+    z-index: 9900;
+    pointer-events: none;
+    animation: b4ToastUp 1.5s ease forwards;
+}
+.b4-savings-toast.b4-toast-fade { opacity: 0; transition: opacity 0.4s; }

@@ -1052,11 +1052,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
             </div>`;
 
-            Game.EventManager.on(document.getElementById('b6-next-btn'), 'click',
-                () => this.nextRound(), {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b6-next-btn'), 'click', () => {
+                if (g.currentRound + 1 >= g.totalRounds) {
+                    this.nextRound();
+                } else {
+                    this._showRoundCompleteCard(g.currentRound + 1, items, total, paid, change, () => this.nextRound());
+                }
+            }, {}, 'gameUI');
         },
 
         // ── 13. 下一關 ────────────────────────────────────────
+        // 關卡完成轉場卡（B5 _showRoundTransition pattern）
+        _showRoundCompleteCard(roundNum, items, total, paid, change, callback) {
+            const prev = document.getElementById('b6-round-complete');
+            if (prev) prev.remove();
+            const card = document.createElement('div');
+            card.id = 'b6-round-complete';
+            card.className = 'b6-round-complete';
+            card.innerHTML = `
+                <div class="b6-rc-inner">
+                    <div class="b6-rc-badge">第 ${roundNum} 關完成！</div>
+                    <div class="b6-rc-emoji">🎉</div>
+                    <div class="b6-rc-items">${items.map(it => it.name).join('・')}</div>
+                    <div class="b6-rc-amounts">共 ${total} 元｜付 ${paid} 元｜找零 ${change} 元</div>
+                    <div class="b6-rc-hint">點任意處繼續</div>
+                </div>`;
+            document.body.appendChild(card);
+            const advance = () => {
+                if (!card.parentNode) return;
+                card.classList.add('b6-rc-fade');
+                Game.TimerManager.setTimeout(() => {
+                    if (card.parentNode) card.remove();
+                    callback();
+                }, 300, 'turnTransition');
+            };
+            card.addEventListener('click', advance, { once: true });
+            Game.TimerManager.setTimeout(advance, 1500, 'turnTransition');
+        },
+
         nextRound() {
             this.state.game.currentRound++;
             if (this.state.game.currentRound >= this.state.game.totalRounds) {

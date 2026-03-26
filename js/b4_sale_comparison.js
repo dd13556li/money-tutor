@@ -747,6 +747,21 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── Diff Answer Handler ─────────────────────────────────
+        // 省錢 toast（A4 _showPricePopup pattern）
+        _showSavingsToast(amount) {
+            const prev = document.getElementById('b4-savings-toast');
+            if (prev) prev.remove();
+            const toast = document.createElement('div');
+            toast.id = 'b4-savings-toast';
+            toast.className = 'b4-savings-toast';
+            toast.textContent = `💰 省了 ${amount} 元！`;
+            document.body.appendChild(toast);
+            Game.TimerManager.setTimeout(() => {
+                toast.classList.add('b4-toast-fade');
+                Game.TimerManager.setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400, 'ui');
+            }, 1100, 'ui');
+        },
+
         handleDiffAnswer(isCorrect, correctDiff) {
             if (isCorrect) {
                 this.audio.play('correct');
@@ -762,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         saved: correctDiff
                     });
                 }
+                this._showSavingsToast(correctDiff);
                 Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
             } else {
                 this.audio.play('error');

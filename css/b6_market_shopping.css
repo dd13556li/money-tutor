@@ -593,3 +593,36 @@
     transition: width 0.4s ease;
 }
 .b6-stall-total { min-width: 52px; text-align: right; font-weight: bold; color: #713f12; }
+
+/* ── 關卡完成轉場卡（B5 _showRoundTransition pattern）──────── */
+@keyframes b6RcIn {
+    0%   { opacity: 0; transform: scale(0.78); }
+    60%  { opacity: 1; transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+}
+.b6-round-complete {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 150, 105, 0.88);
+    z-index: 9800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.b6-round-complete.b6-rc-fade { opacity: 0; transition: opacity 0.3s; }
+.b6-rc-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    animation: b6RcIn 0.4s ease forwards;
+    padding: 24px 32px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px;
+}
+.b6-rc-badge   { font-size: 1.6rem; font-weight: 900; color: #fff; text-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+.b6-rc-emoji   { font-size: 3rem; }
+.b6-rc-items   { font-size: 1rem; color: rgba(255,255,255,0.9); font-weight: 600; }
+.b6-rc-amounts { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 4px; }
+.b6-rc-hint    { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 8px; }

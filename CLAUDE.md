@@ -501,6 +501,9 @@ toolbarConfig: {
 | B3 存錢統計摘要（2026-03-27）| B3 | 完成畫面第二頁目標清單下新增三格摘要（目標數量/合計金額/平均週數）；無新 state，從 `achievedGoals` 派生；CSS `.b3-goal-summary/.b3-gs-item/.b3-gs-val` 加入 `b3_savings_plan.css` |
 | B4 省錢排行榜（2026-03-27）| B4 | 完成畫面新增「🏅 省錢排行榜」top-3 medals；無新 state，從 `comparisonHistory` 排序；`savingsRankHTML` 在比價歷程前渲染；CSS `.b4-res-ranking/.b4-rank-row/.b4-rank-medal` 加入 `b4_sale_comparison.css` |
 | B6 攤位消費分析（2026-03-27）| B6 | 完成畫面新增「🏪 攤位消費分析」橫條圖；`state.game.stallStats{}`；`_showChangeResult()` items 迴圈中累計；`showResults()` 渲染黃框比例條；CSS `.b6-res-stall-stats/.b6-stall-fill` 加入 `b6_market_shopping.css` |
+| B4 省錢 toast（2026-03-27）| B4 | diff 答對後立即顯示固定底部浮動 toast「💰 省了X元！」；`_showSavingsToast(amount)`；`handleDiffAnswer` 正確分支呼叫；`@keyframes b4ToastUp` 升起+淡出；`pointer-events:none` 不干擾操作 |
+| B6 關卡完成轉場卡（2026-03-27）| B6 | 非最後關「下一關」改呼叫 `_showRoundCompleteCard(…)`；深綠全屏卡含關卡號/商品列表/付款摘要；1.5s 自動或點任意處前進；`@keyframes b6RcIn`；最後關直接 `nextRound()` |
+| B2 最大收支記錄（2026-03-27）| B2 | 完成畫面新增「📌 本期最大記錄」；從 `answeredHistory[].events[]` 求最大值；無新 state；CSS `.b2-res-max-records/.b2-max-item.income/expense` 加入 `b2_allowance_diary.css` |
 | B3 存錢目標清單（2026-03-26）| B3 | 完成畫面第二頁新增「🐷 存錢目標清單」：`state.quiz.achievedGoals[]`；答對時 `push({item,weekly,answer})`；第二畫面條件渲染 `.b3-res-goals` 卡片列（icon+名稱+售價+每週×週數）；CSS `.b3-res-goals/.b3-goal-row/.b3-goal-*` 加入 `b3_savings_plan.css` |
 | B4 比價歷程表（2026-03-26）| B4 | 完成畫面新增「🛒 比價歷程」4欄表格（商品/便宜/較貴/省下）：`state.quiz.comparisonHistory[]`；`handleDiffAnswer` 答對時從 `state.currentDiffItem` 取資料 push；`showResults()` 節省橫幅後渲染橘框斑馬表；CSS `.b4-res-compare/.b4-cmp-table/.b4-cmp-cheap/exp/saved` 加入 `b4_sale_comparison.css` |
 
