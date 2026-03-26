@@ -488,6 +488,9 @@ toolbarConfig: {
 | B3 quiz 答對語音含週存與商品名（2026-03-26）| B3 | choice + numpad 答對語音改為 `每週存X元，需要Y週，就能買Z了！`；強化除法概念連結 |
 | C3 金錢區外框自適應（2026-03-26）| C3 | 移除 `min-height: 124/144/156px`；`height: 120px/80px` → `auto`；`.unit3-banknote-container .unit3-banknote { width: 120px !important; height: auto !important; max-height: none !important }`（0-2-0 + !important 解決 `.money-item img` 0-1-1 覆蓋）；padding `8px` → `2px` |
 | C3 設定頁兌換組合改版（2026-03-26）| C3 | 標題改「小換大」/「大換小」（`#333`）；末尾加 `🎲 隨機`（`data-type="random-pair"`，與一般 `selection-btn` 同樣式）；`pair = { type, random: true }`；`generateQuestions()` 每題用 `activePair` 隨機挑選；`start()` 加 `pair.random` 語音守衛 |
+| C3 「大換小」標題字色修正（2026-03-26）| C3 | `renderPairButtons()` 大換小 h4 字色 `#fff` → `#333`；Grep `大換小.*color` 定位 |
+| C3 兌換區金額數字間距修復（2026-03-26）| C3 | `getCommonCSS()` inline style `.money-value { margin: 1px 0 0 0 }` → `margin: 6px 0 0 0`；外部 CSS 的 8px 被 inline style 覆蓋，根因在此；另補 `.money-label` CSS（`target-money` 的標籤 class）|
+| C3 兌換主類別「🎲 全隨機」（2026-03-26）| C3 | `renderCategoryButtons()` 末尾加 `data-type="all-random-category"` 按鈕；`handleSelection()` 加 `all-random-category` 分支：`category='all-random'`、`pair={random:true,type:'all'}`；`renderPairButtons()` 全隨機時顯示提示；`generateQuestions()` 加 `isAllRandomMode`：收集三類別全部 22 個 pairs，每題隨機抽，`lastExchangeKey` 機制防連續重複 |
 
 ---
 

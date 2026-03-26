@@ -1,7 +1,7 @@
 # C3 換錢 — 單元開發經驗報告書
 
 > **日期**：2026-02-09
-> **更新日期**：2026-03-04（語音選擇優先順序統一）
+> **更新日期**：2026-03-26（「大換小」字色修正、金額間距修復、兌換主類別全隨機）
 > **時間**：下午
 > **單元名稱**：C3 換錢（Money Exchange）
 > **系列**：C 貨幣認知
@@ -1343,3 +1343,53 @@ state.settings.pair = { type: 'small-to-big', random: true }
 ```
 
 **修改檔案**：`js/c3_money_exchange.js`、`css/c3_money_exchange.css`
+
+---
+
+## 十五、視覺修正與兌換主類別全隨機（2026-03-26）
+
+### 15.1 「大換小」標題字色修正
+
+**問題**：設定頁「大換小」區塊標題文字為白色（`#fff`），在白色背景下不可見。
+
+**根因**：`renderPairButtons()` 中大換小的 `<h4>` 有 `color: #fff`，小換大已正確使用 `#333`，兩者不一致。
+
+**修復**：`js/c3_money_exchange.js` 第 4169 行，`color: #fff` → `color: #333`。
+
+### 15.2 兌換區金額數字間距修復
+
+**問題**：兌換區的淡化目標金錢圖示（如 50元），金額文字與圖示幾乎重疊，間距過小。
+
+**根因分析**：
+1. HTML 結構：`<div class="target-money"><img class="unit3-coin faded"><div class="money-value">50元</div></div>`
+2. `css/c3_money_exchange.css` 中 `.money-value { margin: 8px 0 0 0 }` — 但被覆蓋
+3. `getCommonCSS()` inline `<style>` 注入時間晚於外部 CSS，其 `.money-value { margin: 1px 0 0 0 }` 贏得層疊，實際間距只有 1px
+
+**修復**：`getCommonCSS()` inline style 中 `.money-value { margin: 1px 0 0 0 }` → `margin: 6px 0 0 0`
+
+**附帶修復**：`css/c3_money_exchange.css` 及 inline style 補充 `.money-label` 樣式（`margin: 4px 0 0 0`），供 `generateTargetMoneyHTML()` 中 `money-label` class 使用。
+
+### 15.3 兌換主類別「🎲 全隨機」
+
+**新增功能**：在「💰 兌換主類別」右側新增「🎲 全隨機」按鈕，選後每題從三大類別所有 pairs 中隨機抽取，且連續兩題不會相同。
+
+**可用 pairs 總數**：22 個（錢幣↔錢幣 10 + 紙鈔↔紙鈔 6 + 錢幣↔紙鈔 6）
+
+**技術實作**：
+
+| 函數 | 變更 |
+|------|------|
+| `renderCategoryButtons()` | 類別按鈕末尾加 `data-type="all-random-category"` 按鈕；`category === 'all-random'` 時標為 active |
+| `renderPairButtons()` | `category === 'all-random'` 早返回，顯示「✅ 將從所有類別中隨機出題，每題儘可能不重複」 |
+| `handleSelection()` | 新增 `all-random-category` 分支：`category = 'all-random'`、`pair = { random: true, type: 'all' }`；重繪 pair buttons；由既有 button-group active 邏輯處理按鈕高亮 |
+| `generateQuestions()` | 新增 `isAllRandomMode`；全隨機時 `eligiblePairsForRandom` 收集所有類別 pairs；`isAllRandomMode` 加入 `activePair` 抽取條件；既有 `lastExchangeKey` 防連續重複機制自動生效 |
+| `start()` | 歡迎語音加 `isAllRandom` 守衛：「每題都是不同的金錢兌換」 |
+
+**state 結構**（全隨機模式）：
+```javascript
+state.settings.category = 'all-random'
+state.settings.pair = { random: true, type: 'all' }
+// generateQuestions() 每題從 22 個 pairs 中隨機選，from/to 由 activePair 決定
+```
+
+**修改檔案**：`js/c3_money_exchange.js`

@@ -118,6 +118,16 @@
             flex-shrink: 0;
         }
 
+        /* Unit3 兌換目標金錢標籤 */
+        .money-label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin: 4px 0 0 0;
+        }
+
         /* Unit3 金錢價值標籤基本樣式 */
         .money-value {
             display: block !important;

@@ -4131,7 +4131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { category } = this.state.settings;
             const categories = this.gameData.categories;
             let html = '';
-            
+
             for (const catKey in categories) {
                 let categoryName = categories[catKey].name;
                 if (categoryName.includes('<->')) {
@@ -4140,12 +4140,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isActive = category === catKey ? 'active' : '';
                 html += `<button class="selection-btn ${isActive}" data-type="category" data-value="${catKey}">${categoryName}</button>`;
             }
+            const isAllRandomActive = category === 'all-random' ? 'active' : '';
+            html += `<button class="selection-btn ${isAllRandomActive}" data-type="all-random-category">🎲 全隨機</button>`;
             return html;
         },
 
         renderPairButtons() {
             const { category, pair } = this.state.settings;
             if (!category) return '<p style="color: #999; margin: 10px 0;">請先選擇兌換主類別</p>';
+            if (category === 'all-random') return '<p style="color: #667eea; margin: 10px 0; font-weight: bold;">✅ 將從所有類別中隨機出題，每題儘可能不重複</p>';
             
             const categories = this.gameData.categories;
             const subCategory = categories[category];
@@ -4166,7 +4169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (bigToSmall.length > 0) {
-                html += '<div style="width: 100%;"><h4 style="margin: 0 0 10px 0; color: #fff;">大換小</h4>';
+                html += '<div style="width: 100%;"><h4 style="margin: 0 0 10px 0; color: #333;">大換小</h4>';
                 bigToSmall.forEach(p => {
                     const isActive = pair && !pair.random && pair.from === p.from && pair.to === p.to ? 'active' : '';
                     html += `<button class="selection-btn ${isActive}" data-type="pair" data-from="${p.from}" data-to="${p.to}" data-exchange-type="${p.type}">${p.from}元 → ${p.to}元</button>`;
@@ -4229,6 +4232,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pairButtons) pairButtons.innerHTML = this.renderPairButtons();
                 this.updateStartButton();
                 return; // 不走下方的 button-group active 邏輯
+            } else if (type === 'all-random-category') {
+                this.state.settings.category = 'all-random';
+                this.state.settings.pair = { random: true, type: 'all' };
+                const pairButtons = document.getElementById('pair-buttons');
+                if (pairButtons) pairButtons.innerHTML = this.renderPairButtons();
             } else {
                 this.state.settings[type] = value;
 
@@ -4503,10 +4511,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const { difficulty, pair } = this.state.settings;
             let welcomeText = '';
             
+            const isAllRandom = this.state.settings.category === 'all-random';
             if (difficulty === 'easy') {
-                welcomeText = pair.random
-                    ? `金錢兌換測驗開始，拖曳金錢到兌換區進行隨機金錢兌換`
-                    : `金錢兌換測驗開始，拖曳金錢到兌換區進行${pair.from}元和${pair.to}元的兌換`;
+                welcomeText = isAllRandom
+                    ? `金錢兌換測驗開始，拖曳金錢到兌換區，每題都是不同的金錢兌換`
+                    : pair.random
+                        ? `金錢兌換測驗開始，拖曳金錢到兌換區進行隨機金錢兌換`
+                        : `金錢兌換測驗開始，拖曳金錢到兌換區進行${pair.from}元和${pair.to}元的兌換`;
             } else if (difficulty === 'normal') {
                 welcomeText = `金錢兌換測驗開始，請拖曳正確數量的金錢到兌換區`;
             } else if (difficulty === 'hard') {
@@ -4539,9 +4550,15 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Debug.log('exchange', `🎛️ 配置驅動: ${difficulty}模式兌換範圍 ${minExchanges}-${maxExchanges}`);
 
             // 若為隨機模式，預先取得可用 pairs 供每題抽取
-            const isRandomMode = pair.random === true;
+            const isAllRandomMode = this.state.settings.category === 'all-random';
+            const isRandomMode = pair.random === true && !isAllRandomMode;
             let eligiblePairsForRandom = [];
-            if (isRandomMode) {
+            if (isAllRandomMode) {
+                // 全隨機：收集所有類別的所有 pairs
+                Object.values(this.gameData.categories).forEach(cat => {
+                    eligiblePairsForRandom.push(...cat.pairs);
+                });
+            } else if (isRandomMode) {
                 const subCategory = this.gameData.categories[this.state.settings.category];
                 eligiblePairsForRandom = subCategory ? subCategory.pairs.filter(p => p.type === pair.type) : [];
             }
@@ -4557,7 +4574,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     attempts++;
 
                     // 隨機模式：每次嘗試都重新抽一個具體 pair
-                    const activePair = isRandomMode
+                    const activePair = (isRandomMode || isAllRandomMode)
                         ? eligiblePairsForRandom[Math.floor(Math.random() * eligiblePairsForRandom.length)]
                         : pair;
 
@@ -8665,7 +8682,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     max-width: 80px !important;
                     max-height: none !important;
                 }
-                .money-value { font-size: 12px; color: #333; margin: 1px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; }
+                .money-value { font-size: 12px; color: #333; margin: 6px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; }
 
                 /* 【關鍵修正】兌換區整體佈局改用 CSS Grid */
                 .exchange-row {
@@ -8689,6 +8706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .target-area { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-start; }
                 .target-money { display: flex; flex-direction: column; align-items: center; transition: opacity 0.5s ease; }
                 .target-money img { width: 75px; height: 75px; object-fit: contain; }
+                .money-label { display: block; font-size: 12px; font-weight: bold; color: #333; text-align: center; margin: 4px 0 0 0; }
                 .faded { opacity: 0.4; }
                 .target-active { opacity: 1; }
                 .checkmark-area { width: 36px; height: 36px; align-self: center; margin-top: 35px; }
