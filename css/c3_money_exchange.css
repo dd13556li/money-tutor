@@ -99,7 +99,7 @@
         /* Unit3 硬幣樣式 */
         .unit3-coin {
             width: 80px;
-            height: 80px;
+            height: auto;
             object-fit: contain;
             border-radius: 50%;
             margin: 0; /* 移除邊距確保與金額數字對齊 */
@@ -107,34 +107,15 @@
             flex-shrink: 0; /* 防止圖示縮小 */
         }
 
-        /* Unit3 紙鈔樣式 - 參照unit6.css標準 120px×120px */
+        /* Unit3 紙鈔樣式 */
         .unit3-banknote {
             width: 120px;
-            height: 120px;
+            height: auto;
             object-fit: contain;
             border-radius: 10px;
-            margin: 0; /* 移除邊距確保與金額數字對齊 */
+            margin: 0;
             display: block;
-            flex-shrink: 0; /* 防止圖示縮小 */
-        }
-
-        /* Unit3 覆蓋 unit6.css 衝突 - 使用更高優先級 */
-        .money-item .unit3-banknote,
-        .exchange-money-item .unit3-banknote,
-        div .unit3-banknote {
-            width: var(--banknote-size) !important;
-            height: var(--banknote-size) !important;
-            max-width: var(--banknote-size) !important;
-            max-height: var(--banknote-size) !important;
-        }
-
-        .money-item .unit3-coin,
-        .exchange-money-item .unit3-coin,
-        div .unit3-coin {
-            width: var(--coin-size) !important;
-            height: var(--coin-size) !important;
-            max-width: var(--coin-size) !important;
-            max-height: var(--coin-size) !important;
+            flex-shrink: 0;
         }
 
         /* Unit3 金錢價值標籤基本樣式 */
@@ -179,18 +160,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            padding: 2px;
             border: 2px solid #4CAF50;
             border-radius: 12px;
             background: white;
             cursor: grab;
             transition: all 0.3s ease;
-            min-width: 90px; /* 適應硬幣寬度 80px + 邊距 */
-            min-height: 124px; /* 增加4px適應金額數字的額外間距 */
-            max-width: 95px; /* 限制最大寬度避免不必要的空間 */
+            min-width: 90px;
+            max-width: 95px;
+            height: auto !important;
             position: relative;
-            flex-shrink: 0; /* 防止容器被壓縮 */
-            margin: 3px; /* 容器間基本間距 */
+            flex-shrink: 0;
+            margin: 3px;
         }
 
         .unit3-banknote-container {
@@ -198,18 +179,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            padding: 2px;
             border: 2px solid #4CAF50;
             border-radius: 12px;
             background: white;
             cursor: grab;
             transition: all 0.3s ease;
-            min-width: 140px; /* 適應紙鈔寬度 120px + 邊距 */
-            min-height: 144px; /* 增加4px適應金額數字的額外間距 */
-            max-width: 145px; /* 限制最大寬度 */
+            min-width: 124px;
+            max-width: 126px;
+            height: auto !important;
             position: relative;
-            flex-shrink: 0; /* 防止容器被壓縮 */
-            margin: 3px; /* 容器間基本間距 */
+            flex-shrink: 0;
+            margin: 3px;
         }
 
         /* Unit3 容器懸停效果 */
@@ -226,13 +207,20 @@
             transform: translateY(-1px);
         }
 
-        /* 兌換區域專用間距規則 - 解決紙鈔重疊 */
+        /* 兌換區域專用間距規則 - 解決紙鈔重疊 + 垂直置中 */
         .exchange-drop-zone .unit3-banknote-container,
         .drop-zone .unit3-banknote-container,
         .exchange-area .unit3-banknote-container {
             margin: 6px 8px !important; /* 增加兌換區域的紙鈔間距 */
-            min-width: 145px !important;
+            min-width: 128px !important;
             flex-shrink: 0 !important;
+            width: 128px !important;
+            height: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 2px !important;
         }
 
         .exchange-drop-zone .unit3-coin-container,
@@ -484,17 +472,15 @@
 
             .unit3-coin-container {
                 min-width: 80px;
-                min-height: 110px;
                 max-width: 85px;
-                padding: 6px;
+                padding: 2px;
                 margin: 2px;
             }
 
             .unit3-banknote-container {
-                min-width: 120px; /* 小螢幕仍保持足夠寬度 */
-                min-height: 125px;
-                max-width: 125px;
-                padding: 6px;
+                min-width: 88px;
+                max-width: 95px;
+                padding: 2px;
                 margin: 2px;
             }
 
@@ -502,7 +488,7 @@
             .exchange-drop-zone .unit3-banknote-container,
             .drop-zone .unit3-banknote-container {
                 margin: 4px 6px !important;
-                min-width: 125px !important;
+                min-width: 90px !important;
             }
 
             .unit3-coin {
@@ -543,21 +529,19 @@
 
             .unit3-coin-container {
                 min-width: 70px;
-                min-height: 100px;
                 max-width: 75px;
             }
 
             .unit3-banknote-container {
-                min-width: 100px; /* 超小螢幕仍保持合理寬度 */
-                min-height: 110px;
-                max-width: 105px;
+                min-width: 85px;
+                max-width: 92px;
             }
 
             /* 超小螢幕兌換區域專用間距 */
             .exchange-drop-zone .unit3-banknote-container,
             .drop-zone .unit3-banknote-container {
                 margin: 2px 4px !important;
-                min-width: 105px !important;
+                min-width: 88px !important;
             }
 
             .unit3-coin {
@@ -1091,3 +1075,4 @@
             visibility: visible !important;
             z-index: 15;
         }
+

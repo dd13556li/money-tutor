@@ -1296,3 +1296,50 @@ this.voice =
 ```
 
 **修改檔案**：`js/c3_money_exchange.js`（4 處）
+
+---
+
+## 十四、設定頁兌換組合改版 + 金錢區外框自適應（2026-03-26）
+
+### 14.1 金錢區外框自適應
+
+**問題**：遊戲畫面中，錢幣/紙鈔圖示外的綠色邊框垂直高度過高，圖示與邊框之間空隙太大。
+
+**根因分析**：
+1. `.unit3-coin-container` / `.unit3-banknote-container` 有固定 `min-height`（124px/144px），導致外框無法收縮
+2. `.money-item img { max-height: 75px }` (specificity 0-1-1) 覆蓋了 `.unit3-banknote { height: 120px }` (0-1-0)，圖片實際渲染小於預期
+3. 紙鈔圖片為 2:1 長寬比，在 120×120 正方形容器中上下各有 ~30px 透明帶
+
+**修復內容**（`css/c3_money_exchange.css` + `js/c3_money_exchange.js`）：
+
+| 項目 | 修改前 | 修改後 |
+|------|--------|--------|
+| `min-height` 限制 | `min-height: 124px/144px/156px` | 全數移除 |
+| 圖片高度 | `height: 120px`（紙鈔）/ `80px`（硬幣） | `height: auto`（自然比例） |
+| 容器尺寸 | 無高特異度覆蓋 | `.unit3-banknote-container .unit3-banknote { width: 120px !important; height: auto !important; max-height: none !important }` |
+| padding | `8px` | `2px` |
+
+### 14.2 設定頁兌換組合改版
+
+**新增功能**：
+1. **短標題**：「小面額換大面額」→「小換大」；「大面額換小面額」→「大換小」；字色改為 `#333`（原白色不可見）
+2. **🎲 隨機按鈕**：每組（小換大/大換小）末尾新增，樣式與一般 `selection-btn` 相同
+3. **隨機語意**：選「🎲 隨機」後進入測驗，每道題從該組所有合法組合中隨機挑選（非進設定時固定一組）
+4. 適用三個類別：錢幣↔錢幣、紙鈔↔紙鈔、錢幣↔紙鈔
+
+**技術實作**：
+
+| 函數 | 變更 |
+|------|------|
+| `renderPairButtons()` | h4 改短文字 + `#333` 色；各組末尾加 `data-type="random-pair"` 按鈕；active 判斷加 `!pair.random` 守衛 |
+| `handleSelection()` | 新增 `random-pair` 分支：`state.settings.pair = { type, random: true }`；重繪 pair buttons；`return` 早退避免被 button-group active 邏輯覆蓋 |
+| `generateQuestions()` | 偵測 `pair.random === true`；每輪迭代用 `activePair`（隨機從 `eligiblePairsForRandom` 取）替代固定 `pair` |
+| `start()` | welcome 語音加 `pair.random` 守衛，隨機模式說「隨機金錢兌換」 |
+
+**state 結構**（隨機模式）：
+```javascript
+state.settings.pair = { type: 'small-to-big', random: true }
+// 無 from/to 欄位，generateQuestions() 每題自行挑選
+```
+
+**修改檔案**：`js/c3_money_exchange.js`、`css/c3_money_exchange.css`

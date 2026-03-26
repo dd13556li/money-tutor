@@ -486,6 +486,8 @@ toolbarConfig: {
 | B5 超支建議商品高亮（2026-03-26）| B5 | `_handleConfirm` 超支分支：`suggestion` 存在時 800ms 後加 `b5-hint-glow` 至建議移除的卡片（2400ms 後移除）；B5 `_showBudgetHint` pattern |
 | B2 easy 逐項事件語音（2026-03-26）| B2 | `_animateEasyEntries` 每步高亮時加 `Game.Speech.speak('收入X元'/'花了X元')`；C1 逐一計數 pattern |
 | B3 quiz 答對語音含週存與商品名（2026-03-26）| B3 | choice + numpad 答對語音改為 `每週存X元，需要Y週，就能買Z了！`；強化除法概念連結 |
+| C3 金錢區外框自適應（2026-03-26）| C3 | 移除 `min-height: 124/144/156px`；`height: 120px/80px` → `auto`；`.unit3-banknote-container .unit3-banknote { width: 120px !important; height: auto !important; max-height: none !important }`（0-2-0 + !important 解決 `.money-item img` 0-1-1 覆蓋）；padding `8px` → `2px` |
+| C3 設定頁兌換組合改版（2026-03-26）| C3 | 標題改「小換大」/「大換小」（`#333`）；末尾加 `🎲 隨機`（`data-type="random-pair"`，與一般 `selection-btn` 同樣式）；`pair = { type, random: true }`；`generateQuestions()` 每題用 `activePair` 隨機挑選；`start()` 加 `pair.random` 語音守衛 |
 
 ---
 

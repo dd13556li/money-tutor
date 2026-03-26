@@ -4155,20 +4155,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const bigToSmall = subCategory.pairs.filter(p => p.type === 'big-to-small');
             
             if (smallToBig.length > 0) {
-                html += '<div style="width: 100%; margin-bottom: 15px;"><h4 style="margin: 0 0 10px 0; color: #fff;">小面額換大面額</h4>';
+                html += '<div style="width: 100%; margin-bottom: 15px;"><h4 style="margin: 0 0 10px 0; color: #333;">小換大</h4>';
                 smallToBig.forEach(p => {
-                    const isActive = pair && pair.from === p.from && pair.to === p.to ? 'active' : '';
+                    const isActive = pair && !pair.random && pair.from === p.from && pair.to === p.to ? 'active' : '';
                     html += `<button class="selection-btn ${isActive}" data-type="pair" data-from="${p.from}" data-to="${p.to}" data-exchange-type="${p.type}">${p.from}元 → ${p.to}元</button>`;
                 });
+                const randomStbActive = pair && pair.random && pair.type === 'small-to-big' ? 'active' : '';
+                html += `<button class="selection-btn c3-random-pair-btn ${randomStbActive}" data-type="random-pair" data-exchange-type="small-to-big">🎲 隨機</button>`;
                 html += '</div>';
             }
-            
+
             if (bigToSmall.length > 0) {
-                html += '<div style="width: 100%;"><h4 style="margin: 0 0 10px 0; color: #fff;">大面額換小面額</h4>';
+                html += '<div style="width: 100%;"><h4 style="margin: 0 0 10px 0; color: #fff;">大換小</h4>';
                 bigToSmall.forEach(p => {
-                    const isActive = pair && pair.from === p.from && pair.to === p.to ? 'active' : '';
+                    const isActive = pair && !pair.random && pair.from === p.from && pair.to === p.to ? 'active' : '';
                     html += `<button class="selection-btn ${isActive}" data-type="pair" data-from="${p.from}" data-to="${p.to}" data-exchange-type="${p.type}">${p.from}元 → ${p.to}元</button>`;
                 });
+                const randomBtsActive = pair && pair.random && pair.type === 'big-to-small' ? 'active' : '';
+                html += `<button class="selection-btn c3-random-pair-btn ${randomBtsActive}" data-type="random-pair" data-exchange-type="big-to-small">🎲 隨機</button>`;
                 html += '</div>';
             }
             
@@ -4219,6 +4223,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (type === 'pair') {
                 this.state.settings.pair = { from: parseInt(from), to: parseInt(to), type: exchangeType };
+            } else if (type === 'random-pair') {
+                this.state.settings.pair = { type: exchangeType, random: true };
+                const pairButtons = document.getElementById('pair-buttons');
+                if (pairButtons) pairButtons.innerHTML = this.renderPairButtons();
+                this.updateStartButton();
+                return; // 不走下方的 button-group active 邏輯
             } else {
                 this.state.settings[type] = value;
 
@@ -4494,7 +4504,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let welcomeText = '';
             
             if (difficulty === 'easy') {
-                welcomeText = `金錢兌換測驗開始，拖曳金錢到兌換區進行${pair.from}元和${pair.to}元的兌換`;
+                welcomeText = pair.random
+                    ? `金錢兌換測驗開始，拖曳金錢到兌換區進行隨機金錢兌換`
+                    : `金錢兌換測驗開始，拖曳金錢到兌換區進行${pair.from}元和${pair.to}元的兌換`;
             } else if (difficulty === 'normal') {
                 welcomeText = `金錢兌換測驗開始，請拖曳正確數量的金錢到兌換區`;
             } else if (difficulty === 'hard') {
@@ -4526,6 +4538,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             Game.Debug.log('exchange', `🎛️ 配置驅動: ${difficulty}模式兌換範圍 ${minExchanges}-${maxExchanges}`);
 
+            // 若為隨機模式，預先取得可用 pairs 供每題抽取
+            const isRandomMode = pair.random === true;
+            let eligiblePairsForRandom = [];
+            if (isRandomMode) {
+                const subCategory = this.gameData.categories[this.state.settings.category];
+                eligiblePairsForRandom = subCategory ? subCategory.pairs.filter(p => p.type === pair.type) : [];
+            }
+
             for (let i = 0; i < this.state.totalQuestions; i++) {
                 let sourceItemsCount, exchangeRate, totalExchanges;
                 let attempts = 0;
@@ -4536,17 +4556,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 do {
                     attempts++;
 
-                    if (pair.type === 'small-to-big') {
-                        exchangeRate = pair.to / pair.from; // 例如：5/1 = 5（需要5個1元換1個5元）
+                    // 隨機模式：每次嘗試都重新抽一個具體 pair
+                    const activePair = isRandomMode
+                        ? eligiblePairsForRandom[Math.floor(Math.random() * eligiblePairsForRandom.length)]
+                        : pair;
+
+                    if (activePair.type === 'small-to-big') {
+                        exchangeRate = activePair.to / activePair.from;
 
                         if (difficulty === 'normal') {
-                            // 【普通模式】固定1輪兌換
                             totalExchanges = 1;
                             sourceItemsCount = exchangeRate;
                         } else {
-                            // 【困難模式/簡單模式】靈活設定，但不超過30個金錢圖示
                             const maxSourceCoins = 30;
-                            const minRounds = 2; // 至少2輪
+                            const minRounds = 2;
                             const maxRounds = Math.floor(maxSourceCoins / exchangeRate);
 
                             const randomRounds = minRounds + Math.floor(Math.random() * Math.min(4, maxRounds - minRounds + 1));
@@ -4556,20 +4579,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             totalExchanges = finalRounds;
                         }
 
-                        Game.Debug.log('exchange', `🪙 小換大設定: ${sourceItemsCount}個${pair.from}元 → ${totalExchanges}輪兌換`);
+                        Game.Debug.log('exchange', `🪙 小換大設定: ${sourceItemsCount}個${activePair.from}元 → ${totalExchanges}輪兌換`);
 
                     } else {
-                        exchangeRate = pair.from / pair.to; // 例如：5/1 = 5（1個5元換5個1元）
+                        exchangeRate = activePair.from / activePair.to;
 
                         if (difficulty === 'normal') {
-                            // 【普通模式】固定1輪兌換
                             totalExchanges = 1;
                             sourceItemsCount = 1;
                         } else {
-                            // 【困難模式/簡單模式】靈活設定，但兌換結果不超過30個金錢圖示
                             const maxResultCoins = 30;
                             const maxSourceCoins = Math.floor(maxResultCoins / exchangeRate);
-                            const minSourceCoins = 2; // 至少2個源金錢
+                            const minSourceCoins = 2;
 
                             const randomSourceCoins = minSourceCoins + Math.floor(Math.random() * Math.min(4, maxSourceCoins - minSourceCoins + 1));
                             const finalSourceCoins = Math.min(randomSourceCoins, maxSourceCoins);
@@ -4578,16 +4599,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             totalExchanges = finalSourceCoins;
 
                             const resultCount = finalSourceCoins * exchangeRate;
-                            Game.Debug.log('state', `🪙 大換小設定: ${sourceItemsCount}個${pair.from}元 → ${resultCount}個結果金錢 (最多30個限制)`);
+                            Game.Debug.log('state', `🪙 大換小設定: ${sourceItemsCount}個${activePair.from}元 → ${resultCount}個結果金錢 (最多30個限制)`);
                         }
 
-                        Game.Debug.log('exchange', `🪙 大換小設定: ${sourceItemsCount}個${pair.from}元 → ${totalExchanges}輪兌換`);
+                        Game.Debug.log('exchange', `🪙 大換小設定: ${sourceItemsCount}個${activePair.from}元 → ${totalExchanges}輪兌換`);
                     }
 
-                    // 🔧 [新增] 生成當前題目的兌換特徵key
-                    const currentExchangeKey = `${pair.from}-${pair.to}-${sourceItemsCount}`;
-                    
-                    // 檢查是否與上一題重複
+                    const currentExchangeKey = `${activePair.from}-${activePair.to}-${sourceItemsCount}`;
+
                     if (currentExchangeKey !== this.state.lastExchangeKey || attempts >= maxAttempts) {
                         Game.Debug.log('question', `🎯 [C3-防重複] 第${i+1}題生成`, {
                             exchangeKey: currentExchangeKey,
@@ -4595,14 +4614,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             attempts,
                             isDuplicate: currentExchangeKey === this.state.lastExchangeKey
                         });
-                        break; // 不重複或達到最大重試次數，跳出do-while循環
+                        this.state.quizQuestions.push({
+                            sourceValue: activePair.from, targetValue: activePair.to, sourceItemsCount,
+                            exchangeRate, totalExchanges, exchangeType: activePair.type
+                        });
+                        this.state.lastExchangeKey = currentExchangeKey;
+                        break;
                     }
                 } while (attempts < maxAttempts);
-
-                this.state.quizQuestions.push({
-                    sourceValue: pair.from, targetValue: pair.to, sourceItemsCount,
-                    exchangeRate, totalExchanges, exchangeType: pair.type
-                });
             }
         },
 
@@ -8633,7 +8652,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 .money-item { width: 80px; height: 80px; background: transparent; border: none; cursor: grab; transition: transform 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; }
                 .money-item:hover { transform: scale(1.05); }
                 .money-item img { max-width: 75px; max-height: 75px; object-fit: contain; }
-                .money-value { font-size: 12px; color: #333; margin: 8px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; }
+                /* 高 specificity 覆蓋：unit3 容器內的圖片不受 money-item img 75px 限制 */
+                .unit3-banknote-container .unit3-banknote {
+                    width: 120px !important;
+                    height: auto !important;
+                    max-width: 120px !important;
+                    max-height: none !important;
+                }
+                .unit3-coin-container .unit3-coin {
+                    width: 80px !important;
+                    height: auto !important;
+                    max-width: 80px !important;
+                    max-height: none !important;
+                }
+                .money-value { font-size: 12px; color: #333; margin: 1px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; }
 
                 /* 【關鍵修正】兌換區整體佈局改用 CSS Grid */
                 .exchange-row {
@@ -8788,12 +8820,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     gap: 15px;
                     justify-content: center;
                     min-height: 120px;
-                    align-items: center;
+                    align-items: flex-start;
                     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
                     border-radius: 10px;
                     padding: 15px;
                 }
-                
+
+                /* 強制紙鈔容器尺寸（覆蓋 .money-item {width:80px} 的影響） */
+                .unit3-easy-money-source .unit3-banknote-container {
+                    width: 124px !important;
+                    min-width: 124px !important;
+                    height: auto !important;
+                    flex-shrink: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 2px !important;
+                    border: 2px solid #4CAF50 !important;
+                    border-radius: 12px !important;
+                    background: white !important;
+                    margin: 0 !important;
+                }
+
                 .unit3-easy-exchange-section {
                     background: rgba(255,255,255,0.95);
                     margin: 20px;
@@ -8898,13 +8947,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     gap: 15px;
                     justify-content: center;
                     min-height: 120px;
-                    align-items: center;
+                    align-items: flex-start;
                     background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
                     border-radius: 10px;
                     padding: 15px;
                     transition: all 0.3s ease;
                 }
-                
+
+                /* 強制紙鈔容器尺寸（覆蓋 .money-item {width:80px} 的影響） */
+                .unit3-normal-money-source .unit3-banknote-container,
+                .unit3-hard-money-source .unit3-banknote-container {
+                    width: 124px !important;
+                    min-width: 124px !important;
+                    height: auto !important;
+                    flex-shrink: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 2px !important;
+                    border: 2px solid #4CAF50 !important;
+                    border-radius: 12px !important;
+                    background: white !important;
+                    margin: 0 !important;
+                }
+
                 .unit3-normal-money-source.dragover, .unit3-hard-money-source.dragover {
                     background: linear-gradient(135deg, #dcedc8 0%, #c8e6c9 100%);
                     box-shadow: 0 0 15px rgba(76, 175, 80, 0.5) inset;

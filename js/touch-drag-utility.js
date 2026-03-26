@@ -109,6 +109,41 @@ class TouchDragUtility {
                 transform: scale(1.15) !important;
             }
 
+            /* F6 拖曳 Emoji / 圖示：去背、只顯示內容 */
+            .touch-drag-clone.draggable-emoji {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                min-width: auto !important;
+                min-height: auto !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            .touch-drag-clone.draggable-emoji img {
+                filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)) !important;
+                transform: scale(1.15) !important;
+            }
+
+            /* 當 clone 本身是 <img>（金錢圖示/自訂圖示的直接複製）：
+               移除方框陰影，改用 drop-shadow 跟著圖形輪廓
+               （!important 才能覆蓋 .touch-drag-clone 的 box-shadow !important）*/
+            img.touch-drag-clone {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+                outline: none !important;
+                filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)) !important;
+            }
+
+            /* 當 clone 本身是 <span>（emoji 文字）：同樣移除方框陰影 */
+            span.touch-drag-clone {
+                box-shadow: none !important;
+                border: none !important;
+                outline: none !important;
+            }
+
             /* 金錢項目拖曳時圖片添加陰影效果 */
             .touch-drag-clone.money-item img,
             .touch-drag-clone.change-money img,
@@ -248,7 +283,7 @@ class TouchDragUtility {
 
         // 🔧 [性能優化] 快速檢查是否可能是拖拽元素
         // 🔧 [A6 觸控修復 v2.3] 使用 let 以便在子元素 pointer-events:none 時重新指向父元素
-        const _DRAG_SEL = '.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin';
+        const _DRAG_SEL = '.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin, .b3-ndrag-denom';
         let target = event.target;
 
         this.log('👆 touchstart事件觸發', {
@@ -541,7 +576,7 @@ class TouchDragUtility {
         }
         
         // 🔧 [性能優化] 快速預檢查：如果目標元素明顯不是拖拽元素，直接返回
-        const quickCheck = target.closest('.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin');
+        const quickCheck = target.closest('.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin, .b3-ndrag-denom');
         if (!quickCheck) {
             return null;
         }

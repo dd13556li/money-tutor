@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <div class="b-res-reward-wrap">
             <a href="#" id="endgame-reward-link" class="b-res-reward-link">
-                🎁 開啟獎勵系統（可加 ${q.correctCount} 分）
+                🎁 開啟獎勵系統
             </a>
         </div>
 

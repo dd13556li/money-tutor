@@ -64,6 +64,7 @@ const B3_WEEKLY_OPTIONS = {
 // ── 面額兌換規則（供撲滿手動兌換）────────────────────────────────
 const EXCHANGE_RULES = [
     { from: 1,   count: 10, to: 10   },
+    { from: 1,   count: 5,  to: 5    },
     { from: 5,   count: 2,  to: 10   },
     { from: 10,  count: 5,  to: 50   },
     { from: 50,  count: 2,  to: 100  },
@@ -368,7 +369,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="b3-cal-settings b3-days-preview" id="b3-days-preview" style="display:none;"></div>
 
-                <div class="b-setting-group b3-quiz-settings" id="count-settings-group" style="display:none;">
+                <!-- 普通模式設定 -->
+                <div class="b-setting-group b3-normal-settings" id="n-start-date-group" style="display:none;">
+                    <label class="b-setting-label">📅 開始日期：</label>
+                    <div class="b-btn-group">
+                        <input type="date" id="b3-n-start-date" class="b3-date-input" value="${today}">
+                    </div>
+                </div>
+                <div class="b-setting-group b3-normal-settings" id="n-price-range-group" style="display:none;">
+                    <label class="b-setting-label">🛒 購買物品金額：</label>
+                    <div class="b-btn-group" id="n-price-range-btns">
+                        <button class="b-sel-btn" data-nrange="300">300元以內</button>
+                        <button class="b-sel-btn" data-nrange="500">500元以內</button>
+                        <button class="b-sel-btn" data-nrange="800">800元以內</button>
+                    </div>
+                </div>
+                <div class="b-setting-group b3-normal-settings" id="n-daily-group" style="display:none;">
+                    <label class="b-setting-label">💰 每天存款金額：</label>
+                    <div class="b-btn-group" id="n-daily-btn-group">
+                        <button class="b-sel-btn" data-ndaily="preset">預設</button>
+                        <button class="b-sel-btn" data-ndaily="custom">自訂</button>
+                    </div>
+                    <div id="b3-preset-display" style="display:none;margin-top:10px;padding:10px 20px;background:#fef3c7;border:2px solid #d97706;border-radius:12px;text-align:center;">
+                        <span id="b3-preset-number" style="font-size:2rem;font-weight:900;color:#92400e;letter-spacing:2px;">--</span>
+                        <span style="font-size:1rem;color:#92400e;margin-left:4px;">元 / 天</span>
+                    </div>
+                    <div id="b3-n-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
+                        <input type="number" id="b3-n-custom-daily-input"
+                               min="1" max="9999" placeholder="輸入金額"
+                               style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
+                        <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
+                    </div>
+                </div>
+                <div class="b3-normal-settings b3-days-preview" id="b3-n-days-preview" style="display:none;"></div>
+
+                <!-- 困難模式設定 -->
+                <div class="b-setting-group b3-hard-settings" id="count-settings-group" style="display:none;">
                     <label class="b-setting-label">📋 題數：</label>
                     <div class="b-btn-group" id="count-group">
                         <button class="b-sel-btn" data-val="1">1題</button>
@@ -378,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-val="20">20題</button>
                     </div>
                 </div>
-                <div class="b-setting-group b3-quiz-settings" id="mode-settings-group" style="display:none;">
+                <div class="b-setting-group b3-hard-settings" id="mode-settings-group" style="display:none;">
                     <label class="b-setting-label">🔄 作答模式：</label>
                     <div class="b-btn-group" id="mode-group">
                         <button class="b-sel-btn" data-val="retry">重試模式</button>
@@ -429,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="b-setting-group">
                     <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
-                        ✨ 簡單：月曆模擬每天存錢直到達成目標｜普通/困難：計算每週存款所需週數
+                        ✨ 簡單：月曆存錢，面額已分解好直接放置｜普通：月曆存錢，自行組合面額｜困難：計算每週存款所需週數
                     </label>
                 </div>
             </div>
@@ -442,9 +478,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _diffDescriptions: {
-            easy:   '簡單：月曆模擬！點擊每一天存入固定金額，累積到目標金額就能買到想要的東西',
-            normal: '普通：輸入正確週數，計算每週存固定金額需要幾週才夠',
-            hard:   '困難：目標金額更大，需精確計算存款所需週數',
+            easy:   '簡單：月曆模擬！點擊每一天存入固定金額，面額已幫你分解好，直接拖曳放置即可',
+            normal: '普通：月曆模擬！每天自行組合正確面額存入撲滿，比簡單模式更具挑戰性',
+            hard:   '困難：計算每週存固定金額需要幾週才能達成目標，精確輸入週數',
         },
 
         _bindSettingsEvents() {
@@ -453,25 +489,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#diff-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    this.state.settings.difficulty = btn.dataset.val;
+                    const diff = btn.dataset.val;
+                    this.state.settings.difficulty = diff;
                     const desc = document.getElementById('diff-desc');
-                    if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
-                    // Show/hide cal vs quiz settings
-                    const isEasy = btn.dataset.val === 'easy';
-                    document.querySelectorAll('.b3-cal-settings').forEach(el => el.style.display = isEasy ? '' : 'none');
-                    document.querySelectorAll('.b3-quiz-settings').forEach(el => el.style.display = isEasy ? 'none' : '');
-                    if (!isEasy) {
-                        // Reset cal-specific settings
+                    if (desc) { desc.textContent = this._diffDescriptions[diff]; desc.classList.add('show'); }
+                    // Show/hide settings by difficulty
+                    document.querySelectorAll('.b3-cal-settings').forEach(el => el.style.display = diff === 'easy' ? '' : 'none');
+                    document.querySelectorAll('.b3-normal-settings').forEach(el => el.style.display = diff === 'normal' ? '' : 'none');
+                    document.querySelectorAll('.b3-hard-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
+                    if (diff === 'hard') {
+                        // Reset calendar settings
                         this.state.settings.startDate = null;
                         this.state.settings.dailyAmount = null;
                         this.state.settings.priceRange = null;
                     } else {
-                        // Reset quiz-specific settings
+                        // Reset hard-mode settings
                         this.state.settings.questionCount = null;
                         this.state.settings.retryMode = null;
-                        // Set default date
+                    }
+                    if (diff === 'easy') {
                         const dateInput = document.getElementById('b3-start-date');
                         if (dateInput) this.state.settings.startDate = dateInput.value;
+                    } else if (diff === 'normal') {
+                        const dateInput = document.getElementById('b3-n-start-date');
+                        if (dateInput) this.state.settings.startDate = dateInput.value;
+                        // Reset normal-specific UI
+                        this.state.settings.dailyAmount = null;
+                        this.state.settings.priceRange = null;
+                        const presetDisplay = document.getElementById('b3-preset-display');
+                        if (presetDisplay) { presetDisplay.style.display = 'none'; presetDisplay.classList.remove('b3-preset-locked'); }
+                        const customRow = document.getElementById('b3-n-custom-daily-row');
+                        if (customRow) customRow.style.display = 'none';
+                        document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -527,7 +577,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             }
 
-            // Count buttons (normal/hard)
+            // ── 普通模式設定事件 ──────────────────────────────
+            // Normal: 開始日期
+            const nDateInput = document.getElementById('b3-n-start-date');
+            if (nDateInput) {
+                Game.EventManager.on(nDateInput, 'change', () => {
+                    this.state.settings.startDate = nDateInput.value;
+                }, {}, 'settings');
+            }
+
+            // Normal: 購買物品金額
+            document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.priceRange = parseInt(btn.dataset.nrange);
+                    this._updateNDaysPreview();
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            // Normal: 每天存款金額（預設/自訂）
+            document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const v = btn.dataset.ndaily;
+                    const presetDisplay = document.getElementById('b3-preset-display');
+                    const customRow = document.getElementById('b3-n-custom-daily-row');
+                    if (v === 'preset') {
+                        if (customRow) customRow.style.display = 'none';
+                        if (presetDisplay) { presetDisplay.style.display = 'block'; presetDisplay.classList.remove('b3-preset-locked'); }
+                        this.state.settings.dailyAmount = 'preset-pending';
+                        this._checkCanStart();
+                        // 浮動金額動畫
+                        const pool = [10, 20, 30, 50, 75, 100];
+                        const numEl = document.getElementById('b3-preset-number');
+                        const animId = setInterval(() => {
+                            if (numEl) numEl.textContent = pool[Math.floor(Math.random() * pool.length)];
+                        }, 80);
+                        Game.TimerManager.setTimeout(() => {
+                            clearInterval(animId);
+                            const chosen = pool[Math.floor(Math.random() * pool.length)];
+                            if (numEl) numEl.textContent = chosen;
+                            if (presetDisplay) presetDisplay.classList.add('b3-preset-locked');
+                            this.state.settings.dailyAmount = chosen;
+                            this._updateNDaysPreview();
+                            this._checkCanStart();
+                        }, 1200, 'presetLock');
+                    } else {
+                        if (presetDisplay) { presetDisplay.style.display = 'none'; presetDisplay.classList.remove('b3-preset-locked'); }
+                        if (customRow) customRow.style.display = 'flex';
+                        this.state.settings.dailyAmount = 'custom';
+                        const inp = document.getElementById('b3-n-custom-daily-input');
+                        if (inp) { inp.value = ''; inp.focus(); }
+                        this._checkCanStart();
+                    }
+                }, {}, 'settings');
+            });
+
+            // Normal: 自訂金額輸入
+            const nCustomDailyInput = document.getElementById('b3-n-custom-daily-input');
+            if (nCustomDailyInput) {
+                Game.EventManager.on(nCustomDailyInput, 'input', () => {
+                    const val = parseInt(nCustomDailyInput.value);
+                    this.state.settings.dailyAmount = (val >= 1 && val <= 9999) ? val : 'custom';
+                    this._updateNDaysPreview();
+                    this._checkCanStart();
+                }, {}, 'settings');
+            }
+
+            // Count buttons (hard mode only)
             document.querySelectorAll('#count-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#count-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -740,11 +860,33 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn) return;
             if (!s.difficulty) { btn.disabled = true; return; }
             if (s.difficulty === 'easy') {
-                // 需選擇價格區間，且自訂金額選了但尚未輸入有效值時，鎖定開始
                 btn.disabled = !s.priceRange || (s.dailyAmount === 'custom');
+            } else if (s.difficulty === 'normal') {
+                btn.disabled = !s.priceRange || !s.dailyAmount ||
+                               s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
                 btn.disabled = !s.questionCount || !s.retryMode;
             }
+        },
+
+        // 普通模式設定頁天數預覽（寫入 #b3-n-days-preview）
+        _updateNDaysPreview() {
+            const preview = document.getElementById('b3-n-days-preview');
+            if (!preview) return;
+            const s = this.state.settings;
+            const range = s.priceRange;
+            const daily = s.dailyAmount;
+            const effectiveDaily = (daily && typeof daily === 'number') ? daily : null;
+            if (!effectiveDaily || !range) { preview.style.display = 'none'; return; }
+            const items = B3_ALL_ITEMS.filter(i => i.price <= range);
+            if (!items.length) { preview.style.display = 'none'; return; }
+            const prices = items.map(i => i.price);
+            const minDays = Math.ceil(Math.min(...prices) / effectiveDaily);
+            const maxDays = Math.ceil(Math.max(...prices) / effectiveDaily);
+            preview.innerHTML = minDays === maxDays
+                ? `📅 預計需要 <strong>${maxDays}</strong> 天`
+                : `📅 預計需要 <strong>${minDays}～${maxDays}</strong> 天`;
+            preview.style.display = '';
         },
 
         // ── 9. 遊戲開始 ───────────────────────────────────────
@@ -754,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
 
-            if (this.state.settings.difficulty === 'easy') {
+            if (this.state.settings.difficulty === 'easy' || this.state.settings.difficulty === 'normal') {
                 this._startCalendarSession();
             } else {
                 const s = this.state.settings;
@@ -1174,8 +1316,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = this.state.calendar;
             const month = c.startDate.getMonth() + 1;
             const dayNum = c.clickedDays + 1;
-            Game.Speech.speak(`${month}月${day}日，第${dayNum}天`);
-            this._startDragSession(day);
+            const diff = this.state.settings.difficulty;
+            Game.Speech.speak(`${month}月${day}日，第${dayNum}天`, () => {
+                if (diff === 'normal') {
+                    this._startNormalDragSession(day);
+                } else {
+                    this._startDragSession(day);
+                }
+            });
         },
 
         // ── 拖曳存錢工作階段 ─────────────────────────────────────
@@ -1314,6 +1462,279 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 普通模式：自由組合面額拖曳 ──────────────────────────
+
+        _startNormalDragSession(day) {
+            const c = this.state.calendar;
+            const targetAmount = c.dailyAmount;
+
+            // 可用面額：所有 ≤ targetAmount 的面額，加上「下一個較大面額」
+            const ALL_DENOMS = [1, 5, 10, 50, 100, 500, 1000];
+            const smaller = ALL_DENOMS.filter(d => d <= targetAmount);
+            const nextLarger = ALL_DENOMS.find(d => d > targetAmount);
+            const availDenoms = nextLarger ? [...smaller, nextLarger] : smaller;
+            if (!availDenoms.length) availDenoms.push(1);
+
+            c.drag = {
+                dayBeingSaved: day,
+                mode: 'normal',
+                targetAmount,
+                placedItems: [],  // [{ denom, uid }]
+                placedTotal: 0,
+                availDenoms,
+                items: [],        // 完成後填入，供 _completeDragSession 使用
+                errorCount: 0,
+            };
+
+            const pigBank = document.getElementById('b3-pig-bank');
+            if (!pigBank) return;
+
+            // 更新「今日可存金錢」卡片：顯示大數字 + 面額選項
+            this._updateNormalDailyCard();
+
+            // 顯示放置區
+            const dropZone = document.getElementById('b3-pig-drop-zone');
+            const slotsContainer = document.getElementById('b3-drop-slots');
+            if (slotsContainer) slotsContainer.innerHTML = this._renderNormalDropZoneHTML();
+            if (dropZone) dropZone.style.display = '';
+
+            const speechText = `今天要存${toTWD(targetAmount)}，請選擇正確的面額`;
+            c.lastSpeech = speechText;
+            Game.Speech.speak(speechText);
+
+            this._initNormalDragAndDrop();
+            this.state.isProcessing = false;
+        },
+
+        _updateNormalDailyCard() {
+            const c = this.state.calendar;
+            const drag = c.drag;
+            const subtitle = document.getElementById('b3-daily-subtitle');
+            const itemsContainer = document.getElementById('b3-daily-items');
+            if (subtitle) subtitle.style.display = 'none';
+            if (!itemsContainer) return;
+            itemsContainer.innerHTML = `
+<div class="b3-normal-target-wrap">
+    <div class="b3-normal-target-amount">${drag.targetAmount}</div>
+    <div class="b3-normal-target-unit">元</div>
+</div>
+<div class="b3-normal-denom-sources">
+    ${drag.availDenoms.map(d => {
+        const isBill = d >= 100;
+        const imgSize = isBill ? '72px' : '54px';
+        return `<div class="b3-ndrag-denom" draggable="true" data-denom="${d}">
+            <img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">
+            <div class="b3-ndrag-label">${d}元</div>
+        </div>`;
+    }).join('')}
+</div>`;
+        },
+
+        _renderNormalDropZoneHTML() {
+            const c = this.state.calendar;
+            const drag = c.drag;
+            if (!drag || drag.mode !== 'normal') return '';
+            const total = drag.placedTotal;
+            const target = drag.targetAmount;
+
+            // 依面額分組顯示
+            const denomCounts = {};
+            drag.placedItems.forEach(({ denom }) => {
+                denomCounts[denom] = (denomCounts[denom] || 0) + 1;
+            });
+            const placedHTML = Object.keys(denomCounts).length
+                ? Object.entries(denomCounts).map(([denom, count]) => {
+                    const d = parseInt(denom);
+                    const isBill = d >= 100;
+                    const imgSize = isBill ? '56px' : '44px';
+                    return `<div class="b3-nplaced-row">
+                        <img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">
+                        <span class="b3-nplaced-count">×${count}</span>
+                    </div>`;
+                }).join('')
+                : `<div class="b3-nplace-hint">拖曳或點擊面額放入此處</div>`;
+
+            const totalColor = total === target ? '#16a34a' : total > target ? '#dc2626' : '#1e40af';
+            const confirmDisabled = total <= 0 ? 'disabled' : '';
+            return `
+<div class="b3-normal-placed-area" id="b3-normal-placed-area">${placedHTML}</div>
+<div class="b3-normal-total-row">
+    <span>已存：</span><span id="b3-n-total" style="color:${totalColor};font-weight:900;">${total} 元</span>
+    <span> / 目標：${target} 元</span>
+</div>
+<div class="b3-normal-action-row">
+    <button class="b3-normal-clear-btn" id="b3-normal-clear-btn">🗑️ 清除</button>
+    <button class="b3-normal-confirm-btn" id="b3-normal-confirm-btn" ${confirmDisabled}>✅ 確認</button>
+</div>`;
+        },
+
+        _initNormalDragAndDrop() {
+            // 1. HTML5 拖曳：來源面額（drag source tiles）
+            document.querySelectorAll('.b3-ndrag-denom').forEach(tile => {
+                Game.EventManager.on(tile, 'dragstart', (e) => {
+                    tile.classList.add('b3-ndragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ denom: parseInt(tile.dataset.denom) }));
+                    const img = tile.querySelector('img');
+                    if (img && e.dataTransfer.setDragImage) {
+                        const rect = img.getBoundingClientRect();
+                        const iw = rect.width || 54;
+                        const ih = rect.height || 54;
+                        e.dataTransfer.setDragImage(img, iw / 2, ih / 2);
+                    }
+                }, {}, 'gameUI');
+                Game.EventManager.on(tile, 'dragend', () => tile.classList.remove('b3-ndragging'), {}, 'gameUI');
+                // 點擊也能新增
+                Game.EventManager.on(tile, 'click', () => {
+                    this._handleNormalDrop(parseInt(tile.dataset.denom));
+                }, {}, 'gameUI');
+            });
+
+            // 2. 觸控支援（TouchDragUtility）
+            if (window.TouchDragUtility) {
+                const pigCol = document.getElementById('b3-pig-col');
+                if (pigCol) {
+                    window.TouchDragUtility.cleanupAll?.();
+                    window.TouchDragUtility.registerDraggable(pigCol, '.b3-ndrag-denom', {
+                        onDragStart: () => true,
+                        onDrop: (draggedEl) => {
+                            this._handleNormalDrop(parseInt(draggedEl.dataset.denom));
+                        },
+                    });
+                }
+                // 登記整個「存入金錢區」容器為 drop zone（持久存在，不被 DOM 更新破壞）
+                // 作為 b3-normal-placed-area 之外的 fallback（手指落在合計列/按鈕區時仍能觸發）
+                const pigDropZone = document.getElementById('b3-pig-drop-zone');
+                if (pigDropZone) window.TouchDragUtility.registerDropZone(pigDropZone);
+            }
+
+            // 3. 放置區事件（每次 DOM 更新後需重綁）
+            this._bindNormalDropZoneEvents();
+        },
+
+        _bindNormalDropZoneEvents() {
+            // 放置區：直接綁定到 b3-normal-placed-area（HTML5 dragover 必須在目標元素上 preventDefault）
+            const dropZone = document.getElementById('b3-normal-placed-area');
+            if (dropZone) {
+                Game.EventManager.on(dropZone, 'dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('b3-ndrop-hover');
+                }, {}, 'gameUI');
+                Game.EventManager.on(dropZone, 'dragleave', (e) => {
+                    if (!dropZone.contains(e.relatedTarget)) {
+                        dropZone.classList.remove('b3-ndrop-hover');
+                    }
+                }, {}, 'gameUI');
+                Game.EventManager.on(dropZone, 'drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('b3-ndrop-hover');
+                    try {
+                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        if (data.denom) this._handleNormalDrop(data.denom);
+                    } catch(err) {}
+                }, {}, 'gameUI');
+                // 觸控放置區（每次更新後重新登記新元素）
+                if (window.TouchDragUtility) {
+                    window.TouchDragUtility.registerDropZone(dropZone);
+                }
+            }
+            const confirmBtn = document.getElementById('b3-normal-confirm-btn');
+            if (confirmBtn) Game.EventManager.on(confirmBtn, 'click', () => this._confirmNormalDeposit(), {}, 'gameUI');
+            const clearBtn = document.getElementById('b3-normal-clear-btn');
+            if (clearBtn) Game.EventManager.on(clearBtn, 'click', () => this._clearNormalDropZone(), {}, 'gameUI');
+        },
+
+        _handleNormalDrop(denom) {
+            const c = this.state.calendar;
+            if (!c.drag || c.drag.mode !== 'normal') return;
+            if (this.state.isProcessing) return;
+            const newTotal = c.drag.placedTotal + denom;
+            const target = c.drag.targetAmount;
+            if (newTotal > target) {
+                this.audio.play('error');
+                Game.Speech.speak(`放太多了！目標是${toTWD(target)}`);
+                return;
+            }
+            this.audio.play('coin');
+            const uid = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            c.drag.placedItems.push({ denom, uid });
+            c.drag.placedTotal = newTotal;
+            this._updateNormalDropZone();
+        },
+
+        _updateNormalDropZone() {
+            const slotsContainer = document.getElementById('b3-drop-slots');
+            if (slotsContainer) slotsContainer.innerHTML = this._renderNormalDropZoneHTML();
+            this._bindNormalDropZoneEvents();
+        },
+
+        _clearNormalDropZone() {
+            const c = this.state.calendar;
+            if (!c.drag || c.drag.mode !== 'normal') return;
+            c.drag.placedItems = [];
+            c.drag.placedTotal = 0;
+            this._updateNormalDropZone();
+        },
+
+        _confirmNormalDeposit() {
+            const c = this.state.calendar;
+            if (!c.drag || c.drag.mode !== 'normal') return;
+            if (this.state.isProcessing) return;
+            const { placedTotal, targetAmount } = c.drag;
+            if (placedTotal === targetAmount) {
+                this.state.isProcessing = true;
+                this.audio.play('correct');
+                // 移除提示高亮
+                document.querySelectorAll('.b3-ndrag-hint').forEach(el => el.classList.remove('b3-ndrag-hint'));
+                c.drag.items = c.drag.placedItems.map((item, i) => ({ denom: item.denom, slotIdx: i }));
+                c.drag.placedCount = c.drag.items.length;
+                c.drag.placedAmount = placedTotal;
+                Game.Speech.speak(`存入${toTWD(targetAmount)}，正確！`, () => {
+                    this._completeDragSession();
+                });
+            } else if (placedTotal > targetAmount) {
+                c.drag.errorCount++;
+                this.audio.play('error');
+                Game.Speech.speak(`存入太多了，目標是${toTWD(targetAmount)}，請重新選擇`);
+                this._clearNormalDropZone();
+                if (c.drag.errorCount >= 3) this._showNormalDepositHint();
+            } else {
+                c.drag.errorCount++;
+                this.audio.play('error');
+                Game.Speech.speak(`還差${toTWD(targetAmount - placedTotal)}元，請繼續放入`);
+                if (c.drag.errorCount >= 3) this._showNormalDepositHint();
+            }
+        },
+
+        _showNormalDepositHint() {
+            const c = this.state.calendar;
+            if (!c.drag) return;
+            const target = c.drag.targetAmount;
+            // 貪婪分解最佳面額組合
+            const ALL_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+            let remaining = target;
+            const hintMap = {};
+            ALL_DENOMS.forEach(d => {
+                if (remaining >= d) {
+                    hintMap[d] = Math.floor(remaining / d);
+                    remaining %= d;
+                }
+            });
+            // 高亮對應面額格子（脈動動畫）
+            document.querySelectorAll('.b3-ndrag-denom').forEach(tile => {
+                const d = parseInt(tile.dataset.denom);
+                if (hintMap[d]) tile.classList.add('b3-ndrag-hint');
+            });
+            // 語音提示
+            const parts = Object.entries(hintMap)
+                .filter(([, cnt]) => cnt > 0)
+                .sort(([a], [b]) => b - a)
+                .map(([d, cnt]) => `${d}元${cnt > 1 ? cnt + '個' : ''}`);
+            Game.Speech.speak(`提示：可以用 ${parts.join('、')} 組合成${toTWD(target)}`);
+        },
+
+        // ── Easy 模式：對應槽位放置 ──────────────────────────────
+
         _handleCoinDrop(denom, slotIdx, targetSlot) {
             const c = this.state.calendar;
             if (!c.drag) return;
@@ -1422,7 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isEndingGame = true;
 
             const c = this.state.calendar;
-            const elapsed  = c.startTime ? (Date.now() - c.startTime) : 0;
+            const elapsed = c.startTime ? (Date.now() - c.startTime) : 0;
             const mins = Math.floor(elapsed / 60000);
             const secs = Math.floor((elapsed % 60000) / 1000);
 
@@ -1431,7 +1852,45 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
+            // ── 第一畫面：達成存錢目標 ──
             app.innerHTML = `
+<div class="b-res-wrapper">
+    <div class="b-res-screen">
+        <div class="b-res-header">
+            <div class="b-res-trophy" style="font-size:3rem;animation:none;">🎉</div>
+            <h1 class="b-res-title">達成存錢目標！</h1>
+        </div>
+        <div class="b-res-container">
+            <div class="b3-cal-success-item">
+                <span class="b3-cal-success-icon">${this._itemIconHTML(c.item, '160px')}</span>
+                <div class="b3-cal-success-name">${c.item.name} 買到了！</div>
+                <div class="b3-cal-success-price">${c.item.price} 元</div>
+            </div>
+            <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
+                <div class="b-res-card b-res-card-1">
+                    <div class="b-res-icon">📅</div>
+                    <div class="b-res-label">存錢天數</div>
+                    <div class="b-res-value">${c.clickedDays} 天</div>
+                </div>
+                <div class="b-res-card b-res-card-2">
+                    <div class="b-res-icon">💰</div>
+                    <div class="b-res-label">每天存款</div>
+                    <div class="b-res-value">${c.dailyAmount} 元</div>
+                </div>
+            </div>
+            <div class="b-res-btns">
+                <button id="b3-view-summary-btn" class="b-res-play-btn">
+                    <span class="btn-icon">📊</span><span class="btn-text">查看測驗總結</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+            Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
+                Game.EventManager.removeByCategory('gameUI');
+                // ── 第二畫面：測驗總結 ──
+                app.innerHTML = `
 <div class="b-res-wrapper">
     <div class="b-res-screen">
         <div class="b-res-header">
@@ -1445,30 +1904,26 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="b-res-reward-wrap">
             <a href="#" id="endgame-reward-link" class="b-res-reward-link">
-                🎁 開啟獎勵系統（可加 ${c.clickedDays} 分）
+                🎁 開啟獎勵系統
             </a>
         </div>
         <div class="b-res-container">
-            <div class="b3-cal-success-item">
-                <span class="b3-cal-success-icon">${this._itemIconHTML(c.item, '128px')}</span>
-                <div class="b3-cal-success-name">${c.item.name} 買到了！</div>
-                <div class="b3-cal-success-price">${c.item.price} 元</div>
-            </div>
-            <div class="b-res-grid">
+            <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
                 <div class="b-res-card b-res-card-1">
-                    <div class="b-res-icon">📅</div>
-                    <div class="b-res-label">存錢天數</div>
+                    <div class="b-res-icon">✅</div>
+                    <div class="b-res-label">完成天數</div>
                     <div class="b-res-value">${c.clickedDays} 天</div>
                 </div>
                 <div class="b-res-card b-res-card-2">
-                    <div class="b-res-icon">💰</div>
-                    <div class="b-res-label">每天存款</div>
-                    <div class="b-res-value">${c.dailyAmount} 元</div>
-                </div>
-                <div class="b-res-card b-res-card-3">
                     <div class="b-res-icon">⏱️</div>
                     <div class="b-res-label">完成時間</div>
                     <div class="b-res-value">${mins > 0 ? mins + '分' : ''}${secs}秒</div>
+                </div>
+            </div>
+            <div class="b-res-perf-section">
+                <h3>📊 表現評價</h3>
+                <div class="b-res-perf-badge" style="background:#f59e0b;">
+                    🏆 完成了 ${c.clickedDays} 天，成功存到夢想物品！
                 </div>
             </div>
             <div class="b-res-achievements">
@@ -1490,22 +1945,23 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 </div>`;
-
-            Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
-                () => this.startGame(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
-                () => this.showSettings(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
-                e.preventDefault();
-                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
-                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
+                    () => this.startGame(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
+                    () => this.showSettings(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
+                    e.preventDefault();
+                    if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                    else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                }, {}, 'gameUI');
+                this._fireConfetti();
+                Game.TimerManager.setTimeout(() => Game.Speech.speak('存錢成功，繼續加油！'), 300, 'speech');
             }, {}, 'gameUI');
 
             Game.TimerManager.setTimeout(() => {
                 document.getElementById('success-sound')?.play();
                 this._fireConfetti();
             }, 100, 'confetti');
-
             Game.TimerManager.setTimeout(() => {
                 Game.Speech.speak(`太棒了！你只用了${c.clickedDays}天就存到了${toTWD(c.item.price)}，買到了${c.item.name}！`);
             }, 800, 'speech');
@@ -1893,18 +2349,62 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let badge, badgeColor;
-            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            let perfText;
+            if (accuracy >= 90)      perfText = `🏆 完成了 ${q.correctCount} 題，表現優異！`;
+            else if (accuracy >= 70) perfText = `👍 完成了 ${q.correctCount} 題，表現良好！`;
+            else if (accuracy >= 50) perfText = `💪 完成了 ${q.correctCount} 題，繼續努力！`;
+            else                     perfText = `📚 完成了 ${q.correctCount} 題，多多練習，你可以的！`;
+
+            // 取最後一題物品做購買展示
+            const lastQ      = q.questions[q.totalQuestions - 1] || {};
+            const lastItem   = lastQ.item   || { name: '', price: '', icon: '🎁' };
+            const lastWeekly = lastQ.weekly || '';
+            const lastAnswer = lastQ.answer || '';
 
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
+            // ── 第一畫面：達成存錢目標 ──
             app.innerHTML = `
+<div class="b-res-wrapper">
+    <div class="b-res-screen">
+        <div class="b-res-header">
+            <div class="b-res-trophy" style="font-size:3rem;animation:none;">🎉</div>
+            <h1 class="b-res-title">達成存錢目標！</h1>
+        </div>
+        <div class="b-res-container">
+            <div class="b3-cal-success-item">
+                <span class="b3-cal-success-icon">${this._itemIconHTML(lastItem, '160px')}</span>
+                <div class="b3-cal-success-name">${lastItem.name} 買到了！</div>
+                <div class="b3-cal-success-price">${lastItem.price} 元</div>
+            </div>
+            <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
+                <div class="b-res-card b-res-card-1">
+                    <div class="b-res-icon">📅</div>
+                    <div class="b-res-label">存錢週數</div>
+                    <div class="b-res-value">${lastAnswer} 週</div>
+                </div>
+                <div class="b-res-card b-res-card-2">
+                    <div class="b-res-icon">💰</div>
+                    <div class="b-res-label">每週存款</div>
+                    <div class="b-res-value">${lastWeekly} 元</div>
+                </div>
+            </div>
+            <div class="b-res-btns">
+                <button id="b3-view-summary-btn" class="b-res-play-btn">
+                    <span class="btn-icon">📊</span><span class="btn-text">查看測驗總結</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+            Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
+                Game.EventManager.removeByCategory('gameUI');
+                // ── 第二畫面：測驗總結 ──
+                app.innerHTML = `
 <div class="b-res-wrapper">
     <div class="b-res-screen">
         <div class="b-res-header">
@@ -1916,37 +2416,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="b-res-mascot-spacer"></span>
             </div>
         </div>
-
         <div class="b-res-reward-wrap">
             <a href="#" id="endgame-reward-link" class="b-res-reward-link">
-                🎁 開啟獎勵系統（可加 ${q.correctCount} 分）
+                🎁 開啟獎勵系統
             </a>
         </div>
-
         <div class="b-res-container">
-            <div class="b-res-grid">
+            <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
                 <div class="b-res-card b-res-card-1">
                     <div class="b-res-icon">✅</div>
-                    <div class="b-res-label">答對題數</div>
-                    <div class="b-res-value">${q.correctCount}/${q.totalQuestions}</div>
+                    <div class="b-res-label">完成題數</div>
+                    <div class="b-res-value">${q.correctCount} 題</div>
                 </div>
                 <div class="b-res-card b-res-card-2">
-                    <div class="b-res-icon">📊</div>
-                    <div class="b-res-label">正確率</div>
-                    <div class="b-res-value">${accuracy}%</div>
-                </div>
-                <div class="b-res-card b-res-card-3">
                     <div class="b-res-icon">⏱️</div>
                     <div class="b-res-label">完成時間</div>
                     <div class="b-res-value">${mins > 0 ? mins + '分' : ''}${secs}秒</div>
                 </div>
             </div>
-
             <div class="b-res-perf-section">
                 <h3>📊 表現評價</h3>
-                <div class="b-res-perf-badge">${badge}</div>
+                <div class="b-res-perf-badge">${perfText}</div>
             </div>
-
             <div class="b-res-achievements">
                 <h3>🏆 學習成果</h3>
                 <div class="b-res-ach-list">
@@ -1955,7 +2446,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 練習加法累積計算</div>
                 </div>
             </div>
-
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -1967,32 +2457,33 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 </div>`;
-
-            Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
-                () => this.startGame(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
-                () => this.showSettings(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
-                e.preventDefault();
-                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
-                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
+                    () => this.startGame(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
+                    () => this.showSettings(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
+                    e.preventDefault();
+                    if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                    else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                }, {}, 'gameUI');
+                this._fireConfetti();
+                Game.TimerManager.setTimeout(() => {
+                    let msg;
+                    if (accuracy === 100)    msg = '太厲害了，全部答對了！';
+                    else if (accuracy >= 80) msg = `很棒喔，答對了${q.correctCount}題！`;
+                    else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
+                    else                     msg = '要再加油喔，多練習幾次！';
+                    Game.Speech.speak(msg);
+                }, 300, 'speech');
             }, {}, 'gameUI');
-
-            Game.TimerManager.setTimeout(() => {
-                const accuracy = q.totalQuestions > 0
-                    ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
-                let msg;
-                if (accuracy === 100)    msg = '太厲害了，全部答對了！';
-                else if (accuracy >= 80) msg = `很棒喔，答對了${q.correctCount}題！`;
-                else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
-                else                     msg = '要再加油喔，多練習幾次！';
-                Game.Speech.speak(msg);
-            }, 800, 'speech');
 
             Game.TimerManager.setTimeout(() => {
                 document.getElementById('success-sound')?.play();
                 this._fireConfetti();
             }, 100, 'confetti');
+            Game.TimerManager.setTimeout(() => {
+                if (lastItem.name) Game.Speech.speak(`太棒了！${lastItem.name}買到了！`);
+            }, 800, 'speech');
         },
 
         _fireConfetti() {
