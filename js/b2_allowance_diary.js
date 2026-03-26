@@ -356,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctCount: 0,
                 errorCount: 0,
                 questions: [],
+                answeredHistory: [],
                 startTime: null,
                 currentInput: '',
             },
@@ -391,12 +392,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetGameState() {
             const q = this.state.quiz;
-            q.currentQuestion = 0;
-            q.totalQuestions  = this.state.settings.questionCount;
-            q.correctCount    = 0;
-            q.questions       = [];
-            q.startTime       = null;
-            q.currentInput    = '';
+            q.currentQuestion  = 0;
+            q.totalQuestions   = this.state.settings.questionCount;
+            q.correctCount     = 0;
+            q.questions        = [];
+            q.answeredHistory  = [];
+            q.startTime        = null;
+            q.currentInput     = '';
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B2] 遊戲狀態已重置');
@@ -784,6 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
@@ -937,6 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
@@ -995,6 +999,32 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
+            const historyHTML = (() => {
+                const hist = q.answeredHistory;
+                if (!hist || hist.length === 0) return '';
+                const rows = hist.map((h, i) => {
+                    const eventsStr = h.events.map(e =>
+                        `<span class="b2-hist-ev ${e.type}">${e.type === 'income' ? '＋' : '－'}${e.amount}</span>`
+                    ).join('');
+                    return `<tr>
+                        <td class="b2-hist-no">${i + 1}</td>
+                        <td class="b2-hist-start">${h.startAmount}</td>
+                        <td class="b2-hist-evs">${eventsStr}</td>
+                        <td class="b2-hist-ans">${h.answer}</td>
+                    </tr>`;
+                }).join('');
+                return `
+                <div class="b2-res-diary">
+                    <h3>📒 記帳日記回顧</h3>
+                    <table class="b2-hist-table">
+                        <thead><tr>
+                            <th>#</th><th>起始</th><th>收支事件</th><th>結餘</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+            })();
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
@@ -1051,6 +1081,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 閱讀記帳日記格式</div>
                 </div>
             </div>
+
+            ${historyHTML}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

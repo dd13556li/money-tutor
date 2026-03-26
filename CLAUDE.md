@@ -494,6 +494,9 @@ toolbarConfig: {
 | B1 面額使用統計（2026-03-27）| B1 | 完成畫面新增「🪙 面額使用統計」：`state.quiz.denomStats`累計；`addCoin(denom)` 加 `denomStats[denom]++`；`showResults()` 渲染面額圖示+次數格子；CSS `.b-res-denom-stats/.b1-stat-grid/.b1-stat-item` 加入 `b1_daily_budget.css`；C1 計數統計 pattern |
 | B5 派對物品回顧（2026-03-27）| B5 | 完成畫面新增「🎉 本次派對採購物品」：`state.game.successfulRoundItems[]`；`_handleConfirm` 答對分支收集 `${icon} ${name}`（去重）；`showResults()` 渲染粉色標籤泡泡；CSS `.b5-res-party-review/.b5-party-tags/.b5-party-tag` 加入 `b5_party_budget.css`；A4 交易摘要 pattern |
 | B6 採購收據（2026-03-27）| B6 | 完成畫面新增「🧾 採購收據」表格：`state.game.receipts[]`；`_showChangeResult` 儲存 `{items,total,paid,change}`；`showResults()` 渲染 5 欄表格（關卡/商品/小計/付款/找零）；CSS `.b6-res-receipt/.b6-receipt-table` 加入 `b6_market_shopping.css`；A3/A4 收據風格 pattern |
+| B2 記帳日記回顧（2026-03-26）| B2 | 完成畫面新增「📒 記帳日記回顧」：`state.quiz.answeredHistory[]`；`_handleChoiceAnswer`+`_handleNumpadAnswer` 答對時 `push({startAmount,events,answer})`；`showResults()` 渲染綠框斑馬表格，收入綠膠囊/支出紅膠囊；CSS `.b2-res-diary/.b2-hist-table/.b2-hist-ev` 加入 `b2_allowance_diary.css` |
+| B3 存錢目標清單（2026-03-26）| B3 | 完成畫面第二頁新增「🐷 存錢目標清單」：`state.quiz.achievedGoals[]`；答對時 `push({item,weekly,answer})`；第二畫面條件渲染 `.b3-res-goals` 卡片列（icon+名稱+售價+每週×週數）；CSS `.b3-res-goals/.b3-goal-row/.b3-goal-*` 加入 `b3_savings_plan.css` |
+| B4 比價歷程表（2026-03-26）| B4 | 完成畫面新增「🛒 比價歷程」4欄表格（商品/便宜/較貴/省下）：`state.quiz.comparisonHistory[]`；`handleDiffAnswer` 答對時從 `state.currentDiffItem` 取資料 push；`showResults()` 節省橫幅後渲染橘框斑馬表；CSS `.b4-res-compare/.b4-cmp-table/.b4-cmp-cheap/exp/saved` 加入 `b4_sale_comparison.css` |
 
 ---
 

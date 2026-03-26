@@ -7069,6 +7069,74 @@ Game.Speech.speak(`${verb}${ev.amount}元`);
 3. **純追加**：不修改原有遊戲流程，零副作用
 4. **單元 CSS**：加入單元專屬 CSS 檔，不汙染 `b-series.css`
 
-*報告更新時間：2026-03-27*
+---
+
+## 第二十輪豐富化（2026-03-26）
+
+**主題**：B2 記帳日記回顧、B3 存錢目標清單、B4 比價歷程表
+
+### B2 — 記帳日記回顧（C2 統計累積 pattern）
+
+完成畫面在「學習成果」後新增「📒 記帳日記回顧」表格，列出本局所有答對題目的起始金額、收支事件（綠色＋/紅色－）及結餘。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.quiz` | 新增 `answeredHistory: []` |
+| `resetGameState()` | `q.answeredHistory = []` |
+| `_handleChoiceAnswer()` 答對分支 | `push({ startAmount, events, answer })` |
+| `_handleNumpadAnswer()` 答對分支 | `push({ startAmount, events, answer })` |
+| `showResults()` | 計算 `historyHTML`，渲染 `.b2-res-diary` 表格 |
+| `css/b2_allowance_diary.css` | `.b2-res-diary`、`.b2-hist-table`、`.b2-hist-ev.income/expense` |
+
+視覺：綠色底框，每列顯示起始→收支事件膠囊→結餘；收入綠底、支出紅底。
+
+**參照**：C2 逐一計數、F5 統計卡片。**搜尋**：`answeredHistory`、`b2-res-diary`、`b2-hist-ev`
+
+---
+
+### B3 — 存錢目標清單（F4 答對即記錄 pattern）
+
+完成畫面第二頁（「存錢達人」）在「學習成果」後新增「🐷 存錢目標清單」，列出本局答對的所有存錢目標：圖示、名稱、售價、每週存款×週數。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.quiz` | 新增 `achievedGoals: []` |
+| `resetGameState()` | `q.achievedGoals = []` |
+| `_handleChoiceAnswer()` 答對分支 | `push({ item, weekly, answer })` |
+| `_handleNumpadAnswer()` 答對分支 | `push({ item, weekly, answer })` |
+| `showResults()` 第二畫面 | 條件渲染 `.b3-res-goals` 清單列 |
+| `css/b3_savings_plan.css` | `.b3-res-goals`、`.b3-goal-list`、`.b3-goal-row`、`.b3-goal-icon/name/price/weeks` |
+
+視覺：紫色底框，每行一張白底卡：emoji + 名稱 + 售價 + 每週存X元×Y週。
+
+**參照**：F4 即時回饋記錄、B5 派對物品回顧。**搜尋**：`achievedGoals`、`b3-res-goals`、`b3-goal-row`
+
+---
+
+### B4 — 比價歷程表（A4 交易摘要 pattern）
+
+完成畫面在「累計節省金額」橫幅後新增「🛒 比價歷程」4 欄表格：商品 / 便宜 / 較貴 / 省下。
+
+| 位置 | 修改內容 |
+|------|---------|
+| `state.quiz` | 新增 `comparisonHistory: []` |
+| `resetGameState()` | `q.comparisonHistory = []` |
+| `startGame()` | `q.comparisonHistory = []`（第二次重置保證乾淨） |
+| `handleDiffAnswer()` 答對分支 | 從 `state.currentDiffItem` 取資料，`push({ name, icon, cheapStore, cheapPrice, expStore, expPrice, saved })` |
+| `showResults()` | 條件渲染 `.b4-res-compare` 表格 |
+| `css/b4_sale_comparison.css` | `.b4-res-compare`、`.b4-cmp-table`、`.b4-cmp-cheap/exp/saved` |
+
+視覺：橘色底框，便宜店綠色、較貴店紅色、省下欄橘色加粗，斑馬條紋。
+
+**參照**：A4 `showTransactionSummaryScreenWithData`、B6 採購收據。**搜尋**：`comparisonHistory`、`b4-res-compare`、`b4-cmp-table`
+
+---
+
+### 第二十輪設計共通原則
+
+與第十九輪相同：狀態累積→條件渲染→零副作用→單元 CSS。
+B3 特別說明：`achievedGoals` 在整個 quiz 階段持續累積，在第二畫面（`b3-view-summary-btn` 點擊後）顯示。
+
+*報告更新時間：2026-03-26*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
 

@@ -207,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalQuestions: 0,
                 correctCount: 0,
                 questions: [],
+                achievedGoals: [],
                 startTime: null,
                 currentInput: '',
             },
@@ -276,12 +277,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetGameState() {
             const q = this.state.quiz;
-            q.currentQuestion = 0;
-            q.totalQuestions  = this.state.settings.questionCount || 0;
-            q.correctCount    = 0;
-            q.questions       = [];
-            q.startTime       = null;
-            q.currentInput    = '';
+            q.currentQuestion  = 0;
+            q.totalQuestions   = this.state.settings.questionCount || 0;
+            q.correctCount     = 0;
+            q.questions        = [];
+            q.achievedGoals    = [];
+            q.startTime        = null;
+            q.currentInput     = '';
             const c = this.state.calendar;
             c.item = null; c.dailyAmount = 0; c.accumulated = 0; c.denomPile = {};
             c.clickedDays = 0; c.startDate = null; c.startTime = null; c.drag = null;
@@ -2197,6 +2199,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.achievedGoals.push({ item: question.item, weekly: question.weekly, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
@@ -2253,6 +2256,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
+                this.state.quiz.achievedGoals.push({ item: question.item, weekly: question.weekly, answer: question.answer });
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！每週存${question.weekly}元，需要${question.answer}週，就能買${question.item.name}了！`);
@@ -2446,6 +2450,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 練習加法累積計算</div>
                 </div>
             </div>
+            ${q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b3-res-goals">
+                <h3>🐷 存錢目標清單</h3>
+                <div class="b3-goal-list">
+                    ${q.achievedGoals.map(g => `
+                    <div class="b3-goal-row">
+                        <span class="b3-goal-icon">${g.item.icon || '🎁'}</span>
+                        <span class="b3-goal-name">${g.item.name}</span>
+                        <span class="b3-goal-price">${g.item.price}元</span>
+                        <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
+                    </div>`).join('')}
+                </div>
+            </div>` : ''}
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>

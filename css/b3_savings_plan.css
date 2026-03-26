@@ -1491,3 +1491,36 @@
     0%, 100% { box-shadow: 0 0 0 3px rgba(245,158,11,0.4); }
     50%       { box-shadow: 0 0 0 9px rgba(245,158,11,0.1); }
 }
+
+/* ── 存錢目標清單（完成畫面）────────────────────────────────── */
+.b3-res-goals {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #fdf4ff;
+    border: 2px solid #e879f9;
+    border-radius: 14px;
+}
+.b3-res-goals h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #7e22ce;
+}
+.b3-goal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.b3-goal-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1.5px solid #f0abfc;
+    border-radius: 10px;
+    font-size: 13px;
+}
+.b3-goal-icon  { font-size: 24px; flex-shrink: 0; }
+.b3-goal-name  { font-weight: bold; color: #581c87; flex: 1; }
+.b3-goal-price { font-weight: bold; color: #d97706; min-width: 52px; text-align: right; }
+.b3-goal-weeks { font-size: 12px; color: #6b7280; min-width: 110px; text-align: right; }

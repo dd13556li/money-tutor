@@ -398,3 +398,43 @@
     animation: b4SelectHint 0.85s ease 2 !important;
     border: 3px solid #f59e0b !important;
 }
+
+/* ── 比價歷程表（完成畫面）──────────────────────────────────── */
+.b4-res-compare {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #fff7ed;
+    border: 2px solid #fed7aa;
+    border-radius: 14px;
+}
+.b4-res-compare h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #9a3412;
+}
+.b4-cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.b4-cmp-table th {
+    background: #ffedd5;
+    color: #7c2d12;
+    padding: 6px 8px;
+    font-weight: bold;
+    text-align: center;
+}
+.b4-cmp-table td {
+    padding: 6px 8px;
+    text-align: center;
+    border-top: 1px solid #fed7aa;
+    vertical-align: middle;
+    line-height: 1.4;
+}
+.b4-cmp-table tr:nth-child(even) td { background: #fff7ed; }
+.b4-cmp-name  { text-align: left; font-weight: bold; color: #374151; }
+.b4-cmp-cheap { color: #166534; font-weight: bold; }
+.b4-cmp-cheap span { display: block; font-size: 13px; }
+.b4-cmp-exp   { color: #991b1b; }
+.b4-cmp-exp span   { display: block; font-size: 13px; }
+.b4-cmp-saved { font-weight: bold; color: #d97706; white-space: nowrap; }

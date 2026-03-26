@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalSaved: 0,
                 selectErrorCount: 0,
                 questions: [],
+                comparisonHistory: [],
                 startTime: null
             },
             phase: 'select',    // 'select' | 'diff'
@@ -209,12 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetGameState() {
             const q = this.state.quiz;
-            q.currentQuestion = 0;
-            q.totalQuestions  = this.state.settings.questionCount;
-            q.correctCount    = 0;
-            q.totalSaved      = 0;
-            q.questions       = [];
-            q.startTime       = null;
+            q.currentQuestion     = 0;
+            q.totalQuestions      = this.state.settings.questionCount;
+            q.correctCount        = 0;
+            q.totalSaved          = 0;
+            q.questions           = [];
+            q.comparisonHistory   = [];
+            q.startTime           = null;
             this.state.phase        = 'select';
             this.state.numpadValue  = '';
             this.state.isEndingGame = false;
@@ -372,12 +374,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const s = this.state.settings;
             const q = this.state.quiz;
-            q.currentQuestion = 0;
-            q.totalQuestions  = s.questionCount;
-            q.correctCount    = 0;
-            q.totalSaved      = 0;
-            q.startTime       = Date.now();
-            q.questions       = this._generateQuestions(q.totalQuestions);
+            q.currentQuestion   = 0;
+            q.totalQuestions    = s.questionCount;
+            q.correctCount      = 0;
+            q.totalSaved        = 0;
+            q.comparisonHistory = [];
+            q.startTime         = Date.now();
+            q.questions         = this._generateQuestions(q.totalQuestions);
 
             this.state.phase         = 'select';
             this.state.numpadValue   = '';
@@ -750,6 +753,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showCenterFeedback('✅', '答對了！');
                 this.state.quiz.correctCount++;
                 this.state.quiz.totalSaved += correctDiff;
+                const ci = this.state.currentDiffItem;
+                if (ci) {
+                    this.state.quiz.comparisonHistory.push({
+                        name: ci.name, icon: ci.icon,
+                        cheapStore: ci.optB.store, cheapPrice: ci.optB.price,
+                        expStore: ci.optA.store,   expPrice:  ci.optA.price,
+                        saved: correctDiff
+                    });
+                }
                 Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
             } else {
                 this.audio.play('error');
@@ -881,6 +893,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-savings-icon">🤑</div>
                 <div class="b4-savings-text">這次比價你總共省了</div>
                 <div class="b4-savings-amount">${q.totalSaved} 元</div>
+            </div>` : ''}
+
+            ${q.comparisonHistory && q.comparisonHistory.length > 0 ? `
+            <div class="b4-res-compare">
+                <h3>🛒 比價歷程</h3>
+                <table class="b4-cmp-table">
+                    <thead><tr>
+                        <th>商品</th><th>便宜</th><th>較貴</th><th>省下</th>
+                    </tr></thead>
+                    <tbody>
+                        ${q.comparisonHistory.map(h => `<tr>
+                            <td class="b4-cmp-name">${h.icon} ${h.name}</td>
+                            <td class="b4-cmp-cheap">${h.cheapStore}<br><span>${h.cheapPrice}元</span></td>
+                            <td class="b4-cmp-exp">${h.expStore}<br><span>${h.expPrice}元</span></td>
+                            <td class="b4-cmp-saved">省${h.saved}元</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
             </div>` : ''}
 
             <div class="b-res-btns">

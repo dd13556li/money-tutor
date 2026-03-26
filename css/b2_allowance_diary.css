@@ -396,6 +396,46 @@
     60%      { transform: translateX(8px); }
 }
 
+/* ── 記帳日記回顧（完成畫面）────────────────────────────────── */
+.b2-res-diary {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 14px;
+}
+.b2-res-diary h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #166534;
+}
+.b2-hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.b2-hist-table th {
+    background: #dcfce7;
+    color: #14532d;
+    padding: 6px 8px;
+    font-weight: bold;
+    text-align: center;
+}
+.b2-hist-table td {
+    padding: 6px 8px;
+    text-align: center;
+    border-top: 1px solid #bbf7d0;
+    vertical-align: middle;
+}
+.b2-hist-table tr:nth-child(even) td { background: #f0fdf4; }
+.b2-hist-no    { font-weight: bold; color: #6b7280; width: 28px; }
+.b2-hist-start { color: #1d4ed8; font-weight: bold; }
+.b2-hist-ans   { color: #065f46; font-weight: bold; }
+.b2-hist-evs   { text-align: left; }
+.b2-hist-ev    { display: inline-block; margin: 2px 3px; padding: 1px 6px; border-radius: 10px; font-weight: bold; font-size: 12px; }
+.b2-hist-ev.income  { background: #dcfce7; color: #166534; }
+.b2-hist-ev.expense { background: #fee2e2; color: #991b1b; }
+
 /* ── RWD ───────────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .b2-diary-title   { font-size: 16px; }
@@ -403,4 +443,5 @@
     .b2-choice-btn    { padding: 12px 18px; font-size: 19px; }
     .b2-numpad-btn    { padding: 11px 4px; font-size: 17px; }
     .b2-question-label { font-size: 15px; }
+    .b2-hist-table    { font-size: 11px; }
 }
