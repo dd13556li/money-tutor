@@ -9068,8 +9068,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .change-options-area {
                     background: white;
                     margin: 6px 12px 10px 12px;
-                    padding: 16px;
-                    padding-top: 44px; /* 上方空間給標記顯示 */
+                    padding: 12px 16px;
                     border-radius: 16px;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                 }
@@ -9079,7 +9078,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gap: 16px;
                     justify-content: center;
                     flex-wrap: wrap;
-                    margin-top: 12px; /* 給標記留出額外空間 */
+                    margin-top: 0;
                 }
 
                 /* 每個選項卡片 */
