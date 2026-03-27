@@ -442,3 +442,26 @@ ${compareStores === 'triple'
     ? `<div class="b-res-ach-item">✅ 將三家商店由便宜到貴排序（F4 排序技能應用）</div>`
     : `<div class="b-res-ach-item">✅ 計算兩價格的差額</div>`}
 ```
+
+---
+
+## 十三、連勝徽章（Round 20，2026-03-28）
+
+### 13.1 設計動機（B3 streak pattern）
+
+B4 有兩個答題階段（Select 選店 + Diff 差額），連勝追蹤跨越兩個階段累積。
+
+### 13.2 觸發點
+
+| 函數 | 操作 |
+|------|------|
+| 選店正確（easy）| `streak++`，檢查徽章，進入下一題 |
+| 選店正確（normal/hard）| 不計連勝，進入差額計算 |
+| `handleDiffAnswer` 正確 | `streak++`，檢查徽章 |
+| 選店錯誤 / 差額錯誤 | `streak = 0` |
+
+三商店 easy 選最便宜正確也累計連勝（與兩商店 easy 相同路徑）。
+
+### 13.3 CSS
+
+`.b4-streak-badge`：固定置中，`b4SbPop`，橘金漸層，1.6s 後淡出。

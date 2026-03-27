@@ -481,3 +481,34 @@ _showMinCoinsHint(walletTotal, requiredTotal) {
     animation: b1ToastUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 ```
+
+---
+
+## 十二、連勝徽章與費用明細提示（Round 20，2026-03-28）
+
+### 12.1 連勝徽章（B3 streak pattern）
+
+- `state.quiz.streak` 計數，答對 +1，答錯清零
+- 達 3 連勝：置中彈出 `🔥 3連勝！繼續加油！` + 語音
+- 達 5 連勝：`⚡ 5連勝！太厲害了！` + 語音
+- CSS：`.b1-streak-badge / .b1-sb-inner / b1SbPop`（橘金漸層，固定置中，1.6s 後淡出）
+
+### 12.2 費用明細提示（B2 breakdown pattern）
+
+答錯後顯示行程費用明細，幫助學生理解各項成本：
+
+| 模式 | 觸發時機 |
+|------|----------|
+| 困難（hard）| 每次答錯後 400ms 顯示 |
+| 普通（normal）| 第 3 次答錯後 900ms 顯示（與硬幣提示同時）|
+| 簡單（easy）| 不顯示（費用已見）|
+
+```html
+<!-- 費用明細卡範例 -->
+💡 費用明細
+📌 午餐費  60 元
+📌 公車費  20 元
+合計 80 元
+```
+
+CSS：`.b1-breakdown`（黃框）、`.b1-bd-row`、`.b1-bd-total`、`b1FadeIn` 動畫，4 秒後自動淡出。

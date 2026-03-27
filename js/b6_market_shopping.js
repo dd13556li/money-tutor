@@ -315,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentRound: 0,
                 totalRounds: 5,
                 correctCount: 0,
+                streak: 0,
                 missions: [],
                 startTime: null,
                 // current round state
@@ -362,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.currentRound = 0;
             g.totalRounds  = this.state.settings.rounds;
             g.correctCount = 0;
+            g.streak       = 0;
             g.missions     = [];
             g.startTime    = null;
             g.mission      = null;
@@ -505,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.currentRound = 0;
             g.totalRounds  = s.rounds;
             g.correctCount = 0;
+            g.streak       = 0;
             g.startTime    = Date.now();
             g.missions     = this._pickMissions(s.rounds, s.difficulty);
 
@@ -537,16 +540,62 @@ document.addEventListener('DOMContentLoaded', () => {
             g.paidAmount  = 0;
 
             this._renderShoppingUI();
+            this._showMissionIntroModal(g.mission, g.currentRound + 1);
+        },
 
-            // 語音引導：讀出購物清單
+        // ── 關卡開場任務說明彈窗（B1 _showTaskModal pattern）──
+        _showMissionIntroModal(mission, roundNum) {
+            const existing = document.getElementById('b6-mission-intro');
+            if (existing) existing.remove();
+            const g = this.state.game;
+            const items = mission.items.map(({ stall, id }) => {
+                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                return item ? `<span class="b6-mi-item">${item.icon} ${item.name}</span>` : '';
+            }).filter(Boolean).join('');
+            const names = mission.items.map(({ stall, id }) => {
+                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                return item ? item.name : '';
+            }).filter(Boolean).join('、');
+
+            const modal = document.createElement('div');
+            modal.id = 'b6-mission-intro';
+            modal.className = 'b6-mission-intro';
+            modal.innerHTML = `
+                <div class="b6-mi-card">
+                    <div class="b6-mi-round">第 ${roundNum} 關</div>
+                    <div class="b6-mi-title">🛒 今天的採購任務</div>
+                    <div class="b6-mi-items">${items}</div>
+                    <div class="b6-mi-budget">預算：<b>${mission.budget}</b> 元</div>
+                    <div class="b6-mi-hint">點任意處開始</div>
+                </div>`;
+            document.body.appendChild(modal);
+            Game.Speech.speak(`第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`);
+
+            const dismiss = () => {
+                if (!modal.parentNode) return;
+                modal.classList.add('b6-mi-fade');
+                Game.TimerManager.setTimeout(() => { if (modal.parentNode) modal.remove(); }, 350, 'ui');
+            };
+            modal.addEventListener('click', dismiss, { once: true });
+            Game.TimerManager.setTimeout(dismiss, 2800, 'turnTransition');
+        },
+
+        // ── 連勝徽章（B3 streak pattern）─────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b6-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b6-streak-badge';
+            badge.className = 'b6-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b6-sb-inner"><div class="b6-sb-label">${label}</div><div class="b6-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
             Game.TimerManager.setTimeout(() => {
-                const names = g.mission.items.map(({ stall, id }) => {
-                    const item = B6_STALLS[stall].items.find(i => i.id === id);
-                    return item ? item.name : '';
-                }).filter(Boolean).join('、');
-                this.state.game.lastSpeechText = `今天要買：${names}。請去各攤位找到這些商品。`;
-                Game.Speech.speak(`今天要買：${names}。請去各攤位找到這些商品。`);
-            }, 600, 'speech');
+                badge.classList.add('b6-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
         },
 
         // ── 10. 購物畫面 ──────────────────────────────────────
@@ -1028,6 +1077,10 @@ document.addEventListener('DOMContentLoaded', () => {
             g.receipts.push({ items, total, paid, change });
 
             g.correctCount++;
+            g.streak = (g.streak || 0) + 1;
+            if (g.streak === 3 || g.streak === 5) {
+                Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
+            }
 
             const app = document.getElementById('app');
             app.innerHTML = `

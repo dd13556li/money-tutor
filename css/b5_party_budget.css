@@ -399,3 +399,37 @@
 .b5-ri-label  { font-size: 14px; color: #6b7280; margin-top: 4px; }
 .b5-ri-budget { font-size: 44px; font-weight: 900; color: #d97706; letter-spacing: 1px; }
 .b5-ri-hint   { font-size: 12px; color: #9ca3af; margin-top: 12px; }
+
+/* ── B5 Budget Meter Bar (Round 20) ── */
+.b5-budget-meter {
+    height: 10px; background: #e5e7eb; border-radius: 8px;
+    margin: 4px 0 10px; position: relative; overflow: hidden;
+}
+.b5-budget-meter-fill {
+    height: 100%; border-radius: 8px;
+    transition: width 0.4s ease, background 0.3s ease;
+    background: #10b981;
+}
+.b5-budget-meter-fill.near { background: #f59e0b; }
+.b5-budget-meter-fill.over { background: #ef4444; }
+.b5-meter-label {
+    position: absolute; right: 4px; top: -1px;
+    font-size: 9px; font-weight: 700; color: #374151;
+    line-height: 12px;
+}
+
+/* ── B5 Streak Badge (Round 20) ── */
+.b5-streak-badge {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 9850; pointer-events: none;
+    animation: b5SbPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.b5-streak-badge.b5-sb-fade { opacity: 0; transition: opacity 0.4s ease; }
+@keyframes b5SbPop { from { opacity:0; transform:translate(-50%,-50%) scale(0.5); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.b5-sb-inner {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 20px; padding: 18px 36px; text-align: center;
+    box-shadow: 0 8px 32px rgba(217,119,6,0.45);
+}
+.b5-sb-label { font-size: 32px; font-weight: 900; color: white; }
+.b5-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }

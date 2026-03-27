@@ -531,6 +531,10 @@ toolbarConfig: {
 | B1~B6 report 新增觸控與版面章節（2026-03-27）| B1~B6 report | B1 補 九/十；B2 補 十/十一；B3 補 十一/十二；B4 補 十/十一；B5 補 十/十一；B6 補 十四/十五；各含觸控桌面支援、版面結構 ASCII 圖、CSS 類別表 |
 | B4 三商店排序模式（2026-03-28）| B4 | `B4_TRIPLE_ITEMS`（15 組三店）；`compareStores` 設定（`two`/`triple`）；`isTriple` 題目旗標；easy/normal 選最便宜→差額三選一；hard 依序點選 1️⃣2️⃣3️⃣；`_renderTripleQuestion`/`_bindTripleEvents`/`_handleTripleSelectClick`/`_handleTripleRankClick`/`_renderTripleDiffSection`；`tripleClickOrder[]`；`.b4-triple-grid/.b4-triple-card/.b4-rank-badge` CSS；F4 排序 pattern |
 | B1 最少張數提示（2026-03-28）| B1 | 答對後比較實際用幣數 vs `_calcOptimalCoins` 最少數；超過時顯示橘色底部 toast「你用了N張，其實最少只需要M張！」；`_showMinCoinsHint(walletTotal, requiredTotal)`；`.b1-min-coins-toast` CSS；C4/C6 最佳付款 pattern |
+| B1~B6 連勝徽章（2026-03-28）| B1~B6 | `quiz.streak`/`game.streak` 計數；答對 +1，答錯清零；達 3/5 題觸發 `_showStreakBadge(streak)`；橘金色置中徽章 + 語音；`.bX-streak-badge`/`.bX-sb-inner`/`bXSbPop` CSS；B3 streak pattern |
+| B1 費用明細提示（2026-03-28）| B1 | 困難模式答錯後 400ms 顯示費用明細卡：`_showScheduleBreakdown(question)` 列出每項費用+合計；普通模式 3 次錯誤後 900ms 顯示；`.b1-breakdown` 黃框；`b1FadeIn` 動畫；B2 breakdown pattern |
+| B5 預算儀表條（2026-03-28）| B5 | `_updateTotalBar()` 同步更新 `#b5-budget-meter-fill`（0%→100%，green→amber→red）+ `#b5-meter-label` 百分比；HTML 插在 `.b5-total-bar` 下方；`.b5-budget-meter/.b5-budget-meter-fill` CSS；F5 量比較 pattern |
+| B6 關卡開場任務彈窗（2026-03-28）| B6 | `renderRound()` 呼叫 `_showMissionIntroModal(mission, roundNum)`；顯示本關購買清單（綠色膠囊）+ 預算大字；語音「第N關，今天要買：X、Y，預算M元」；2800ms 自動關閉或點擊關閉；`.b6-mission-intro/.b6-mi-card/.b6-mi-item` CSS；B1 `_showTaskModal` pattern |
 
 ---
 

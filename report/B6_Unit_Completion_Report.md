@@ -545,3 +545,31 @@ stallTab.addEventListener('click', () => {
 | `.b6-res-receipt` | 完成畫面採購收據 |
 | `.b6-res-stall-stats` | 攤位消費分析橫條圖 |
 
+
+---
+
+## 十六、連勝徽章 + 關卡開場彈窗（Round 20，2026-03-28）
+
+### 16.1 連勝徽章（B3 streak pattern）
+
+- `state.game.streak` 跨關累計
+- `_showChangeResult` 正確路徑：`correctCount++` 後立即 `streak++`，達 3/5 觸發徽章
+- CSS：`.b6-streak-badge / .b6-sb-inner / b6SbPop`
+
+### 16.2 關卡開場任務彈窗（B1 `_showTaskModal` pattern）
+
+`renderRound()` 末尾呼叫 `_showMissionIntroModal(mission, roundNum)`：
+
+**視覺設計**：
+- 半透明黑色遮罩全屏 + 白色圓角卡片（max-width 340px）
+- 頂部：「第 N 關」灰色小字
+- 標題：「🛒 今天的採購任務」
+- 商品清單：綠色膠囊標籤（emoji + 名稱）
+- 預算：橘色大字
+- 底部：「點任意處開始」提示
+
+**語音**：「第N關，今天要買：X、Y，預算M元。」
+
+**關閉**：點任意處 / 2800ms 自動關閉（淡出 350ms）
+
+**CSS**：`.b6-mission-intro`（背景遮罩）/ `.b6-mi-card`（白卡，`b6MiPop` 彈出）/ `.b6-mi-item`（綠色膠囊）

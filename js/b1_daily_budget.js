@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentQuestion: 0,
                 totalQuestions: 10,
                 correctCount: 0,
+                streak: 0,
                 questions: [],
                 startTime: null,
                 denomStats: {},
@@ -235,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion = 0;
             q.totalQuestions  = this.state.settings.questionCount;
             q.correctCount    = 0;
+            q.streak          = 0;
             q.questions       = [];
             q.startTime       = null;
             q.denomStats      = {};
@@ -406,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion = 0;
             q.totalQuestions  = s.questionCount;
             q.correctCount    = 0;
+            q.streak          = 0;
             q.startTime       = Date.now();
             q.questions       = this._generateQuestions(q.totalQuestions);
 
@@ -709,6 +712,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 連勝徽章（B3 streak pattern）────────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b1-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b1-streak-badge';
+            badge.className = 'b1-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b1-sb-inner"><div class="b1-sb-label">${label}</div><div class="b1-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
+            Game.TimerManager.setTimeout(() => {
+                badge.classList.add('b1-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
+        },
+
+        // ── 費用明細提示（B2 breakdown pattern）────────────────
+        _showScheduleBreakdown(question) {
+            if (!question) return;
+            const existing = document.getElementById('b1-breakdown');
+            if (existing) return; // 防重複
+            const div = document.createElement('div');
+            div.id = 'b1-breakdown';
+            div.className = 'b1-breakdown';
+            const rows = question.items.map(it =>
+                `<div class="b1-bd-row"><span class="b1-bd-name">📌 ${it.name}</span><span class="b1-bd-cost">${it.cost} 元</span></div>`
+            ).join('');
+            div.innerHTML = `<div class="b1-bd-title">💡 費用明細</div>${rows}<div class="b1-bd-total">合計 ${question.total} 元</div>`;
+            const walletArea = document.getElementById('wallet-area');
+            if (walletArea) walletArea.before(div);
+            else document.querySelector('.b-game-wrap')?.appendChild(div);
+            Game.TimerManager.setTimeout(() => {
+                div.classList.add('b1-bd-fade');
+                Game.TimerManager.setTimeout(() => { if (div.parentNode) div.remove(); }, 400, 'ui');
+            }, 4000, 'ui');
+        },
+
         // ── 最少張數提示（C4/C6 最佳付款 pattern）──────────────
         _showMinCoinsHint(walletTotal, requiredTotal) {
             const used    = this.state.wallet.length;
@@ -762,10 +804,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (diff > 0) msg += `，找回${toTWD(diff)}`;
                 Game.Speech.speak(msg);
                 this.state.quiz.correctCount++;
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
                 // 最少張數提示（C4/C6 最佳付款 pattern）
                 this._showMinCoinsHint(walletTotal, requiredTotal);
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
                 this._showFeedback('❌', this.state.settings.retryMode === 'proceed' ? '答錯了！' : '再試一次！');
@@ -783,6 +830,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 普通模式：3次錯誤後自動顯示提示
                     if (this.state.settings.difficulty === 'normal' && this.state.quiz.errorCount >= 3) {
                         Game.TimerManager.setTimeout(() => this._showCoinHint(), 600, 'ui');
+                        Game.TimerManager.setTimeout(() => this._showScheduleBreakdown(this.state.quiz.questions[this.state.quiz.currentQuestion]), 900, 'ui');
+                    }
+                    // 困難模式答錯：顯示費用明細（B2 breakdown pattern）
+                    if (this.state.settings.difficulty === 'hard') {
+                        Game.TimerManager.setTimeout(() => this._showScheduleBreakdown(this.state.quiz.questions[this.state.quiz.currentQuestion]), 400, 'ui');
                     }
                 }
                 return;

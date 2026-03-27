@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentRound: 0,
                 totalRounds: 5,
                 correctCount: 0,
+                streak: 0,
                 scenarios: [],
                 startTime: null,
                 // current round state
@@ -234,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.currentRound = 0;
             g.totalRounds  = this.state.settings.rounds;
             g.correctCount = 0;
+            g.streak       = 0;
             g.scenarios    = [];
             g.startTime    = null;
             g.selectedIds  = new Set();
@@ -377,6 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.currentRound = 0;
             g.totalRounds  = s.rounds;
             g.correctCount = 0;
+            g.streak       = 0;
             g.startTime    = Date.now();
             g.scenarios    = this._pickScenarios(s.rounds, s.difficulty);
 
@@ -491,6 +494,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>已選：<span class="b5-total-amount" id="b5-total-amount">0</span> 元</span>
                     <span class="b5-remaining" id="b5-remaining">還剩 ${g.budget} 元</span>
                 </div>
+                <div class="b5-budget-meter">
+                    <div class="b5-budget-meter-fill ok" id="b5-budget-meter-fill" style="width:0%"></div>
+                    <span class="b5-meter-label" id="b5-meter-label">0%</span>
+                </div>
 
                 <div class="b5-items-grid" id="b5-items-grid">
                     ${itemsHTML}
@@ -599,6 +606,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 else                          bar.classList.add('ok');
             }
 
+            // 預算儀表條（F5 量比較 pattern）
+            const meter = document.getElementById('b5-budget-meter-fill');
+            if (meter && g.budget > 0) {
+                const pct = Math.min(Math.round(total / g.budget * 100), 100);
+                meter.style.width = pct + '%';
+                meter.className = 'b5-budget-meter-fill' +
+                    (total > g.budget ? ' over' : total > g.budget * 0.9 ? ' near' : ' ok');
+                const label = document.getElementById('b5-meter-label');
+                if (label) label.textContent = `${pct}%`;
+            }
+
             if (btn) btn.disabled = total > g.budget || total === 0;
         },
 
@@ -676,6 +694,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 g.correctCount++;
+                g.streak = (g.streak || 0) + 1;
+                if (g.streak === 3 || g.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
+                }
                 // 記錄各關預算使用（B6 receipts pattern）
                 g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
                 // 記錄本關選購物品（A4 交易摘要模式）
@@ -688,6 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rem = g.budget - total;
                 Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
             } else {
+                g.streak = 0;
                 this.audio.play('error');
                 if (!mustOk) {
                     this._showCenterFeedback('❌', '必買商品未選！');
@@ -736,6 +759,24 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this._showRoundTransition(this.state.game.currentRound + 1, () => this.renderRound());
             }
+        },
+
+        // ── 連勝徽章（B3 streak pattern）─────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b5-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b5-streak-badge';
+            badge.className = 'b5-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b5-sb-inner"><div class="b5-sb-label">${label}</div><div class="b5-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
+            Game.TimerManager.setTimeout(() => {
+                badge.classList.add('b5-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
         },
 
         _showRoundTransition(roundNum, callback) {

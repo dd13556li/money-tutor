@@ -192,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctCount: 0,
                 totalSaved: 0,
                 selectErrorCount: 0,
+                streak: 0,
                 questions: [],
                 comparisonHistory: [],
                 startTime: null
@@ -257,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.totalQuestions      = this.state.settings.questionCount;
             q.correctCount        = 0;
             q.totalSaved          = 0;
+            q.streak              = 0;
             q.questions           = [];
             q.comparisonHistory   = [];
             q.startTime           = null;
@@ -442,6 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.totalQuestions    = s.questionCount;
             q.correctCount      = 0;
             q.totalSaved        = 0;
+            q.streak            = 0;
             q.comparisonHistory = [];
             q.startTime         = Date.now();
             q.questions         = this._generateQuestions(q.totalQuestions);
@@ -624,6 +627,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (diff === 'easy') {
                     // 簡單：直接下一題
                     this.state.quiz.correctCount++;
+                    this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+                    if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                        Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                    }
                     Game.Speech.speak(`答對了！${correctCard?.querySelector('.b4-store-name')?.textContent || ''}比較便宜`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
                 } else {
@@ -636,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 700, 'turnTransition');
                 }
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 if (wrongCard)   wrongCard.classList.add('selected-wrong');
                 if (correctCard) {
@@ -1158,6 +1166,24 @@ document.addEventListener('DOMContentLoaded', () => {
             else section.appendChild(hint);
         },
 
+        // ── 連勝徽章（B3 streak pattern）──────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b4-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b4-streak-badge';
+            badge.className = 'b4-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b4-sb-inner"><div class="b4-sb-label">${label}</div><div class="b4-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
+            Game.TimerManager.setTimeout(() => {
+                badge.classList.add('b4-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
+        },
+
         // ── Diff Answer Handler ─────────────────────────────────
         // 省錢 toast（A4 _showPricePopup pattern）
         _showSavingsToast(amount) {
@@ -1180,6 +1206,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showCenterFeedback('✅', '答對了！');
                 this.state.quiz.correctCount++;
                 this.state.quiz.totalSaved += correctDiff;
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 const ci = this.state.currentDiffItem;
                 if (ci) {
                     this.state.quiz.comparisonHistory.push({
@@ -1192,6 +1222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showSavingsToast(correctDiff);
                 Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showDiffFormulaHint(); // 答錯即顯示算式提示
                 if (this.state.settings.retryMode === 'proceed') {

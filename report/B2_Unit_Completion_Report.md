@@ -404,3 +404,21 @@ B2 以「閱讀 → 輸入」為主要互動，無拖曳操作，觸控支援較
 | `.b2-numpad` | 數字鍵盤（3×4 格）|
 | `.b2-calc-breakdown` | 逐步算式提示（黃底琥珀框）|
 
+
+---
+
+## 十二、連勝徽章（Round 20，2026-03-28）
+
+### 12.1 設計動機（B3 streak pattern）
+
+B2 選擇題模式與鍵盤輸入模式均已有完整回饋，加入連勝機制強化遊戲動機。
+
+### 12.2 實作
+
+- `state.quiz.streak` 計數，初始化於 `resetGameState()` / `startGame()`
+- `_handleChoiceAnswer` 和 `_handleNumpadAnswer` 兩個正確分支均加入 `streak++`；錯誤分支加入 `streak = 0`
+- `_showStreakBadge(streak)` 在 3 連勝 / 5 連勝時顯示置中徽章
+
+### 12.3 CSS
+
+`.b2-streak-badge`：固定置中，`b2SbPop` 彈出動畫，橘金漸層背景，1.6s 後 `b2-sb-fade` 淡出。

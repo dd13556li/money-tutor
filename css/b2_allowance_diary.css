@@ -518,3 +518,19 @@
     .b2-question-label { font-size: 15px; }
     .b2-hist-table    { font-size: 11px; }
 }
+
+/* ── B2 Streak Badge (Round 20) ── */
+.b2-streak-badge {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 9850; pointer-events: none;
+    animation: b2SbPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.b2-streak-badge.b2-sb-fade { opacity: 0; transition: opacity 0.4s ease; }
+@keyframes b2SbPop { from { opacity:0; transform:translate(-50%,-50%) scale(0.5); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.b2-sb-inner {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 20px; padding: 18px 36px; text-align: center;
+    box-shadow: 0 8px 32px rgba(217,119,6,0.45);
+}
+.b2-sb-label { font-size: 32px; font-weight: 900; color: white; }
+.b2-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }

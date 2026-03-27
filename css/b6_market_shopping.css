@@ -626,3 +626,45 @@
 .b6-rc-items   { font-size: 1rem; color: rgba(255,255,255,0.9); font-weight: 600; }
 .b6-rc-amounts { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 4px; }
 .b6-rc-hint    { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 8px; }
+
+/* ── B6 Mission Intro Modal (Round 20) ── */
+.b6-mission-intro {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55); z-index: 9800;
+    animation: b6MiIn 0.35s ease both;
+}
+@keyframes b6MiIn { from { opacity:0; } to { opacity:1; } }
+.b6-mission-intro.b6-mi-fade { opacity: 0; transition: opacity 0.35s ease; }
+.b6-mi-card {
+    background: white; border-radius: 20px; padding: 28px 32px; text-align: center;
+    max-width: 340px; width: 90%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    animation: b6MiPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes b6MiPop { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+.b6-mi-round { font-size: 13px; color: #6b7280; margin-bottom: 4px; }
+.b6-mi-title { font-size: 20px; font-weight: 800; color: #1f2937; margin-bottom: 14px; }
+.b6-mi-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.b6-mi-item {
+    background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 20px;
+    padding: 6px 14px; font-size: 15px; font-weight: 600; color: #15803d;
+}
+.b6-mi-budget { font-size: 16px; color: #374151; margin-bottom: 10px; }
+.b6-mi-budget b { color: #f59e0b; font-size: 20px; }
+.b6-mi-hint { font-size: 12px; color: #9ca3af; }
+
+/* ── B6 Streak Badge (Round 20) ── */
+.b6-streak-badge {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 9850; pointer-events: none;
+    animation: b6SbPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.b6-streak-badge.b6-sb-fade { opacity: 0; transition: opacity 0.4s ease; }
+@keyframes b6SbPop { from { opacity:0; transform:translate(-50%,-50%) scale(0.5); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.b6-sb-inner {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 20px; padding: 18px 36px; text-align: center;
+    box-shadow: 0 8px 32px rgba(217,119,6,0.45);
+}
+.b6-sb-label { font-size: 32px; font-weight: 900; color: white; }
+.b6-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }

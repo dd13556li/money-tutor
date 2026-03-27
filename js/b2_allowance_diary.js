@@ -355,6 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalQuestions: 10,
                 correctCount: 0,
                 errorCount: 0,
+                streak: 0,
                 questions: [],
                 answeredHistory: [],
                 startTime: null,
@@ -395,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion  = 0;
             q.totalQuestions   = this.state.settings.questionCount;
             q.correctCount     = 0;
+            q.streak           = 0;
             q.questions        = [];
             q.answeredHistory  = [];
             q.startTime        = null;
@@ -554,6 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.currentQuestion = 0;
             q.totalQuestions  = s.questionCount;
             q.correctCount    = 0;
+            q.streak          = 0;
             q.startTime       = Date.now();
             q.questions       = this._generateQuestions(s.questionCount);
             q.currentInput    = '';
@@ -787,11 +790,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isCorrect) {
                 this.state.quiz.correctCount++;
                 this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 if (this.state.settings.retryMode === 'retry') {
                     this.state.quiz.errorCount++;
@@ -941,11 +949,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isCorrect) {
                 this.state.quiz.correctCount++;
                 this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
+                this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+                if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                    Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+                }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
             } else {
+                this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showCalcBreakdown(question); // 答錯即顯示計算過程
                 if (this.state.settings.retryMode === 'retry') {
@@ -965,6 +978,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
+        },
+
+        // ── 連勝徽章（B3 streak pattern）─────────────────────
+        _showStreakBadge(streak) {
+            const existing = document.getElementById('b2-streak-badge');
+            if (existing) existing.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b2-streak-badge';
+            badge.className = 'b2-streak-badge';
+            const label = streak === 3 ? '🔥 3連勝！' : '⚡ 5連勝！';
+            const msg   = streak === 3 ? '繼續加油！' : '太厲害了！';
+            badge.innerHTML = `<div class="b2-sb-inner"><div class="b2-sb-label">${label}</div><div class="b2-sb-msg">${msg}</div></div>`;
+            document.body.appendChild(badge);
+            Game.Speech.speak(streak === 3 ? '三連勝，繼續加油！' : '五連勝，太厲害了！');
+            Game.TimerManager.setTimeout(() => {
+                badge.classList.add('b2-sb-fade');
+                Game.TimerManager.setTimeout(() => { if (badge.parentNode) badge.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
         },
 
         // ── 14. 下一題 ────────────────────────────────────────

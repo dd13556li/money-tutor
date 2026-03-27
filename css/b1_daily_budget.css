@@ -863,3 +863,33 @@
     animation: b1ToastUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 .b1-min-coins-toast.b1-toast-fade { opacity: 0; transition: opacity 0.4s ease; }
+
+/* ── B1 Schedule Breakdown Hint (Round 20) ── */
+.b1-breakdown {
+    background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px;
+    padding: 10px 14px; margin: 6px 0 10px;
+    animation: b1FadeIn 0.3s ease both;
+}
+@keyframes b1FadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.b1-bd-title { font-weight: 700; color: #92400e; font-size: 13px; margin-bottom: 5px; }
+.b1-bd-row { display:flex; justify-content:space-between; font-size: 13px; color: #374151; padding: 2px 0; }
+.b1-bd-name { flex: 1; }
+.b1-bd-cost { font-weight: 600; color: #d97706; }
+.b1-bd-total { border-top: 1px solid #f59e0b; margin-top: 5px; padding-top: 4px; font-weight: 700; color: #92400e; text-align: right; font-size: 14px; }
+.b1-breakdown.b1-bd-fade { opacity: 0; transition: opacity 0.4s ease; }
+
+/* ── B1 Streak Badge (Round 20) ── */
+.b1-streak-badge {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 9850; pointer-events: none;
+    animation: b1SbPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.b1-streak-badge.b1-sb-fade { opacity: 0; transition: opacity 0.4s ease; }
+@keyframes b1SbPop { from { opacity:0; transform:translate(-50%,-50%) scale(0.5); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+.b1-sb-inner {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 20px; padding: 18px 36px; text-align: center;
+    box-shadow: 0 8px 32px rgba(217,119,6,0.45);
+}
+.b1-sb-label { font-size: 32px; font-weight: 900; color: white; }
+.b1-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }
