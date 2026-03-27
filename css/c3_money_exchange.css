@@ -31,15 +31,16 @@
         .unified-results-container {
             display: flex !important;
             flex-direction: row !important;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center; /* 置中靠攏 */
             gap: 8px; /* 適當間距保持緊湊 */
-            flex-wrap: wrap;
-            padding: 20px; /* 增加內間距 */
+            flex-wrap: wrap !important; /* 強制換行，防止重疊 */
+            padding: 16px; /* 增加內間距 */
             border: 2px dashed #ccc;
             border-radius: 8px;
             background-color: #f9f9f9;
-            min-height: 180px; /* 增加最小高度適應新容器 */
+            min-height: 120px;
+            width: 100%; /* 明確設定寬度確保換行生效 */
             max-width: 100%; /* 確保不超出容器 */
             box-sizing: border-box;
         }
@@ -139,8 +140,9 @@
             background: transparent;
             border: none;
             border-radius: 0;
-            padding: 0;
-            margin: 8px 0 0 0; /* 增加上邊距，為圖示與數字間提供更多空間 */
+            padding: 0 0 3px 0; /* 底部留 3px 讓文字不緊貼邊框 */
+            margin: 4px 0 0 0; /* 圖示與數字間距 */
+            line-height: 1; /* 移除 half-leading，文字底部貼齊容器 */
             text-align: center;
             width: 100%; /* 確保金額數字占滿容器寬度以實現居中 */
             z-index: 10;

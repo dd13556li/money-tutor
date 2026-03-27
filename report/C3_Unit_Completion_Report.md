@@ -1,7 +1,7 @@
 # C3 換錢 — 單元開發經驗報告書
 
 > **日期**：2026-02-09
-> **更新日期**：2026-03-26（「大換小」字色修正、金額間距修復、兌換主類別全隨機）
+> **更新日期**：2026-03-27（提示鈕四項修正）、2026-03-26（「大換小」字色修正、金額間距修復、兌換主類別全隨機）
 > **時間**：下午
 > **單元名稱**：C3 換錢（Money Exchange）
 > **系列**：C 貨幣認知
@@ -1393,3 +1393,103 @@ state.settings.pair = { random: true, type: 'all' }
 ```
 
 **修改檔案**：`js/c3_money_exchange.js`
+
+---
+
+## 十六、提示鈕四項修正（2026-03-27）
+
+### 問題背景
+
+使用者在普通模式按下提示鈕後，發現以下四個問題：
+
+| # | 問題描述 |
+|---|---------|
+| 1 | 500元換100元時，應只有 1 張 500 元出現勾勾，但實際上 5 張都出現 |
+| 2 | 兌換區有金錢圖示時按提示，那些圖示沒有被退回我的金錢區 |
+| 3 | 勾勾圖示被拖入兌換區後就消失（應持續顯示至該輪完成） |
+| 4 | 桌面端按下提示後，金錢圖示無法再被拖曳（觸控端正常） |
+
+---
+
+### Issue 1 & 2：勾勾數量錯誤 ＋ 兌換區未退回
+
+**根因（雙問題同源）**：`showNormalModeHint()` 讀取 `this.state.gameState`（C3 模組頂層物件，永遠是 `{}`），而非 StateManager 的 `this.getGameState('gameState')`。
+
+`syncToLegacyState` 只同步路徑前綴 `'game.'`，但 `setState` 發出 `'normal.'`/`'hard.'` 前綴事件，造成 `this.state.gameState` 永遠不被更新。
+
+- Issue 1：`requiredSourceCounts` 讀不到，fallback 至 `exchangeRate=5`，誤標全部 5 張
+- Issue 2：`currentRoundDropZone` 永遠 `undefined`，退回邏輯不執行
+
+**修復**：
+
+```javascript
+// 修復前
+const gameState = this.state.gameState;  // 永遠是 {}
+
+// 修復後
+const gameState = this.getGameState('gameState');
+
+// Issue 1：只標記 requiredCount 個
+const currentRound = gameState.completedExchanges || 0;
+const requiredCount = (gameState.requiredSourceCounts && gameState.requiredSourceCounts[currentRound] !== undefined)
+    ? gameState.requiredSourceCounts[currentRound] : 1;
+
+// Issue 2：清空兌換區（保留結構）
+const placedCoinsContainer = exchangeZone.querySelector('.placed-coins-container');
+if (placedCoinsContainer) placedCoinsContainer.innerHTML = '';
+const dropHint = exchangeZone.querySelector('.drop-hint');
+if (dropHint) dropHint.style.display = '';
+this.setGameState('gameState', gameState);
+this.updateCurrentTotalDisplay(0);
+```
+
+另附帶修復：退回元素 ID 使用穩定 `baseCoinId`（去除累積前綴）：
+```javascript
+const baseCoinId = coinId.replace(/^(source-item-)+/, '');
+newMoneyItem.id = baseCoinId;
+```
+
+---
+
+### Issue 3：拖曳後勾勾消失
+
+C3 普通模式不進行全量重繪（只局部操作 DOM），故 Issue 1/2 修復後，勾勾標記的 DOM 元素不被替換，勾勾自然持續顯示至該輪完成。不需要額外持久化機制。
+
+---
+
+### Issue 4：桌面端拖曳失效（`找不到ID為 coin-N`）
+
+**根因**：三層堆疊問題：
+
+1. `cloneNode(true)` 繼承 `dragHandled = 'true'`，阻擋 `handleDragStart` 執行
+2. `handleDragStart` 未執行 → `state.draggedElementId` 是舊值 → `handleDrop` 找不到元素
+3. 退回元素 ID 累積前綴（`source-item-source-item-coin-1`），`getElementById` 失敗
+
+**修復**：
+
+```javascript
+// 修復 1：clone 後清除 dragHandled
+delete newCoin.dataset.dragHandled;
+
+// 修復 2：handleDrop fallback
+let droppedElement = document.getElementById(draggedElementId);
+if (!droppedElement) {
+    const fallback = document.querySelector('.money-item.dragging, .exchange-money-item.dragging');
+    if (fallback) droppedElement = fallback;
+    else return;
+}
+
+// 修復 3：穩定 ID
+const baseCoinId = coinId.replace(/^(source-item-)+/, '');
+```
+
+---
+
+### 修改檔案
+
+- `js/c3_money_exchange.js`
+  - `showNormalModeHint()`：改用 `getGameState('gameState')`，修正勾勾數量、退回邏輯、穩定 ID
+  - `handleDrop()`：`let droppedElement` + `.dragging` fallback
+  - `processDropToFlexibleZone()`：`delete newCoin.dataset.dragHandled`
+
+**關鍵搜尋詞**：`showNormalModeHint`、`requiredSourceCounts`、`getGameState('gameState')`、`dragHandled`、`baseCoinId`

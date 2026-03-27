@@ -2135,6 +2135,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 綁定普通模式專用事件
             this.setupNormalModeEventListeners(question);
+            // 重新套用提示標記（若使用者已按過提示鈕）
+            this.applyHintMarkings('normal');
         },
 
         // =====================================================
@@ -2220,6 +2222,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 綁定困難模式專用事件
             this.setupHardModeEventListeners(question);
+            // 重新套用提示標記（若使用者已按過提示鈕）
+            this.applyHintMarkings('hard');
         },
 
         // =====================================================
@@ -4703,7 +4707,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // 🆕 顯示困難模式提示（顯示綠色打勾提示正確答案）
+        // 🆕 顯示困難模式提示（顯示綠色打勾提示正確答案，提示持續至題目完成）
         showHardModeHint() {
             Game.Debug.log('hint', '💡 困難模式: 顯示提示');
 
@@ -4714,84 +4718,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const targetAmount = currentQuestion.targetAmount;
-            const currentTotal = this.state.gameState.currentTotal || 0;
-            const remainingAmount = targetAmount - currentTotal;
 
-            Game.Debug.log('hint', `💡 困難模式: 目標: ${targetAmount}元, 目前: ${currentTotal}元, 還需: ${remainingAmount}元`);
+            // 退回兌換區所有金錢，從頭計算完整解法
+            this.state.gameState.droppedItems = [];
+            this.state.gameState.currentTotal = 0;
 
-            // 計算還需要哪些金錢才能達到目標金額
             const sourceCoins = this.state.gameState.sourceCoins || [];
-            const droppedItems = this.state.gameState.droppedItems || [];
-            const droppedIds = droppedItems.map(item => item ? item.id : null).filter(id => id !== null);
+            const solution = this.findSolutionFromAvailableCoins(targetAmount, sourceCoins);
 
-            // 取得尚未放置的金錢
-            const availableCoins = sourceCoins.filter(coin => !droppedIds.includes(coin.id));
-            const availableDenominations = availableCoins.map(coin => coin.value);
-
-            // 計算需要的金錢組合
-            const solution = this.findSolutionFromAvailableCoins(remainingAmount, availableCoins);
+            Game.Debug.log('hint', `💡 困難模式: 目標 ${targetAmount}元, sourceCoins: ${sourceCoins.length}個, 解法:`, solution ? solution.map(c => c.value + '元') : '找不到');
 
             if (solution && solution.length > 0) {
-                Game.Debug.log('hint', `💡 困難模式: 找到解法:`, solution.map(c => c.value + '元'));
+                // 儲存提示幣 ID（跨重繪持久）
+                this.state.gameState.hintedCoinIds = solution.map(c => c.id);
 
-                // 清除之前的提示樣式
-                document.querySelectorAll('.hint-checkmark').forEach(el => el.remove());
-                document.querySelectorAll('.unit4-hard-source-item').forEach(el => {
-                    el.classList.remove('hint-highlighted');
-                });
-
-                // 在需要選取的金錢上顯示綠色打勾
-                solution.forEach(coin => {
-                    const coinElement = document.getElementById(coin.id);
-                    if (coinElement) {
-                        coinElement.classList.add('hint-highlighted');
-
-                        // 添加綠色打勾符號
-                        const checkmark = document.createElement('div');
-                        checkmark.className = 'hint-checkmark';
-                        checkmark.innerHTML = '✓';
-                        checkmark.style.cssText = `
-                            position: absolute;
-                            top: 5px;
-                            right: 5px;
-                            width: 24px;
-                            height: 24px;
-                            background-color: #4CAF50;
-                            color: white;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 16px;
-                            font-weight: bold;
-                            z-index: 10;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                        `;
-
-                        // 確保父元素有相對定位
-                        coinElement.style.position = 'relative';
-                        coinElement.appendChild(checkmark);
-
-                        Game.Debug.log('hint', `✅ 困難模式: 標記金錢: ${coin.id} (${coin.value}元)`);
-                    }
-                });
-
-                // 5秒後移除提示
-                Game.TimerManager.setTimeout(() => {
-                    document.querySelectorAll('.hint-checkmark').forEach(el => el.remove());
-                    document.querySelectorAll('.unit4-hard-source-item').forEach(el => {
-                        el.classList.remove('hint-highlighted');
-                    });
-                    Game.Debug.log('hint', '⏰ 困難模式: 5秒時間到，移除提示');
-                }, 5000);
-
-                // 🆕 顯示目前總額（不再自動隱藏）
-                const totalDisplay1 = document.getElementById('current-total-display');
-                if (totalDisplay1) {
-                    totalDisplay1.style.display = 'block';
-                    totalDisplay1.textContent = `目前總額: ${currentTotal} 元`;
-                    totalDisplay1.classList.add('hint-shown');
-                }
+                // 重新渲染（renderHardMode 末尾自動呼叫 applyHintMarkings）
+                this.renderHardMode(currentQuestion);
 
                 // 播放語音提示
                 if (this.speech && typeof this.speech.speak === 'function') {
@@ -4799,17 +4741,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Debug.log('speech', '🗣️ 困難模式: 播放語音: "請依提示拿出正確的金額"');
                 }
             } else {
-                // 找不到解法時，顯示目前總額（不再自動隱藏）
-                const totalDisplay = document.getElementById('current-total-display');
-                if (totalDisplay) {
-                    totalDisplay.style.display = 'block';
-                    totalDisplay.textContent = `目前總額: ${currentTotal} 元`;
-                    totalDisplay.classList.add('hint-shown');
-                }
-
                 if (this.speech && typeof this.speech.speak === 'function') {
-                    const traditionalTotal = currentTotal === 0 ? '零元' : this.speech.convertToTraditionalCurrency(currentTotal);
-                    this.speech.speak(`目前總額是${traditionalTotal}`, { interrupt: true });
+                    this.speech.speak('請拿出正確的金額', { interrupt: true });
                 }
             }
         },
@@ -4845,7 +4778,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // 🆕 顯示普通模式提示（同困難模式，顯示綠色打勾提示正確答案）
+        // 將提示標記套用至 DOM（跨重繪持久化）
+        applyHintMarkings(mode) {
+            const hintedCoinIds = this.state.gameState && this.state.gameState.hintedCoinIds;
+            if (!hintedCoinIds || hintedCoinIds.length === 0) return;
+
+            hintedCoinIds.forEach(coinId => {
+                const coinElement = document.getElementById(coinId);
+                if (!coinElement) return;
+
+                coinElement.classList.add('hint-highlighted');
+                coinElement.style.position = 'relative';
+
+                // 避免重複插入 checkmark
+                if (!coinElement.querySelector('.hint-checkmark')) {
+                    const checkmark = document.createElement('div');
+                    checkmark.className = 'hint-checkmark';
+                    checkmark.innerHTML = '✓';
+                    checkmark.style.cssText = `
+                        position: absolute;
+                        top: 5px;
+                        right: 5px;
+                        width: 24px;
+                        height: 24px;
+                        background-color: #4CAF50;
+                        color: white;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 16px;
+                        font-weight: bold;
+                        z-index: 10;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    `;
+                    coinElement.appendChild(checkmark);
+                }
+                Game.Debug.log('hint', `✅ applyHintMarkings(${mode}): 標記 ${coinId}`);
+            });
+        },
+
+        // 🆕 顯示普通模式提示（顯示綠色打勾提示正確答案，提示持續至題目完成）
         showNormalModeHint() {
             Game.Debug.log('hint', '💡 普通模式: 顯示提示');
 
@@ -4856,83 +4829,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const targetAmount = currentQuestion.targetAmount;
-            const currentTotal = this.state.gameState.currentTotal || 0;
-            const remainingAmount = targetAmount - currentTotal;
 
-            Game.Debug.log('hint', `💡 普通模式: 目標: ${targetAmount}元, 目前: ${currentTotal}元, 還需: ${remainingAmount}元`);
+            // 退回兌換區所有金錢，從頭計算完整解法
+            this.state.gameState.droppedItems = [];
+            this.state.gameState.currentTotal = 0;
 
-            // 計算還需要哪些金錢才能達到目標金額
             const sourceCoins = this.state.gameState.sourceCoins || [];
-            const droppedItems = this.state.gameState.droppedItems || [];
-            const droppedIds = droppedItems.map(item => item ? item.id : null).filter(id => id !== null);
+            const solution = this.findSolutionFromAvailableCoins(targetAmount, sourceCoins);
 
-            // 取得尚未放置的金錢
-            const availableCoins = sourceCoins.filter(coin => !droppedIds.includes(coin.id));
-
-            // 計算需要的金錢組合
-            const solution = this.findSolutionFromAvailableCoins(remainingAmount, availableCoins);
+            Game.Debug.log('hint', `💡 普通模式: 目標 ${targetAmount}元, sourceCoins: ${sourceCoins.length}個, 解法:`, solution ? solution.map(c => c.value + '元') : '找不到');
 
             if (solution && solution.length > 0) {
-                Game.Debug.log('hint', `💡 普通模式: 找到解法:`, solution.map(c => c.value + '元'));
+                // 儲存提示幣 ID（跨重繪持久）
+                this.state.gameState.hintedCoinIds = solution.map(c => c.id);
 
-                // 清除之前的提示樣式
-                document.querySelectorAll('.hint-checkmark').forEach(el => el.remove());
-                document.querySelectorAll('.unit4-normal-source-item').forEach(el => {
-                    el.classList.remove('hint-highlighted');
-                });
-
-                // 在需要選取的金錢上顯示綠色打勾
-                solution.forEach(coin => {
-                    const coinElement = document.getElementById(coin.id);
-                    if (coinElement) {
-                        coinElement.classList.add('hint-highlighted');
-
-                        // 添加綠色打勾符號
-                        const checkmark = document.createElement('div');
-                        checkmark.className = 'hint-checkmark';
-                        checkmark.innerHTML = '✓';
-                        checkmark.style.cssText = `
-                            position: absolute;
-                            top: 5px;
-                            right: 5px;
-                            width: 24px;
-                            height: 24px;
-                            background-color: #4CAF50;
-                            color: white;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 16px;
-                            font-weight: bold;
-                            z-index: 10;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                        `;
-
-                        // 確保父元素有相對定位
-                        coinElement.style.position = 'relative';
-                        coinElement.appendChild(checkmark);
-
-                        Game.Debug.log('hint', `✅ 普通模式: 標記金錢: ${coin.id} (${coin.value}元)`);
-                    }
-                });
-
-                // 5秒後移除提示
-                Game.TimerManager.setTimeout(() => {
-                    document.querySelectorAll('.hint-checkmark').forEach(el => el.remove());
-                    document.querySelectorAll('.unit4-normal-source-item').forEach(el => {
-                        el.classList.remove('hint-highlighted');
-                    });
-                    Game.Debug.log('hint', '⏰ 普通模式: 5秒時間到，移除提示');
-                }, 5000);
-
-                // 🆕 顯示目前總額（不再自動隱藏）
-                const totalDisplay1 = document.getElementById('current-total-display');
-                if (totalDisplay1) {
-                    totalDisplay1.style.display = 'block';
-                    totalDisplay1.textContent = `目前總額: ${currentTotal} 元`;
-                    totalDisplay1.classList.add('hint-shown');
-                }
+                // 重新渲染（renderNormalMode 末尾自動呼叫 applyHintMarkings）
+                this.renderNormalMode(currentQuestion);
 
                 // 播放語音提示
                 if (this.speech && typeof this.speech.speak === 'function') {
@@ -4940,17 +4852,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Debug.log('speech', '🗣️ [普通模式] 播放語音: "請依提示拿出正確的金額"');
                 }
             } else {
-                // 找不到解法時，顯示目前總額（不再自動隱藏）
-                const totalDisplay = document.getElementById('current-total-display');
-                if (totalDisplay) {
-                    totalDisplay.style.display = 'block';
-                    totalDisplay.textContent = `目前總額: ${currentTotal} 元`;
-                    totalDisplay.classList.add('hint-shown');
-                }
-
                 if (this.speech && typeof this.speech.speak === 'function') {
-                    const traditionalTotal = currentTotal === 0 ? '零元' : this.speech.convertToTraditionalCurrency(currentTotal);
-                    this.speech.speak(`目前總額是${traditionalTotal}`, { interrupt: true });
+                    this.speech.speak('請拿出正確的金額', { interrupt: true });
                 }
             }
         },

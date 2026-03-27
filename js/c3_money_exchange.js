@@ -2249,10 +2249,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Debug.warn('drag', '❌ 拖放失敗: 找不到 draggedElementId 狀態');
                     return;
                 }
-                const droppedElement = document.getElementById(draggedElementId); // 使用真實ID尋找元素
+                let droppedElement = document.getElementById(draggedElementId); // 使用真實ID尋找元素
                 if (!droppedElement) {
-                    Game.Debug.warn('drag', `❌ 拖放失敗: 找不到ID為 ${draggedElementId} 的元素`);
-                    return;
+                    // 【Fallback】ID 過期時，嘗試用 .dragging class 找到拖曳中的元素
+                    const fallback = document.querySelector('.money-item.dragging, .exchange-money-item.dragging');
+                    if (fallback) {
+                        Game.Debug.warn('drag', `⚠️ 拖放 fallback: ID "${draggedElementId}" 已失效，改用 ${fallback.id}`);
+                        MoneyExchange3.state.draggedElementId = fallback.id;
+                        droppedElement = fallback;
+                    } else {
+                        Game.Debug.warn('drag', `❌ 拖放失敗: 找不到ID為 ${draggedElementId} 的元素`);
+                        return;
+                    }
                 }
 
                 // 2. 判斷放置目標
@@ -2433,10 +2441,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newCoin = droppedElement.cloneNode(true);
                 newCoin.draggable = true;
                 newCoin.style.opacity = '1';
-                
+
                 // 【核心修正 #2】只移除 'dragging' 類別，必須保留 'money-item' 類別，
                 // 這樣點擊事件處理器才能識別它是一個可操作的錢幣。
                 newCoin.classList.remove('dragging');
+                // 【修正 Issue4】刪除 cloneNode 繼承的 dragHandled 標記，防止後續拖曳被擋掉
+                delete newCoin.dataset.dragHandled;
                 
                 newCoin.classList.add('exchange-money-item'); // 標示為兌換區內的錢幣
                 newCoin.id = `exchange-${coinId}`; // 賦予新ID以避免衝突
@@ -8682,7 +8692,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     max-width: 80px !important;
                     max-height: none !important;
                 }
-                .money-value { font-size: 12px; color: #333; margin: 6px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; }
+                .money-value { font-size: 12px; color: #333; margin: 4px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0 0 3px 0; width: 100%; display: block; line-height: 1; }
+
+                /* 【強制結果區換行+尺寸】覆蓋 .money-item {width:80px} 對結果區的影響 */
+                .unified-results-container { flex-wrap: wrap !important; width: 100% !important; }
+                .unified-results-container .unit3-banknote-container {
+                    width: 124px !important; min-width: 124px !important; height: auto !important;
+                    flex-shrink: 0 !important; display: flex !important; flex-direction: column !important;
+                    align-items: center !important; justify-content: flex-start !important;
+                    padding: 2px 2px 0 2px !important; border: 2px solid #4CAF50 !important;
+                    border-radius: 12px !important; background: white !important; margin: 4px !important;
+                }
+                .unified-results-container .unit3-coin-container {
+                    min-width: 90px !important; height: auto !important;
+                    flex-shrink: 0 !important; margin: 4px !important;
+                }
 
                 /* 【關鍵修正】兌換區整體佈局改用 CSS Grid */
                 .exchange-row {
@@ -8705,7 +8729,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 .equals-sign { align-self: center; width: 40px; height: 40px; background: #4CAF50; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; font-weight: bold; }
                 .target-area { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-start; }
                 .target-money { display: flex; flex-direction: column; align-items: center; transition: opacity 0.5s ease; }
-                .target-money img { width: 75px; height: 75px; object-fit: contain; }
+                .target-money img { object-fit: contain; }
+                .target-money .unit3-banknote { width: 120px !important; height: auto !important; max-height: none !important; }
+                .target-money .unit3-coin { width: 80px !important; height: auto !important; }
                 .money-label { display: block; font-size: 12px; font-weight: bold; color: #333; text-align: center; margin: 4px 0 0 0; }
                 .faded { opacity: 0.4; }
                 .target-active { opacity: 1; }
@@ -8813,6 +8839,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     display: flex;
                     flex-direction: column;
+                    width: 100%;
+                    overflow-x: hidden;
                 }
                 
                 .unit3-easy-money-section {
@@ -8853,8 +8881,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
-                    justify-content: center !important;
-                    padding: 2px !important;
+                    justify-content: flex-start !important;
+                    padding: 2px 2px 0 2px !important;
                     border: 2px solid #4CAF50 !important;
                     border-radius: 12px !important;
                     background: white !important;
@@ -8939,6 +8967,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
                     display: flex;
                     flex-direction: column;
+                    width: 100%;
+                    overflow-x: hidden;
                 }
                 
                 .unit3-normal-money-section, .unit3-normal-exchange-section, .unit3-normal-results-section,
@@ -8982,8 +9012,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
-                    justify-content: center !important;
-                    padding: 2px !important;
+                    justify-content: flex-start !important;
+                    padding: 2px 2px 0 2px !important;
                     border: 2px solid #4CAF50 !important;
                     border-radius: 12px !important;
                     background: white !important;
@@ -9544,7 +9574,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const question = this.state.quizQuestions[this.state.currentQuestionIndex];
             if (!question) return;
 
-            const gameState = this.state.gameState;
+            // 【修正 Issue2】必須讀 StateManager 的 gameState，而非 this.state.gameState（舊版，永遠是 {}）
+            const gameState = this.getGameState('gameState');
             const moneyArea = document.getElementById('my-money-area');
             if (!moneyArea) return;
 
@@ -9555,12 +9586,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const containerClass = (sourceItemData && sourceItemData.value >= 100) ? 'unit3-banknote-container' : 'unit3-coin-container';
 
                 gameState.currentRoundDropZone.placedCoins.forEach(coinId => {
+                    // 【修正 Issue4】還原為穩定的 coin-N ID，避免重複按提示時 ID 不斷堆疊前綴
+                    const baseCoinId = coinId.replace(/^(source-item-)+/, '');
                     const newMoneyItem = document.createElement('div');
                     newMoneyItem.className = `${containerClass} money-item`;
                     newMoneyItem.draggable = true;
                     newMoneyItem.setAttribute('data-value', question.sourceValue);
-                    newMoneyItem.setAttribute('data-id', `coin-${coinId}`);
-                    newMoneyItem.id = `source-item-${coinId}`;
+                    newMoneyItem.setAttribute('data-id', baseCoinId);
+                    newMoneyItem.id = baseCoinId;
 
                     if (sourceItemData) {
                         newMoneyItem.innerHTML = `
@@ -9575,15 +9608,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'dragSystem');
 
                     moneyArea.appendChild(newMoneyItem);
-                    gameState.coinPositions[coinId] = 'money-area';
+                    gameState.coinPositions[baseCoinId] = 'money-area';
                 });
 
-                // 清空兌換區
+                // 清空兌換區（保留內部結構，只清除已放置的金錢）
                 exchangeZone.classList.remove('filled');
                 exchangeZone.style.opacity = '0.3';
-                exchangeZone.innerHTML = '';
+                const placedCoinsContainer = exchangeZone.querySelector('.placed-coins-container');
+                if (placedCoinsContainer) placedCoinsContainer.innerHTML = '';
+                const dropHint = exchangeZone.querySelector('.drop-hint');
+                if (dropHint) dropHint.style.display = '';  // 重新顯示「拖入金錢到此區域」
                 gameState.currentRoundDropZone.placedCoins = [];
                 gameState.roundComplete = false;
+                this.setGameState('gameState', gameState);
+                this.updateCurrentTotalDisplay(0);
 
                 // 恢復目標金錢淡化狀態
                 document.querySelectorAll('.target-display').forEach(target => {
@@ -9596,17 +9634,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.updateSectionTitleCounts();
 
-            // --- Step 2: 在「我的金錢區」前 exchangeRate 個圖示顯示綠色勾勾 ---
-            const exchangeRate = question.exchangeRate;
+            // --- Step 2: 在「我的金錢區」標記本輪所需的金錢圖示（顯示綠色勾勾）---
+            // 【修正 Issue1】使用 requiredSourceCounts[currentRound] 而非 exchangeRate
+            // 大換小每輪只需 1 個，小換大每輪需要 exchangeRate 個
+            const currentRound = gameState.completedExchanges || 0;
+            const requiredCount = (gameState.requiredSourceCounts && gameState.requiredSourceCounts[currentRound] !== undefined)
+                ? gameState.requiredSourceCounts[currentRound]
+                : 1;
             const moneyItems = moneyArea.querySelectorAll('.money-item');
 
             // 清除舊勾勾
             moneyItems.forEach(item => item.classList.remove('show-correct-tick'));
 
-            // 標記前 exchangeRate 個
+            // 標記前 requiredCount 個
             let marked = 0;
             for (const item of moneyItems) {
-                if (marked >= exchangeRate) break;
+                if (marked >= requiredCount) break;
                 item.classList.add('show-correct-tick');
                 marked++;
             }
@@ -9614,7 +9657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 播放語音提示
             const sourceItemData = this.gameData.allItems.find(item => item.value === question.sourceValue);
             const sourceName = sourceItemData ? sourceItemData.name : `${question.sourceValue}元`;
-            const speechText = `請將${exchangeRate}個${sourceName}拖曳到兌換區`;
+            const speechText = `請將${requiredCount}個${sourceName}拖曳到兌換區`;
             this.Speech.speak(speechText, 'normal');
         },
 

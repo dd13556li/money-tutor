@@ -4576,10 +4576,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 獲取小尺寸物品圖片或emoji替代方案（用於指令彈窗）
         getSmallItemDisplay(item) {
-            const imgContent = this.getItemImg(item, '60px');
+            const imgContent = this.getItemImg(item, '128px');
             return `
                 <div class="small-item-display"
-                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
+                     style="width: 128px; height: 128px; display: flex; align-items: center; justify-content: center;
                             background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 2.5em; margin-bottom: 15px;">
                     <div class="small-item-emoji" title="${item.name}">${imgContent}</div>
                 </div>

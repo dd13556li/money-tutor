@@ -490,6 +490,7 @@ toolbarConfig: {
 | C3 設定頁兌換組合改版（2026-03-26）| C3 | 標題改「小換大」/「大換小」（`#333`）；末尾加 `🎲 隨機`（`data-type="random-pair"`，與一般 `selection-btn` 同樣式）；`pair = { type, random: true }`；`generateQuestions()` 每題用 `activePair` 隨機挑選；`start()` 加 `pair.random` 語音守衛 |
 | C3 「大換小」標題字色修正（2026-03-26）| C3 | `renderPairButtons()` 大換小 h4 字色 `#fff` → `#333`；Grep `大換小.*color` 定位 |
 | C3 兌換區金額數字間距修復（2026-03-26）| C3 | `getCommonCSS()` inline style `.money-value { margin: 1px 0 0 0 }` → `margin: 6px 0 0 0`；外部 CSS 的 8px 被 inline style 覆蓋，根因在此；另補 `.money-label` CSS（`target-money` 的標籤 class）|
+| C3 提示鈕4項修正（2026-03-27）| C3 | Issue1：`showNormalModeHint` 改用 `requiredSourceCounts[currentRound]`（非 `exchangeRate`）；Issue2：`const gameState = this.getGameState('gameState')`（原 `this.state.gameState` 永遠是 `{}`）；`exchangeZone.innerHTML=''` → 保留 `.placed-coins-container`/`.drop-hint` 結構；Issue4：`handleDrop` `let droppedElement` + `.dragging` fallback；`processDropToFlexibleZone` clone 後 `delete newCoin.dataset.dragHandled`；hint 退回元素 ID 用 `baseCoinId`（去 `source-item-` 前綴） |
 | C3 兌換主類別「🎲 全隨機」（2026-03-26）| C3 | `renderCategoryButtons()` 末尾加 `data-type="all-random-category"` 按鈕；`handleSelection()` 加 `all-random-category` 分支：`category='all-random'`、`pair={random:true,type:'all'}`；`renderPairButtons()` 全隨機時顯示提示；`generateQuestions()` 加 `isAllRandomMode`：收集三類別全部 22 個 pairs，每題隨機抽，`lastExchangeKey` 機制防連續重複 |
 | B1 面額使用統計（2026-03-27）| B1 | 完成畫面新增「🪙 面額使用統計」：`state.quiz.denomStats`累計；`addCoin(denom)` 加 `denomStats[denom]++`；`showResults()` 渲染面額圖示+次數格子；CSS `.b-res-denom-stats/.b1-stat-grid/.b1-stat-item` 加入 `b1_daily_budget.css`；C1 計數統計 pattern |
 | B5 派對物品回顧（2026-03-27）| B5 | 完成畫面新增「🎉 本次派對採購物品」：`state.game.successfulRoundItems[]`；`_handleConfirm` 答對分支收集 `${icon} ${name}`（去重）；`showResults()` 渲染粉色標籤泡泡；CSS `.b5-res-party-review/.b5-party-tags/.b5-party-tag` 加入 `b5_party_budget.css`；A4 交易摘要 pattern |
@@ -509,6 +510,7 @@ toolbarConfig: {
 | B5 每關開場預算介紹卡（2026-03-27）| B5 | `renderRound()` 末尾呼叫 `_showRoundIntroCard(roundNum, budget)`；紫色半透明全屏蓋板 + 白卡顯示關卡/🎂/預算大字；語音整合（移除舊 400ms speech timer）；1800ms 或點擊後 fade；CSS `.b5-round-intro`/`b5RiIn`/`.b5-ri-*` 加入 `b5_party_budget.css` |
 | B3 quiz 答對連勝徽章（2026-03-27）| B3 | `state.quiz.streak` 計數；`_handleChoiceAnswer`/`_handleNumpadAnswer` 正確 `streak++`、錯誤 `streak=0`；達 3/5 題觸發 `_showStreakBadge(streak)`；橘金色 badge 置中彈出 + 語音；CSS `.b3-streak-badge`/`b3SbPop` 加入 `b3_savings_plan.css` |
 | B1 投幣剛好浮動提示（2026-03-27）| B1 | `_updateWalletDisplay` 加 `total === required` 判斷；剛好時呼叫 `_showExactMatchToast()` + 語音「剛好！不需要找零，可以出發了！」；底部深綠 toast `b1ToastUp` 升起；CSS `.b1-exact-toast`/`b1ToastUp` 加入 `b1_daily_budget.css` |
+| C4 提示鈕持久化（2026-03-27）| C4 | `applyHintMarkings(mode)` 新函數；`hintedCoinIds` 存於 `state.gameState`（跨重繪持久，`loadQuestion` 建立新 gameState 時自動清除）；`showNormalModeHint`/`showHardModeHint` 改為：清空 droppedItems→從全部 sourceCoins 算解法→儲存 `hintedCoinIds`→re-render；`renderNormalMode`/`renderHardMode` 末尾呼叫 `applyHintMarkings`；移除 5 秒自動消除 timer |
 
 ---
 

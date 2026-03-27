@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-14（輔助點擊兩階段流程修復 + hint CSS 修復 + 設定頁說明更新）
+> **更新日期**：2026-03-27（提示鈕持久化修正）、2026-03-14（輔助點擊兩階段流程修復 + hint CSS 修復 + 設定頁說明更新）
 > **單元名稱**：C4 正確的金額（Correct Amount）
 > **系列**：C 貨幣認知
 
@@ -1139,3 +1139,86 @@ buildQueue() {
 C4 具體描述：「拖曳錢幣完成正確金額付款」
 
 **關鍵搜尋詞**：`assist-click-group`、`啟用後，只要偵測到點擊`
+
+---
+
+## 提示鈕持久化修正（2026-03-27）
+
+### 問題背景
+
+使用者按下提示鈕後，發現以下兩個問題：
+
+| # | 問題描述 |
+|---|---------|
+| 1 | 提示勾勾在金錢圖示被拖入付款區後消失（應持續至題目完成） |
+| 2 | 按下提示鈕時，若付款區已有金錢，應先全部退回我的金錢區，再顯示提示 |
+
+---
+
+### 根因分析
+
+**C4 重繪架構**：每次 drop（`handleDrop`）後，`renderNormalMode()` / `renderHardMode()` 會重寫整個 `#app` innerHTML，舊的 DOM 元素（包含 `.hint-highlighted` class 和 `.hint-checkmark` 子元素）全部被替換，視覺提示因此消失。
+
+舊的 hint 函數只做一次性 DOM 操作，不儲存任何狀態，重繪後無法恢復。
+
+---
+
+### 修復架構
+
+採用「狀態持久化 + 渲染後套用」模式：
+
+```
+按提示鈕
+  → 清空 droppedItems（退回付款區所有金錢）
+  → 從全部 sourceCoins 計算完整解法
+  → 儲存 state.gameState.hintedCoinIds = [id1, id2, ...]
+  → 呼叫 renderNormalMode / renderHardMode
+       → setupEventListeners(question)
+       → applyHintMarkings(mode)  ← 每次重繪後套用
+```
+
+`hintedCoinIds` 存於 `state.gameState`，當 `loadQuestion()` 建立新題目時自動重置，不需要額外清除邏輯。
+
+---
+
+### 新增函數：`applyHintMarkings(mode)`
+
+```javascript
+applyHintMarkings(mode) {
+    const hintedCoinIds = this.state.gameState && this.state.gameState.hintedCoinIds;
+    if (!hintedCoinIds || hintedCoinIds.length === 0) return;
+
+    hintedCoinIds.forEach(coinId => {
+        const coinElement = document.getElementById(coinId);
+        if (!coinElement) return;
+        coinElement.classList.add('hint-highlighted');
+        coinElement.style.position = 'relative';
+        if (!coinElement.querySelector('.hint-checkmark')) {
+            // 插入 ✓ checkmark（防重複）
+        }
+    });
+},
+```
+
+---
+
+### 改寫 `showNormalModeHint()` / `showHardModeHint()`
+
+| 舊行為 | 新行為 |
+|--------|--------|
+| 只標記剩餘未放置的金錢 | 退回所有 droppedItems，從全部 sourceCoins 計算解法 |
+| 直接操作 DOM | 儲存 `hintedCoinIds` → re-render → `applyHintMarkings` |
+| 5 秒後自動消除提示 | 移除 timer，提示持續至題目完成（`loadQuestion` 自動清除） |
+
+---
+
+### 修改檔案
+
+- `js/c4_correct_amount.js`
+  - 新增 `applyHintMarkings(mode)` 函數
+  - `renderNormalMode()`：末尾加 `this.applyHintMarkings('normal')`（前一輪已加）
+  - `renderHardMode()`：末尾加 `this.applyHintMarkings('hard')`
+  - `showNormalModeHint()`：完整改寫
+  - `showHardModeHint()`：完整改寫
+
+**關鍵搜尋詞**：`applyHintMarkings`、`hintedCoinIds`、`showNormalModeHint`、`showHardModeHint`

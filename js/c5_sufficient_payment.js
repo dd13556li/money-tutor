@@ -4680,9 +4680,9 @@ document.addEventListener('DOMContentLoaded', () => {
         getSmallItemDisplay(item) {
             return `
                 <div class="small-item-display"
-                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
+                     style="width: 128px; height: 128px; display: flex; align-items: center; justify-content: center;
                             background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 2.5em; margin-bottom: 15px;">
-                    <div class="small-item-emoji" title="${item.name}">${this.getItemImg(item, '60px')}</div>
+                    <div class="small-item-emoji" title="${item.name}">${this.getItemImg(item, '128px')}</div>
                 </div>
             `;
         },

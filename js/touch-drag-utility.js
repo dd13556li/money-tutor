@@ -576,7 +576,7 @@ class TouchDragUtility {
         }
         
         // 🔧 [性能優化] 快速預檢查：如果目標元素明顯不是拖拽元素，直接返回
-        const quickCheck = target.closest('.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin, .b3-ndrag-denom');
+        const quickCheck = target.closest('.draggable-item, .money-item, .counting-item, .change-money, .change-money-item, .normal-change-money, .payment-money-item, .payment-money, .wallet-money, .placed-money, .source-item, .placement-slot, .placed-item, .number-item, .payment-target, .change-money.draggable, .draggable-emoji, .easy-change-money, .b3-drag-coin, .b3-ndrag-denom');
         if (!quickCheck) {
             return null;
         }
