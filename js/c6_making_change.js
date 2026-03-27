@@ -9079,16 +9079,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 .change-options {
                     display: flex;
                     gap: 16px;
-                    justify-content: center;
-                    flex-wrap: wrap;
+                    width: 100%;
                     margin-top: 0;
                 }
 
                 /* 每個選項卡片 */
                 .change-option {
                     flex: 1;
-                    min-width: 220px;
-                    max-width: 280px;
+                    min-width: 0;
                     background: linear-gradient(135deg, #f5f7fa 0%, #e3e8ef 100%);
                     border: 4px solid #cbd5e0;
                     border-radius: 16px;
