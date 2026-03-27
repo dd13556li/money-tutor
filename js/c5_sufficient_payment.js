@@ -4878,6 +4878,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             isShowingTotal = true;
                             Game.Debug.log('hint', '👁️ 困難模式：顯示總額，3秒後自動隱藏');
 
+                            // 播放語音（同普通模式）
+                            if (this.speech && typeof this.speech.speak === 'function') {
+                                const traditionalTotal = currentTotal === 0 ? '零元' : this.speech.convertToTraditionalCurrency(currentTotal);
+                                this.speech.speak(`目前總額是${traditionalTotal}`, { interrupt: true });
+                            }
+
                             // 🆕 設置3秒自動隱藏計時器
                             hideTimer = Game.TimerManager.setTimeout(() => {
                                 totalDisplayDiv.classList.remove('hint-shown');
