@@ -668,3 +668,15 @@
 }
 .b6-sb-label { font-size: 32px; font-weight: 900; color: white; }
 .b6-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+/* ── B6 Wrong Item Tip (Round 21) ── */
+.b6-wrong-tip {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: #1f2937; border-radius: 14px; padding: 10px 18px;
+    z-index: 9900; pointer-events: none; text-align: center;
+    animation: b6WtIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    min-width: 200px; max-width: 320px;
+}
+@keyframes b6WtIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+.b6-wt-msg  { font-size: 14px; color: #fca5a5; font-weight: 700; }
+.b6-wt-hint { font-size: 12px; color: #6ee7b7; margin-top: 4px; }

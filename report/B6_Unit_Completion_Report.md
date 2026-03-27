@@ -573,3 +573,38 @@ stallTab.addEventListener('click', () => {
 **關閉**：點任意處 / 2800ms 自動關閉（淡出 350ms）
 
 **CSS**：`.b6-mission-intro`（背景遮罩）/ `.b6-mi-card`（白卡，`b6MiPop` 彈出）/ `.b6-mi-item`（綠色膠囊）
+
+## 十七、錯誤商品攤位提示（Round 21，2026-03-28）
+
+### 17.1 功能說明
+
+學生點到當前攤位中「不在購物清單」的商品時，除原有的錯誤訊息外，新增提示：「這裡需要：X、Y」，顯示此攤位仍未收集的任務商品。
+
+**原行為**：`❌ 商品名不在今天的購物清單上`（灰底 toast）
+**新行為**：深色容器，分兩行 —
+- 第一行（紅字）：`❌ 商品名不在清單上`
+- 第二行（綠字）：`這裡需要：🥬 白菜、🧅 蔥` （過濾此攤位未收集的需求）
+
+若此攤位已無需求（全已收集），則退化顯示原有單行訊息。
+
+### 17.2 實作
+
+```javascript
+const neededAtStall = g.mission.items
+    .filter(mi => mi.stall === stall && !g.collectedIds.has(mi.id))
+    .map(mi => {
+        const d = B6_STALLS[stall]?.items.find(p => p.id === mi.id);
+        return d ? `${d.icon} ${d.name}` : mi.id;
+    });
+```
+
+語音整合：`${itemName}不對，這裡需要${neededNames.join('和')}`
+
+### 17.3 CSS
+
+`.b6-wrong-tip`：深色 `#1f2937` 背景，`border-radius:14px`，底部固定，`b6WtIn` 滑入動畫，`pointer-events:none`，2.4 秒後移除。  
+`.b6-wt-msg`（紅）/ `.b6-wt-hint`（綠）雙行結構。
+
+### 17.4 設計參考
+
+C5「錢不夠差額圖示」pattern — 錯誤後立即給予正向引導，告知「應該做什麼」而非只說「做錯了」。

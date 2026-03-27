@@ -617,7 +617,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (label) label.textContent = `${pct}%`;
             }
 
-            if (btn) btn.disabled = total > g.budget || total === 0;
+            const canConfirm = total > 0 && total <= g.budget;
+            if (btn) {
+                btn.disabled = !canConfirm;
+                btn.classList.toggle('ready', canConfirm);
+            }
         },
 
         _showCenterFeedback(icon, text = '') {

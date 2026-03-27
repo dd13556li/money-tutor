@@ -2100,6 +2100,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         : this._renderNumpadHTML()}
                 </div>
 
+                <div class="b3-week-preview" id="b3-week-preview"></div>
+
                 <div id="b3-anim-section"></div>
             </div>`;
         },
@@ -2132,12 +2134,28 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
+        // ── 存週預覽格（F5 量比較 pattern）──────────────────────
+        _updateWeekPreview(n, question) {
+            const preview = document.getElementById('b3-week-preview');
+            if (!preview) return;
+            const cap = Math.min(n, 16); // 最多顯示16格
+            const isCorrect = n === question.answer;
+            const blocks = [];
+            for (let i = 0; i < cap; i++) {
+                blocks.push(`<span class="b3-week-block${isCorrect ? ' correct' : ''}" style="animation-delay:${i * 60}ms"></span>`);
+            }
+            const extra = n > 16 ? `<span class="b3-week-extra">+${n - 16}</span>` : '';
+            const label = `<span class="b3-week-label">${n} 週</span>`;
+            preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}`;
+        },
+
         // ── 12. 事件綁定 ──────────────────────────────────────
         _bindQuestionEvents(question) {
             const diff = this.state.settings.difficulty;
             if (diff === 'easy') {
                 document.querySelectorAll('.b3-choice-btn').forEach(btn => {
                     Game.EventManager.on(btn, 'click', () => {
+                        this._updateWeekPreview(parseInt(btn.dataset.val), question);
                         this._handleChoiceAnswer(parseInt(btn.dataset.val), question);
                     }, {}, 'gameUI');
                 });
@@ -2159,6 +2177,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             return;
                         }
                         this._updateInputDisplay();
+                        const n = parseInt(this.state.quiz.currentInput);
+                        if (!isNaN(n) && n > 0) this._updateWeekPreview(n, question);
                     }, {}, 'gameUI');
                 });
             }

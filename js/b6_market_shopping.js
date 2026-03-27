@@ -724,8 +724,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!needIds.has(itemId)) {
                         this.audio.play('error');
-                        // 顯示提示文字
                         const itemData = B6_STALLS[stall].items.find(i => i.id === itemId);
+                        const itemName = itemData ? itemData.name : '這個';
+                        // 找出此攤位還需要收集的商品
+                        const neededAtStall = g.mission.items
+                            .filter(mi => mi.stall === stall && !g.collectedIds.has(mi.id))
+                            .map(mi => {
+                                const d = B6_STALLS[stall]?.items.find(p => p.id === mi.id);
+                                return d ? `${d.icon} ${d.name}` : mi.id;
+                            });
                         const tipId = 'b6-wrong-tip';
                         let tip = document.getElementById(tipId);
                         if (!tip) {
@@ -733,11 +740,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             tip.id = tipId;
                             document.body.appendChild(tip);
                         }
-                        const itemName = itemData ? itemData.name : '這個';
-                        tip.textContent = `❌ ${itemName}不在今天的購物清單上`;
+                        tip.className = 'b6-wrong-tip';
+                        if (neededAtStall.length > 0) {
+                            tip.innerHTML = `<div class="b6-wt-msg">❌ ${itemName}不在清單上</div>` +
+                                `<div class="b6-wt-hint">這裡需要：${neededAtStall.join('、')}</div>`;
+                            Game.Speech.speak(`${itemName}不對，這裡需要${neededAtStall.map(s=>s.replace(/^\S+\s/,'')).join('和')}`);
+                        } else {
+                            tip.innerHTML = `<div class="b6-wt-msg">❌ ${itemName}不在今天的購物清單上</div>`;
+                            Game.Speech.speak(`${itemName}不在今天的購物清單上`);
+                        }
                         Game.TimerManager.clearByCategory('wrongTip');
-                        Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2000, 'wrongTip');
-                        Game.Speech.speak(`${itemName}不在今天的購物清單上`);
+                        Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2400, 'wrongTip');
                         return;
                     }
 

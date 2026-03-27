@@ -512,3 +512,38 @@ _showMinCoinsHint(walletTotal, requiredTotal) {
 ```
 
 CSS：`.b1-breakdown`（黃框）、`.b1-bd-row`、`.b1-bd-total`、`b1FadeIn` 動畫，4 秒後自動淡出。
+
+## 十三、行程卡精準金額綠光（Round 21，2026-03-28）
+
+### 13.1 功能說明
+
+當錢包投入金額剛好等於行程所需總費用時，行程卡出現綠色脈動邊框（`b1ExactGlow`），強調「不需要找零」的完美狀態，與底部 toast「剛好！不需要找零，可以出發了！」搭配。
+
+- 金額超過或不足 → 移除 `.exact-match` class，恢復普通樣式
+- 金額剛好 → 加入 `.exact-match` class，啟動綠光循環
+
+### 13.2 實作
+
+```javascript
+// _updateWalletDisplay() 確認按鈕更新段末
+const card = document.querySelector('.b1-schedule-card');
+if (card) card.classList.toggle('exact-match', total === required && total > 0);
+```
+
+### 13.3 CSS
+
+```css
+.b1-schedule-card.exact-match {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 18px rgba(16,185,129,0.5);
+    animation: b1ExactGlow 1.2s ease-in-out infinite;
+}
+@keyframes b1ExactGlow {
+    0%,100% { box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+    50%     { box-shadow: 0 0 28px rgba(16,185,129,0.75); }
+}
+```
+
+### 13.4 設計參考
+
+A6「確認付款脈動」+ B1 現有 exact match toast — 視覺（邊框閃光）與聽覺（語音 toast）雙重反饋，強化剛好付清的成就感。

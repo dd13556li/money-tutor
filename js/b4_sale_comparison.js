@@ -754,6 +754,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             });
 
+            // 三商店困難模式：10秒無動作後高亮最便宜商品（B1 _showMinCoinsHint pattern）
+            if (isHard) {
+                Game.TimerManager.setTimeout(() => {
+                    if (this.state.tripleClickOrder.length === 0 && !this.state.isProcessing) {
+                        const hintCard = document.getElementById(`tcard-${curr.cheapestIdx}`);
+                        if (hintCard) {
+                            hintCard.classList.add('b4-triple-auto-hint');
+                            Game.Speech.speak('提示：先找最便宜的');
+                            Game.TimerManager.setTimeout(() => hintCard.classList.remove('b4-triple-auto-hint'), 2500, 'ui');
+                        }
+                    }
+                }, 10000, 'ui');
+            }
+
             // 導覽
             const backBtn = document.getElementById('back-to-settings');
             if (backBtn) Game.EventManager.on(backBtn, 'click', () => this.showSettings(), {}, 'gameUI');

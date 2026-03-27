@@ -508,3 +508,13 @@
 }
 .b4-sb-label { font-size: 32px; font-weight: 900; color: white; }
 .b4-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+/* ── B4 Triple Hard Auto-Hint (Round 21) ── */
+.b4-triple-auto-hint {
+    border: 3px solid #10b981 !important;
+    animation: b4AutoHintPulse 0.7s ease-in-out 3;
+}
+@keyframes b4AutoHintPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(16,185,129,0); }
+    50%       { box-shadow: 0 0 20px rgba(16,185,129,0.7); }
+}

@@ -577,3 +577,36 @@ B3 月曆模式同時使用 HTML5 DnD（桌面）與 `TouchDragUtility`（行動
 | `.b3-drag-coin` | 拖曳中金幣幽靈 |
 | `.b3-drop-slot` | 日曆格放置槽 |
 
+
+## 十三、週數預覽方塊（Round 21，2026-03-28）
+
+### 13.1 功能說明
+
+quiz 模式（存錢計畫）在學生選擇答案或輸入數字時，立即在選項區上方顯示對應週數的小方塊矩陣：
+
+- 每個方塊代表一週（灰色 = 未確認，綠色 = 正確答案）
+- 最多顯示 16 個方塊，超出時顯示 `+N` 溢出標籤
+- 動畫：`b3BlockPop`（每格 60ms stagger 延遲），視覺化「數數」效果
+
+### 13.2 實作
+
+```javascript
+_updateWeekPreview(n, question) {
+    const preview = document.getElementById('b3-week-preview');
+    const cap = Math.min(n, 16);
+    const isCorrect = n === question.answer;
+    // 渲染 cap 個方塊 + 溢出標籤 + 週數文字
+}
+```
+
+**觸發時機**：
+- 簡單模式（choice）：點選選項按鈕時（選擇後 → `_handleChoiceAnswer` 前）
+- 數字鍵盤模式：每次輸入有效數字後更新（不等待確認）
+
+### 13.3 CSS
+
+`.b3-week-block`：20×20px 圓角方塊，灰底；`.correct`：10b981 綠色；`b3BlockPop`：scale(0.3)→(1) 彈跳；stagger 60ms/格，16 格共 960ms 完全展開。
+
+### 13.4 設計參考
+
+F5「量比較」視覺化比例條 — 將抽象數字轉為視覺元素，強化學生對「幾週才夠存到」的直覺感受。

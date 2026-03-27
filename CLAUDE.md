@@ -535,6 +535,11 @@ toolbarConfig: {
 | B1 費用明細提示（2026-03-28）| B1 | 困難模式答錯後 400ms 顯示費用明細卡：`_showScheduleBreakdown(question)` 列出每項費用+合計；普通模式 3 次錯誤後 900ms 顯示；`.b1-breakdown` 黃框；`b1FadeIn` 動畫；B2 breakdown pattern |
 | B5 預算儀表條（2026-03-28）| B5 | `_updateTotalBar()` 同步更新 `#b5-budget-meter-fill`（0%→100%，green→amber→red）+ `#b5-meter-label` 百分比；HTML 插在 `.b5-total-bar` 下方；`.b5-budget-meter/.b5-budget-meter-fill` CSS；F5 量比較 pattern |
 | B6 關卡開場任務彈窗（2026-03-28）| B6 | `renderRound()` 呼叫 `_showMissionIntroModal(mission, roundNum)`；顯示本關購買清單（綠色膠囊）+ 預算大字；語音「第N關，今天要買：X、Y，預算M元」；2800ms 自動關閉或點擊關閉；`.b6-mission-intro/.b6-mi-card/.b6-mi-item` CSS；B1 `_showTaskModal` pattern |
+| B3 週數預覽方塊（2026-03-28）| B3 | quiz 模式：選擇/輸入答案時即時渲染小方塊預覽週數；`_updateWeekPreview(n, question)`；上限 16 格 + `+N` 溢出；正確答案時 `.correct` 綠色；`b3BlockPop` 動畫；F5 量比較 pattern |
+| B5 確認按鈕 ready 脈動（2026-03-28）| B5 | `_updateTotalBar()` 加 `btn.classList.toggle('ready', canConfirm)`；`#b5-confirm-btn.ready` CSS `b5ConfirmPulse` 動畫（綠光縮放）；A6 確認付款脈動 pattern |
+| B6 錯誤商品攤位提示（2026-03-28）| B6 | 點到不在清單的商品時，額外顯示「這裡需要：X、Y」（`.b6-wt-hint` 綠字）；`neededAtStall` 過濾此攤位未收集需求；`.b6-wrong-tip` 整合容器（深色背景 + `b6WtIn` 動畫）|
+| B1 行程卡精準金額綠光（2026-03-28）| B1 | `_updateWalletDisplay` 加 `.b1-schedule-card.exact-match`；剛好符合時 `b1ExactGlow` 脈動綠框；移除時同步清除 CSS class |
+| B4 三商店困難自動提示（2026-03-28）| B4 | `_bindTripleEvents` hard 模式：10 秒無點擊後 `tcard-cheapestIdx` 加 `.b4-triple-auto-hint`（綠框 `b4AutoHintPulse` 3 次）+ 語音「提示：先找最便宜的」|
 
 ---
 

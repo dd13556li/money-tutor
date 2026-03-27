@@ -700,6 +700,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.Speech.speak('金額足夠，可以出發了！');
                     }
                 }
+                // 行程卡綠光（剛好符合時）
+                const card = document.querySelector('.b1-schedule-card');
+                if (card) card.classList.toggle('exact-match', total === required && total > 0);
             }
 
             // 簡單模式：動態淡化超出剩餘所需的錢幣
