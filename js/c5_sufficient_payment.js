@@ -5232,10 +5232,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500); // 等待音效播放
 
             } else {
-                // 不足時：播放錯誤音效
-                Game.Debug.log('judge', '❌ 錢不足，播放錯誤音效');
+                // 不足時：播放正確音效（簡單模式數完即完成，不播錯誤音）
+                Game.Debug.log('judge', '✅ 錢不足（簡單模式數完），播放正確音效');
                 if (!this.state.gameState.audioPlayed) {
-                    this.audio.playError02Sound();
+                    this.audio.playCorrectSound();
                     this.state.gameState.audioPlayed = true; // 🔧 [修正] 標記音效已播放
                 }
 
@@ -5384,10 +5384,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const { currentTotal, itemPrice: autoItemPrice, itemName } = autoJudgmentData;
                     if (userSaysEnough) {
                         // 錢夠的情況
-                        message = `恭喜你答對了！你的錢總共${currentTotal}元，可以買${autoItemPrice}元的${itemName}！${endingText}`;
+                        message = `恭喜你數完了！你的錢總共${currentTotal}元，可以買${autoItemPrice}元的${itemName}！${endingText}`;
                     } else {
                         // 錢不夠的情況：額外顯示差額金錢圖示
-                        message = `恭喜你答對了！你的錢總共${currentTotal}元，不能購買${autoItemPrice}元的${itemName}，${endingText}`;
+                        message = `恭喜你數完了！你的錢總共${currentTotal}元，不能購買${autoItemPrice}元的${itemName}，${endingText}`;
                         shortfallHTML = this.buildShortfallHTML(autoItemPrice - currentTotal);
                     }
                 } else {
