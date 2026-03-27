@@ -529,6 +529,8 @@ toolbarConfig: {
 | 全單元設定頁隨機圖示後移（2026-03-27）| A5/C3/C6/F1~F6 | `🎲 隨機`→`隨機 🎲`；`🎲 全隨機`→`全隨機 🎲`；A5/F5獨立`隨機`補`🎲`；F6`🎨 圖示主題`→`🎨 主題選擇` |
 | C3 金錢卡底部間距縮小（2026-03-27）| C3 | `getCommonCSS()` `.money-value { padding: 0 0 3px 0 }` → `padding: 0`；移除金額文字下方 3px 間距，底部邊線緊靠數字 |
 | B1~B6 report 新增觸控與版面章節（2026-03-27）| B1~B6 report | B1 補 九/十；B2 補 十/十一；B3 補 十一/十二；B4 補 十/十一；B5 補 十/十一；B6 補 十四/十五；各含觸控桌面支援、版面結構 ASCII 圖、CSS 類別表 |
+| B4 三商店排序模式（2026-03-28）| B4 | `B4_TRIPLE_ITEMS`（15 組三店）；`compareStores` 設定（`two`/`triple`）；`isTriple` 題目旗標；easy/normal 選最便宜→差額三選一；hard 依序點選 1️⃣2️⃣3️⃣；`_renderTripleQuestion`/`_bindTripleEvents`/`_handleTripleSelectClick`/`_handleTripleRankClick`/`_renderTripleDiffSection`；`tripleClickOrder[]`；`.b4-triple-grid/.b4-triple-card/.b4-rank-badge` CSS；F4 排序 pattern |
+| B1 最少張數提示（2026-03-28）| B1 | 答對後比較實際用幣數 vs `_calcOptimalCoins` 最少數；超過時顯示橘色底部 toast「你用了N張，其實最少只需要M張！」；`_showMinCoinsHint(walletTotal, requiredTotal)`；`.b1-min-coins-toast` CSS；C4/C6 最佳付款 pattern |
 
 ---
 

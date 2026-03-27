@@ -709,6 +709,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 最少張數提示（C4/C6 最佳付款 pattern）──────────────
+        _showMinCoinsHint(walletTotal, requiredTotal) {
+            const used    = this.state.wallet.length;
+            const denoms  = DENOM_BY_DIFF[this.state.settings.difficulty] || DENOM_BY_DIFF.easy;
+            const optimal = this._calcOptimalCoins(requiredTotal, denoms);
+            const minCount = optimal.length;
+            if (used <= minCount) return; // 已達最佳，不顯示
+            const existing = document.getElementById('b1-min-coins-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.id = 'b1-min-coins-toast';
+            toast.className = 'b1-min-coins-toast';
+            toast.innerHTML = `💡 你用了 <b>${used}</b> 張，其實最少只需要 <b>${minCount}</b> 張！`;
+            document.body.appendChild(toast);
+            Game.TimerManager.setTimeout(() => {
+                toast.classList.add('b1-toast-fade');
+                Game.TimerManager.setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400, 'ui');
+            }, 1800, 'ui');
+        },
+
         // ── 剛好浮動提示 ────────────────────────────────────────
         _showExactMatchToast() {
             const existing = document.getElementById('b1-exact-toast');
@@ -743,6 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak(msg);
                 this.state.quiz.correctCount++;
                 this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
+                // 最少張數提示（C4/C6 最佳付款 pattern）
+                this._showMinCoinsHint(walletTotal, requiredTotal);
             } else {
                 this.audio.play('error');
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;

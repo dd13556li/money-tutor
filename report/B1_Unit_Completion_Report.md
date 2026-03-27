@@ -432,3 +432,52 @@ addCoin(denom) {
 | `.b1-coins-source` | `flex-wrap: wrap; gap: 12px` | `gap: 8px` |
 | `.b1-coin-btn` | `64px × 64px` | `52px × 52px` |
 
+
+---
+
+## 十一、最少張數提示（Round 25，2026-03-28）
+
+### 11.1 設計動機
+
+參照 C4/C6「最佳付款」概念：學生答對後若使用的張數超過理論最小值，顯示教育性 toast，引導反思「有沒有更省的組合？」。
+
+### 11.2 實作
+
+```javascript
+_showMinCoinsHint(walletTotal, requiredTotal) {
+    const used    = this.state.wallet.length;           // 實際使用張/枚數
+    const denoms  = DENOM_BY_DIFF[difficulty];
+    const optimal = this._calcOptimalCoins(requiredTotal, denoms); // 貪婪最優
+    const minCount = optimal.length;
+    if (used <= minCount) return; // 已達最佳，不顯示
+    // 顯示橘色底部 toast
+}
+```
+
+- 呼叫點：`handleConfirm` 答對分支，`correctCount++` 之後立即呼叫
+- 使用已有的 `_calcOptimalCoins(amount, denoms)` 貪婪函數
+- `walletTotal` 可能 ≥ `requiredTotal`（有找零情況），但最少張數仍依 `requiredTotal` 計算
+- Toast 持續 1800ms 後淡出，不干擾 1400ms 後的 `nextQuestion` 流程
+
+### 11.3 視覺設計
+
+```
+💡 你用了 5 張，其實最少只需要 3 張！
+```
+
+- 位置：`position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%)`
+- 背景：橘色漸層（`#92400e → #d97706`）
+- 動畫：`b1ToastUp`（與 exact toast 共用，從下方彈入）
+- z-index：9900（不覆蓋 modal）
+
+### 11.4 CSS
+
+```css
+.b1-min-coins-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #92400e, #d97706);
+    color: white; font-size: 16px; font-weight: 600;
+    padding: 11px 24px; border-radius: 40px;
+    animation: b1ToastUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+```
