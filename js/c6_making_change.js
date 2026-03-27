@@ -3603,24 +3603,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="c6-step1-container">
-                        <!-- 商品區 -->
-                        <div class="item-section">
-                            <h2 class="section-title">🛍️ 商品資訊</h2>
-                            <div class="item-display">
-                                <div class="item-emoji">${this.getItemImg(item, '3em')}</div>
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-price">價格: ${itemPrice} 元</div>
+                        <!-- 商品資訊 + 付款區（整合卡片） -->
+                        <div class="item-payment-section">
+                            <div class="ip-title-row">
+                                <h2 class="section-title" style="margin:0;">🛍️ 商品付款</h2>
+                                ${difficulty === 'hard' ? '<div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
                             </div>
-                        </div>
-
-                        <!-- 付款區 -->
-                        <div class="payment-section">
-                            <div style="position: relative; margin-bottom: 10px; text-align: center;">
-                                <h2 class="section-title" style="margin: 0; display: inline-block;">💳 付款區</h2>
-                                ${difficulty === 'hard' ? '<div style="position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
-                            </div>
-                            <div class="payment-info">
-                                已付金額: <span id="payment-total">0</span> 元
+                            <div class="item-info-compact">
+                                <span class="iic-img">${this.getItemImg(item, '2.2em')}</span>
+                                <span class="iic-name">${item.name}</span>
+                                <span class="iic-price">${itemPrice} 元</span>
+                                <span class="iic-divider">｜</span>
+                                <span class="iic-paid">已付: <span id="payment-total">0</span> 元</span>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
                                 <div id="payment-money-container" class="payment-overlay">${paymentHintHTML}</div>
@@ -3704,24 +3698,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="c6-step1-container">
-                        <!-- 商品區 -->
-                        <div class="item-section">
-                            <h2 class="section-title">🛍️ 商品資訊</h2>
-                            <div class="item-display">
-                                <div class="item-emoji">${this.getItemImg(item, '3em')}</div>
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-price">價格: ${itemPrice} 元</div>
+                        <!-- 商品資訊 + 付款區（整合卡片） -->
+                        <div class="item-payment-section">
+                            <div class="ip-title-row">
+                                <h2 class="section-title" style="margin:0;">🛍️ 商品付款</h2>
+                                <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
                             </div>
-                        </div>
-
-                        <!-- 付款區 -->
-                        <div class="payment-section">
-                            <div style="position: relative; margin-bottom: 10px; text-align: center;">
-                                <h2 class="section-title" style="margin: 0; display: inline-block;">💳 付款區</h2>
-                                <div style="position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
-                            </div>
-                            <div class="payment-info" id="payment-info-display" style="display: none;">
-                                已付金額: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元
+                            <div class="item-info-compact">
+                                <span class="iic-img">${this.getItemImg(item, '2.2em')}</span>
+                                <span class="iic-name">${item.name}</span>
+                                <span class="iic-price">${itemPrice} 元</span>
+                                <span class="iic-divider">｜</span>
+                                <div id="payment-info-display" class="iic-paid" style="display:none;">已付: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元</div>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
                                 <div id="payment-money-container" class="payment-overlay">
@@ -5540,7 +5528,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 🔧 [新增] 顯示已付金額資訊
             const paymentInfo = document.getElementById('payment-info-display');
             if (paymentInfo) {
-                paymentInfo.style.display = 'block';
+                paymentInfo.style.display = 'inline-flex';
             }
 
             // 先退回所有金錢到錢包
@@ -8487,69 +8475,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 .c6-step1-container {
                     display: flex;
                     flex-direction: column;
-                    gap: 20px;
-                    padding: 15px;
+                    gap: 10px;
+                    padding: 8px 12px;
                     max-width: 1200px;
                     margin: 0 auto;
                 }
 
-                /* 區域通用樣式 */
-                .item-section,
-                .payment-section,
+                /* 整合卡片（商品資訊 + 付款區） */
+                .item-payment-section,
                 .wallet-section {
                     background: white;
                     border-radius: 15px;
-                    padding: 20px;
+                    padding: 14px 18px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 }
 
                 .section-title {
-                    font-size: 1.5em;
+                    font-size: 1.4em;
                     font-weight: bold;
-                    margin: 0 0 15px 0;
+                    margin: 0 0 10px 0;
                     color: #333;
                     text-align: center;
                 }
 
-                /* 商品區樣式 */
-                .item-section {
-                    min-height: 200px;
-                }
-
-                .item-display {
-                    text-align: center;
-                    padding: 15px;
+                /* 整合卡片標題列（標題 + 提示按鈕） */
+                .ip-title-row {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                    gap: 30px;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
                 }
 
-                .item-emoji {
-                    font-size: 5em;
-                    flex-shrink: 0;
-                }
-
-                .item-name {
-                    font-size: 2em;
-                    font-weight: bold;
-                    color: #2196F3;
-                    margin: 0 15px;
-                }
-
-                .item-price {
-                    font-size: 2em;
-                    font-weight: bold;
-                    color: #FF5722;
-                    background: #fff3e0;
-                    padding: 10px 20px;
+                /* 緊湊橫排商品資訊 */
+                .item-info-compact {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    background: #f0f7ff;
                     border-radius: 10px;
-                    white-space: nowrap;
+                    padding: 7px 12px;
+                    margin-bottom: 10px;
+                    flex-wrap: wrap;
                 }
-
-                /* 付款區樣式 */
-                .payment-section {
-                    min-height: 250px;
+                .iic-img { display: inline-flex; align-items: center; }
+                .iic-name { font-size: 1.25em; font-weight: bold; color: #2196F3; }
+                .iic-price {
+                    font-size: 1.25em; font-weight: bold; color: #FF5722;
+                    background: #fff3e0; padding: 3px 12px;
+                    border-radius: 8px; white-space: nowrap;
+                }
+                .iic-divider { color: #bbb; font-size: 1.2em; }
+                .iic-paid {
+                    font-size: 1.15em; font-weight: bold; color: #333;
+                    background: linear-gradient(135deg, #FFD700, #FFA500);
+                    padding: 3px 12px; border-radius: 8px; white-space: nowrap;
+                    border: 2px solid #FF8C00;
                 }
 
                 .payment-info {
@@ -8572,8 +8552,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
                     border: 3px dashed #4CAF50;
                     border-radius: 15px;
-                    padding: 20px;
-                    min-height: 180px;
+                    padding: 14px;
+                    min-height: 130px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -8637,17 +8617,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 /* 錢包區樣式 */
                 .wallet-section {
-                    min-height: 200px;
+                    min-height: 120px;
                 }
 
                 .wallet-container {
                     display: flex;
-                    gap: 15px;
+                    gap: 12px;
                     flex-wrap: wrap;
                     justify-content: center;
                     align-items: center;
-                    padding: 25px;
-                    min-height: 150px;
+                    padding: 12px;
+                    min-height: 100px;
                     background: #f5f5f5;
                     border-radius: 10px;
                 }
