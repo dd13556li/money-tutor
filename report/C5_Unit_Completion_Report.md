@@ -1336,3 +1336,41 @@ if (this.speech && typeof this.speech.speak === 'function') {
 **關鍵搜尋詞**：`setupHardModeEventListeners`、`困難模式：顯示總額`、`convertToTraditionalCurrency`
 
 ---
+
+## 簡單模式完成音效與語音修正（2026-03-27）
+
+### 需求
+
+簡單模式測驗完成時（錢夠/錢不夠兩種情況），音效及語音統一調整：
+- 音效：兩種情況均播放 `correct02.mp3`（原錢不夠為 `error02.mp3`）
+- 語音：「恭喜你答對了！」→「恭喜你數完了！」
+
+### 修改位置
+
+**`checkEasyModeAutoJudgment()`**（錢不夠路徑）：
+```javascript
+// 原：
+this.audio.playError02Sound();
+// 改：
+this.audio.playCorrectSound();
+```
+
+**`handleJudgment()`** `autoJudgmentData` 分支（錢夠路徑）：
+```javascript
+// 原：
+message = `恭喜你答對了！你的錢總共${currentTotal}元，可以買${autoItemPrice}元的${itemName}！${endingText}`;
+// 改：
+message = `恭喜你數完了！你的錢總共${currentTotal}元，可以買${autoItemPrice}元的${itemName}！${endingText}`;
+```
+
+**`handleJudgment()`** `autoJudgmentData` 分支（錢不夠路徑）：
+```javascript
+// 原：
+message = `恭喜你答對了！你的錢總共${currentTotal}元，不能購買${autoItemPrice}元的${itemName}，${endingText}`;
+// 改：
+message = `恭喜你數完了！你的錢總共${currentTotal}元，不能購買${autoItemPrice}元的${itemName}，${endingText}`;
+```
+
+**關鍵搜尋詞**：`checkEasyModeAutoJudgment`、`autoJudgmentData`、`恭喜你數完了`
+
+---

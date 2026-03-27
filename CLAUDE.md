@@ -519,6 +519,14 @@ toolbarConfig: {
 | F4 排序數量預設選項（2026-03-27）| F4 | `sortingCounts.preset`（value:10, order:0）排在「3個數字」前；所有條目補 order 1–6；`getSettingOptions` 既有排序邏輯自動生效 |
 | C6 我的錢包新增🎲隨機（2026-03-27）| C6 | `walletAmount==='random'`；`generateQuestion` 每題隨機抽 [10,50,100,500,1000]；`effectiveItemTypes` 依實際金額決定物品類型；`c6-random-wallet-hint` 提示文字 |
 | C5 困難模式提示鈕加語音（2026-03-27）| C5 | `setupHardModeEventListeners` 提示鈕顯示總額後加 `speech.speak('目前總額是X元')`；同普通模式 `convertToTraditionalCurrency` pattern |
+| C5 簡單模式完成音效與語音（2026-03-27）| C5 | `checkEasyModeAutoJudgment`：錢不夠路徑 `playError02Sound()` → `playCorrectSound()`；`handleJudgment` autoJudgmentData：兩路完成訊息改 `恭喜你數完了！` |
+| C6 測驗頁step1整合卡片+C5風格版面（2026-03-27）| C6 | `item-payment-section` 合併商品+付款區；`ip-title-row` 標題置中；`item-info-compact` 水平排；圖片 180px；`border:2px solid #4CAF50`、`padding:20px`、自然高度；`#payment-drop-zone min-height:140px` |
+| C6 找零頁step2滿版面（2026-03-27）| C6 | `game-container flex column min-height:100vh`；`c6-step2-container flex:1 width:100%`；圖片 180px；`item-info-compact` 水平排 |
+| C6 找零金額框垂直距離縮小（2026-03-27）| C6 | `change-question-area` margin/padding 縮小；`change-title` 1.4em；`change-amount-highlight` padding 8px；`change-options-area` padding-top 12px；`change-option` padding 12px |
+| C6 困難模式商品資訊置中+紙鈔放大（2026-03-27）| C6 | `item-info-section` 加 `align-items:center`；找零選項紙鈔 80px→110px，硬幣 60px |
+| C6 找零選項均分寬度（2026-03-27）| C6 | `change-options width:100%` 移除 `flex-wrap`；`change-option` 移除 `max-width`、`min-width:0` |
+| C2 金錢數量預設顯示範圍（2026-03-27）| C2 | 設定頁 `moneyQuantity==='default'` 按鈕文字 `預設`→`預設(5-20)` |
+| 全單元設定頁隨機圖示後移（2026-03-27）| A5/C3/C6/F1~F6 | `🎲 隨機`→`隨機 🎲`；`🎲 全隨機`→`全隨機 🎲`；A5/F5獨立`隨機`補`🎲`；F6`🎨 圖示主題`→`🎨 主題選擇` |
 
 ---
 

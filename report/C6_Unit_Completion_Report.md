@@ -1250,3 +1250,112 @@ const effectiveItemTypes = (walletAmount === 'random')
 **關鍵搜尋詞**：`walletAmount === 'random'`、`randomWallets`、`effectiveItemTypes`、`c6-random-wallet-hint`
 
 ---
+
+## 測驗頁step1 UI 大改版（2026-03-27）
+
+### 需求
+
+1. 商品資訊 + 付款區整合為單一卡片（減少上下距離）
+2. 商品圖片改為 180×180px
+3. 版面對齊 C5 風格（綠色邊框、自然高度、不強制撐滿）
+
+### 實作
+
+**HTML 結構**（`renderEasyMode` / `renderNormalMode`）：
+- 移除原有的「商品資訊卡」與「付款區卡」兩層獨立卡片
+- 改為 `item-payment-section` 單一白卡
+- 內部：`ip-title-row`（標題置中 + 提示按鈕）+ `item-info-compact`（水平排）+ `#payment-drop-zone` + 確認按鈕
+
+**CSS（`getC6EasyModeCSS()`）**：
+- `c6-easy-layout`：`display:flex; flex-direction:column`（維持 sticky title bar）
+- `c6-step1-container`：移除 `flex:1`，改 `padding:10px; gap:10px`
+- `item-payment-section`：移除 `flex:1`，改自然高度；加 `border:2px solid #4CAF50; padding:20px`
+- `#payment-drop-zone`：`flex:1` → `min-height:140px`
+
+**圖片尺寸**：全部 `getItemImg(item, '128px')` → `180px`
+
+**關鍵搜尋詞**：`item-payment-section`、`ip-title-row`、`item-info-compact`、`c6-step1-container`
+
+---
+
+## 找零頁step2 滿版面（2026-03-27）
+
+### 需求
+
+找零頁（step2）水平 + 垂直撐滿版面，商品圖片改 180px。
+
+### 實作
+
+**CSS（`getC6EasyModeCSS()`）**：
+```css
+.game-container {
+    display: flex; flex-direction: column; min-height: 100vh;
+}
+.c6-step2-container {
+    display: flex; flex-direction: column; flex: 1; width: 100%;
+    gap: 10px; padding: 8px 12px 12px; box-sizing: border-box;
+}
+```
+
+**`itemInfoHTML`**（easy/normal/hard 三處）：`getItemImg(item, '3em')` → `180px`，`item-display` div → `item-info-compact`
+
+**關鍵搜尋詞**：`game-container`、`c6-step2-container`、`c6-purchase-info`
+
+---
+
+## 找零金額框垂直距離縮小（2026-03-27）
+
+### 需求
+
+減少「找零金額 N元」框與上下框的垂直距離；找零選項內硬幣更貼近外框。
+
+### 修改（`getC6NormalStep2CSS()` 或 `getC6EasyModeCSS()`）
+
+| CSS 類別 | 變更 |
+|---------|------|
+| `.change-question-area` | `margin:20px→8px`、`padding:30px→12px 20px` |
+| `.change-title` | `font-size:1.8em→1.4em`、`margin-bottom:15px→6px` |
+| `.change-amount-highlight` | `padding:20px→8px 20px`、`margin:10px→4px` |
+| `.change-options-area` | `padding-top:60px→12px`、`margin` 縮小 |
+| `.change-option` | `padding:25px→12px` |
+
+**關鍵搜尋詞**：`change-question-area`、`change-options-area`、`change-option`
+
+---
+
+## 困難模式商品資訊置中 + 找零選項紙鈔放大（2026-03-27）
+
+### 需求
+
+1. 困難模式計算頁「玩具車圖片 435元」水平置中
+2. 找零選項紙鈔圖示要明顯大於硬幣
+
+### 實作
+
+**商品置中**：`.item-info-section` 加 `display:flex; flex-direction:column; align-items:center`
+
+**紙鈔圖大小**：`_showChangeQuiz()` 中 `sizeStyle`:
+```javascript
+const sizeStyle = isBanknote ? 'width: 110px; height: auto;' : 'width: 60px; height: auto;';
+```
+
+**關鍵搜尋詞**：`item-info-section`、`sizeStyle`、`isBanknote`
+
+---
+
+## 找零選項均分寬度（2026-03-27）
+
+### 需求
+
+三個找零選項框水平平均分配寬度（不因 max-width 受限）。
+
+### 修改
+
+```css
+.change-options { display: flex; gap: 16px; width: 100%; }
+.change-option  { flex: 1; min-width: 0; /* 移除 max-width */ }
+```
+
+**關鍵搜尋詞**：`change-options`、`change-option`
+
+---
