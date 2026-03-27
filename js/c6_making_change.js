@@ -6183,7 +6183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         '<div class="no-change-display">不需找零</div>' :
                                         option.money.map(money => {
                                             const isBanknote = money.value >= 100;
-                                            const sizeStyle = isBanknote ? 'width: 80px; height: auto;' : 'width: 60px; height: auto;';
+                                            const sizeStyle = isBanknote ? 'width: 110px; height: auto;' : 'width: 60px; height: auto;';
                                             return `
                                                 <div class="option-money-item" data-value="${money.value}">
                                                     <img src="${money.image}"
@@ -6671,6 +6671,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     border-radius: 20px;
                     padding: 20px;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
                 }
 
                 .item-info-section .section-title {
