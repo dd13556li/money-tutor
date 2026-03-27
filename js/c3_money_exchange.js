@@ -8692,7 +8692,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     max-width: 80px !important;
                     max-height: none !important;
                 }
-                .money-value { font-size: 12px; color: #333; margin: 4px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0 0 3px 0; width: 100%; display: block; line-height: 1; }
+                .money-value { font-size: 12px; color: #333; margin: 4px 0 0 0; text-align: center; font-weight: bold; border: none; background: transparent; padding: 0; width: 100%; display: block; line-height: 1; }
 
                 /* 【強制結果區換行+尺寸】覆蓋 .money-item {width:80px} 對結果區的影響 */
                 .unified-results-container { flex-wrap: wrap !important; width: 100% !important; }

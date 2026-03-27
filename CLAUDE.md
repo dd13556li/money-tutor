@@ -527,6 +527,8 @@ toolbarConfig: {
 | C6 找零選項均分寬度（2026-03-27）| C6 | `change-options width:100%` 移除 `flex-wrap`；`change-option` 移除 `max-width`、`min-width:0` |
 | C2 金錢數量預設顯示範圍（2026-03-27）| C2 | 設定頁 `moneyQuantity==='default'` 按鈕文字 `預設`→`預設(5-20)` |
 | 全單元設定頁隨機圖示後移（2026-03-27）| A5/C3/C6/F1~F6 | `🎲 隨機`→`隨機 🎲`；`🎲 全隨機`→`全隨機 🎲`；A5/F5獨立`隨機`補`🎲`；F6`🎨 圖示主題`→`🎨 主題選擇` |
+| C3 金錢卡底部間距縮小（2026-03-27）| C3 | `getCommonCSS()` `.money-value { padding: 0 0 3px 0 }` → `padding: 0`；移除金額文字下方 3px 間距，底部邊線緊靠數字 |
+| B1~B6 report 新增觸控與版面章節（2026-03-27）| B1~B6 report | B1 補 九/十；B2 補 十/十一；B3 補 十一/十二；B4 補 十/十一；B5 補 十/十一；B6 補 十四/十五；各含觸控桌面支援、版面結構 ASCII 圖、CSS 類別表 |
 
 ---
 
