@@ -1558,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="button-group">
                                         <button class="selection-btn ${theme === 'default' ? 'active' : ''}"
                                                 data-type="theme" data-value="default">
-                                            🎲 隨機
+                                            隨機 🎲
                                         </button>
                                         ${Object.keys(Game.gameData.themes).filter(key => key !== 'custom' && key !== 'default').map(key => `
                                             <button class="selection-btn ${theme === key ? 'active' : ''}"

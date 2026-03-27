@@ -2414,7 +2414,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="button-group">
                                 <button class="selection-btn ${sessionType === 'random' ? 'active' : ''}"
                                         data-type="sessionType" data-value="random">
-                                    隨機
+                                    隨機 🎲
                                 </button>
                                 <button class="selection-btn ${sessionType === 'withdraw' ? 'active' : ''}"
                                         data-type="sessionType" data-value="withdraw">

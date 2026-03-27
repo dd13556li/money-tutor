@@ -4151,7 +4151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<button class="selection-btn ${isActive}" data-type="category" data-value="${catKey}">${categoryName}</button>`;
             }
             const isAllRandomActive = category === 'all-random' ? 'active' : '';
-            html += `<button class="selection-btn ${isAllRandomActive}" data-type="all-random-category">🎲 全隨機</button>`;
+            html += `<button class="selection-btn ${isAllRandomActive}" data-type="all-random-category">全隨機 🎲</button>`;
             return html;
         },
 
@@ -4174,7 +4174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `<button class="selection-btn ${isActive}" data-type="pair" data-from="${p.from}" data-to="${p.to}" data-exchange-type="${p.type}">${p.from}元 → ${p.to}元</button>`;
                 });
                 const randomStbActive = pair && pair.random && pair.type === 'small-to-big' ? 'active' : '';
-                html += `<button class="selection-btn c3-random-pair-btn ${randomStbActive}" data-type="random-pair" data-exchange-type="small-to-big">🎲 隨機</button>`;
+                html += `<button class="selection-btn c3-random-pair-btn ${randomStbActive}" data-type="random-pair" data-exchange-type="small-to-big">隨機 🎲</button>`;
                 html += '</div>';
             }
 
@@ -4185,7 +4185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `<button class="selection-btn ${isActive}" data-type="pair" data-from="${p.from}" data-to="${p.to}" data-exchange-type="${p.type}">${p.from}元 → ${p.to}元</button>`;
                 });
                 const randomBtsActive = pair && pair.random && pair.type === 'big-to-small' ? 'active' : '';
-                html += `<button class="selection-btn c3-random-pair-btn ${randomBtsActive}" data-type="random-pair" data-exchange-type="big-to-small">🎲 隨機</button>`;
+                html += `<button class="selection-btn c3-random-pair-btn ${randomBtsActive}" data-type="random-pair" data-exchange-type="big-to-small">隨機 🎲</button>`;
                 html += '</div>';
             }
             

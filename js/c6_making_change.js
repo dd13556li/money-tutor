@@ -1279,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                                     <button class="selection-btn ${settings.walletAmount === 'random' ? 'active' : ''}"
                                             data-type="walletAmount" data-value="random">
-                                        🎲 隨機
+                                        隨機 🎲
                                     </button>
                                     <button class="selection-btn ${settings.walletAmount === 'custom' ? 'active' : ''}"
                                             data-type="walletAmount" data-value="custom">
@@ -2664,7 +2664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (walletAmount === 'random') {
                     const randomWallets = [10, 50, 100, 500, 1000];
                     actualWalletAmount = randomWallets[Math.floor(Math.random() * randomWallets.length)];
-                    Game.Debug.log('wallet', `🎲 隨機錢包金額: ${actualWalletAmount}元`);
+                    Game.Debug.log('wallet', `隨機 🎲錢包金額: ${actualWalletAmount}元`);
                 } else {
                     actualWalletAmount = walletAmount;
                 }

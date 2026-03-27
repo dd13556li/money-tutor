@@ -306,7 +306,7 @@ const QuantityComparisonConfig = {
         },
         random: {
             id: 'random',
-            label: '隨機',
+            label: '隨機 🎲',
             description: '隨機出現找大或找小的題目',
             instruction: '', // 動態生成
             order: 3
@@ -1921,7 +1921,7 @@ const QuantityComparisonTemplates = {
                 <div class="button-group" data-setting-type="theme">
                     <button class="selection-btn ${theme === 'default' ? 'active' : ''}"
                             data-type="theme" data-value="default">
-                        🎲 隨機
+                        隨機 🎲
                     </button>
                     ${Object.entries(themes).map(([key, icons]) => {
                         const themeNames = {

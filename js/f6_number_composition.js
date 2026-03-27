@@ -789,7 +789,7 @@ const Game = {
                         <div class="setting-group">
                             <label>🎨 主題選擇：</label>
                             <div class="button-group">
-                                <button class="selection-btn ${this.state.settings.theme === 'default' ? 'active' : ''}" data-type="theme" data-value="default">🎲 隨機</button>
+                                <button class="selection-btn ${this.state.settings.theme === 'default' ? 'active' : ''}" data-type="theme" data-value="default">隨機 🎲</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'fruits' ? 'active' : ''}" data-type="theme" data-value="fruits">水果 🍎</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'animals' ? 'active' : ''}" data-type="theme" data-value="animals">動物 🐶</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'vehicles' ? 'active' : ''}" data-type="theme" data-value="vehicles">交通工具 🚗</button>
@@ -2085,7 +2085,7 @@ const Game = {
 
         // 初始化狀態（如果還沒有）
         if (!this.hardFillBlankState) {
-            // 🎲 隨機決定輸入框在左邊還是右邊（0=左邊，1=右邊）
+            // 隨機 🎲決定輸入框在左邊還是右邊（0=左邊，1=右邊）
             const isLeftInput = Math.random() < 0.5;
 
             this.hardFillBlankState = {
@@ -2434,7 +2434,7 @@ const Game = {
 
         // 初始化狀態（如果還沒有）
         if (!this.hardDecompositionState) {
-            // 🎲 隨機決定哪一邊是輸入框（0=左邊，1=右邊）
+            // 隨機 🎲決定哪一邊是輸入框（0=左邊，1=右邊）
             const isLeftInput = Math.random() < 0.5;
 
             this.hardDecompositionState = {
