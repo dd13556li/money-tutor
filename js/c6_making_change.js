@@ -8468,26 +8468,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 .c6-easy-layout {
                     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
                     min-height: 100vh;
-                    padding: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    box-sizing: border-box;
                 }
 
-                /* C6 步驟1容器 - 垂直布局 */
+                /* C6 步驟1容器 - 垂直布局，滿版 */
                 .c6-step1-container {
                     display: flex;
                     flex-direction: column;
+                    flex: 1;
                     gap: 10px;
-                    padding: 8px 12px;
-                    max-width: 1200px;
-                    margin: 0 auto;
+                    padding: 8px 12px 12px;
+                    width: 100%;
+                    box-sizing: border-box;
                 }
 
-                /* 整合卡片（商品資訊 + 付款區） */
+                /* 付款卡片撐滿剩餘空間 */
+                .item-payment-section {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                /* drop-zone 填滿付款卡片剩餘高度 */
+                #payment-drop-zone {
+                    flex: 1;
+                }
+
+                /* 整合卡片（商品資訊 + 付款區）與錢包卡片 */
                 .item-payment-section,
                 .wallet-section {
                     background: white;
                     border-radius: 15px;
                     padding: 14px 18px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    width: 100%;
+                    box-sizing: border-box;
                 }
 
                 .section-title {
