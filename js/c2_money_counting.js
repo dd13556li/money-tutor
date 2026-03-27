@@ -559,9 +559,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="setting-group">
                                 <label>💵 金錢數量：</label>
                                 <div class="button-group">
-                                    <button class="selection-btn ${settings.moneyQuantity === 'default' ? 'active' : ''}" 
+                                    <button class="selection-btn ${settings.moneyQuantity === 'default' ? 'active' : ''}"
                                             data-type="moneyQuantity" data-value="default">
-                                        預設
+                                        預設(5-20)
                                     </button>
                                     <button class="selection-btn ${settings.moneyQuantity === '1-10' ? 'active' : ''}" 
                                             data-type="moneyQuantity" data-value="1-10">
