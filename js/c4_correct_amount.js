@@ -770,6 +770,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             <div class="setting-group" id="denomination-setting-group" style="display: ${settings.digits === 'custom' ? 'none' : 'block'};">
                                 <label>💰 面額選擇 (可多選)：</label>
+                                <div class="button-group" style="margin-bottom: 12px;">
+                                    <button class="selection-btn" onclick="Game.applyDefaultDenominations()">
+                                        ⭐ 預設（依位數自動選擇）
+                                    </button>
+                                </div>
                                 <div class="denomination-selection">
                                     <div class="denomination-group">
                                         <h4 style="margin: 0 0 10px 0; color: #000;">錢幣</h4>
@@ -1263,6 +1268,25 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // 新增：檢查位數和幣值組合是否有效
+        // 依目前位數自動套用合理面額預設（不重繪頁面，直接更新按鈕狀態）
+        applyDefaultDenominations() {
+            const digits = this.state.settings.digits;
+            const presets = {
+                1: [1, 5],
+                2: [1, 10, 50],
+                3: [10, 100, 500],
+                4: [100, 500, 1000]
+            };
+            const defaults = presets[digits];
+            if (!defaults) return; // 自訂金額模式不適用
+            this.state.settings.denominations = [...defaults];
+            // 直接更新 DOM，不重新渲染整個設定頁
+            document.querySelectorAll('[data-type="denomination"]').forEach(btn => {
+                const val = parseInt(btn.dataset.value, 10);
+                btn.classList.toggle('active', defaults.includes(val));
+            });
+        },
+
         isValidCombination(digits, denominations) {
             if (!denominations.length) return true;
             

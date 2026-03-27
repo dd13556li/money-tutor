@@ -3958,7 +3958,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="modal-body">
                         <div class="target-item-display">
                             <div class="item-image">
-                                ${this.getProductIconHTML(targetItem, '100px')}
+                                ${this.getProductIconHTML(targetItem, '128px')}
                             </div>
                             <div class="item-info">
                                 <h3 class="item-name">${targetItem.description || targetItem.name}</h3>

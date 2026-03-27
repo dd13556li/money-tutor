@@ -1193,6 +1193,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="setting-group" id="denomination-section"
                                  style="display: ${settings.digits === 'custom' ? 'none' : 'block'};">
                                 <label>💰 面額選擇 (可多選)：</label>
+                                <div class="button-group" style="margin-bottom: 12px;">
+                                    <button class="selection-btn" onclick="Game.applyDefaultDenominations()">
+                                        ⭐ 預設（依位數自動選擇）
+                                    </button>
+                                </div>
                                 <div class="denomination-selection">
                                     <div class="denomination-group">
                                         <h4 style="margin: 0 0 10px 0; color: #000;">錢幣</h4>
@@ -1834,6 +1839,25 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // 新增：檢查位數和幣值組合是否有效（簡化版，適用unit5）
+        // 依目前位數自動套用合理面額預設（不重繪頁面，直接更新按鈕狀態）
+        applyDefaultDenominations() {
+            const digits = this.state.settings.digits;
+            const presets = {
+                1: [1, 5],
+                2: [1, 10, 50],
+                3: [10, 100, 500],
+                4: [100, 500, 1000]
+            };
+            const defaults = presets[digits];
+            if (!defaults) return; // 自訂金額模式不適用
+            this.state.settings.denominations = [...defaults];
+            // 直接更新 DOM，不重新渲染整個設定頁
+            document.querySelectorAll('[data-type="denomination"]').forEach(btn => {
+                const val = parseInt(btn.dataset.value, 10);
+                btn.classList.toggle('active', defaults.includes(val));
+            });
+        },
+
         isValidCombination(digits, denominations) {
             if (!denominations.length) return true;
 
@@ -3942,6 +3966,35 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // 🔧 [修正] 清除所有現有的訊息視窗
+        // 將差額金額分解為真實金錢圖示 HTML
+        buildShortfallHTML(shortfall) {
+            if (!shortfall || shortfall <= 0) return '';
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let remaining = shortfall;
+            const coins = [];
+            for (const d of denoms) {
+                while (remaining >= d && coins.length < 12) {
+                    coins.push(d);
+                    remaining -= d;
+                }
+                if (coins.length >= 12) break;
+            }
+            const imgsHTML = coins.map(d => {
+                const isBanknote = d >= 100;
+                const w = isBanknote ? '72px' : '44px';
+                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                    style="width:${w};height:auto;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));">`;
+            }).join('');
+            return `<div style="margin-top:14px;border-top:2px dashed rgba(255,255,255,0.55);padding-top:12px;text-align:center;">
+                <div style="font-size:0.8em;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;">
+                    還差 <span style="font-size:1.4em;color:#FFD700;">${shortfall}</span> 元
+                </div>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center;">
+                    ${imgsHTML}
+                </div>
+            </div>`;
+        },
+
         clearAllMessages() {
             const existingMessages = document.querySelectorAll('.game-message');
             existingMessages.forEach(msg => {
@@ -3951,20 +4004,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        // 顯示訊息
-        showMessage(text, type, callback = null) {
+        // 顯示訊息（extraHTML 為選填，不會被語音朗讀）
+        showMessage(text, type, callback = null, extraHTML = '') {
             // 🔧 [修正] 清除所有現有的訊息視窗，防止重疊
             this.clearAllMessages();
 
             const message = document.createElement('div');
             message.classList.add('game-message'); // 添加識別類名
-            
+
             // 添加emoji圖標
             const emoji = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '❌';
             const messageContent = document.createElement('div');
             messageContent.innerHTML = `
                 <div style="font-size: 2em; margin-bottom: 10px;">${emoji}</div>
                 <div>${text}</div>
+                ${extraHTML}
             `;
 
             const bgColors = {
@@ -5306,29 +5360,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
 
                 let message;
+                let shortfallHTML = '';
                 if (autoJudgmentData) {
                     // 自動判斷使用新格式訊息
-                    const { currentTotal, itemPrice, itemName } = autoJudgmentData;
+                    const { currentTotal, itemPrice: autoItemPrice, itemName } = autoJudgmentData;
                     if (userSaysEnough) {
                         // 錢夠的情況
-                        // 🔧 [修正] 使用阿拉伯數字格式
-                        message = `恭喜你答對了！你的錢總共${currentTotal}元，可以買${itemPrice}元的${itemName}！${endingText}`;
+                        message = `恭喜你答對了！你的錢總共${currentTotal}元，可以買${autoItemPrice}元的${itemName}！${endingText}`;
                     } else {
-                        // 錢不夠的情況
-                        // 🔧 [修正] 使用阿拉伯數字格式
-                        message = `恭喜你答對了！你的錢總共${currentTotal}元，不能購買${itemPrice}元的${itemName}，${endingText}`;
+                        // 錢不夠的情況：額外顯示差額金錢圖示
+                        message = `恭喜你答對了！你的錢總共${currentTotal}元，不能購買${autoItemPrice}元的${itemName}，${endingText}`;
+                        shortfallHTML = this.buildShortfallHTML(autoItemPrice - currentTotal);
                     }
                 } else {
                     // 手動判斷使用原始格式訊息
+                    if (!userSaysEnough) {
+                        // 錢不夠的情況：額外顯示差額金錢圖示
+                        shortfallHTML = this.buildShortfallHTML(itemPrice - totalMoney);
+                    }
                     message = userSaysEnough ?
                         `恭喜你答對了！你的錢夠買${itemPrice}元的${itemName}！${endingText}` :
                         `恭喜你答對了！你的錢不夠買${itemPrice}元的${itemName}！${endingText}`;
                 }
-                    
+
                 const messageType = 'success';
 
                 Game.Debug.log('ui', `💬 顯示${messageType === 'success' ? '成功' : '失敗'}訊息:`, message);
-                
+
                 // 使用回調系統同步消息視窗和語音
                 this.showMessage(message, messageType, (hideMessage) => {
                     this.speech.speak(message, {
@@ -5341,7 +5399,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }, 1000);
                         }
                     });
-                });
+                }, shortfallHTML);
 
             } else {
                 // 判斷錯誤

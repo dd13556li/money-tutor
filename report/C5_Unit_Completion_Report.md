@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
+> **更新日期**：2026-03-27（錢不夠差額金錢圖示 + 面額預設按鈕）、2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
 > **單元名稱**：C5 夠不夠（Sufficient Payment）
 > **系列**：C 貨幣認知
 
@@ -1252,3 +1252,52 @@ C5 具體描述：「拖曳錢幣至付款區」（格式同 C4 章節說明）
 **關鍵搜尋詞**：`assist-click-group`、`啟用後，只要偵測到點擊`
 
 ---
+
+---
+
+## 正確回答「錢不夠」時顯示差額金錢圖示（2026-03-27）
+
+### 需求
+
+三種難度（簡單/普通/困難）正確回答「❌ 錢不夠，不能買」後，在彈窗主訊息下方以真實金錢圖示顯示還差多少錢，紙鈔圖示（100/500/1000元）大於硬幣圖示（1/5/10/50元）。
+
+### 實作
+
+**新增 `buildShortfallHTML(shortfall)`**：
+- 貪婪演算法將差額分解為面額（1000→500→100→50→10→5→1），最多 12 枚
+- 紙鈔（≥100元）寬度 72px，硬幣（<100元）寬度 44px，均加 `drop-shadow`
+- 返回 HTML 字串：「還差 **X** 元（金色）」+ 金錢圖示列
+
+**修改 `showMessage(text, type, callback, extraHTML='')`**：
+- 新增第 4 參數 `extraHTML`（不會被語音朗讀）
+- 渲染在主訊息文字下方，以虛線分隔
+
+**修改 `handleJudgment`**：
+- 正確且為「不能買」情況：計算差額並生成 `shortfallHTML`
+  - 自動判斷路徑（簡單模式）：`autoItemPrice - currentTotal`
+  - 手動判斷路徑（普通/困難模式）：`itemPrice - totalMoney`
+- 傳入 `showMessage(message, 'success', cb, shortfallHTML)`
+
+**關鍵搜尋詞**：`buildShortfallHTML`、`extraHTML`、`showMessage.*extraHTML`
+
+---
+
+## 面額選擇預設按鈕（2026-03-27）
+
+**需求**：選擇位數後，「💰 面額選擇 (可多選)」下方第一列新增「⭐ 預設（依位數自動選擇）」按鈕，樣式同 `selection-btn`，點選後不刷新頁面，直接更新面額按鈕選中狀態。
+
+**預設面額對應表**：
+
+| 位數 | 預設面額 |
+|------|---------|
+| 1位數 | 1元、5元 |
+| 2位數 | 1元、10元、50元 |
+| 3位數 | 10元、100元、500元 |
+| 4位數 | 100元、500元、1000元 |
+
+**`applyDefaultDenominations()`**：
+1. 讀取 `settings.digits` → 查 `presets` 表
+2. 更新 `state.settings.denominations`
+3. `querySelectorAll('[data-type="denomination"]')` 遍歷全部面額按鈕，`classList.toggle('active', defaults.includes(val))` 直接切換選中狀態（不重繪頁面）
+
+**關鍵搜尋詞**：`applyDefaultDenominations`、`denomination.*preset`

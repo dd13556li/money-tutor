@@ -1,7 +1,7 @@
 # F4 數字排序 — 單元完成經驗報告書
 
 > **建立日期**：2026-02-08（原始）
-> **更新日期**：2026-03-20（正確放置改播數字語音）
+> **更新日期**：2026-03-27（排序數量新增⭐預設選項）、2026-03-24（簡單模式放置不重播語音）、2026-03-20（正確放置改播數字語音）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：F4 — 數字排序（Number Sorting）
 > **報告類型**：單元完成經驗與開發建議
@@ -1005,3 +1005,31 @@ this.voice =
 **關鍵搜尋詞**：`a:not(.selection-btn):not(.choice-btn)` in `css/ai-theme.css`
 
 ---
+
+---
+
+## 排序數量新增「⭐ 預設 (10個)」選項（2026-03-27）
+
+**需求**：設定頁「📋 排序數量」中，在「3個數字」左邊新增一個預設選項，其值為 10 個數字。
+
+**實作**：在 `NumberSortingConfig.sortingCounts` 加入 `preset` 條目，並為所有條目補上 `order` 值：
+
+| key | label | value | order |
+|-----|-------|-------|-------|
+| preset | ⭐ 預設 (10個) | 10 | 0 |
+| 3 | 3個數字 | 3 | 1 |
+| 5 | 5個數字 | 5 | 2 |
+| 10 | 10個數字 | 10 | 3 |
+| 15 | 15個數字 | 15 | 4 |
+| 20 | 20個數字 | 20 | 5 |
+| custom | 自訂 | — | 6 |
+
+`getSettingOptions` 現有邏輯：`options.some(option => option.order > 0)` 為 true（3~custom 均有 order>0）→ 排序觸發 → `preset (order:0)` 排在最前。
+
+選擇「⭐ 預設 (10個)」後：
+- `settings.sortingCount = 'preset'`
+- `getSortingCountConfig('preset').value = 10`
+- 遊戲邏輯使用 `gameConfig.sortingCount.value = 10` → 每題排序 10 個數字
+- 非 `'custom'`，不顯示自訂輸入框（既有邏輯自動處理）
+
+**關鍵搜尋詞**：`sortingCounts.preset`、`getSortingCountConfig`、`order: 0`

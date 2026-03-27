@@ -205,42 +205,55 @@ const NumberSortingConfig = {
     // 📋 排序數量配置
     // =====================================================
     sortingCounts: {
+        preset: {
+            id: 'preset',
+            label: '⭐ 預設 (10個)',
+            description: '預設排序10個數字（推薦）',
+            value: 10,
+            order: 0
+        },
         3: {
             id: '3',
             label: '3個數字',
             description: '每題排序3個數字',
-            value: 3
+            value: 3,
+            order: 1
         },
         5: {
             id: '5',
             label: '5個數字',
             description: '每題排序5個數字',
-            value: 5
+            value: 5,
+            order: 2
         },
         10: {
             id: '10',
             label: '10個數字',
             description: '每題排序10個數字',
-            value: 10
+            value: 10,
+            order: 3
         },
         15: {
             id: '15',
             label: '15個數字',
             description: '每題排序15個數字',
-            value: 15
+            value: 15,
+            order: 4
         },
         20: {
             id: '20',
             label: '20個數字',
             description: '每題排序20個數字',
-            value: 20
+            value: 20,
+            order: 5
         },
         custom: {
             id: 'custom',
             label: '自訂',
             description: '自由設定排序數量',
             customizable: true,
-            defaultValue: 10
+            defaultValue: 10,
+            order: 6
         }
     },
 

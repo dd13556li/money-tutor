@@ -511,6 +511,10 @@ toolbarConfig: {
 | B3 quiz 答對連勝徽章（2026-03-27）| B3 | `state.quiz.streak` 計數；`_handleChoiceAnswer`/`_handleNumpadAnswer` 正確 `streak++`、錯誤 `streak=0`；達 3/5 題觸發 `_showStreakBadge(streak)`；橘金色 badge 置中彈出 + 語音；CSS `.b3-streak-badge`/`b3SbPop` 加入 `b3_savings_plan.css` |
 | B1 投幣剛好浮動提示（2026-03-27）| B1 | `_updateWalletDisplay` 加 `total === required` 判斷；剛好時呼叫 `_showExactMatchToast()` + 語音「剛好！不需要找零，可以出發了！」；底部深綠 toast `b1ToastUp` 升起；CSS `.b1-exact-toast`/`b1ToastUp` 加入 `b1_daily_budget.css` |
 | C4 提示鈕持久化（2026-03-27）| C4 | `applyHintMarkings(mode)` 新函數；`hintedCoinIds` 存於 `state.gameState`（跨重繪持久，`loadQuestion` 建立新 gameState 時自動清除）；`showNormalModeHint`/`showHardModeHint` 改為：清空 droppedItems→從全部 sourceCoins 算解法→儲存 `hintedCoinIds`→re-render；`renderNormalMode`/`renderHardMode` 末尾呼叫 `applyHintMarkings`；移除 5 秒自動消除 timer |
+| A4 購買任務彈窗商品圖片（2026-03-27）| A4 | `showTargetItemModal` 內 `getProductIconHTML(targetItem, '100px')` → `'128px'` |
+| C5 錢不夠差額圖示（2026-03-27）| C5 | `buildShortfallHTML(shortfall)`：貪婪分解→紙鈔 72px/硬幣 44px img；`showMessage` 新增第 4 參數 `extraHTML`（不語音朗讀）；`handleJudgment` 正確+不夠路徑傳入差額 HTML |
+| C4/C5 面額預設按鈕（2026-03-27）| C4/C5 | `applyDefaultDenominations()`：依位數套用 presets（1→[1,5]；2→[1,10,50]；3→[10,100,500]；4→[100,500,1000]）；`querySelectorAll('[data-type="denomination"]')` 直接 `classList.toggle('active')` 不重繪頁面；按鈕置於 💰 面額選擇標題正下方第一列，樣式同 `selection-btn` |
+| F4 排序數量預設選項（2026-03-27）| F4 | `sortingCounts.preset`（value:10, order:0）排在「3個數字」前；所有條目補 order 1–6；`getSettingOptions` 既有排序邏輯自動生效 |
 
 ---
 
