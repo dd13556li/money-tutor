@@ -517,6 +517,8 @@ toolbarConfig: {
 | C4/C5 面額預設按鈕（2026-03-27）| C4/C5 | `applyDefaultDenominations()`：依位數套用 presets（1→[1,5]；2→[1,10,50]；3→[10,100,500]；4→[100,500,1000]）；`querySelectorAll('[data-type="denomination"]')` 直接 `classList.toggle('active')` 不重繪頁面；按鈕置於 💰 面額選擇標題正下方第一列，樣式同 `selection-btn` |
 | C4/C5 面額預設鈕記憶+位數連動（2026-03-27）| C4/C5 | `state.settings.usingPreset` flag；`applyDefaultDenominations` 設 flag + 按鈕 active；手動改面額清除 flag；digits 切換時若 flag=true 自動重新套用預設 |
 | F4 排序數量預設選項（2026-03-27）| F4 | `sortingCounts.preset`（value:10, order:0）排在「3個數字」前；所有條目補 order 1–6；`getSettingOptions` 既有排序邏輯自動生效 |
+| C6 我的錢包新增🎲隨機（2026-03-27）| C6 | `walletAmount==='random'`；`generateQuestion` 每題隨機抽 [10,50,100,500,1000]；`effectiveItemTypes` 依實際金額決定物品類型；`c6-random-wallet-hint` 提示文字 |
+| C5 困難模式提示鈕加語音（2026-03-27）| C5 | `setupHardModeEventListeners` 提示鈕顯示總額後加 `speech.speak('目前總額是X元')`；同普通模式 `convertToTraditionalCurrency` pattern |
 
 ---
 

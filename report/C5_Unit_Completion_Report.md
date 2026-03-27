@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-27（錢不夠差額金錢圖示 + 面額預設按鈕）、2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
+> **更新日期**：2026-03-27（錢不夠差額金錢圖示 + 面額預設按鈕 + 預設連動 + 困難模式提示語音）、2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
 > **單元名稱**：C5 夠不夠（Sufficient Payment）
 > **系列**：C 貨幣認知
 
@@ -1301,3 +1301,38 @@ C5 具體描述：「拖曳錢幣至付款區」（格式同 C4 章節說明）
 3. `querySelectorAll('[data-type="denomination"]')` 遍歷全部面額按鈕，`classList.toggle('active', defaults.includes(val))` 直接切換選中狀態（不重繪頁面）
 
 **關鍵搜尋詞**：`applyDefaultDenominations`、`denomination.*preset`
+
+---
+
+## 面額預設鈕記憶 + 位數連動（2026-03-27）
+
+**需求**：選擇 ⭐ 預設後，再切換位數時面額自動更新為新位數的預設組合；手動改動面額後取消連動。
+
+**實作**：`state.settings.usingPreset` flag（初始 `false`）。
+
+- `applyDefaultDenominations()`：套用預設後設 `usingPreset = true`，`#c5-preset-denom-btn` 加 `active`
+- denomination 點擊：設 `usingPreset = false`，移除按鈕 `active`
+- digits 切換：若 `usingPreset && value !== 'custom'`，自動呼叫 `applyDefaultDenominations()`
+
+**關鍵搜尋詞**：`usingPreset`、`c5-preset-denom-btn`
+
+---
+
+## 困難模式提示鈕加語音（2026-03-27）
+
+**需求**：困難模式按下提示鈕，顯示目前總額的同時播放語音，行為同普通模式。
+
+**修改位置**：`setupHardModeEventListeners()` 困難模式提示鈕 click handler 的「顯示總額」分支，加入：
+
+```javascript
+if (this.speech && typeof this.speech.speak === 'function') {
+    const traditionalTotal = currentTotal === 0 ? '零元' : this.speech.convertToTraditionalCurrency(currentTotal);
+    this.speech.speak(`目前總額是${traditionalTotal}`, { interrupt: true });
+}
+```
+
+普通模式已有相同邏輯（`setupNormalModeEventListeners`），困難模式補齊。
+
+**關鍵搜尋詞**：`setupHardModeEventListeners`、`困難模式：顯示總額`、`convertToTraditionalCurrency`
+
+---
