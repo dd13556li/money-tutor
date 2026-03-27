@@ -1277,6 +1277,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                             data-type="walletAmount" data-value="1000">
                                         1000元
                                     </button>
+                                    <button class="selection-btn ${settings.walletAmount === 'random' ? 'active' : ''}"
+                                            data-type="walletAmount" data-value="random">
+                                        🎲 隨機
+                                    </button>
                                     <button class="selection-btn ${settings.walletAmount === 'custom' ? 'active' : ''}"
                                             data-type="walletAmount" data-value="custom">
                                         自訂
@@ -1658,7 +1662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 其他單選處理
                 const oldValue = settings[type];
                 if (type === 'walletAmount') {
-                    settings[type] = (value === 'custom') ? 'custom' : parseInt(value, 10);
+                    settings[type] = (value === 'custom' || value === 'random') ? value : parseInt(value, 10);
                 } else {
                     settings[type] = value;
 
@@ -1688,6 +1692,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 非自訂時自動更新物品類型
                     if (value !== 'custom') {
                         this.autoSetItemTypes();
+                    }
+                    // 隨機模式提示
+                    let randomHint = document.getElementById('c6-random-wallet-hint');
+                    if (value === 'random') {
+                        if (!randomHint) {
+                            randomHint = document.createElement('p');
+                            randomHint.id = 'c6-random-wallet-hint';
+                            randomHint.style.cssText = 'margin-top:8px;font-size:0.9em;color:#667eea;';
+                            randomHint.textContent = '每題將隨機從 10、50、100、500、1000 元中選擇不同錢包金額。';
+                            const customWalletDiv2 = document.getElementById('custom-wallet-input');
+                            if (customWalletDiv2) customWalletDiv2.parentNode.insertBefore(randomHint, customWalletDiv2.nextSibling);
+                        }
+                    } else if (randomHint) {
+                        randomHint.remove();
                     }
                 }
             }
@@ -1770,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const conditions = {
                 walletAmount: !!walletAmount,
-                customWalletValid: (walletAmount === 'custom') ? (customWalletAmount >= 10) : true, // 🔧 [修正] 自訂錢包金額需 >= 10 元
+                customWalletValid: (walletAmount === 'custom') ? (customWalletAmount >= 10) : true,
                 difficulty: !!difficulty,
                 mode: modeValid,
                 questionCount: !!questionCount
@@ -2426,7 +2444,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 自動設定物品類型（根據錢包金額自動切換對應層級）
         autoSetItemTypes() {
             const { walletAmount } = this.state.settings;
-            const types = (walletAmount && walletAmount !== 'custom')
+            const types = (walletAmount && walletAmount !== 'custom' && walletAmount !== 'random')
                 ? this.getItemTypesByWalletAmount(walletAmount)
                 : ['cheap', 'budget', 'medium', 'pricey', 'premium'];
             this.state.settings.itemTypes = types;
@@ -2640,7 +2658,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // 確定錢包金額
-                const actualWalletAmount = (walletAmount === 'custom') ? customWalletAmount : walletAmount;
+                let actualWalletAmount;
+                if (walletAmount === 'custom') {
+                    actualWalletAmount = customWalletAmount;
+                } else if (walletAmount === 'random') {
+                    const randomWallets = [10, 50, 100, 500, 1000];
+                    actualWalletAmount = randomWallets[Math.floor(Math.random() * randomWallets.length)];
+                    Game.Debug.log('wallet', `🎲 隨機錢包金額: ${actualWalletAmount}元`);
+                } else {
+                    actualWalletAmount = walletAmount;
+                }
                 if (!actualWalletAmount || actualWalletAmount <= 0) {
                     Game.Debug.error('❌ 錢包金額無效');
                     return null;
@@ -2653,8 +2680,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const itemPrice = Math.floor(Math.random() * (maxPrice - minPrice + 1)) + minPrice;
                 Game.Debug.log('wallet', `💵 生成商品價格: ${itemPrice}元 (範圍: ${minPrice}-${maxPrice}元)`);
 
-                // 2. 選擇物品
-                const randomType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+                // 2. 選擇物品（隨機模式時依實際錢包金額決定物品類型）
+                const effectiveItemTypes = (walletAmount === 'random')
+                    ? this.getItemTypesByWalletAmount(actualWalletAmount)
+                    : itemTypes;
+                const randomType = effectiveItemTypes[Math.floor(Math.random() * effectiveItemTypes.length)];
                 const typeItems = this.items[randomType];
                 if (!typeItems || typeItems.length === 0) {
                     Game.Debug.error(`❌ 物品類型 ${randomType} 無可用物品`);
@@ -3338,6 +3368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     value: walletAmount,
                     valid: !!walletAmount && (
                         [10, 50, 100, 500, 1000].includes(walletAmount) ||
+                        walletAmount === 'random' ||
                         (walletAmount === 'custom' && this.state.settings.customWalletAmount > 0)
                     )
                 },

@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-14（輔助點擊重複進題修復 + 過渡語音串接 + 設定頁說明更新）
+> **更新日期**：2026-03-27（設定頁我的錢包新增🎲隨機選項）、2026-03-14（輔助點擊重複進題修復 + 過渡語音串接 + 設定頁說明更新）
 > **單元名稱**：C6 找零與計算（Making Change）
 > **系列**：C 貨幣認知
 
@@ -1199,5 +1199,54 @@ Game.TimerManager.setTimeout(() => {
 C6 具體描述：「拖曳找零錢幣至對應格」（格式同 C4 章節說明）
 
 **關鍵搜尋詞**：`assist-click-group`、`啟用後，只要偵測到點擊`
+
+---
+
+## 設定頁「我的錢包」新增🎲隨機選項（2026-03-27）
+
+### 需求
+
+設定頁面「我的錢包」選項新增「🎲 隨機」，進入測驗後每題錢包金額不同。
+
+### 實作
+
+**設定頁 HTML**（`showSettings()`）：在「自訂」按鈕前插入隨機按鈕：
+```html
+<button class="selection-btn ${settings.walletAmount === 'random' ? 'active' : ''}"
+        data-type="walletAmount" data-value="random">
+    🎲 隨機
+</button>
+```
+
+**`handleSettingSelection()`**：`walletAmount` 型別判斷加入 `'random'`，不執行 `parseInt`：
+```javascript
+settings[type] = (value === 'custom' || value === 'random') ? value : parseInt(value, 10);
+```
+
+選擇隨機時插入提示文字（不重新渲染頁面）：
+> 每題將隨機從 10、50、100、500、1000 元中選擇不同錢包金額。
+
+**`autoSetItemTypes()`**：隨機模式等同未選，使用全部 5 種物品類型：
+```javascript
+const types = (walletAmount && walletAmount !== 'custom' && walletAmount !== 'random')
+    ? this.getItemTypesByWalletAmount(walletAmount)
+    : ['cheap', 'budget', 'medium', 'pricey', 'premium'];
+```
+
+**`generateQuestion()`**：每題獨立隨機抽取錢包金額，並依實際金額決定物品類型：
+```javascript
+} else if (walletAmount === 'random') {
+    const randomWallets = [10, 50, 100, 500, 1000];
+    actualWalletAmount = randomWallets[Math.floor(Math.random() * randomWallets.length)];
+}
+// 物品類型依實際錢包金額
+const effectiveItemTypes = (walletAmount === 'random')
+    ? this.getItemTypesByWalletAmount(actualWalletAmount)
+    : itemTypes;
+```
+
+**驗證（`checkStartState` / `startQuiz`）**：允許 `'random'` 通過驗證。
+
+**關鍵搜尋詞**：`walletAmount === 'random'`、`randomWallets`、`effectiveItemTypes`、`c6-random-wallet-hint`
 
 ---
