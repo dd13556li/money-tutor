@@ -3610,7 +3610,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${difficulty === 'hard' ? '<div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
                             </div>
                             <div class="item-info-compact">
-                                <span class="iic-img">${this.getItemImg(item, '2.2em')}</span>
+                                <span class="iic-img">${this.getItemImg(item, '128px')}</span>
                                 <span class="iic-name">${item.name}</span>
                                 <span class="iic-price">${itemPrice} 元</span>
                                 <span class="iic-divider">｜</span>
@@ -3705,7 +3705,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
                             </div>
                             <div class="item-info-compact">
-                                <span class="iic-img">${this.getItemImg(item, '2.2em')}</span>
+                                <span class="iic-img">${this.getItemImg(item, '128px')}</span>
                                 <span class="iic-name">${item.name}</span>
                                 <span class="iic-price">${itemPrice} 元</span>
                                 <span class="iic-divider">｜</span>
@@ -8502,14 +8502,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 .ip-title-row {
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
+                    justify-content: center;
+                    position: relative;
                     margin-bottom: 8px;
+                }
+                .ip-title-row .section-title {
+                    flex: 1;
+                    text-align: center;
+                }
+                .ip-title-row > div:last-child {
+                    position: absolute;
+                    right: 0;
                 }
 
                 /* 緊湊橫排商品資訊 */
                 .item-info-compact {
                     display: flex;
                     align-items: center;
+                    justify-content: center;
                     gap: 10px;
                     background: #f0f7ff;
                     border-radius: 10px;
