@@ -8464,7 +8464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // =====================================================
         getC6EasyModeCSS() {
             return `
-                /* C6 簡單模式整體布局 */
+                /* C6 簡單模式整體布局 - 參考 C5 */
                 .c6-easy-layout {
                     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
                     min-height: 100vh;
@@ -8473,36 +8473,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     box-sizing: border-box;
                 }
 
-                /* C6 步驟1容器 - 垂直布局，滿版 */
+                /* C6 步驟1容器 - 垂直布局（自然高度，參考 C5） */
                 .c6-step1-container {
                     display: flex;
                     flex-direction: column;
-                    flex: 1;
                     gap: 10px;
-                    padding: 8px 12px 12px;
+                    padding: 10px;
                     width: 100%;
                     box-sizing: border-box;
                 }
 
-                /* 付款卡片撐滿剩餘空間 */
+                /* 付款卡片 - 自然高度，不撐滿剩餘空間 */
                 .item-payment-section {
-                    flex: 1;
                     display: flex;
                     flex-direction: column;
                 }
 
-                /* drop-zone 填滿付款卡片剩餘高度 */
+                /* drop-zone 固定最小高度（參考 C5 drop-zone-container） */
                 #payment-drop-zone {
-                    flex: 1;
+                    min-height: 140px;
                 }
 
-                /* 整合卡片（商品資訊 + 付款區）與錢包卡片 */
+                /* 整合卡片（商品資訊 + 付款區）與錢包卡片 - 參考 C5 樣式 */
                 .item-payment-section,
                 .wallet-section {
                     background: white;
-                    border-radius: 15px;
-                    padding: 14px 18px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    border-radius: 10px;
+                    padding: 20px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    border: 2px solid #4CAF50;
                     width: 100%;
                     box-sizing: border-box;
                 }
