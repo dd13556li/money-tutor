@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="button-group">
                                     <button class="selection-btn ${theme === 'default' ? 'active' : ''}"
                                             data-type="theme" data-value="default">
-                                        預設 🎲
+                                        🎲 隨機
                                     </button>
                                     ${Object.entries(Game.gameData.themes).filter(([key]) => key !== 'custom' && key !== 'default').map(([key, icons]) => {
                                         const themeNames = { fruits: '水果', animals: '動物', vehicles: '交通工具' };

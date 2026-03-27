@@ -1921,7 +1921,7 @@ const QuantityComparisonTemplates = {
                 <div class="button-group" data-setting-type="theme">
                     <button class="selection-btn ${theme === 'default' ? 'active' : ''}"
                             data-type="theme" data-value="default">
-                        預設 🎲
+                        🎲 隨機
                     </button>
                     ${Object.entries(themes).map(([key, icons]) => {
                         const themeNames = {

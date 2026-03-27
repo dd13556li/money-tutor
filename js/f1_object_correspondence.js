@@ -2130,7 +2130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <button class="selection-btn ${theme === 'default' ? 'active' : ''} ${difficulty === 'hard' ? 'disabled' : ''}"
                                                 data-type="theme" data-value="default"
                                                 ${difficulty === 'hard' ? 'disabled' : ''}>
-                                            ${difficulty === 'hard' ? '❌ ' : ''}預設 🎲
+                                            ${difficulty === 'hard' ? '❌ ' : ''}🎲 隨機
                                         </button>
                                         ${Object.keys(Game.gameData.themes).filter(key => key !== 'custom' && key !== 'default').map(key => `
                                             <button class="selection-btn ${theme === key ? 'active' : ''} ${difficulty === 'hard' ? 'disabled' : ''}"

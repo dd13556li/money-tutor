@@ -785,11 +785,11 @@ const Game = {
                                 `).join('')}
                             </div>
                         </div>
-                        <!-- 🎨 圖示主題 -->
+                        <!-- 🎨 主題選擇 -->
                         <div class="setting-group">
-                            <label>🎨 圖示主題：</label>
+                            <label>🎨 主題選擇：</label>
                             <div class="button-group">
-                                <button class="selection-btn ${this.state.settings.theme === 'default' ? 'active' : ''}" data-type="theme" data-value="default">預設 🔴</button>
+                                <button class="selection-btn ${this.state.settings.theme === 'default' ? 'active' : ''}" data-type="theme" data-value="default">🎲 隨機</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'fruits' ? 'active' : ''}" data-type="theme" data-value="fruits">水果 🍎</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'animals' ? 'active' : ''}" data-type="theme" data-value="animals">動物 🐶</button>
                                 <button class="selection-btn ${this.state.settings.theme === 'vehicles' ? 'active' : ''}" data-type="theme" data-value="vehicles">交通工具 🚗</button>
