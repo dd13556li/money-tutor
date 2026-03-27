@@ -237,7 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 mode: null,
                 questionCount: null,
                 customAmount: 50,
-                assistClick: false
+                assistClick: false,
+                usingPreset: false
             },
             gameState: {},
             // 新增：進度追蹤
@@ -771,7 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="setting-group" id="denomination-setting-group" style="display: ${settings.digits === 'custom' ? 'none' : 'block'};">
                                 <label>💰 面額選擇 (可多選)：</label>
                                 <div class="button-group" style="margin-bottom: 12px;">
-                                    <button class="selection-btn" onclick="Game.applyDefaultDenominations()">
+                                    <button class="selection-btn ${settings.usingPreset ? 'active' : ''}" id="c4-preset-denom-btn" onclick="Game.applyDefaultDenominations()">
                                         ⭐ 預設（依位數自動選擇）
                                     </button>
                                 </div>
@@ -1032,6 +1033,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.settings.denominations.push(numValue);
                 }
 
+                // 手動改變面額時取消預設模式
+                this.state.settings.usingPreset = false;
+                const presetBtn = document.getElementById('c4-preset-denom-btn');
+                if (presetBtn) presetBtn.classList.remove('active');
+
                 this.updateSmartUI(); // 更新智能UI狀態
                 this.updateCompatibilityHint(); // 🔧 更新相容性提示
                 this.checkStartState();
@@ -1063,6 +1069,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         denomGroup.style.display = value === 'custom' ? 'none' : 'block';
                     }
                     this.updateDenominationUI(); // 位數改變時更新幣值選項
+                    // 預設模式開啟時，切換位數自動套用新位數的預設面額
+                    if (this.state.settings.usingPreset && value !== 'custom') {
+                        this.applyDefaultDenominations();
+                    }
                     this.updateSmartUI(); // 更新智能UI狀態
                     this.updateCompatibilityHint(); // 🔧 更新相容性提示
                 } else {
@@ -1280,11 +1290,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const defaults = presets[digits];
             if (!defaults) return; // 自訂金額模式不適用
             this.state.settings.denominations = [...defaults];
+            this.state.settings.usingPreset = true;
             // 直接更新 DOM，不重新渲染整個設定頁
             document.querySelectorAll('[data-type="denomination"]').forEach(btn => {
                 const val = parseInt(btn.dataset.value, 10);
                 btn.classList.toggle('active', defaults.includes(val));
             });
+            const presetBtn = document.getElementById('c4-preset-denom-btn');
+            if (presetBtn) presetBtn.classList.add('active');
         },
 
         isValidCombination(digits, denominations) {

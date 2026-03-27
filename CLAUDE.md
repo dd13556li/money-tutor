@@ -515,6 +515,7 @@ toolbarConfig: {
 | A4 購買任務彈窗商品圖片（2026-03-27）| A4 | `showTargetItemModal` 內 `getProductIconHTML(targetItem, '100px')` → `'128px'` |
 | C5 錢不夠差額圖示（2026-03-27）| C5 | `buildShortfallHTML(shortfall)`：貪婪分解→紙鈔 72px/硬幣 44px img；`showMessage` 新增第 4 參數 `extraHTML`（不語音朗讀）；`handleJudgment` 正確+不夠路徑傳入差額 HTML |
 | C4/C5 面額預設按鈕（2026-03-27）| C4/C5 | `applyDefaultDenominations()`：依位數套用 presets（1→[1,5]；2→[1,10,50]；3→[10,100,500]；4→[100,500,1000]）；`querySelectorAll('[data-type="denomination"]')` 直接 `classList.toggle('active')` 不重繪頁面；按鈕置於 💰 面額選擇標題正下方第一列，樣式同 `selection-btn` |
+| C4/C5 面額預設鈕記憶+位數連動（2026-03-27）| C4/C5 | `state.settings.usingPreset` flag；`applyDefaultDenominations` 設 flag + 按鈕 active；手動改面額清除 flag；digits 切換時若 flag=true 自動重新套用預設 |
 | F4 排序數量預設選項（2026-03-27）| F4 | `sortingCounts.preset`（value:10, order:0）排在「3個數字」前；所有條目補 order 1–6；`getSettingOptions` 既有排序邏輯自動生效 |
 
 ---
