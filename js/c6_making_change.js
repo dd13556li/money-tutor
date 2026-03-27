@@ -9035,30 +9035,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* 找零題目區域 */
                 .change-question-area {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    margin: 20px 20px 10px 20px;
-                    padding: 30px;
-                    border-radius: 20px;
-                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+                    margin: 8px 12px 6px 12px;
+                    padding: 12px 20px;
+                    border-radius: 16px;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
                     text-align: center;
                 }
 
                 .change-title {
-                    font-size: 1.8em;
+                    font-size: 1.4em;
                     font-weight: bold;
                     color: white;
-                    margin-bottom: 15px;
+                    margin-bottom: 6px;
                     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
                 }
 
                 .change-amount-highlight {
-                    font-size: 3em;
+                    font-size: 2.6em;
                     font-weight: 900;
                     color: #ffd700;
                     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-                    margin: 10px 0;
-                    padding: 20px;
+                    margin: 4px 0;
+                    padding: 8px 20px;
                     background: rgba(255, 255, 255, 0.2);
-                    border-radius: 15px;
+                    border-radius: 12px;
                     animation: pulse 2s ease-in-out infinite;
                 }
 
@@ -9067,30 +9067,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* 找零選項區域 */
                 .change-options-area {
                     background: white;
-                    margin: 10px 20px 20px 20px;
-                    padding: 30px;
-                    padding-top: 60px; /* 增加上方空間給標記顯示 */
-                    border-radius: 20px;
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                    margin: 6px 12px 10px 12px;
+                    padding: 16px;
+                    padding-top: 44px; /* 上方空間給標記顯示 */
+                    border-radius: 16px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                 }
 
                 .change-options {
                     display: flex;
-                    gap: 20px;
+                    gap: 16px;
                     justify-content: center;
                     flex-wrap: wrap;
-                    margin-top: 20px; /* 給標記留出額外空間 */
+                    margin-top: 12px; /* 給標記留出額外空間 */
                 }
 
                 /* 每個選項卡片 */
                 .change-option {
                     flex: 1;
-                    min-width: 250px;
-                    max-width: 300px;
+                    min-width: 220px;
+                    max-width: 280px;
                     background: linear-gradient(135deg, #f5f7fa 0%, #e3e8ef 100%);
                     border: 4px solid #cbd5e0;
-                    border-radius: 20px;
-                    padding: 25px;
+                    border-radius: 16px;
+                    padding: 12px;
                     cursor: pointer;
                     transition: all 0.3s ease;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
