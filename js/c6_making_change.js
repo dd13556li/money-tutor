@@ -3610,7 +3610,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${difficulty === 'hard' ? '<div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
                             </div>
                             <div class="item-info-compact">
-                                <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                                <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
                                 <span class="iic-price">${itemPrice} 元</span>
                                 <span class="iic-divider">｜</span>
@@ -3705,7 +3705,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
                             </div>
                             <div class="item-info-compact">
-                                <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                                <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
                                 <span class="iic-price">${itemPrice} 元</span>
                                 <span class="iic-divider">｜</span>
@@ -4595,10 +4595,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 獲取小尺寸物品圖片或emoji替代方案（用於指令彈窗）
         getSmallItemDisplay(item) {
-            const imgContent = this.getItemImg(item, '128px');
+            const imgContent = this.getItemImg(item, '180px');
             return `
                 <div class="small-item-display"
-                     style="width: 128px; height: 128px; display: flex; align-items: center; justify-content: center;
+                     style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;
                             background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 2.5em; margin-bottom: 15px;">
                     <div class="small-item-emoji" title="${item.name}">${imgContent}</div>
                 </div>
@@ -5754,7 +5754,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="c6-purchase-info">
                     <div class="section-title">🛍️ 購買物品</div>
                     <div class="item-info-compact">
-                        <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                        <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
                         <span class="iic-price">${itemPrice} 元</span>
                     </div>
@@ -6153,7 +6153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button id="c6-amount-hint-btn" class="c6-hint-btn" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; cursor: pointer;">💡 提示</button></div>
                     </div>
                     <div class="item-info-compact">
-                        <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                        <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
                         <span class="iic-price">${itemPrice} 元</span>
                     </div>
@@ -6463,7 +6463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-info-section">
                                 <div class="section-title">🛍️ 購買物品</div>
                                 <div class="item-info-compact" style="justify-content:center;">
-                                    <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                                    <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                     <span class="iic-name">${item.name}</span>
                                     <span class="iic-price">${itemPrice} 元</span>
                                 </div>
