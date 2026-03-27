@@ -5753,10 +5753,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemInfoHTML = `
                 <div class="c6-purchase-info">
                     <div class="section-title">🛍️ 購買物品</div>
-                    <div class="item-display">
-                        <div class="item-emoji">${this.getItemImg(item, '3em')}</div>
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-price">價格: ${itemPrice} 元</div>
+                    <div class="item-info-compact">
+                        <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                        <span class="iic-name">${item.name}</span>
+                        <span class="iic-price">${itemPrice} 元</span>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6148,14 +6148,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1️⃣ 生成購買物品區 HTML（與簡單模式相同格式）
             const itemInfoHTML = `
                 <div class="c6-purchase-info">
-                    <div class="section-title" style="display: flex; align-items: center; justify-content: center; position: relative;">
-                        🛍️ 購買物品
-                        <div style="position:absolute;right:10px;top:0;bottom:0;display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button id="c6-amount-hint-btn" class="c6-hint-btn" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; cursor: pointer;">💡 提示</button></div>
+                    <div class="ip-title-row">
+                        <h2 class="section-title" style="margin:0;">🛍️ 購買物品</h2>
+                        <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button id="c6-amount-hint-btn" class="c6-hint-btn" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; cursor: pointer;">💡 提示</button></div>
                     </div>
-                    <div class="item-display">
-                        <div class="item-emoji">${this.getItemImg(item, '3em')}</div>
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-price">價格: ${itemPrice} 元</div>
+                    <div class="item-info-compact">
+                        <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                        <span class="iic-name">${item.name}</span>
+                        <span class="iic-price">${itemPrice} 元</span>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6462,10 +6462,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- 商品資訊區域 -->
                             <div class="item-info-section">
                                 <div class="section-title">🛍️ 購買物品</div>
-                                <div class="item-info" style="text-align: center; justify-content: center;">
-                                    <div class="item-emoji">${this.getItemImg(item, '3em')}</div>
-                                    <div class="item-name">${item.name}</div>
-                                    <div class="item-price">價格: ${itemPrice} 元</div>
+                                <div class="item-info-compact" style="justify-content:center;">
+                                    <span class="iic-img">${this.getItemImg(item, '128px')}</span>
+                                    <span class="iic-name">${item.name}</span>
+                                    <span class="iic-price">${itemPrice} 元</span>
                                 </div>
                             </div>
 
@@ -8753,13 +8753,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 /* ========== C6 步驟2：找零驗證頁面樣式 ========== */
+                .game-container {
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+                    box-sizing: border-box;
+                }
+
                 .c6-step2-container {
                     display: flex;
                     flex-direction: column;
-                    gap: 20px;
-                    padding: 15px;
-                    max-width: 1200px;
-                    margin: 0 auto;
+                    flex: 1;
+                    gap: 10px;
+                    padding: 8px 12px 12px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .c6-purchase-info {
+                    width: 100%;
+                    box-sizing: border-box;
                 }
 
                 /* 共用區塊標題樣式 */
@@ -8775,30 +8789,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 .c6-purchase-info {
                     background: white;
                     border-radius: 15px;
-                    padding: 20px;
+                    padding: 14px 18px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                }
-
-                .c6-purchase-info .item-display {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 20px;
-                    margin-bottom: 15px;
-                }
-
-                .c6-purchase-info .item-details {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
                 }
 
                 .calculation-display {
                     text-align: center;
-                    padding: 15px;
+                    padding: 10px;
                     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
                     border-radius: 10px;
-                    margin-top: 15px;
+                    margin-top: 8px;
                 }
 
                 .calc-text {
@@ -8811,19 +8811,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 .c6-change-area {
                     background: white;
                     border-radius: 15px;
-                    padding: 20px;
+                    padding: 14px 18px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    width: 100%;
+                    box-sizing: border-box;
                 }
 
                 .store-change {
                     display: flex;
-                    gap: 15px;
+                    gap: 12px;
                     flex-wrap: wrap;
                     justify-content: center;
-                    padding: 20px;
+                    padding: 12px;
                     background: #f5f5f5;
                     border-radius: 10px;
-                    min-height: 150px;
+                    min-height: 120px;
                 }
 
                 .change-money {
