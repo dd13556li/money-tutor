@@ -5492,7 +5492,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const inserted = this.state.gameState.insertedAmount;
                     this.speech.speakCustom(inserted === 0
                         ? '請先投幣，燈號亮起後才能選擇服務'
-                        : `這個服務需要${this.convertAmountToSpeech(price)}元，請投入正確金額`);
+                        : `這個服務需要${this.convertAmountToSpeech(price)}，請投入正確金額`);
                     return;
                 }
                 // 服務未鎖定（coin-first-available）：允許繼續
@@ -5518,7 +5518,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const assignedService = this.state.gameState.normalMode.assignedService;
 
                 // 如果是指定任務，檢查是否選對
-                if (taskType === 'assigned' && assignedService) {
+                if ((taskType === 'assigned' || taskType === 'coinFirstAssigned') && assignedService) {
                     if (service.id !== assignedService.id) {
                         // 選錯了！計入錯誤
                         this.handleNormalModeAction('selectWrongService');
@@ -5542,11 +5542,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 簡單模式：檢查是否為指定任務且選對了
             if (isEasyMode) {
+                const taskType = this.state.settings.taskType;
                 const assignedService = this.state.gameState.easyMode.assignedService;
-                if (assignedService && service.id === assignedService.id) {
-                    // 🎆 簡單模式選對了！觸發煙火和音效
-                    this.Debug.log('service', '[Service] 簡單模式：選擇正確服務，觸發煙火');
-                    this.playSuccessFireworks();
+                if (assignedService) {
+                    if (taskType === 'coinFirstAssigned' && service.id !== assignedService.id) {
+                        // coinFirstAssigned 簡單模式：其他亮起的服務不可選
+                        this.audio.playSound('error');
+                        this.speech.speakCustom(`選錯了，請選擇 ${assignedService.name}`);
+                        return;
+                    }
+                    if (service.id === assignedService.id) {
+                        // 🎆 簡單模式選對了！觸發煙火和音效
+                        this.Debug.log('service', '[Service] 簡單模式：選擇正確服務，觸發煙火');
+                        this.playSuccessFireworks();
+                    }
                 }
             }
 
@@ -6545,10 +6554,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const taskType = this.state.settings.taskType;
             const difficulty = this.state.settings.difficulty;
 
-            // 取得指定服務 ID（coinFirstAssigned 模式）
+            // 取得指定服務（coinFirstAssigned 模式）
             let assignedServiceId = null;
+            let assignedService = null;
             if (taskType === 'coinFirstAssigned') {
-                const assignedService = difficulty === 'easy'
+                assignedService = difficulty === 'easy'
                     ? this.state.gameState.easyMode.assignedService
                     : this.state.gameState.normalMode.assignedService;
                 assignedServiceId = assignedService?.id;
@@ -6559,15 +6569,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.service-item.coin-first-locked').forEach(el => {
                 const price = parseInt(el.dataset.price);
                 const serviceId = el.dataset.serviceId;
-                let shouldUnlock = false;
+                const isAssignedService = (taskType === 'coinFirstAssigned') && (serviceId === assignedServiceId);
 
-                if (taskType === 'coinFirstAssigned') {
-                    // 只有指定服務且金額精確相符才亮燈
-                    shouldUnlock = (serviceId === assignedServiceId) && (inserted === price);
-                } else {
-                    // coinFirstFree：任何服務只要金額精確相符就亮燈
-                    shouldUnlock = (inserted === price);
-                }
+                // 亮燈條件：已投金額 >= 服務價格（同 A1 邏輯，兩種模式相同）
+                const shouldUnlock = (price <= inserted);
 
                 if (shouldUnlock) {
                     anyUnlocked = true;
@@ -6581,7 +6586,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const light = wrapper?.querySelector('.indicator-light');
                     if (light) light.style.removeProperty('filter');
 
-                    // 取得服務名稱用於語音
                     const serviceName = el.querySelector('.service-name')?.textContent || '';
 
                     this.TimerManager.setTimeout(() => {
@@ -6591,45 +6595,57 @@ document.addEventListener('DOMContentLoaded', () => {
                         const activeLight = wrapperForLight?.querySelector('.indicator-light');
                         if (activeLight) activeLight.classList.add('active');
 
-                        // 更新步驟至 step2（選服務）
-                        if (difficulty === 'easy') {
-                            this.state.gameState.easyMode.currentStep = 'step2';
-                        } else {
-                            this.state.gameState.normalMode.currentStep = 'step2';
-                            this.state.gameState.normalMode.errorCount = 0;
-                        }
-
-                        // 語音提示 + 顯示下一步提示
-                        this.speech.speakCustom(`${serviceName}的燈號亮起了，請點選這個服務`, () => {
+                        // 更新步驟至 step2（coinFirstAssigned 只在指定服務亮起時更新；coinFirstFree 在批次語音時統一更新）
+                        if (isAssignedService) {
                             if (difficulty === 'easy') {
-                                this.showEasyModeHint();
+                                this.state.gameState.easyMode.currentStep = 'step2';
+                            } else {
+                                this.state.gameState.normalMode.currentStep = 'step2';
+                                this.state.gameState.normalMode.errorCount = 0;
                             }
-                        });
+                            // coinFirstAssigned：只對指定服務播語音
+                            this.speech.speakCustom(`${serviceName}的燈號亮起了，請點選這個服務`, () => {
+                                if (difficulty === 'easy') this.showEasyModeHint();
+                            });
+                        }
 
                         this.Debug.log('flow', `[CoinFirst] 服務亮起: ${serviceName} (${price}元)`);
                     }, 650, 'serviceUnlock');
                 }
             });
 
+            // coinFirstFree：所有服務亮起後統一播放一次語音 + 更新步驟
+            if (taskType !== 'coinFirstAssigned' && anyUnlocked) {
+                this.TimerManager.setTimeout(() => {
+                    if (difficulty === 'easy') {
+                        this.state.gameState.easyMode.currentStep = 'step2';
+                    } else {
+                        this.state.gameState.normalMode.currentStep = 'step2';
+                        this.state.gameState.normalMode.errorCount = 0;
+                    }
+                    const availCount = document.querySelectorAll('.service-item.coin-first-available').length;
+                    const msg = availCount === 1
+                        ? `燈號亮起了，請點選這個服務`
+                        : `已有${availCount}個服務可以選了，請選擇一個`;
+                    this.speech.speakCustom(msg, () => {
+                        if (difficulty === 'easy') this.showEasyModeHint();
+                    });
+                }, 700, 'serviceUnlock');
+            }
+
             // 超投提示：已投金額超出所有服務最高價格
             if (!anyUnlocked && inserted > 0) {
-                const difficulty2 = this.state.settings.difficulty;
-                const services = this.serviceConfig[difficulty2].services;
+                const services = this.serviceConfig[difficulty].services;
                 const maxPrice = Math.max(...services.map(s => s.price));
 
                 if (inserted > maxPrice) {
                     this.speech.speakCustom('已超過所有服務金額，請按退幣鍵重來');
-                    // 高亮退幣按鈕（如有）
                     const refundBtn = document.querySelector('.refund-btn, .cancel-btn');
                     if (refundBtn) refundBtn.classList.add('easy-mode-hint');
                     this.Debug.log('flow', `[CoinFirst] 超投：${inserted}元 > 最高價${maxPrice}元`);
-                } else if (taskType === 'coinFirstAssigned' && assignedServiceId) {
-                    const services2 = this.serviceConfig[difficulty2].services;
-                    const assignedService = services2.find(s => s.id === assignedServiceId);
-                    if (assignedService && inserted > assignedService.price) {
-                        this.speech.speakCustom('投多了，請按退幣鍵重新投入正確金額');
-                        this.Debug.log('flow', `[CoinFirst] 超投指定服務：${inserted}元 > ${assignedService.price}元`);
-                    }
+                } else if (taskType === 'coinFirstAssigned' && assignedService && inserted > assignedService.price) {
+                    this.speech.speakCustom('投多了，請按退幣鍵重新投入正確金額');
+                    this.Debug.log('flow', `[CoinFirst] 超投指定服務：${inserted}元 > ${assignedService.price}元`);
                 }
             }
         },

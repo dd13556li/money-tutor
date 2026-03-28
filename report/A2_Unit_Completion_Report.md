@@ -1,7 +1,7 @@
 # A2 理髮廳自助機單元 — 完成經驗報告書
 
 > **建立日期**：2026-02-09（日）12:38
-> **更新日期**：2026-03-22（付款彈窗大改版：錢包式彈窗 + 兩階段付款 + 難度分離提示）
+> **更新日期**：2026-03-28（元元語音修正；coinFirst 亮燈改 price≤inserted；錯選服務守衛）、2026-03-22（付款彈窗大改版：錢包式彈窗 + 兩階段付款 + 難度分離提示）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：A2 — 理髮廳自助機
 > **報告類型**：單元完成經驗與開發建議
@@ -1402,3 +1402,52 @@ this.state.gameState.normalMode.walletAmount = walletData.totalAmount;
 **關鍵搜尋詞**：`walletPaymentModal`, `wp-section`, `validateCoinFirstPayment`, `_handleCoinFirstPaymentError`, `shouldVerify`, `willShowHint`, `serviceAlreadyLit`, `coin-first-available`
 
 ---
+
+## 十九、2026-03-28 修正：元元語音 + coinFirst 亮燈邏輯
+
+### 19.1 「元元」語音重複
+
+**根因**：`selectService()` 中當 coinFirst 模式下點到已鎖定服務時觸發語音：
+```javascript
+`這個服務需要${this.convertAmountToSpeech(price)}元，請投入正確金額`
+```
+`convertAmountToSpeech()` 已在回傳值末尾含「元」（例如「參拾元」），模板再加一個「元」，結果播出「參拾元元」。
+
+**修法**：移除模板末尾的 `元`，改為：
+```javascript
+`這個服務需要${this.convertAmountToSpeech(price)}，請投入正確金額`
+```
+
+---
+
+### 19.2 coinFirst 亮燈改為 price ≤ inserted（同 A1 邏輯）
+
+**問題**：`updateServiceAvailabilityByAmount()` 原使用精確相符（`inserted === price`）才亮燈，導致投入 250元 時只有恰好 250元 的服務亮燈，其他可負擔服務（30元、150元、200元）保持暗色。
+
+**修法**：兩種 coinFirst 模式均改用 `price <= inserted`：
+
+| 模式 | 亮燈條件 | 語音/步驟更新 |
+|------|---------|-------------|
+| coinFirstAssigned | 全部 `price <= inserted` 的服務亮燈 | 只對**指定服務**播語音、更新步驟至 step2 |
+| coinFirstFree | 全部 `price <= inserted` 的服務亮燈 | forEach 完後批次語音（700ms）：`已有N個服務可以選了` |
+
+**關鍵變數**：
+- `isAssignedService = (taskType === 'coinFirstAssigned') && (serviceId === assignedServiceId)`
+- 其他服務靜默解鎖（亮燈無語音）
+
+---
+
+### 19.3 錯選服務守衛
+
+由於其他可負擔服務也會變成 `coin-first-available` 並可點選，需攔截 coinFirstAssigned 模式下選錯服務：
+
+**normal/hard 模式**（line 5521）：
+```javascript
+// 原：taskType === 'assigned'
+// 改：taskType === 'assigned' || taskType === 'coinFirstAssigned'
+if ((taskType === 'assigned' || taskType === 'coinFirstAssigned') && assignedService) {
+```
+
+**easy 模式**（line 5544）：新增 coinFirstAssigned 專屬守衛，`service.id !== assignedService.id` 時播錯誤音效 + 語音「選錯了，請選擇X」並 return。
+
+**關鍵搜尋詞**：`price <= inserted`、`已有${availCount}個服務可以選了`、`coinFirstAssigned 簡單模式：其他亮起的服務不可選`
