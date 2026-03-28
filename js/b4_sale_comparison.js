@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null, clickMode: null },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -329,6 +329,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🤖 輔助點擊</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:6px;font-size:12px;color:#6b7280;line-height:1.5;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">📝 作業單</label>
                             <div class="b-btn-group">
                                 <a href="#" id="settings-worksheet-link" class="b-sel-btn"
@@ -409,6 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
+            document.querySelectorAll('[data-assist]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('[data-assist]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.clickMode = btn.dataset.assist;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             Game.EventManager.on(document.getElementById('settings-reward-link'), 'click', (e) => {
                 e.preventDefault();
                 if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
@@ -430,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.compareStores;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.compareStores || !s.clickMode;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -492,6 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuestion() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
+            AssistClick.deactivate();
             this.state.isProcessing    = false;
             this.state.phase           = 'select';
             this.state.numpadValue     = '';
@@ -547,6 +567,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.lastSpeechText = speechMap[diff] || `${curr.name}，哪個地方比較便宜？`;
                 Game.Speech.speak(speechMap[diff] || `${curr.name}，哪個地方比較便宜？`);
             }, 400, 'speech');
+
+            // 輔助點擊啟動
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
+            }
         },
 
         _renderHeader() {
@@ -735,6 +760,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.lastSpeechText = txt;
                 Game.Speech.speak(txt);
             }, 400, 'speech');
+
+            // 輔助點擊啟動
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(curr, null), 600, 'ui');
+            }
         },
 
         _bindTripleEvents(curr, diff) {
@@ -1484,6 +1514,158 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     };  // end Game
+
+    // 👆 輔助點擊模式（AssistClick）— 獨立區塊
+    // ============================================================
+    const AssistClick = {
+        _overlay: null, _handler: null, _touchHandler: null,
+        _queue: [], _enabled: false,
+        _lastHighlighted: null, _observer: null,
+        _curr: null, _correctSide: null,
+
+        activate(curr, correctSide) {
+            if (this._overlay) return;
+            this._curr        = curr;
+            this._correctSide = correctSide;
+            this._overlay = document.createElement('div');
+            this._overlay.id = 'b4-assist-overlay';
+            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            document.body.appendChild(this._overlay);
+            this._handler      = (e) => { e.stopPropagation(); this._executeStep(); };
+            this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };
+            this._overlay.addEventListener('click',    this._handler);
+            this._overlay.addEventListener('touchend', this._touchHandler, { passive: false });
+            this._enabled = true;
+            this._startObserver();
+            this.buildQueue();
+        },
+
+        deactivate() {
+            if (this._overlay) {
+                this._overlay.removeEventListener('click',    this._handler);
+                this._overlay.removeEventListener('touchend', this._touchHandler);
+                this._overlay.remove();
+                this._overlay = null;
+            }
+            if (this._observer) { this._observer.disconnect(); this._observer = null; }
+            this._clearHighlight();
+            this._queue = []; this._enabled = false;
+            this._curr = null; this._correctSide = null;
+            this._handler = null; this._touchHandler = null;
+        },
+
+        buildQueue() {
+            if (!this._enabled) return;
+            this._clearHighlight();
+            this._queue = [];
+
+            const curr        = this._curr;
+            const correctSide = this._correctSide;
+            const diff        = Game.state.settings.difficulty;
+            const phase       = Game.state.phase;
+
+            if (!curr) return;
+
+            if (curr.isTriple) {
+                // ── 三商店模式 ────────────────────────────────
+                if (diff === 'hard') {
+                    // hard：依已點順序決定下一個目標（cheapest→middle→mostExp）
+                    const rankOrder = [curr.cheapestIdx, curr.middleIdx, curr.mostExpIdx];
+                    const done      = Game.state.tripleClickOrder.length;
+                    if (done >= rankOrder.length) return;
+                    const nextIdx = rankOrder[done];
+                    const card = document.getElementById(`tcard-${nextIdx}`);
+                    if (card && !card.classList.contains('ranked')) {
+                        this._queue = [{ el: card, action: () => card.click() }];
+                    }
+                } else {
+                    // easy/normal：點最便宜卡
+                    if (phase === 'select') {
+                        const card = document.getElementById(`tcard-${curr.cheapestIdx}`);
+                        if (card && !card.classList.contains('selected-correct')) {
+                            this._queue = [{ el: card, action: () => card.click() }];
+                        }
+                    } else if (phase === 'diff') {
+                        // normal 三商店差額（three options）
+                        const diffSection = document.getElementById('diff-section');
+                        if (!diffSection) return;
+                        const correctDiff = curr.diff;
+                        const opt = diffSection.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                        if (opt && !opt.disabled) {
+                            this._queue = [{ el: opt, action: () => opt.click() }];
+                        }
+                    }
+                }
+            } else {
+                // ── 兩家店模式 ────────────────────────────────
+                if (phase === 'select') {
+                    const card = document.getElementById(`card-${correctSide}`);
+                    if (card && !card.classList.contains('selected-correct')) {
+                        this._queue = [{ el: card, action: () => card.click() }];
+                    }
+                } else if (phase === 'diff') {
+                    const correctDiff = curr.diff;
+                    if (diff === 'normal') {
+                        const opt = document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                        if (opt && !opt.disabled) {
+                            this._queue = [{ el: opt, action: () => opt.click() }];
+                        }
+                    } else {
+                        // hard：逐位數 + 確認
+                        const steps = [];
+                        const digits = String(correctDiff).split('');
+                        for (const d of digits) {
+                            const btn = document.querySelector(`[data-num="${d}"]`);
+                            if (btn) steps.push({ el: btn, action: () => btn.click() });
+                        }
+                        const okBtn = document.getElementById('btn-ok');
+                        if (okBtn) steps.push({ el: okBtn, action: () => okBtn.click() });
+                        this._queue = steps;
+                    }
+                }
+            }
+
+            if (this._queue.length > 0) this._highlight(this._queue[0].el);
+        },
+
+        _executeStep() {
+            if (!this._enabled || this._queue.length === 0) return;
+            const step = this._queue.shift();
+            this._clearHighlight();
+            if (step?.action) step.action();
+            // 高亮下一步
+            Game.TimerManager.setTimeout(() => {
+                if (this._enabled && this._queue.length > 0) this._highlight(this._queue[0].el);
+            }, 120, 'ui');
+        },
+
+        _startObserver() {
+            const app = document.getElementById('app');
+            if (!app) return;
+            let t = null;
+            this._observer = new MutationObserver(() => {
+                if (!this._enabled || this._queue.length > 0) return;
+                if (t) window.clearTimeout(t);
+                t = window.setTimeout(() => { if (this._enabled) this.buildQueue(); }, 400);
+            });
+            this._observer.observe(app, { childList: true, subtree: true });
+        },
+
+        _highlight(el) {
+            this._clearHighlight();
+            if (!el) return;
+            el.classList.add('assist-click-hint');
+            this._lastHighlighted = el;
+        },
+
+        _clearHighlight() {
+            if (this._lastHighlighted) {
+                this._lastHighlighted.classList.remove('assist-click-hint');
+                this._lastHighlighted = null;
+            }
+            document.querySelectorAll('.assist-click-hint').forEach(e => e.classList.remove('assist-click-hint'));
+        }
+    };
 
     Game.init();
 });

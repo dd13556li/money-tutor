@@ -631,6 +631,20 @@
     100% { transform: scale(1); }
 }
 
+/* ── 輔助點擊高亮（B 系列 AssistClick）──────────────────────────── */
+.assist-click-hint {
+    animation: bAssistPulse 1.5s infinite !important;
+    box-shadow: 0 0 25px rgba(255, 193, 7, 0.8) !important;
+    outline: 4px solid #FFC107 !important;
+    outline-offset: 2px !important;
+    position: relative;
+    z-index: 1;
+}
+@keyframes bAssistPulse {
+    0%, 100% { box-shadow: 0 0 25px rgba(255, 193, 7, 0.8); }
+    50%       { box-shadow: 0 0 45px rgba(255, 193, 7, 1.0); }
+}
+
 /* ── RWD ────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .b-header-center { font-size: 15px; }
