@@ -677,9 +677,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 煙火動畫和成功音效系統
         // =====================================================
         playSuccessFireworks() {
-            // 只在指定任務模式下觸發煙火和音效
+            // 只在指定任務模式下觸發煙火和音效（含先投幣指定任務）
             const taskType = this.state.settings.taskType;
-            if (taskType !== 'assigned') {
+            if (taskType !== 'assigned' && taskType !== 'coinFirstAssigned') {
                 BarberKiosk.Debug.log('ui', ' 非指定任務模式，跳過煙火動畫');
                 return;
             }
@@ -5534,7 +5534,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // 🎆 [防止重複] 只在第一次選擇正確服務時觸發煙火（步驟驗證通過後）
-                if (taskType === 'assigned' && assignedService && service.id === assignedService.id) {
+                if ((taskType === 'assigned' || taskType === 'coinFirstAssigned') && assignedService && service.id === assignedService.id) {
                     this.Debug.log('service', '[Service] 普通/困難模式：選擇正確服務，觸發煙火');
                     this.playSuccessFireworks();
                 }
@@ -6292,7 +6292,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // coinFirstAssigned：必須精確等於服務價格
                 if (inserted === service.price) {
                     this.Debug.log('payment', '[coinFirst] 投幣正確！亮燈服務:', service.name);
-                    this.playSuccessFireworks();
+                    // 煙火改在選擇正確服務時觸發（selectService），此處不重複
                     this.TimerManager.setTimeout(() => {
                         this.updateServiceAvailabilityByAmount();
                     }, 100, 'serviceUnlock');
