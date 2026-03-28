@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -315,6 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🤖 輔助點擊</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 看行程清單，準備好正確的錢幣，出發！<br>
                                 簡單：硬幣；普通：硬幣+紙鈔；困難：自行加總所有費用
@@ -387,6 +397,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
 
+            document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.clickMode = btn.dataset.assist;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             // 開始
             Game.EventManager.on(document.getElementById('start-btn'), 'click', () => {
                 this.startGame();
@@ -394,8 +413,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _checkCanStart() {
+            const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
-            if (btn) btn.disabled = !this.state.settings.difficulty || !this.state.settings.questionCount || !this.state.settings.retryMode;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -444,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuestion() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
+            AssistClick.deactivate();
             this.state.isProcessing = false;
             this.state.wallet = [];
             this.state.quiz.errorCount = 0;
@@ -481,6 +502,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.lastSpeechText = text;
                 Game.Speech.speak(text);
             }, 400, 'speech');
+
+            // 輔助點擊啟動
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
+            }
         },
 
         _renderHeader() {
@@ -1213,6 +1239,115 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     };  // end Game
+
+    // 👆 輔助點擊模式（AssistClick）— 獨立區塊
+    // ============================================================
+    const AssistClick = {
+        _overlay: null, _handler: null, _touchHandler: null,
+        _enabled: false, _lastHighlighted: null, _observer: null,
+        _curr: null,
+
+        activate(curr) {
+            if (this._overlay) return;
+            this._curr = curr;
+            this._overlay = document.createElement('div');
+            this._overlay.id = 'b1-assist-overlay';
+            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            document.body.appendChild(this._overlay);
+            this._handler      = (e) => { e.stopPropagation(); this._executeStep(); };
+            this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };
+            this._overlay.addEventListener('click',    this._handler);
+            this._overlay.addEventListener('touchend', this._touchHandler, { passive: false });
+            this._enabled = true;
+            this._startObserver();
+            this.buildQueue();
+        },
+
+        deactivate() {
+            if (this._overlay) {
+                this._overlay.removeEventListener('click',    this._handler);
+                this._overlay.removeEventListener('touchend', this._touchHandler);
+                this._overlay.remove();
+                this._overlay = null;
+            }
+            if (this._observer) { this._observer.disconnect(); this._observer = null; }
+            this._clearHighlight();
+            this._enabled = false; this._curr = null;
+            this._handler = null; this._touchHandler = null;
+        },
+
+        buildQueue() {
+            if (!this._enabled) return;
+            this._clearHighlight();
+
+            const curr = this._curr;
+            if (!curr) return;
+
+            // 計算錢包中已有金額
+            const walletTotal = Game.state.wallet.reduce((s, c) => s + c.denom, 0);
+            const remaining   = curr.total - walletTotal;
+
+            if (remaining <= 0) {
+                // 已足夠 → 高亮確認按鈕
+                const btn = document.getElementById('confirm-btn');
+                if (btn && !btn.disabled) this._highlight(btn, () => btn.click());
+            } else {
+                // 計算下一個最優硬幣
+                const diff   = Game.state.settings.difficulty;
+                const denoms = (typeof DENOM_BY_DIFF !== 'undefined')
+                    ? (DENOM_BY_DIFF[diff] || DENOM_BY_DIFF.easy)
+                    : [1, 5, 10, 50];
+                const sorted = [...denoms].sort((a, b) => b - a);
+                let nextDenom = sorted[0];
+                for (const d of sorted) {
+                    if (d <= remaining) { nextDenom = d; break; }
+                }
+                const el = document.querySelector(`.b1-coin-draggable[data-denom="${nextDenom}"]`);
+                if (el) this._highlight(el, () => Game.addCoin(nextDenom));
+            }
+        },
+
+        _executeStep() {
+            if (!this._enabled) return;
+            const fn = this._pendingAction;
+            this._clearHighlight();
+            this._pendingAction = null;
+            if (fn) fn();
+            // 重建下一步（同步執行後 wallet 已更新）
+            Game.TimerManager.setTimeout(() => { if (this._enabled) this.buildQueue(); }, 120, 'ui');
+        },
+
+        _pendingAction: null,
+
+        _startObserver() {
+            const app = document.getElementById('app');
+            if (!app) return;
+            let t = null;
+            this._observer = new MutationObserver(() => {
+                if (!this._enabled) return;
+                if (t) window.clearTimeout(t);
+                t = window.setTimeout(() => { if (this._enabled) this.buildQueue(); }, 300);
+            });
+            this._observer.observe(app, { childList: true, subtree: true, attributes: true });
+        },
+
+        _highlight(el, action) {
+            this._clearHighlight();
+            if (!el) return;
+            el.classList.add('assist-click-hint');
+            this._lastHighlighted = el;
+            this._pendingAction   = action || null;
+        },
+
+        _clearHighlight() {
+            if (this._lastHighlighted) {
+                this._lastHighlighted.classList.remove('assist-click-hint');
+                this._lastHighlighted = null;
+            }
+            document.querySelectorAll('.assist-click-hint').forEach(e => e.classList.remove('assist-click-hint'));
+            this._pendingAction = null;
+        }
+    };
 
     Game.init();
 });

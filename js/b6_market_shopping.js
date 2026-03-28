@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null },
+            settings: { difficulty: null, rounds: null, clickMode: null },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -434,6 +434,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🤖 輔助點擊：</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 依照購物清單在市場各攤位買菜，然後付款找零
                             </label>
@@ -489,12 +499,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
 
+            document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.clickMode = btn.dataset.assist;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             Game.EventManager.on(document.getElementById('start-btn'), 'click', () => this.startGame(), {}, 'settings');
         },
 
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
-            if (btn) btn.disabled = !this.state.settings.difficulty || !this.state.settings.rounds;
+            const s = this.state.settings;
+            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode;
         },
 
         // ── 8. 遊戲開始 ───────────────────────────────────────
@@ -531,6 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.state.isProcessing = false;
+            AssistClick.deactivate();
 
             const g       = this.state.game;
             g.mission     = g.missions[g.currentRound];
@@ -541,6 +562,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._renderShoppingUI();
             this._showMissionIntroModal(g.mission, g.currentRound + 1);
+
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
+            }
         },
 
         // ── 關卡開場任務說明彈窗（B1 _showTaskModal pattern）──
@@ -1360,6 +1385,158 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearAll();
             Game.EventManager.removeAll();
             window.location.href = '../index.html#part4';
+        },
+    };
+
+    // 👆 輔助點擊模式（AssistClick）— 獨立區塊
+    const AssistClick = {
+        _overlay: null, _handler: null, _touchHandler: null,
+        _queue: [], _enabled: false,
+        _lastHighlighted: null, _observer: null,
+
+        activate() {
+            if (this._overlay) return;
+            this._overlay = document.createElement('div');
+            this._overlay.id = 'b6-assist-overlay';
+            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            document.body.appendChild(this._overlay);
+            this._handler = (e) => { e.stopPropagation(); this._executeStep(); };
+            this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };
+            this._overlay.addEventListener('click', this._handler);
+            this._overlay.addEventListener('touchend', this._touchHandler, { passive: false });
+            this._enabled = true;
+            this._startObserver();
+            this.buildQueue();
+        },
+
+        deactivate() {
+            if (this._overlay) {
+                this._overlay.removeEventListener('click', this._handler);
+                this._overlay.removeEventListener('touchend', this._touchHandler);
+                this._overlay.remove(); this._overlay = null;
+            }
+            if (this._observer) { this._observer.disconnect(); this._observer = null; }
+            this._clearHighlight();
+            this._queue = []; this._enabled = false;
+        },
+
+        buildQueue() {
+            if (!this._enabled) return;
+            // Wait for intro modal / round complete card to dismiss
+            if (document.getElementById('b6-mission-intro') || document.getElementById('b6-round-complete')) return;
+            this._clearHighlight();
+            this._queue = [];
+
+            const g = Game.state.game;
+            if (!g || !g.mission) return;
+
+            // Change quiz phase: click correct change option
+            const changeOpts = document.querySelectorAll('.b6-change-opt:not([disabled])');
+            if (changeOpts.length > 0) {
+                const total = Game._calcMissionTotal();
+                const correctChange = g.paidAmount - total;
+                const correctOpt = document.querySelector(`.b6-change-opt[data-value="${correctChange}"]`);
+                if (correctOpt && !correctOpt.disabled) {
+                    this._highlight(correctOpt);
+                    this._queue = [{ el: correctOpt, action: () => correctOpt.click() }];
+                }
+                return;
+            }
+
+            // Result next-round button
+            const nextBtn = document.getElementById('b6-next-btn');
+            if (nextBtn) {
+                this._highlight(nextBtn);
+                this._queue = [{ el: nextBtn, action: () => nextBtn.click() }];
+                return;
+            }
+
+            // Payment phase
+            if (g.phase === 'payment') {
+                const payBtn = document.getElementById('b6-pay-btn');
+                if (payBtn && !payBtn.disabled) {
+                    this._highlight(payBtn);
+                    this._queue = [{ el: payBtn, action: () => payBtn.click() }];
+                } else {
+                    const total = Game._calcMissionTotal();
+                    const remaining = total - g.paidAmount;
+                    if (remaining > 0) {
+                        // Greedy: largest bill ≤ remaining (B6_BILLS already sorted large→small)
+                        let nextBill = B6_BILLS.find(b => b.value <= remaining) || B6_BILLS[B6_BILLS.length - 1];
+                        const billBtn = document.querySelector(`.b6-bill-btn[data-value="${nextBill.value}"]`);
+                        if (billBtn) {
+                            this._highlight(billBtn);
+                            this._queue = [{ el: billBtn, action: () => billBtn.click() }];
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Shopping phase: find next uncollected mission item
+            const nextItem = g.mission.items.find(({ id }) => !g.collectedIds.has(id));
+            if (!nextItem) {
+                // All collected → checkout
+                const checkoutBtn = document.getElementById('b6-checkout-btn');
+                if (checkoutBtn && !checkoutBtn.disabled) {
+                    this._highlight(checkoutBtn);
+                    this._queue = [{ el: checkoutBtn, action: () => checkoutBtn.click() }];
+                }
+                return;
+            }
+
+            // Need to switch stall?
+            if (nextItem.stall !== g.activeStall) {
+                const stallTab = document.querySelector(`.b6-stall-tab[data-stall="${nextItem.stall}"]`);
+                if (stallTab) {
+                    this._highlight(stallTab);
+                    this._queue = [{ el: stallTab, action: () => stallTab.click() }];
+                }
+                return;
+            }
+
+            // Click the product button
+            const productBtn = document.querySelector(`.b6-product-btn:not([disabled])[data-item-id="${nextItem.id}"]`);
+            if (productBtn) {
+                this._highlight(productBtn);
+                this._queue = [{ el: productBtn, action: () => productBtn.click() }];
+            }
+        },
+
+        _executeStep() {
+            if (!this._enabled || this._queue.length === 0) return;
+            const step = this._queue.shift();
+            this._clearHighlight();
+            if (step?.action) step.action();
+            Game.TimerManager.setTimeout(() => { if (this._enabled) this.buildQueue(); }, 150, 'ui');
+        },
+
+        _startObserver() {
+            if (!this._enabled) return;
+            let t = null;
+            const trigger = () => {
+                if (!this._enabled) return;
+                if (t) window.clearTimeout(t);
+                t = window.setTimeout(() => {
+                    if (this._enabled && this._queue.length === 0) this.buildQueue();
+                }, 400);
+            };
+            this._observer = new MutationObserver(trigger);
+            const app = document.getElementById('app');
+            if (app) this._observer.observe(app, { childList: true, subtree: true });
+            this._observer.observe(document.body, { childList: true });
+        },
+
+        _highlight(el) {
+            this._clearHighlight();
+            if (!el) return;
+            el.classList.add('assist-click-hint');
+            this._lastHighlighted = el;
+        },
+
+        _clearHighlight() {
+            if (this._lastHighlighted) { this._lastHighlighted.classList.remove('assist-click-hint'); this._lastHighlighted = null; }
+            document.querySelectorAll('.assist-click-hint').forEach(e => e.classList.remove('assist-click-hint'));
         },
     };
 

@@ -544,7 +544,7 @@ toolbarConfig: {
 | B6 錯誤商品攤位提示（2026-03-28）| B6 | 點到不在清單的商品時，額外顯示「這裡需要：X、Y」（`.b6-wt-hint` 綠字）；`neededAtStall` 過濾此攤位未收集需求；`.b6-wrong-tip` 整合容器（深色背景 + `b6WtIn` 動畫）|
 | B1 行程卡精準金額綠光（2026-03-28）| B1 | `_updateWalletDisplay` 加 `.b1-schedule-card.exact-match`；剛好符合時 `b1ExactGlow` 脈動綠框；移除時同步清除 CSS class |
 | B4 三商店困難自動提示（2026-03-28）| B4 | `_bindTripleEvents` hard 模式：10 秒無點擊後 `tcard-cheapestIdx` 加 `.b4-triple-auto-hint`（綠框 `b4AutoHintPulse` 3 次）+ 語音「提示：先找最便宜的」|
-| B2/B4 輔助點擊模式（2026-03-28）| B2/B4 | `AssistClick` 模組（`Game.init()` 前獨立區塊）；設定頁新增「🤖 輔助點擊」啟用/停用選項；`_checkCanStart` 加 `clickMode` 守衛；B2：easy 高亮正確選項，normal/hard 逐位數+確認；B4：select 相位高亮正確卡，diff normal 高亮 `.b4-diff-opt`，diff hard 逐位數+`btn-ok`，三商店 easy/normal 高亮最便宜卡，hard 依 `rankOrder` 逐張；`b-series.css` 新增 `.assist-click-hint`/`bAssistPulse`；搜尋 `b2-assist-overlay`、`b4-assist-overlay` |
+| B1~B6 輔助點擊模式（2026-03-28/29）| B1~B6 | `AssistClick` 模組（`Game.init()` 前獨立區塊）；設定頁新增「🤖 輔助點擊」啟用/停用選項；`_checkCanStart` 加 `clickMode` 守衛；B2：easy 高亮正確選項，normal/hard 逐位數+確認；B4：select 高亮正確卡，diff normal 高亮 `.b4-diff-opt`，diff hard 逐位數+`btn-ok`，三商店 hard 依 `rankOrder` 逐張；B1：`_pendingAction` 單步模式，貪婪選最大面額，不足→投幣，足夠→confirm；B3：hard quiz only，純 numpad 逐位數+ok；B5：confirm 直接可點則高亮，否則高亮可負擔商品；B6：shopping→切換攤位→點商品→checkout，payment→貪婪選面額→pay，change quiz→正確選項；`b-series.css` 新增 `.assist-click-hint`/`bAssistPulse`；搜尋 `b1-assist-overlay`、`b2-assist-overlay`、`b3-assist-overlay`、`b4-assist-overlay`、`b5-assist-overlay`、`b6-assist-overlay` |
 
 ---
 
