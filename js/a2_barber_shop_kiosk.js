@@ -6067,16 +6067,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     (slotType === 'bill' && hadNoCoins) ||
                     (slotType === 'coin' && hadNoBills);
 
-                // 每次確認後立即更新可負擔服務亮燈（price <= insertedAmount）
-                this.TimerManager.setTimeout(() => {
-                    this.updateServiceAvailabilityByAmount();
-                }, 300, 'serviceUnlock');
-
                 if (shouldVerify) {
+                    // 達到驗證條件：先驗證金額，正確才亮燈（避免超投時燈號誤亮）
                     this.TimerManager.setTimeout(() => {
                         this.validateCoinFirstPayment();
                     }, 300, 'screenTransition');
                 } else {
+                    // 尚未達驗證條件：即時更新可負擔服務亮燈（price <= insertedAmount）
+                    this.TimerManager.setTimeout(() => {
+                        this.updateServiceAvailabilityByAmount();
+                    }, 300, 'serviceUnlock');
                     // 語音提示剩餘金額（指定任務才有目標金額）
                     if (cfRequired !== null) {
                         const remaining = cfRequired - insertedAmount;
@@ -6372,6 +6372,26 @@ document.addEventListener('DOMContentLoaded', () => {
             this.updateMoneyDisplay();
             this.updateMoneyDisplayInScreen();
             this.updateSlotStatus();
+
+            // coinFirst 模式：退幣時重鎖所有已亮起的服務燈號
+            if (this.isCoinFirstMode()) {
+                document.querySelectorAll('.service-item.coin-first-available, .service-item.coin-first-unlocking').forEach(el => {
+                    el.classList.remove('coin-first-available', 'coin-first-unlocking');
+                    el.classList.add('coin-first-locked');
+                    el.style.setProperty('filter', 'grayscale(80%) brightness(0.5)', 'important');
+                    el.style.setProperty('opacity', '1', 'important');
+                    const wrapper = el.closest('.service-item-wrapper');
+                    if (wrapper) {
+                        wrapper.classList.add('coin-first-locked-wrapper');
+                        const light = wrapper.querySelector('.indicator-light');
+                        if (light) {
+                            light.classList.remove('active');
+                            light.style.setProperty('filter', 'grayscale(80%) brightness(0.5)', 'important');
+                        }
+                    }
+                });
+                this.Debug.log('payment', '[CoinFirst] 退幣：服務燈號已重鎖');
+            }
 
             // ★★★ 如果在提示模式下，更新提示動畫位置 ★★★
             if (this.state.gameState.normalMode.hintShown) {
