@@ -6036,8 +6036,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 清空臨時選擇
             this.state.gameState.normalMode.tempSelectedMoney = [];
 
-            // 播放音效（指定任務模式下不播放，避免與 correct02 衝突）
-            if (this.state.settings.taskType !== 'assigned') {
+            // 播放音效（指定任務模式及先投幣指定任務模式下不播放，避免與 correct02 或錯誤音效衝突）
+            const _cfTaskType = this.state.settings.taskType;
+            if (_cfTaskType !== 'assigned' && _cfTaskType !== 'coinFirstAssigned') {
                 this.audio.playSound('cash');
             }
 

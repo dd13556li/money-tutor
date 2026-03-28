@@ -1451,3 +1451,45 @@ if ((taskType === 'assigned' || taskType === 'coinFirstAssigned') && assignedSer
 **easy 模式**（line 5544）：新增 coinFirstAssigned 專屬守衛，`service.id !== assignedService.id` 時播錯誤音效 + 語音「選錯了，請選擇X」並 return。
 
 **關鍵搜尋詞**：`price <= inserted`、`已有${availCount}個服務可以選了`、`coinFirstAssigned 簡單模式：其他亮起的服務不可選`
+
+---
+
+## 二十、2026-03-28 修正：coinFirstAssigned 付款超額移除 cash 音效
+
+### 20.1 問題描述
+
+先投幣指定任務模式（`coinFirstAssigned`）下，投入金額超過服務價格（例如投 500元購買 150元服務）時，使用者在確認付款後會聽到 cash 音效，隨後才收到「付款金額過多」錯誤提示，造成「先聽到成功音感」的混淆。
+
+### 20.2 根因
+
+`confirmMoneySelection()` 中的音效判斷：
+
+```javascript
+// 改前
+if (this.state.settings.taskType !== 'assigned') {
+    this.audio.playSound('cash');
+}
+```
+
+條件只排除 `'assigned'`，`'coinFirstAssigned'` 不在排除清單內，因此會播放 cash 音效。整個流程時序：
+
+1. `confirmMoneySelection()` → 播 cash 音效 ← 問題點
+2. 300ms 後 `validateCoinFirstPayment()` → 偵測超額 → `_handleCoinFirstPaymentError()` → 播 error 音效
+
+### 20.3 修法
+
+```javascript
+// 改後
+const _cfTaskType = this.state.settings.taskType;
+if (_cfTaskType !== 'assigned' && _cfTaskType !== 'coinFirstAssigned') {
+    this.audio.playSound('cash');
+}
+```
+
+`coinFirstAssigned` 模式一律不播 cash 音效：
+- 付款正確：完成後在 `selectService()` 觸發 correct02 + 煙火
+- 付款超額：僅由 `_handleCoinFirstPaymentError()` 播 error 音效
+
+`coinFirstFree`、`freeChoice`、`assigned` 等模式不受影響。
+
+**關鍵搜尋詞**：`_cfTaskType`、`confirmMoneySelection`、`_handleCoinFirstPaymentError`

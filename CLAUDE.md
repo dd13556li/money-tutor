@@ -376,6 +376,7 @@ toolbarConfig: {
 | A2 燈號已亮任務彈窗修正（2026-03-22）| A2 | `showTaskPopup` + `closeTaskPopup` 偵測 `.coin-first-available`；已亮→「💡 請選擇服務」+「X的燈號已亮起，請點選X服務」|
 | A2 元元語音重複（2026-03-28）| A2 | `selectService` line 5495：`convertAmountToSpeech` 已含「元」，模板多加一個 → 移除末尾 `元`；搜尋 `這個服務需要` |
 | A2 coinFirst 亮燈改 price<=inserted（2026-03-28）| A2 | `updateServiceAvailabilityByAmount`：`inserted===price` → `price<=inserted`（同 A1 邏輯）；coinFirstAssigned 只對指定服務播語音/更新步驟，其他可負擔服務靜默亮燈；coinFirstFree 改批次語音 `已有N個服務可以選了`（700ms timer）；`selectService` normal/hard 模式 `assigned\|coinFirstAssigned` 均攔截錯選；easy 模式 coinFirstAssigned 也加錯選守衛；搜尋 `price <= inserted`、`已有${availCount}個服務可以選了` |
+| A2 coinFirstAssigned 付款超額移除 cash 音效（2026-03-28）| A2 | `confirmMoneySelection` cash 音效條件加 `coinFirstAssigned` 排除：超額時不再誤播成功音效（300ms 後由 `_handleCoinFirstPaymentError` 播錯誤音）；搜尋 `_cfTaskType` |
 | F3 觸控放置拖回 | F3 | `.placed-item` |
 | F5 易模式隱藏測驗模式 | F5 | `updateTestModeVisibility` |
 | F5 普通計分0/0 | F5 | `checkAnswer`, `handleCorrectAnswer` |
