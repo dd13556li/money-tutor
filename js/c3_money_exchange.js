@@ -8697,10 +8697,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* 【強制結果區換行+尺寸】覆蓋 .money-item {width:80px} 對結果區的影響 */
                 .unified-results-container { flex-wrap: wrap !important; width: 100% !important; }
                 .unified-results-container .unit3-banknote-container {
-                    width: 124px !important; min-width: 124px !important; height: auto !important;
+                    width: 124px !important; min-width: 124px !important; height: auto !important; min-height: 0 !important;
                     flex-shrink: 0 !important; display: flex !important; flex-direction: column !important;
                     align-items: center !important; justify-content: flex-start !important;
-                    padding: 2px 2px 0 2px !important; border: 2px solid #4CAF50 !important;
+                    padding: 2px 2px 4px 2px !important; border: 2px solid #4CAF50 !important;
                     border-radius: 12px !important; background: white !important; margin: 4px !important;
                 }
                 .unified-results-container .unit3-coin-container {
@@ -8877,12 +8877,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     width: 124px !important;
                     min-width: 124px !important;
                     height: auto !important;
+                    min-height: 0 !important;
                     flex-shrink: 0 !important;
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
                     justify-content: flex-start !important;
-                    padding: 2px 2px 0 2px !important;
+                    padding: 2px 2px 4px 2px !important;
                     border: 2px solid #4CAF50 !important;
                     border-radius: 12px !important;
                     background: white !important;
@@ -9008,12 +9009,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     width: 124px !important;
                     min-width: 124px !important;
                     height: auto !important;
+                    min-height: 0 !important;
                     flex-shrink: 0 !important;
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
                     justify-content: flex-start !important;
-                    padding: 2px 2px 0 2px !important;
+                    padding: 2px 2px 4px 2px !important;
                     border: 2px solid #4CAF50 !important;
                     border-radius: 12px !important;
                     background: white !important;

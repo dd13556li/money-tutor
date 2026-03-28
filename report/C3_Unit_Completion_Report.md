@@ -1,7 +1,7 @@
 # C3 換錢 — 單元開發經驗報告書
 
 > **日期**：2026-02-09
-> **更新日期**：2026-03-27（提示鈕四項修正）、2026-03-26（「大換小」字色修正、金額間距修復、兌換主類別全隨機）
+> **更新日期**：2026-03-28（紙鈔外框底部貼近文字）、2026-03-27（提示鈕四項修正）、2026-03-26（「大換小」字色修正、金額間距修復、兌換主類別全隨機）
 > **時間**：下午
 > **單元名稱**：C3 換錢（Money Exchange）
 > **系列**：C 貨幣認知
@@ -1493,3 +1493,47 @@ const baseCoinId = coinId.replace(/^(source-item-)+/, '');
   - `processDropToFlexibleZone()`：`delete newCoin.dataset.dragHandled`
 
 **關鍵搜尋詞**：`showNormalModeHint`、`requiredSourceCounts`、`getGameState('gameState')`、`dragHandled`、`baseCoinId`
+
+---
+
+## 十五、紙鈔外框底部貼近文字（2026-03-28）
+
+### 問題描述
+
+測驗頁「我的金錢區」（及兌換區）中，1000元、500元等紙鈔金錢卡的綠色外框底部邊線，與下方「1000元」數字文字之間有大量空白（約 40~50px），視覺上卡片顯得過高、不緊湊。
+
+### 根本原因
+
+`c-series.css` 的全域規則：
+
+```css
+.c-series .money-item {
+    min-height: 120px;
+    padding: 10px;
+    ...
+}
+```
+
+`getCommonCSS()` 中的 `.unit3-banknote-container` 規則雖以 `!important` 覆蓋了 `height`、`padding`，但**沒有覆蓋 `min-height`**，導致：
+
+- 紙鈔圖示（120px 寬，auto 高）+ 文字實際內容約 70~80px
+- 容器強制維持 `min-height: 120px`
+- `justify-content: flex-start` 讓剩餘 40~50px 堆積在文字與底部邊線之間
+
+### 修復方式
+
+在 `getCommonCSS()` 三處 `.unit3-banknote-container` CSS 規則中加入 `min-height: 0 !important`，並將 `padding-bottom` 從 `0` 改為 `4px` 以保留小量呼吸空間：
+
+| 選擇器 | 修改 |
+|--------|------|
+| `.unified-results-container .unit3-banknote-container` | `min-height: 0 !important`；`padding: 2px 2px 4px 2px` |
+| `.unit3-easy-money-source .unit3-banknote-container` | 同上 |
+| `.unit3-normal-money-source .unit3-banknote-container, .unit3-hard-money-source .unit3-banknote-container` | 同上 |
+
+圖示尺寸（`width: 120px !important; height: auto !important`）不受影響。
+
+### 修改檔案
+
+- `js/c3_money_exchange.js`：`getCommonCSS()` 三處 `.unit3-banknote-container` 規則
+
+**關鍵搜尋詞**：`min-height: 0 !important`、`padding: 2px 2px 4px 2px`、`unit3-banknote-container`
