@@ -6067,6 +6067,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     (slotType === 'bill' && hadNoCoins) ||
                     (slotType === 'coin' && hadNoBills);
 
+                // 每次確認後立即更新可負擔服務亮燈（price <= insertedAmount）
+                this.TimerManager.setTimeout(() => {
+                    this.updateServiceAvailabilityByAmount();
+                }, 300, 'serviceUnlock');
+
                 if (shouldVerify) {
                     this.TimerManager.setTimeout(() => {
                         this.validateCoinFirstPayment();
