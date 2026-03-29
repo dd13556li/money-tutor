@@ -1090,7 +1090,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         Game.Speech.speak(`排序正確！從${curr.sortedAsc[0].store}${toTWD(curr.sortedAsc[0].price)}到${curr.sortedAsc[2].store}${toTWD(curr.sortedAsc[2].price)}`);
                         this._showSavingsToast(curr.diff);
-                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
+                        this._showPodiumAnimation(curr);
+                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 2400, 'turnTransition');
                     } else {
                         this.audio.play('error');
                         // 顯示正確排序
@@ -1416,6 +1417,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const anchor = section.querySelector('.b4-diff-options') || section.querySelector('.b4-numpad');
             if (anchor) section.insertBefore(hint, anchor);
             else section.appendChild(hint);
+        },
+
+        // ── 三商店獎台動畫（F4 排序 pattern）────────────────────
+        _showPodiumAnimation(curr) {
+            const prev = document.getElementById('b4-podium-overlay');
+            if (prev) prev.remove();
+            const sorted = curr.sortedAsc; // [cheapest, middle, mostExp]
+            // 獎台視覺：左=2nd，中=1st（最高），右=3rd
+            const cols = [
+                { store: sorted[1].store, price: sorted[1].price, rank: '🥈', height: '70px', label: '第2名', cls: 'silver' },
+                { store: sorted[0].store, price: sorted[0].price, rank: '🥇', height: '96px', label: '最便宜', cls: 'gold' },
+                { store: sorted[2].store, price: sorted[2].price, rank: '🥉', height: '50px', label: '第3名', cls: 'bronze' },
+            ];
+            const overlay = document.createElement('div');
+            overlay.id = 'b4-podium-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:10150;display:flex;align-items:flex-end;justify-content:center;padding-bottom:60px;pointer-events:none;';
+            overlay.innerHTML = `<div class="b4-podium-wrap">
+                ${cols.map((col, i) => `
+                <div class="b4-podium-col ${col.cls}" style="animation-delay:${i*0.12}s">
+                    <div class="b4-podium-rank">${col.rank}</div>
+                    <div class="b4-podium-store">${col.store}</div>
+                    <div class="b4-podium-price">${col.price}元</div>
+                    <div class="b4-podium-block ${col.cls}" style="height:${col.height}">
+                        <span class="b4-podium-lbl">${col.label}</span>
+                    </div>
+                </div>`).join('')}
+            </div>`;
+            document.body.appendChild(overlay);
+            Game.TimerManager.setTimeout(() => {
+                overlay.style.transition = 'opacity 0.4s';
+                overlay.style.opacity = '0';
+                Game.TimerManager.setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
         },
 
         // ── 連勝徽章（B3 streak pattern）──────────────────────

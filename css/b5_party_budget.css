@@ -488,3 +488,17 @@
     0%, 100% { box-shadow: 0 4px 14px rgba(16,185,129,0.4); transform: scale(1); }
     50%       { box-shadow: 0 6px 24px rgba(16,185,129,0.7); transform: scale(1.03); }
 }
+
+/* ── B5 Savings Badge (Round 24) ── */
+.b5-savings-badge {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #065f46;
+    margin-top: 8px;
+    animation: bFadeIn 0.4s ease;
+}

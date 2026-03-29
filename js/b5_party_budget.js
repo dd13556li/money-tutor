@@ -816,11 +816,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resultArea) {
                 const rem = g.budget - total;
                 if (isCorrect) {
+                    const remPct = g.budget > 0 ? Math.round((rem / g.budget) * 100) : 0;
+                    const savingsBadge = rem > 0
+                        ? `<div class="b5-savings-badge">💰 節省了 ${rem} 元（節省 ${remPct}%）！</div>`
+                        : '';
                     resultArea.innerHTML = `
                         <div class="b5-result-banner success">
                             🎉 太棒了！派對辦起來！
                             <div class="b5-result-sub">共花了 ${total} 元，還剩 ${rem} 元</div>
-                        </div>`;
+                        </div>
+                        ${savingsBadge}`;
                 } else if (!mustOk) {
                     resultArea.innerHTML = `
                         <div class="b5-result-banner fail">

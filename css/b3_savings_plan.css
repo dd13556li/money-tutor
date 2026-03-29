@@ -1572,3 +1572,39 @@
 @keyframes b3BlockPop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
 .b3-week-label { font-size: 13px; color: #6b7280; font-weight: 600; display: block; margin-top: 2px; }
 .b3-week-extra { font-size: 13px; color: #f59e0b; font-weight: 700; padding: 0 4px; }
+
+/* ── B3 倒數提示 (Round 24) ── */
+.b3-countdown-hint {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    z-index: 9000;
+    animation: b3CdIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b3-cd-num {
+    font-size: 22px;
+    font-weight: 900;
+    color: #d97706;
+}
+.b3-cd-label {
+    font-size: 15px;
+    color: #92400e;
+}
+.b3-cd-fade {
+    transition: opacity 0.4s;
+    opacity: 0;
+}
+@keyframes b3CdIn {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}

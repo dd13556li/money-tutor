@@ -715,3 +715,64 @@
     border-radius: 6px;
     padding: 4px 10px;
 }
+
+/* ── B6 結帳確認清單 (Round 24) ── */
+.b6-checkout-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    animation: bAssistPulse 0s, b6CcIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes b6CcIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+.b6-cc-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #065f46;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.b6-cc-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.b6-cc-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    padding: 4px 0;
+}
+.b6-cc-sep {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 4px 0;
+}
+.b6-cc-total {
+    font-weight: 800;
+    font-size: 17px;
+    color: #1d4ed8;
+}
+.b6-cc-budget {
+    font-size: 14px;
+    color: #6b7280;
+}
+.b6-cc-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+.b6-cc-btn:active { transform: scale(0.97); }

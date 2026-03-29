@@ -1868,7 +1868,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 this._updateCalendarUI(true); // pig already updated
+                const remaining = Math.max(0, c.item.price - c.accumulated);
+                const daysLeft  = Math.ceil(remaining / c.dailyAmount);
+                const speechText = `存入${toTWD(c.dailyAmount)}！還差${toTWD(remaining)}，再存${daysLeft}天就達標了！`;
+                c.lastSpeech = speechText;
+                Game.Speech.speak(speechText);
+                this._showCountdownHint(remaining, daysLeft);
             }
+        },
+
+        // ── 倒數提示浮動卡（B1 _showExactMatchToast pattern）─────
+        _showCountdownHint(remaining, daysLeft) {
+            const prev = document.getElementById('b3-countdown-hint');
+            if (prev) prev.remove();
+            const hint = document.createElement('div');
+            hint.id = 'b3-countdown-hint';
+            hint.className = 'b3-countdown-hint';
+            hint.innerHTML = `<span class="b3-cd-num">${remaining}</span><span class="b3-cd-label">元・再存 ${daysLeft} 天</span>`;
+            document.body.appendChild(hint);
+            Game.TimerManager.setTimeout(() => {
+                hint.classList.add('b3-cd-fade');
+                Game.TimerManager.setTimeout(() => { if (hint.parentNode) hint.remove(); }, 400, 'ui');
+            }, 2000, 'ui');
         },
 
         _showMilestoneBadge(pct) {

@@ -1018,9 +1018,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkoutBtn = document.getElementById('b6-checkout-btn');
             Game.EventManager.on(checkoutBtn, 'click', () => {
                 if (this.state.isProcessing) return;
-                g.phase = 'payment';
-                g.paidAmount = 0;
-                this._renderPaymentUI();
+                this._showCheckoutConfirm(g, () => {
+                    g.phase = 'payment';
+                    g.paidAmount = 0;
+                    this._renderPaymentUI();
+                });
             }, {}, 'gameUI');
             // 語音重播
             const replayBtn = document.getElementById('replay-speech-btn');
@@ -1030,6 +1032,42 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
+        },
+
+        // ── 結帳前確認清單（B1 _showTaskModal pattern）──────────
+        _showCheckoutConfirm(g, callback) {
+            const existing = document.getElementById('b6-checkout-confirm');
+            if (existing) { existing.remove(); callback(); return; }
+            const items = g.mission.items.filter(({ id }) => g.collectedIds.has(id));
+            const resolve = (item) => (_currentStalls[item.stall]?.items || []).find(i => i.id === item.id);
+            const total = items.reduce((sum, item) => sum + (resolve(item)?.price || 0), 0);
+            const itemRows = items.map(item => {
+                const found = resolve(item);
+                return `<div class="b6-cc-row"><span>${found?.icon || ''} ${found?.name || item.id}</span><span>${found?.price || 0} 元</span></div>`;
+            }).join('');
+            const modal = document.createElement('div');
+            modal.id = 'b6-checkout-confirm';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:10200;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;';
+            modal.innerHTML = `
+                <div class="b6-checkout-card">
+                    <div class="b6-cc-title">🛒 結帳清單</div>
+                    <div class="b6-cc-items">
+                        ${itemRows}
+                        <div class="b6-cc-sep"></div>
+                        <div class="b6-cc-row b6-cc-total"><span>合計</span><span>${total} 元</span></div>
+                        <div class="b6-cc-row b6-cc-budget"><span>預算</span><span>${g.mission.budget} 元</span></div>
+                    </div>
+                    <button class="b6-cc-btn" id="b6-cc-go">✓ 去付款</button>
+                </div>`;
+            document.body.appendChild(modal);
+            Game.Speech.speak(`合計${total}元，預算${g.mission.budget}元，確認去付款！`);
+            const go = () => { if (modal.parentNode) modal.remove(); callback(); };
+            Game.EventManager.on(document.getElementById('b6-cc-go'), 'click', go, {}, 'gameUI');
+            const autoT = Game.TimerManager.setTimeout(go, 5000, 'ui');
+            // 點擊背景也關閉
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) { Game.TimerManager.clearTimeout(autoT); go(); }
+            });
         },
 
         _showCenterFeedback(icon, text = '') {
@@ -1694,6 +1732,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Shopping phase: find next uncollected mission item
             const nextItem = g.mission.items.find(({ id }) => !g.collectedIds.has(id));
             if (!nextItem) {
+                // 確認清單彈窗已開啟 → 點「去付款」
+                const ccGo = document.getElementById('b6-cc-go');
+                if (ccGo) {
+                    this._highlight(ccGo);
+                    this._queue = [{ el: ccGo, action: () => ccGo.click() }];
+                    return;
+                }
                 // All collected → checkout
                 const checkoutBtn = document.getElementById('b6-checkout-btn');
                 if (checkoutBtn && !checkoutBtn.disabled) {

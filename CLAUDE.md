@@ -558,6 +558,10 @@ toolbarConfig: {
 | B4 節省百分比（2026-03-29）| B4 | `_showSavingsToast` 改為「省了 X 元（省 Y%）」；高價格 optA.price 為計算基準；unit 模式用 perA；B4 savings toast pattern |
 | B2 收支類型徽章（2026-03-29）| B2 | `_renderQuestionHTML` 每條事件行加 `.b2-type-badge income/expense`（「收入 📥」/「支出 📤」）；金額前加 +/- 符號；移除舊 `::before` 偽元素；CSS 綠/紅膠囊徽章 |
 | B6 第一關進場語音（2026-03-29）| B6 | `_showMissionIntroModal` roundNum===1 時加「歡迎來到{市場名}！」前綴；`roundTitle` 顯示市場 icon+名稱；隨機市場模式讀 `mission._mktKey` |
+| B4 三商店獎台動畫（2026-03-29）| B4 | `_showPodiumAnimation(curr)`：triple 排序正確後顯示 2nd/1st/3rd 獎台動畫；`b4PodiumRise` 動畫；F4 排序 + C5 差額圖示 pattern；搜尋 `b4-podium-overlay` |
+| B5 節省金額徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`rem>0` 時渲染 `.b5-savings-badge`「💰 節省了X元（節省Y%）！」；綠色漸層徽章；B4 savings toast pattern |
+| B6 結帳確認清單（2026-03-29）| B6 | `_showCheckoutConfirm(g, callback)`：結帳按鈕→先顯示商品清單+合計+預算確認卡（`b6-checkout-card`）；語音「合計X元，預算Y元，確認去付款」；5s 自動/點背景關閉；AssistClick 加 `b6-cc-go` 偵測；`.b6-checkout-card/.b6-cc-*` CSS；B1 `_showTaskModal` pattern |
+| B3 月曆倒數提示（2026-03-29）| B3 | `_completeDragSession` else 分支加語音「還差X元，再存Y天就達標了！」；`_showCountdownHint(remaining, daysLeft)` 底部浮動卡顯示剩餘金額+天數；`.b3-countdown-hint/.b3-cd-num/label` CSS；`b3CdIn` 動畫；B1 exact toast pattern |
 
 ---
 
