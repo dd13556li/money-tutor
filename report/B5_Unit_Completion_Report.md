@@ -3,6 +3,7 @@
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-24（第七輪：B5_SCENARIOS easy/normal 8→12 組，共 32 組）
 > **更新日期**：2026-03-25（第九輪：超支時智慧移除建議 `_handleConfirm` 超支分支改版）
+> **更新日期**：2026-03-29（派對主題篩選：`B5_THEMES`（birthday/halloween/picnic）各含 `allItems[]`+`scenarios{}`；`partyTheme: null`；設定頁「🎪 派對主題」3 選項；`renderRound` 改用 `themeData.allItems`；完成畫面標題動態顯示主題）
 > **更新日期**：2026-03-25（第十三輪：關卡轉場卡 `_showRoundTransition`，C6 transitionText pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）

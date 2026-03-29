@@ -2,6 +2,7 @@
 
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-25（第十一輪：正確商品彈出價格動畫 `_showPricePopup`，A4 交易摘要 pattern）
+> **更新日期**：2026-03-29（市場類型篩選：`B6_MARKETS`（traditional/supermarket/nightmarket）各含 `stalls{}`+`missions{}`；`_currentStalls`/`_currentMissions` 模組變數；`marketType: null`；設定頁「🏪 市場類型」3 選項；header 動態顯示市場名稱）
 > **更新日期**：2026-03-25（第十二輪：攤位分頁需求件數徽章，C5 指示燈 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B6 — 菜市場買菜（Market Shopping）

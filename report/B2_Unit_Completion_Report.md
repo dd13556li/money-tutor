@@ -2,6 +2,7 @@
 
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-25（第十一輪：easy 模式逐項動畫高亮 `_animateEasyEntries`，C2 逐一計數 pattern）
+> **更新日期**：2026-03-29（日記主題篩選：`B2_THEMES`（school/holiday/family）；設定頁「📓 日記主題」3 選項；`diaryTheme: null`；完成畫面標題動態顯示主題）
 > **更新日期**：2026-03-25（第十三輪：easy 模式逐項小計顯示 `b2-running-total`，F5 視覺化 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
