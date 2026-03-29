@@ -59,6 +59,23 @@ const B4_TRIPLE_ITEMS = [
     { name:'洗碗精',       icon:'🧼',  stores:[{ store:'超商',   storeIcon:'🏪', price:89  },{ store:'超市',   storeIcon:'🛒', price:59  },{ store:'量販店', storeIcon:'🏬', price:45  }] },
 ];
 
+// ── 單位比價題庫（12 組，optA 每單位較貴、optB 每單位較便宜）────────
+// unit: 商品計算單位；qty/price → perUnit = price/qty（整數）
+const B4_UNIT_ITEMS = [
+    { name:'糖果',     icon:'🍬', unit:'個', optA:{ store:'超商',    storeIcon:'🏪', qty:8,  price:56  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:50  } },
+    { name:'鉛筆',     icon:'✏️', unit:'支', optA:{ store:'文具店',  storeIcon:'🏪', qty:5,  price:40  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:6,  price:36  } },
+    { name:'雞蛋',     icon:'🥚', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:6,  price:60  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:80  } },
+    { name:'香蕉',     icon:'🍌', unit:'根', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:30  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:4,  price:32  } },
+    { name:'水餃',     icon:'🥟', unit:'個', optA:{ store:'冷凍食品',storeIcon:'🏪', qty:10, price:80  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:12, price:84  } },
+    { name:'吐司',     icon:'🍞', unit:'片', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', qty:6,  price:72  } },
+    { name:'小番茄',   icon:'🍅', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:5,  price:35  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:8,  price:40  } },
+    { name:'優格',     icon:'🫙', unit:'瓶', optA:{ store:'超商',    storeIcon:'🏪', qty:2,  price:50  }, optB:{ store:'超市',   storeIcon:'🛒', qty:4,  price:88  } },
+    { name:'巧克力棒', icon:'🍫', unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:75  }, optB:{ store:'超市',   storeIcon:'🛒', qty:5,  price:110 } },
+    { name:'洗衣錠',   icon:'🧼', unit:'顆', optA:{ store:'藥局',    storeIcon:'💊', qty:10, price:120 }, optB:{ store:'量販店', storeIcon:'🏬', qty:15, price:150 } },
+    { name:'果凍',     icon:'🍮', unit:'個', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:45  }, optB:{ store:'量販店', storeIcon:'🏬', qty:6,  price:72  } },
+    { name:'抹布',     icon:'🧹', unit:'條', optA:{ store:'超市',    storeIcon:'🛒', qty:2,  price:30  }, optB:{ store:'量販店', storeIcon:'🏬', qty:4,  price:48  } },
+];
+
 // ── 輔助函數 ────────────────────────────────────────────────────
 const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertToTraditionalCurrency(v) : `${v}元`;
 
@@ -248,6 +265,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 .b4-pbar-mid {
                     background: linear-gradient(90deg, #f59e0b, #fbbf24);
                 }
+                /* 單位比價卡 */
+                .b4-unit-card { padding: 14px 10px !important; }
+                .b4-unit-qty {
+                    font-size: 13px; color: #6b7280; margin-top: 2px;
+                }
+                .b4-unit-per {
+                    font-size: 14px; font-weight: bold; color: #374151;
+                    background: #fef3c7; border: 1.5px solid #fbbf24;
+                    border-radius: 8px; padding: 3px 8px; margin-top: 4px;
+                }
+                .b4-unit-per-val {
+                    font-size: 1.3em; color: #d97706;
+                }
             `;
             document.head.appendChild(s);
         },
@@ -313,9 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="b-btn-group">
                                 <button class="b-sel-btn" data-stores="two">兩家店</button>
                                 <button class="b-sel-btn" data-stores="triple">三家店排序 🎲</button>
+                                <button class="b-sel-btn" data-stores="unit">單位比價 📦</button>
                             </div>
                             <div style="margin-top:6px;font-size:12px;color:#6b7280;line-height:1.5;">
-                                兩家店：比較兩間商店價格 ｜ 三家店：三間商店由便宜到貴排序
+                                兩家店：比較兩間商店價格 ｜ 三家店：三間商店由便宜到貴排序 ｜ 單位比價：計算每單位的價格再比較
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -359,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 比較商店價格，找出最划算的選擇！<br>
-                                兩家店：簡單選最便宜；三家店：由便宜到貴依序排列（F4 排序應用）
+                                兩家店：簡單選最便宜；三家店：由便宜到貴依序排列（F4 排序應用）；單位比價：算每單位價格再比較（÷ 應用）
                             </label>
                         </div>
                     </div>
@@ -374,9 +405,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _diffDescriptions: {
-            easy:   '簡單：點選最便宜的那家商店，答對就過關！',
-            normal: '普通：選出最便宜的之後，再回答差了多少元（三選一）',
-            hard:   '困難（兩家店）：選便宜的後自己輸入差額 ｜（三家店）：聽完報價後由便宜到貴依序點選'
+            easy:   '簡單：點選最划算的那家商店，答對就過關！',
+            normal: '普通：選出最划算的之後，再回答差了多少（三選一）',
+            hard:   '困難（兩/三家店）：選最划算的後自己輸入差額；（三家店）由便宜到貴依序點選'
         },
 
         _bindSettingsEvents() {
@@ -477,8 +508,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _generateQuestions(count) {
-            const isTriple = this.state.settings.compareStores === 'triple';
-            const basePool = isTriple ? B4_TRIPLE_ITEMS : B4_ITEMS;
+            const compareStores = this.state.settings.compareStores;
+            const isTriple = compareStores === 'triple';
+            const isUnit   = compareStores === 'unit';
+            const basePool = isTriple ? B4_TRIPLE_ITEMS : (isUnit ? B4_UNIT_ITEMS : B4_ITEMS);
             const pool     = [...basePool];
             const result   = [];
             for (let i = 0; i < count; i++) {
@@ -496,12 +529,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const middleIdx    = shuffled.findIndex(s => s.price === sortedAsc[1].price);
                     const mostExpIdx   = shuffled.findIndex(s => s.price === sortedAsc[2].price);
                     const diff = sortedAsc[2].price - sortedAsc[0].price; // 最貴 - 最便宜
-                    result.push({ ...item, stores: shuffled, sortedAsc, cheapestIdx, middleIdx, mostExpIdx, diff, isTriple: true });
+                    result.push({ ...item, stores: shuffled, sortedAsc, cheapestIdx, middleIdx, mostExpIdx, diff, isTriple: true, isUnit: false });
+                } else if (isUnit) {
+                    // 單位比價：計算每單位價格（整數）
+                    const perA   = item.optA.price / item.optA.qty; // optA 永遠貴
+                    const perB   = item.optB.price / item.optB.qty; // optB 永遠便宜
+                    const diff   = perA - perB;
+                    const swapped = Math.random() < 0.5;
+                    result.push({ ...item, swapped, perA, perB, diff, isTriple: false, isUnit: true });
                 } else {
                     // 隨機決定左右交換
                     const swapped = Math.random() < 0.5;
                     const diff    = item.optA.price - item.optB.price; // optB 永遠便宜
-                    result.push({ ...item, swapped, diff, isTriple: false });
+                    result.push({ ...item, swapped, diff, isTriple: false, isUnit: false });
                 }
             }
             return result;
@@ -534,6 +574,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 正確答案：便宜的是 optB；若 swapped，便宜在左（left=optB）
             const correctSide = curr.swapped ? 'left' : 'right';
 
+            const questionLabel = curr.isUnit
+                ? `哪家每${curr.unit}比較划算？`
+                : `哪個地方比較便宜？`;
+
             app.innerHTML = `
             ${this._renderHeader()}
             <div class="b-game-wrap">
@@ -541,31 +585,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b4-item-icon">${curr.icon}</span>
                     <div class="b4-item-name">${curr.name}</div>
                     <div class="b4-question-label">
-                        哪個地方比較便宜？
+                        ${questionLabel}
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
                 </div>
                 <div class="b4-compare-grid" id="compare-grid">
-                    ${this._renderOptionCard('left', left, curr.optB.price, correctSide)}
+                    ${this._renderOptionCard('left', left, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
                     <div class="b4-vs-divider">VS</div>
-                    ${this._renderOptionCard('right', right, curr.optB.price, correctSide)}
+                    ${this._renderOptionCard('right', right, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
                 </div>
                 <div id="diff-section"></div>
             </div>`;
 
             this._bindSelectEvents(curr, correctSide, left, right);
 
-            // 語音引導（含雙店價格，對齊 A/C/F 讀出題目數字 pattern）
+            // 語音引導（含雙店資訊，對齊 A/C/F 讀出題目數字 pattern）
             Game.TimerManager.setTimeout(() => {
                 const diff = this.state.settings.difficulty;
-                const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
-                const speechMap = {
-                    easy:   `${curr.name}，${priceInfo}，哪個比較便宜？`,
-                    normal: `${curr.name}，${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
-                    hard:   `${curr.name}，${priceInfo}，哪個比較便宜？選出後輸入差額。`,
-                };
-                this.state.quiz.lastSpeechText = speechMap[diff] || `${curr.name}，哪個地方比較便宜？`;
-                Game.Speech.speak(speechMap[diff] || `${curr.name}，哪個地方比較便宜？`);
+                let speechText;
+                if (curr.isUnit) {
+                    const unitInfo = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}`;
+                    const unitSuffix = diff === 'easy'
+                        ? `，哪家每${curr.unit}比較划算？`
+                        : diff === 'normal'
+                        ? `，哪家每${curr.unit}比較划算？選出後再回答每${curr.unit}差多少元。`
+                        : `，哪家每${curr.unit}比較划算？選出後輸入每${curr.unit}差額。`;
+                    speechText = `${curr.name}，${unitInfo}${unitSuffix}`;
+                } else {
+                    const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
+                    const speechMap = {
+                        easy:   `${curr.name}，${priceInfo}，哪個比較便宜？`,
+                        normal: `${curr.name}，${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
+                        hard:   `${curr.name}，${priceInfo}，哪個比較便宜？選出後輸入差額。`,
+                    };
+                    speechText = speechMap[diff] || `${curr.name}，哪個地方比較便宜？`;
+                }
+                this.state.quiz.lastSpeechText = speechText;
+                Game.Speech.speak(speechText);
             }, 400, 'speech');
 
             // 輔助點擊啟動
@@ -591,8 +647,19 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderOptionCard(side, opt, cheaperPrice, correctSide) {
-            const isCheaper = (opt.price === cheaperPrice);
+        _renderOptionCard(side, opt, cheaperPer, correctSide, unitCurr = null) {
+            if (unitCurr) {
+                // 單位比價模式：顯示數量/總價 + 每單位價格
+                const per = opt.price / opt.qty;
+                return `
+                <div class="b4-option-card b4-unit-card" id="card-${side}" data-side="${side}">
+                    <div class="b4-store-label">商店</div>
+                    <div class="b4-store-icon">${opt.storeIcon}</div>
+                    <div class="b4-store-name">${opt.store}</div>
+                    <div class="b4-unit-qty">${opt.qty}${unitCurr.unit} / ${opt.price}元</div>
+                    <div class="b4-unit-per">每${unitCurr.unit} <span class="b4-unit-per-val">${per}</span>元</div>
+                </div>`;
+            }
             return `
             <div class="b4-option-card" id="card-${side}" data-side="${side}">
                 <div class="b4-store-label">商店</div>
@@ -646,8 +713,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showCenterFeedback('✅', '答對了！');
                 if (correctCard) {
                     correctCard.classList.add('selected-correct');
+                    const cheapTag = curr.isUnit ? '比較划算！' : '比較便宜！';
                     correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
-                        <div class="b4-cheaper-tag">比較便宜！</div>`;
+                        <div class="b4-cheaper-tag">${cheapTag}</div>`;
                 }
                 if (diff === 'easy') {
                     // 簡單：直接下一題
@@ -656,7 +724,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                         Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
                     }
-                    Game.Speech.speak(`答對了！${correctCard?.querySelector('.b4-store-name')?.textContent || ''}比較便宜`);
+                    const cheapWord = curr.isUnit ? '比較划算' : '比較便宜';
+                    Game.Speech.speak(`答對了！${correctCard?.querySelector('.b4-store-name')?.textContent || ''}${cheapWord}`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
                 } else {
                     // 普通/困難：顯示差額問題
@@ -673,19 +742,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (wrongCard)   wrongCard.classList.add('selected-wrong');
                 if (correctCard) {
                     correctCard.classList.add('reveal-correct');
-                    correctCard.innerHTML += `<div class="b4-cheaper-tag">這個才便宜</div>`;
+                    const revealTag = curr.isUnit ? '這個才划算' : '這個才便宜';
+                    correctCard.innerHTML += `<div class="b4-cheaper-tag">${revealTag}</div>`;
                 }
                 if (this.state.settings.retryMode === 'proceed') {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`答錯了，${correctCard?.querySelector('.b4-store-name')?.textContent || '另一個'}才是比較便宜的`);
+                    const cStoreName = correctCard?.querySelector('.b4-store-name')?.textContent || '另一個';
+                    const wrongProceedSpeech = curr.isUnit
+                        ? `答錯了，${cStoreName}才是比較划算的`
+                        : `答錯了，${cStoreName}才是比較便宜的`;
+                    Game.Speech.speak(wrongProceedSpeech);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     this.state.quiz.selectErrorCount++;
                     const autoHint = this.state.quiz.selectErrorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(autoHint
-                        ? `這邊比較貴喔，${correctCard?.querySelector('.b4-store-name')?.textContent || '另一個'}才便宜`
-                        : '這邊比較貴喔，再看看另一邊');
+                    const cStoreName2 = correctCard?.querySelector('.b4-store-name')?.textContent || '另一個';
+                    const retryHintSpeech = curr.isUnit
+                        ? (autoHint ? `這邊比較貴喔，${cStoreName2}才划算` : '這邊每單位比較貴喔，再看看另一邊')
+                        : (autoHint ? `這邊比較貴喔，${cStoreName2}才便宜` : '這邊比較貴喔，再看看另一邊');
+                    Game.Speech.speak(retryHintSpeech);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         ['left','right'].forEach(s => {
@@ -1054,6 +1130,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Diff Phase ─────────────────────────────────────────
         // ── 視覺價差比例條（F5 量比較 pattern）─────────────────────
         _renderPriceBars(curr) {
+            if (curr.isUnit) {
+                // 單位比價模式：用每單位價格畫比例條
+                const maxP = Math.max(curr.perA, curr.perB);
+                const pctA = Math.round(curr.perA / maxP * 100);
+                const pctB = Math.round(curr.perB / maxP * 100);
+                return `
+                <div class="b4-price-bars">
+                    <div class="b4-pbar-row">
+                        <span class="b4-pbar-label">${curr.optA.storeIcon} ${curr.optA.store}</span>
+                        <div class="b4-pbar-track">
+                            <div class="b4-pbar-fill b4-pbar-high" style="width:${pctA}%"></div>
+                        </div>
+                        <span class="b4-pbar-price">${curr.perA} 元/${curr.unit}</span>
+                    </div>
+                    <div class="b4-pbar-row">
+                        <span class="b4-pbar-label">${curr.optB.storeIcon} ${curr.optB.store}</span>
+                        <div class="b4-pbar-track">
+                            <div class="b4-pbar-fill b4-pbar-low" style="width:${pctB}%"></div>
+                        </div>
+                        <span class="b4-pbar-price">${curr.perB} 元/${curr.unit}</span>
+                    </div>
+                </div>`;
+            }
             const maxP = Math.max(curr.optA.price, curr.optB.price);
             const pctA = Math.round(curr.optA.price / maxP * 100);
             const pctB = Math.round(curr.optB.price / maxP * 100);
@@ -1081,21 +1180,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const section = document.getElementById('diff-section');
             if (!section) return;
 
-            const correctDiff = curr.diff; // optA.price - optB.price
+            const correctDiff = curr.diff; // optA.price - optB.price (or perA - perB for unit)
             const barsHTML = this._renderPriceBars(curr);
+            const diffQuestion = curr.isUnit ? `每${curr.unit}差多少元？` : `便宜了多少元？`;
+            const diffUnit     = curr.isUnit ? `元/${curr.unit}` : `元`;
 
             if (diff === 'normal') {
-                const options = this._getDiffOptions(correctDiff);
+                const options = this._getDiffOptions(correctDiff, curr.isUnit);
                 section.innerHTML = `
                 <div class="b4-diff-section" style="animation:b4SlideUp 0.3s ease">
                     ${barsHTML}
                     <div class="b4-diff-question">
-                        便宜了多少元？
+                        ${diffQuestion}
                         <div class="b4-diff-sub">點選正確的差額</div>
                     </div>
                     <div class="b4-diff-options">
                         ${options.map(val => `
-                        <button class="b4-diff-opt" data-val="${val}">${val} 元</button>`).join('')}
+                        <button class="b4-diff-opt" data-val="${val}">${val} ${diffUnit}</button>`).join('')}
                     </div>
                 </div>`;
 
@@ -1119,12 +1220,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-diff-section" style="animation:b4SlideUp 0.3s ease">
                     ${barsHTML}
                     <div class="b4-diff-question">
-                        便宜了多少元？
+                        ${diffQuestion}
                         <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
                     </div>
                     <button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>
                     <div class="b4-input-display" id="numpad-display">
-                        <span id="numpad-val">0</span><span class="b4-unit-text"> 元</span>
+                        <span id="numpad-val">0</span><span class="b4-unit-text"> ${diffUnit}</span>
                     </div>
                     <div class="b4-numpad">
                         ${[7,8,9,4,5,6,1,2,3].map(n =>
@@ -1154,7 +1255,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (diffHintBtn) {
                     Game.EventManager.on(diffHintBtn, 'click', () => {
                         this._showDiffFormulaHint();
-                        Game.Speech.speak(`${curr.optA.price}減${curr.optB.price}`);
+                        const hintSpeech = curr.isUnit
+                            ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，差${curr.diff}元`
+                            : `${curr.optA.price}減${curr.optB.price}`;
+                        Game.Speech.speak(hintSpeech);
                     }, {}, 'diffUI');
                 }
 
@@ -1179,17 +1283,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el) el.textContent = this.state.numpadValue || '0';
         },
 
-        _getDiffOptions(correct) {
+        _getDiffOptions(correct, isUnit = false) {
             const opts = new Set([correct]);
-            const variations = [10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100];
+            const variations = isUnit
+                ? [1, 2, 3, 4, 5, 6, 7, 8]
+                : [10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100];
             for (const v of variations) {
                 if (opts.size >= 3) break;
                 const candidate = correct + (Math.random() < 0.5 ? v : -v);
                 if (candidate > 0 && candidate !== correct) opts.add(candidate);
             }
             // 補足到3個
-            let extra = 10;
-            while (opts.size < 3) { opts.add(correct + extra); extra += 5; }
+            let extra = isUnit ? 1 : 10;
+            while (opts.size < 3) { opts.add(correct + extra); extra += isUnit ? 1 : 5; }
             return [...opts].sort(() => Math.random() - 0.5);
         },
 
@@ -1202,9 +1308,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!section) return;
             const hint = document.createElement('div');
             hint.className = 'b4-diff-hint-formula';
-            hint.innerHTML = `<span class="b4-hint-label">💡 算式提示：</span>`
-                + `${item.optA.price} <span class="b4-hint-op">−</span> ${item.optB.price}`
-                + ` <span class="b4-hint-op">=</span> <span class="b4-hint-blank">？</span> 元`;
+            if (item.isUnit) {
+                // 單位比價：顯示每單位算式
+                hint.innerHTML = `<span class="b4-hint-label">💡 算式提示：</span>`
+                    + `${item.optA.store} ${item.optA.price}÷${item.optA.qty}=${item.perA}元`
+                    + ` <span class="b4-hint-op">−</span> `
+                    + `${item.optB.store} ${item.optB.price}÷${item.optB.qty}=${item.perB}元`
+                    + ` <span class="b4-hint-op">=</span> <span class="b4-hint-blank">？</span> 元/${item.unit}`;
+            } else {
+                hint.innerHTML = `<span class="b4-hint-label">💡 算式提示：</span>`
+                    + `${item.optA.price} <span class="b4-hint-op">−</span> ${item.optB.price}`
+                    + ` <span class="b4-hint-op">=</span> <span class="b4-hint-blank">？</span> 元`;
+            }
             const anchor = section.querySelector('.b4-diff-options') || section.querySelector('.b4-numpad');
             if (anchor) section.insertBefore(hint, anchor);
             else section.appendChild(hint);
@@ -1236,7 +1351,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const toast = document.createElement('div');
             toast.id = 'b4-savings-toast';
             toast.className = 'b4-savings-toast';
-            toast.textContent = `💰 省了 ${amount} 元！`;
+            const ci3 = this.state.currentDiffItem;
+            toast.textContent = (ci3 && ci3.isUnit) ? `💰 每${ci3.unit}省了 ${amount} 元！` : `💰 省了 ${amount} 元！`;
             document.body.appendChild(toast);
             Game.TimerManager.setTimeout(() => {
                 toast.classList.add('b4-toast-fade');
@@ -1258,25 +1374,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ci) {
                     this.state.quiz.comparisonHistory.push({
                         name: ci.name, icon: ci.icon,
-                        cheapStore: ci.optB.store, cheapPrice: ci.optB.price,
-                        expStore: ci.optA.store,   expPrice:  ci.optA.price,
-                        saved: correctDiff
+                        cheapStore: ci.optB.store, cheapPrice: ci.isUnit ? ci.perB : ci.optB.price,
+                        expStore: ci.optA.store,   expPrice:  ci.isUnit ? ci.perA : ci.optA.price,
+                        saved: correctDiff,
+                        isUnit: ci.isUnit || false, unit: ci.unit || ''
                     });
                 }
                 this._showSavingsToast(correctDiff);
-                Game.Speech.speak(`答對了！便宜了${toTWD(correctDiff)}`);
+                const ci2 = this.state.currentDiffItem;
+                const diffSpeech = (ci2 && ci2.isUnit)
+                    ? `答對了！每${ci2.unit}便宜了${correctDiff}元`
+                    : `答對了！便宜了${toTWD(correctDiff)}`;
+                Game.Speech.speak(diffSpeech);
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showDiffFormulaHint(); // 答錯即顯示算式提示
+                const ciW = this.state.currentDiffItem;
+                const diffWrongSpeechBase = (ciW && ciW.isUnit)
+                    ? `每${ciW.unit}差${correctDiff}元`
+                    : `差額是${toTWD(correctDiff)}`;
                 if (this.state.settings.retryMode === 'proceed') {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`差額是${toTWD(correctDiff)}，繼續下一題`);
+                    Game.Speech.speak(`${diffWrongSpeechBase}，繼續下一題`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     // retry: re-enable buttons after showing correct
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`差額是${toTWD(correctDiff)}，再試一次`);
+                    Game.Speech.speak(`${diffWrongSpeechBase}，再試一次`);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         // Re-enable diff options
@@ -1347,7 +1472,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b4-rank-medal">${medals[i]}</span>
                             <span class="b4-rank-item">${h.icon} ${h.name}</span>
                             <span class="b4-rank-store">${h.cheapStore}</span>
-                            <span class="b4-rank-saved">省 ${h.saved} 元</span>
+                            <span class="b4-rank-saved">${h.isUnit ? `每${h.unit}省${h.saved}元` : `省${h.saved}元`}</span>
                         </div>`).join('')}
                     </div>
                 </div>`;
@@ -1417,8 +1542,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ${q.totalSaved > 0 ? `
             <div class="b4-savings-banner">
                 <div class="b4-savings-icon">🤑</div>
-                <div class="b4-savings-text">這次比價你總共省了</div>
-                <div class="b4-savings-amount">${q.totalSaved} 元</div>
+                <div class="b4-savings-text">${this.state.settings.compareStores === 'unit' ? '你找出了最划算的單位價格！' : '這次比價你總共省了'}</div>
+                <div class="b4-savings-amount">${this.state.settings.compareStores === 'unit' ? `${q.totalSaved} 元 / 單位` : `${q.totalSaved} 元`}</div>
             </div>` : ''}
 
             ${savingsRankHTML}
@@ -1433,9 +1558,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <tbody>
                         ${q.comparisonHistory.map(h => `<tr>
                             <td class="b4-cmp-name">${h.icon} ${h.name}</td>
-                            <td class="b4-cmp-cheap">${h.cheapStore}<br><span>${h.cheapPrice}元</span></td>
-                            <td class="b4-cmp-exp">${h.expStore}<br><span>${h.expPrice}元</span></td>
-                            <td class="b4-cmp-saved">省${h.saved}元</td>
+                            <td class="b4-cmp-cheap">${h.cheapStore}<br><span>${h.cheapPrice}${h.isUnit ? `元/${h.unit}` : '元'}</span></td>
+                            <td class="b4-cmp-exp">${h.expStore}<br><span>${h.expPrice}${h.isUnit ? `元/${h.unit}` : '元'}</span></td>
+                            <td class="b4-cmp-saved">${h.isUnit ? `每${h.unit}省${h.saved}元` : `省${h.saved}元`}</td>
                         </tr>`).join('')}
                     </tbody>
                 </table>
