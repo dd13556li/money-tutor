@@ -588,6 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-market="traditional">🏪 傳統市場</button>
                                 <button class="b-sel-btn" data-market="supermarket">🛒 超市</button>
                                 <button class="b-sel-btn" data-market="nightmarket">🏮 夜市</button>
+                                <button class="b-sel-btn" data-market="random">隨機 🎲</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -688,10 +689,17 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.removeByCategory('settings');
             Game.TimerManager.clearAll();
 
-            // 設定當前市場類型
-            const mkt = B6_MARKETS[this.state.settings.marketType] || B6_MARKETS.traditional;
-            _currentStalls   = mkt.stalls;
-            _currentMissions = mkt.missions;
+            // 設定當前市場類型（隨機模式：在 _pickMissions 逐關隨機）
+            const mktKey = this.state.settings.marketType;
+            if (mktKey === 'random') {
+                // 隨機模式延遲到 _pickMissions 時再決定；先用傳統市場作預設
+                _currentStalls   = B6_MARKETS.traditional.stalls;
+                _currentMissions = B6_MARKETS.traditional.missions;
+            } else {
+                const mkt = B6_MARKETS[mktKey] || B6_MARKETS.traditional;
+                _currentStalls   = mkt.stalls;
+                _currentMissions = mkt.missions;
+            }
 
             const s = this.state.settings;
             const g = this.state.game;
@@ -709,6 +717,17 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _pickMissions(count, diff) {
+            const mktKey  = this.state.settings.marketType;
+            const mktKeys = ['traditional', 'supermarket', 'nightmarket'];
+            if (mktKey === 'random') {
+                const result = [];
+                for (let i = 0; i < count; i++) {
+                    const rKey = mktKeys[Math.floor(Math.random() * mktKeys.length)];
+                    const pool = B6_MARKETS[rKey].missions[diff].slice().sort(() => Math.random() - 0.5);
+                    result.push({ ...pool[0], _mktKey: rKey });
+                }
+                return result;
+            }
             const pool = _currentMissions[diff].slice().sort(() => Math.random() - 0.5);
             const result = [];
             for (let i = 0; i < count; i++) {
@@ -726,6 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const g       = this.state.game;
             g.mission     = g.missions[g.currentRound];
+            // 隨機模式：依本關 _mktKey 切換攤位資料
+            if (g.mission._mktKey && B6_MARKETS[g.mission._mktKey]) {
+                _currentStalls = B6_MARKETS[g.mission._mktKey].stalls;
+            }
             g.collectedIds = new Set();
             g.activeStall = Object.keys(_currentStalls)[0];
             g.phase       = 'shopping';
@@ -848,7 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">${(() => { const m = B6_MARKETS[this.state.settings.marketType]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
+                    <span class="b-header-unit">${(() => { const k = this.state.settings.marketType; if (k === 'random') return '🎲 隨機市場'; const m = B6_MARKETS[k]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
                 <div class="b-header-right">
@@ -1049,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">${(() => { const m = B6_MARKETS[this.state.settings.marketType]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
+                    <span class="b-header-unit">${(() => { const k = this.state.settings.marketType; if (k === 'random') return '🎲 隨機市場'; const m = B6_MARKETS[k]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
                 <div class="b-header-right">
