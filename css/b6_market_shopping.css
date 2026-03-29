@@ -871,3 +871,12 @@
     60%  { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
+
+/* ── Round 32：B6 結帳清單平均 ── */
+.b6-cc-avg {
+    font-size: 11px;
+    color: #6b7280;
+    padding-top: 4px;
+    border-top: 1px dashed #e5e7eb;
+    margin-top: 4px;
+}

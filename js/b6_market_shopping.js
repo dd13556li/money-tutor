@@ -1073,6 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b6-cc-sep"></div>
                         <div class="b6-cc-row b6-cc-total"><span>合計</span><span>${total} 元</span></div>
                         <div class="b6-cc-row b6-cc-budget"><span>預算</span><span>${g.mission.budget} 元</span></div>
+                        <div class="b6-cc-row b6-cc-avg"><span>共 ${items.length} 項，平均每項</span><span>${items.length > 0 ? Math.round(total / items.length) : 0} 元</span></div>
                     </div>
                     <button class="b6-cc-btn" id="b6-cc-go">✓ 去付款</button>
                 </div>`;

@@ -950,3 +950,24 @@
 }
 .b1-wallet-progress-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 .b1-wallet-progress-fill.full { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* ── Round 32：B1 面額計數摘要 ── */
+.b1-denom-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    animation: bFadeIn 0.3s ease;
+}
+.b1-ds-item {
+    padding: 2px 8px;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #14532d;
+    font-weight: 600;
+}

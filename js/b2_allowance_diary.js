@@ -964,6 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
                 this._showNetTrend(question);
+                this._showFinancialTip(question); // 理財建議（Round 32）
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
@@ -1156,6 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
                 this._showNetTrend(question);
+                this._showFinancialTip(question); // 理財建議（Round 32）
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
@@ -1197,6 +1199,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 trend.classList.add('b2-nt-fade');
                 Game.TimerManager.setTimeout(() => { if (trend.parentNode) trend.remove(); }, 400, 'ui');
             }, 1400, 'ui');
+        },
+
+        // ── 理財建議卡（Round 32）────────────────────────────────
+        _showFinancialTip(question) {
+            const net = question.answer - question.startAmount;
+            const tips = net > 0
+                ? ['收入大於支出，可以把多出來的錢存起來！', '有盈餘真好！記得把剩餘的錢放進撲滿。']
+                : net < 0
+                ? ['支出超過收入要小心喔，記得控制花費。', '赤字時，思考哪些費用可以減少。']
+                : ['收支剛好平衡，繼續保持！'];
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const prev = document.getElementById('b2-fin-tip');
+            if (prev) prev.remove();
+            const card = document.createElement('div');
+            card.id = 'b2-fin-tip';
+            card.className = 'b2-fin-tip';
+            card.innerHTML = `<span class="b2-ft-icon">💡</span><span class="b2-ft-text">${tip}</span>`;
+            const app = document.getElementById('app');
+            if (app) app.appendChild(card);
+            Game.TimerManager.setTimeout(() => { if (card.parentNode) card.remove(); }, 1400, 'ui');
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────

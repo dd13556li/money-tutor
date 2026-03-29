@@ -625,3 +625,25 @@
 .b2-input-preview.exact { color: #059669; }
 .b2-input-preview.over  { color: #dc2626; }
 .b2-input-preview.under { color: #d97706; }
+
+/* ── Round 32：B2 理財建議卡 ── */
+.b2-fin-tip {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    max-width: 320px;
+    z-index: 600;
+    pointer-events: none;
+    animation: bFadeIn 0.3s ease;
+}
+.b2-ft-icon { font-size: 18px; flex-shrink: 0; }
+.b2-ft-text { line-height: 1.4; }

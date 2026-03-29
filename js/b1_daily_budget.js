@@ -656,6 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b1-wallet-coins b1-drop-zone" id="wallet-coins">
                     <span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>
                 </div>
+                <div class="b1-denom-summary" id="b1-denom-summary" style="display:none"></div>
                 <button class="b1-confirm-btn" id="confirm-btn" disabled>
                     ✅ 準備好了，出發！
                 </button>
@@ -806,6 +807,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 行程卡綠光（剛好符合時）
                 const card = document.querySelector('.b1-schedule-card');
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
+            }
+
+            // 面額計數摘要（Round 32）
+            const denomSummaryEl = document.getElementById('b1-denom-summary');
+            if (denomSummaryEl && this.state.wallet.length > 0) {
+                const counts = {};
+                this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
+                denomSummaryEl.innerHTML = Object.entries(counts)
+                    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                    .map(([d, n]) => `<span class="b1-ds-item">${d}元×${n}</span>`).join('');
+                denomSummaryEl.style.display = '';
+            } else if (denomSummaryEl) {
+                denomSummaryEl.style.display = 'none';
             }
 
             // 簡單模式：動態淡化超出剩餘所需的錢幣

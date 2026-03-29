@@ -1501,6 +1501,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Diff Answer Handler ─────────────────────────────────
         // 省錢 toast（A4 _showPricePopup pattern）
+        // ── 學習要點提示（Round 32）──────────────────────────────
+        _showSubtractionTip(highPrice, lowPrice, diff) {
+            const prev = document.getElementById('b4-sub-tip');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b4-sub-tip';
+            tip.className = 'b4-sub-tip';
+            tip.innerHTML = `<span class="b4-st-label">📐 減法算式：</span>`
+                + `<span class="b4-st-hi">${highPrice}</span>`
+                + `<span class="b4-st-op"> − </span>`
+                + `<span class="b4-st-lo">${lowPrice}</span>`
+                + `<span class="b4-st-op"> = </span>`
+                + `<span class="b4-st-diff">${diff} 元</span>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => { tip.classList.add('b4-tip-fade'); Game.TimerManager.setTimeout(() => tip.remove(), 400, 'ui'); }, 1200, 'ui');
+        },
+
         // ── 冠軍徽章（Round 31）──────────────────────────────────
         _showChampionBadge(storeName) {
             const prev = document.getElementById('b4-champion-badge');
@@ -1565,6 +1582,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? `答對了！每${ci2.unit}便宜了${correctDiff}元`
                     : `答對了！便宜了${toTWD(correctDiff)}`;
                 Game.Speech.speak(diffSpeech);
+                // 學習要點提示（Round 32）
+                if (ci2 && !ci2.isUnit) {
+                    this._showSubtractionTip(ci2.optA.price, ci2.optB.price, correctDiff);
+                }
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
