@@ -640,6 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindSelectEvents(curr, correctSide, left, right);
+            this._showItemIntroModal(curr);
 
             // 語音引導（含雙店資訊，對齊 A/C/F 讀出題目數字 pattern）
             Game.TimerManager.setTimeout(() => {
@@ -670,6 +671,45 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
             }
+        },
+
+        _showItemIntroModal(curr) {
+            const existing = document.getElementById('b4-item-intro-modal');
+            if (existing) existing.remove();
+
+            let storesHTML;
+            if (curr.isTriple) {
+                const sortedAsc = [...curr.stores].sort((a, b) => a.price - b.price);
+                storesHTML = curr.stores.map(s => `<span class="b4-intro-store">${s.storeIcon} ${s.store}<br><strong>${s.price}元</strong></span>`).join('');
+            } else if (curr.isUnit) {
+                storesHTML = `
+                    <span class="b4-intro-store">${curr.optA.storeIcon} ${curr.optA.store}<br><strong>${curr.optA.qty}${curr.unit} / ${curr.optA.price}元</strong></span>
+                    <span class="b4-intro-vs">VS</span>
+                    <span class="b4-intro-store">${curr.optB.storeIcon} ${curr.optB.store}<br><strong>${curr.optB.qty}${curr.unit} / ${curr.optB.price}元</strong></span>`;
+            } else {
+                storesHTML = `
+                    <span class="b4-intro-store">${curr.optA.storeIcon} ${curr.optA.store}<br><strong>${curr.optA.price}元</strong></span>
+                    <span class="b4-intro-vs">VS</span>
+                    <span class="b4-intro-store">${curr.optB.storeIcon} ${curr.optB.store}<br><strong>${curr.optB.price}元</strong></span>`;
+            }
+
+            const questionText = curr.isTriple ? '哪家最便宜？' : (curr.isUnit ? `哪家每${curr.unit}最划算？` : '哪個比較便宜？');
+
+            const modal = document.createElement('div');
+            modal.id = 'b4-item-intro-modal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);cursor:pointer;';
+            modal.innerHTML = `
+                <div class="b4-intro-card">
+                    <div class="b4-intro-icon">${curr.icon}</div>
+                    <div class="b4-intro-name">${curr.name}</div>
+                    <div class="b4-intro-stores">${storesHTML}</div>
+                    <div class="b4-intro-question">${questionText}</div>
+                </div>`;
+            document.body.appendChild(modal);
+
+            const close = () => { if (modal.parentNode) modal.remove(); };
+            const t = Game.TimerManager.setTimeout(close, 1800, 'ui');
+            modal.addEventListener('click', () => { Game.TimerManager.clearTimeout(t); close(); });
         },
 
         _renderHeader() {
@@ -868,6 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindTripleEvents(curr, diff);
+            this._showItemIntroModal(curr);
 
             // 語音
             Game.TimerManager.setTimeout(() => {
