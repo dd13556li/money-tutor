@@ -820,11 +820,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const savingsBadge = rem > 0
                         ? `<div class="b5-savings-badge">💰 節省了 ${rem} 元（節省 ${remPct}%）！</div>`
                         : '';
+                    const usePct = g.budget > 0 ? Math.round((total / g.budget) * 100) : 0;
+                    const effInfo = usePct >= 95 ? { icon: '💎', label: '完美預算！', cls: 'perfect' }
+                        : usePct >= 80 ? { icon: '⭐', label: '善用預算！', cls: 'good' }
+                        : usePct >= 60 ? { icon: '👍', label: '不錯預算！', cls: 'ok' }
+                        : { icon: '💡', label: '節省模式', cls: 'save' };
+                    const effBadge = `<div class="b5-eff-badge ${effInfo.cls}">${effInfo.icon} ${effInfo.label} <span class="b5-eff-pct">${usePct}%</span></div>`;
                     resultArea.innerHTML = `
                         <div class="b5-result-banner success">
                             🎉 太棒了！派對辦起來！
                             <div class="b5-result-sub">共花了 ${total} 元，還剩 ${rem} 元</div>
                         </div>
+                        ${effBadge}
                         ${savingsBadge}`;
                 } else if (!mustOk) {
                     resultArea.innerHTML = `

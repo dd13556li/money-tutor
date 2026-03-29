@@ -934,6 +934,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.b6-stall-tab').forEach(tab => {
                 Game.EventManager.on(tab, 'click', () => {
                     if (g.activeStall === tab.dataset.stall) return;
+                    // 顯示離開攤位的小計（B6 stall subtotal, Round 25）
+                    const leavingStall = g.activeStall;
+                    const collectedHere = g.mission.items.filter(i => i.stall === leavingStall && g.collectedIds.has(i.id));
+                    if (collectedHere.length > 0) {
+                        const subtotal = collectedHere.reduce((s, item) => {
+                            const found = (_currentStalls[leavingStall]?.items || []).find(p => p.id === item.id);
+                            return s + (found?.price || 0);
+                        }, 0);
+                        this._showStallSubtotal(_currentStalls[leavingStall].name, subtotal);
+                    }
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
                     Game.Speech.speak(_currentStalls[tab.dataset.stall].name);
@@ -1068,6 +1078,21 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) { Game.TimerManager.clearTimeout(autoT); go(); }
             });
+        },
+
+        // ── 攤位小計提示（Round 25）──────────────────────────────
+        _showStallSubtotal(stallName, subtotal) {
+            const prev = document.getElementById('b6-stall-subtotal');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b6-stall-subtotal';
+            tip.className = 'b6-stall-subtotal';
+            tip.innerHTML = `<span class="b6-ss-name">${stallName}</span><span class="b6-ss-total">共 ${subtotal} 元</span>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => {
+                tip.classList.add('b6-ss-fade');
+                Game.TimerManager.setTimeout(() => { if (tip.parentNode) tip.remove(); }, 400, 'ui');
+            }, 1800, 'ui');
         },
 
         _showCenterFeedback(icon, text = '') {

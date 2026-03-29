@@ -502,3 +502,23 @@
     margin-top: 8px;
     animation: bFadeIn 0.4s ease;
 }
+
+/* ── B5 Efficiency Badge (Round 25) ── */
+.b5-eff-badge {
+    border-radius: 12px;
+    padding: 8px 14px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 8px;
+    animation: bFadeIn 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.b5-eff-badge.perfect { background: linear-gradient(135deg,#fef3c7,#fde68a); border: 2px solid #f59e0b; color: #92400e; }
+.b5-eff-badge.good    { background: linear-gradient(135deg,#dbeafe,#bfdbfe); border: 2px solid #3b82f6; color: #1e3a8a; }
+.b5-eff-badge.ok      { background: linear-gradient(135deg,#d1fae5,#a7f3d0); border: 2px solid #10b981; color: #065f46; }
+.b5-eff-badge.save    { background: linear-gradient(135deg,#f3f4f6,#e5e7eb); border: 2px solid #9ca3af; color: #374151; }
+.b5-eff-pct { font-size: 18px; font-weight: 900; }

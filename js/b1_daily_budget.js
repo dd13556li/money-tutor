@@ -874,6 +874,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1400, 'ui');
         },
 
+        // ── 找零說明動畫（B6 _showChangeFormula pattern）────────
+        _showChangeTip(paid, required, change) {
+            const prev = document.getElementById('b1-change-tip');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b1-change-tip';
+            tip.className = 'b1-change-tip';
+            tip.innerHTML = `
+                <div class="b1-ct-title">💱 找零計算</div>
+                <div class="b1-ct-row">
+                    <span class="b1-ct-item">${paid}元</span>
+                    <span class="b1-ct-op">−</span>
+                    <span class="b1-ct-item">${required}元</span>
+                    <span class="b1-ct-op">=</span>
+                    <span class="b1-ct-ans">找回 ${change} 元</span>
+                </div>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => {
+                tip.classList.add('b1-ct-fade');
+                Game.TimerManager.setTimeout(() => { if (tip.parentNode) tip.remove(); }, 400, 'ui');
+            }, 2200, 'ui');
+        },
+
         // ── Confirm ────────────────────────────────────────────
         handleConfirm(requiredTotal) {
             if (this.state.isProcessing) return;
@@ -899,6 +922,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
                 // 最少張數提示（C4/C6 最佳付款 pattern）
                 this._showMinCoinsHint(walletTotal, requiredTotal);
+                // 找零說明動畫（Round 25）
+                if (diff > 0) {
+                    Game.TimerManager.setTimeout(() => this._showChangeTip(walletTotal, requiredTotal, diff), 300, 'ui');
+                }
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');

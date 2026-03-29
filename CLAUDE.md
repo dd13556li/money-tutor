@@ -562,6 +562,9 @@ toolbarConfig: {
 | B5 節省金額徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`rem>0` 時渲染 `.b5-savings-badge`「💰 節省了X元（節省Y%）！」；綠色漸層徽章；B4 savings toast pattern |
 | B6 結帳確認清單（2026-03-29）| B6 | `_showCheckoutConfirm(g, callback)`：結帳按鈕→先顯示商品清單+合計+預算確認卡（`b6-checkout-card`）；語音「合計X元，預算Y元，確認去付款」；5s 自動/點背景關閉；AssistClick 加 `b6-cc-go` 偵測；`.b6-checkout-card/.b6-cc-*` CSS；B1 `_showTaskModal` pattern |
 | B3 月曆倒數提示（2026-03-29）| B3 | `_completeDragSession` else 分支加語音「還差X元，再存Y天就達標了！」；`_showCountdownHint(remaining, daysLeft)` 底部浮動卡顯示剩餘金額+天數；`.b3-countdown-hint/.b3-cd-num/label` CSS；`b3CdIn` 動畫；B1 exact toast pattern |
+| B5 預算效率徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`usePct=total/budget*100`；≥95% 💎完美/≥80% ⭐善用/≥60% 👍不錯/<60% 💡節省；`.b5-eff-badge.perfect/good/ok/save` CSS；B4 savings toast pattern |
+| B6 攤位小計提示（2026-03-29）| B6 | 切換攤位時若已收集商品，`_showStallSubtotal(stallName, subtotal)` 顯示離開攤位已花金額；`.b6-stall-subtotal/.b6-ss-name/total` CSS；`b6SsIn` 動畫 |
+| B1 找零說明動畫（2026-03-29）| B1 | 答對且 `diff>0` 時 300ms 後顯示 `_showChangeTip(paid, required, change)`：「付X − 需Y = 找回Z元」公式卡；`.b1-change-tip/.b1-ct-row/item/op/ans` CSS；`b1CtIn` 動畫；B6 change formula pattern |
 
 ---
 

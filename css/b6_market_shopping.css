@@ -776,3 +776,29 @@
     transition: transform 0.15s;
 }
 .b6-cc-btn:active { transform: scale(0.97); }
+
+/* ── B6 攤位小計提示 (Round 25) ── */
+.b6-stall-subtotal {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(6, 95, 70, 0.92);
+    color: #fff;
+    border-radius: 20px;
+    padding: 8px 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 700;
+    z-index: 9500;
+    animation: b6SsIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b6-ss-name { font-size: 14px; opacity: 0.85; }
+.b6-ss-total { font-size: 18px; font-weight: 900; }
+.b6-ss-fade { transition: opacity 0.4s; opacity: 0; }
+@keyframes b6SsIn {
+    from { transform: translateX(-50%) translateY(-16px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);      opacity: 1; }
+}
