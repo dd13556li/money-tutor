@@ -589,6 +589,22 @@ toolbarConfig: {
 | B2 理財建議卡（Round 32）| B2 | `_handleChoiceAnswer`/`_handleNumpadAnswer` 答對後呼叫 `_showFinancialTip(question)`；依 net>0/0/<0 隨機顯示建議語句；底部深色 toast 1.4s 後消失；`.b2-fin-tip/.b2-ft-*` CSS |
 | B4 減法學習要點（Round 32）| B4 | `handleDiffAnswer` 正確分支加 `_showSubtractionTip(high, low, diff)`：底部「X − Y = Z元」算式 toast（1.2s+fade）；`.b4-sub-tip/.b4-st-*` CSS |
 | B6 結帳平均金額（Round 32）| B6 | `_showCheckoutConfirm` 清單新增 `.b6-cc-avg` 列：「共N項，平均每項M元」；`.b6-cc-avg` 虛線分隔灰色文字 CSS |
+| B1 差額錯誤語音（Round 33）| B1 | `handleConfirm` 錯誤分支改「還差X元，再多加一些！」（精準說出短缺金額）|
+| B2 答題動畫（Round 33）| B2 | `_handleChoiceAnswer` 選題時 `.b2-answer-correct` 綠光 / `.b2-answer-wrong` 紅抖動（`b2AnswerGlow/b2AnswerShake`）|
+| B2 錯誤辨識語音（Round 33）| B2 | numpad 答錯計算 `diff33`；「算太多了，多了X元」/ 「還有X元沒算到」|
+| B4 卡片光暈（Round 33）| B4 | `handleSelectClick` 正確卡加 `.b4-card-glow`（`b4CardGlow` 0.8s）|
+| B5 勳章制（Round 33）| B5 | 100%→🥇完美；≥90%→🥇優異；≥70%→🥈良好；≥50%→🥉努力；其他→⭐練習；B1/B2/B3/B4/B6 同步升級 |
+| B6 付款效率環形圖（Round 33）| B6 | `g.exactPayments` 計數精準付款；`showResults` 新增 `efficiencyHTML`（SVG 圓弧圖）|
+| B2 漸進提示（Round 34）| B2 | numpad 第1次錯→`_showRangeHint(lo, hi)` 範圍提示；第2次以上→完整 `_showCalcBreakdown` |
+| B3 配速預覽（Round 34）| B3 | `_renderChoicesHTML` 每個按鈕下方加 `b3-choice-pace` 顯示「每週X元 × Y週 = Z元」|
+| B4/B1/B2/B3/B6 勳章全面升級（Round 34）| B1~B6 | 所有 showResults 的 badge 改為 🥇🥈🥉⭐ 分層勳章 |
+| B5 預算分配說明（Round 34）| B5 | `_showRoundIntroCard` 加 `.b5-ri-alloc`（必買X元 + 選購Y元）|
+| B6 找零兩段漸進提示（Round 34）| B6 | `_changeQuizErrors` 計數；第1次→`_showChangeRangeHint`（架構提示）；第2次→完整公式 |
+| B1 行程項目入場動畫（Round 35）| B1 | `_renderScheduleCard` 每個 `.b1-schedule-item` 加 `b1ItemSlideIn` stagger 動畫（140ms/項）|
+| B2 起始/結束對比條（Round 35）| B2 | easy 動畫後加 `.b2-before-after` 雙橫條（起始灰色/結束依餘額比例染色）|
+| B3 里程碑語音（Round 35）| B3 | `_showMilestoneBadge` 加 `audio.play('correct')` + `Game.Speech.speak` 里程碑語音 |
+| B4 最佳比價摘要（Round 35）| B4 | `savingsRankHTML` 頂部加 `.b4-best-deal` 卡「🌟 最划算：X在Y買，省了Z元！」|
+| B5 困難模式隱藏價格（Round 35）| B5 | hard mode 非必買商品顯示「??? 元」；首次點擊揭示價格（`.b5-price-hidden` CSS）；第二次點擊才選取 |
 
 ---
 
