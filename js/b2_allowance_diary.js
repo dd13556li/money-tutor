@@ -769,10 +769,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._animateEasyEntries(currentQ);
             }
             Game.TimerManager.setTimeout(() => {
+                // 主題情境語音（Round 39）
+                const themeKey = this.state.settings.diaryTheme;
+                const themeIntros = {
+                    school:  '學校週記，',
+                    holiday: '假日時光日記，',
+                    family:  '家庭生活日記，',
+                };
+                const themePrefix = (themeKey && themeKey !== 'random' && themeIntros[themeKey]) ? themeIntros[themeKey] : '';
                 const speechMap = {
-                    easy:   `看看日記，計算最後剩下多少錢？`,
-                    normal: `看看每筆收入和支出，算出最後的金額。`,
-                    hard:   `仔細看每筆記錄，輸入最後剩下多少元。`,
+                    easy:   `${themePrefix}看看日記，計算最後剩下多少錢？`,
+                    normal: `${themePrefix}看看每筆收入和支出，算出最後的金額。`,
+                    hard:   `${themePrefix}仔細看每筆記錄，輸入最後剩下多少元。`,
                 };
                 this.state.quiz.lastSpeechText = speechMap[diff];
                 Game.Speech.speak(speechMap[diff]);

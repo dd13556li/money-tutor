@@ -620,6 +620,12 @@ toolbarConfig: {
 | B4 困難記憶倒數（Round 38）| B4 | `renderQuestion` hard 模式 1900ms 後啟動 `_startMemoryCountdown()`；3秒後 `.b4-mem-blur` 模糊價格，顯示「🤔 靠記憶回答！」|
 | B5 可負擔商品高亮（Round 38）| B5 | `_updateTotalBar` 末尾對非必買未選卡片 toggle `.b5-affordable`（`price <= remBudget`）；綠色虛線外框 |
 | B6 全部收集閃光（Round 38）| B6 | `allDone && !wasDone` 時呼叫 `_showAllCollectedFlash()`；中央深綠全屏閃光卡（`b6AllDoneIn` 1.5s）|
+| B1 場景類別色標（Round 39）| B1 | `_renderScheduleCard` 依 `q.cat` 加 `b1-cat-*` CSS class；schedule card 頂部 4px 色條（school藍/food橙/outdoor綠/entertainment紫/shopping粉）|
+| B2 主題情境語音（Round 39）| B2 | `renderQuestion` 語音前加 `themePrefix`（學校週記/假日時光日記/家庭生活日記）；random 主題不加前綴 |
+| B3 即時剩餘金額標籤（Round 39）| B3 | `_updateWeekPreview` 末尾加 `.b3-week-rem` 標籤：「還差X元」（黃色）/ 「🎉 足夠！」（綠色）|
+| B4 累計節省徽章（Round 39）| B4 | `_renderHeader` header-right 加 `b4-savings-tally`：`q.totalSaved > 0` 顯示「💰 已省X元」綠色小徽章 |
+| B5 即時選擇計數（Round 39）| B5 | total-bar 新增 `#b5-sel-count`；`_updateTotalBar` 更新「必買N件+選購M件」；`.b5-sel-count` 藍色膠囊 |
+| B6 攤位商品語音引導（Round 39）| B6 | 切換攤位時語音改為「X攤，要找Y和Z」；全部收集時說「已全部收集！」 |
 
 ---
 

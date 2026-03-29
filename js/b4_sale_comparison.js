@@ -768,6 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-header-center">${centerTxt}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    ${q.totalSaved > 0 ? `<span class="b4-savings-tally">💰 已省 ${q.totalSaved} 元</span>` : ''}
                     <button class="b-reward-btn" id="reward-btn-g">🎁 獎勵</button>
                     <button class="b-back-btn" id="back-to-settings">返回設定</button>
                 </div>

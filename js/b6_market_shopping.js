@@ -948,7 +948,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
-                    Game.Speech.speak(_currentStalls[tab.dataset.stall].name);
+                    // 攤位商品語音引導（Round 39）：說出攤位名 + 需要收集的商品
+                    const newStall = tab.dataset.stall;
+                    const stallInfo = _currentStalls[newStall];
+                    const neededHere = g.mission.items
+                        .filter(mi => mi.stall === newStall && !g.collectedIds.has(mi.id))
+                        .map(mi => {
+                            const d = stallInfo?.items.find(p => p.id === mi.id);
+                            return d ? d.name : mi.id;
+                        });
+                    const stallSpeech = neededHere.length > 0
+                        ? `${stallInfo.name}，要找${neededHere.join('和')}`
+                        : `${stallInfo.name}，這裡已全部收集！`;
+                    Game.Speech.speak(stallSpeech);
                     this._renderShoppingUI();
                 }, {}, 'gameUI');
             });

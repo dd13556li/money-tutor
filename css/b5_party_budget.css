@@ -631,3 +631,14 @@
     outline-offset: 2px;
     transition: outline 0.3s ease;
 }
+
+/* ── Round 39：B5 即時選擇計數 ── */
+.b5-sel-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}

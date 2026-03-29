@@ -612,8 +612,12 @@ document.addEventListener('DOMContentLoaded', () => {
                        <span class="b1-total-tag b1-total-tag-hidden">??? 元</span>
                    </div>`;
 
+            // 場景類別色標（Round 39）
+            const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
+            const catClass = catColorMap[q.cat] || '';
+
             return `
-            <div class="b1-schedule-card">
+            <div class="b1-schedule-card ${catClass}">
                 <div class="b1-schedule-header">
                     <span class="b1-schedule-icon">${q.icon}</span>
                     <div class="b1-schedule-text">

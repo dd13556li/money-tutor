@@ -1009,3 +1009,10 @@
     border-radius: 2px;
     transition: width 0.6s ease;
 }
+
+/* ── Round 39：B1 場景類別色標 ── */
+.b1-schedule-card.b1-cat-school    { border-top: 4px solid #3b82f6; }
+.b1-schedule-card.b1-cat-food      { border-top: 4px solid #f97316; }
+.b1-schedule-card.b1-cat-outdoor   { border-top: 4px solid #22c55e; }
+.b1-schedule-card.b1-cat-entertainment { border-top: 4px solid #a855f7; }
+.b1-schedule-card.b1-cat-shopping  { border-top: 4px solid #ec4899; }

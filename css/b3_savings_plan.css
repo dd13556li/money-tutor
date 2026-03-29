@@ -1710,3 +1710,20 @@
     z-index: 5000;
     animation: b3SparkleUp 1.2s ease forwards;
 }
+
+/* ── Round 39：B3 即時剩餘金額標籤 ── */
+.b3-week-rem {
+    font-size: 11px;
+    color: #92400e;
+    font-weight: 600;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: 6px;
+}
+.b3-week-rem.enough {
+    color: #065f46;
+    background: #d1fae5;
+    border-color: #6ee7b7;
+}

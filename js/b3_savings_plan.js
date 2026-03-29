@@ -2285,7 +2285,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const extra = n > 16 ? `<span class="b3-week-extra">+${n - 16}</span>` : '';
             const label = `<span class="b3-week-label">${n} 週</span>`;
-            preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}`;
+            // 即時剩餘金額標籤（Round 39）
+            const savedSoFar = n * question.weekly;
+            const remaining  = Math.max(0, question.item.price - savedSoFar);
+            const remTag = remaining > 0
+                ? `<span class="b3-week-rem">還差 ${remaining} 元</span>`
+                : `<span class="b3-week-rem enough">🎉 足夠！</span>`;
+            preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}${remTag}`;
         },
 
         // ── 12. 事件綁定 ──────────────────────────────────────

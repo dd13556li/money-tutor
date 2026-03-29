@@ -666,6 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="b5-total-bar ok" id="b5-total-bar">
                     <span>已選：<span class="b5-total-amount" id="b5-total-amount">0</span> 元</span>
+                    <span class="b5-sel-count" id="b5-sel-count">0 件</span>
                     <span class="b5-remaining" id="b5-remaining">還剩 ${g.budget} 元</span>
                 </div>
                 <div class="b5-budget-meter" style="position:relative">
@@ -782,6 +783,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (totalEl) totalEl.textContent = total;
             if (remEl)   remEl.textContent = rem >= 0 ? `還剩 ${rem} 元` : `超出 ${-rem} 元`;
+            // 即時選擇計數（Round 39）
+            const selCountEl = document.getElementById('b5-sel-count');
+            if (selCountEl) {
+                const mustCount = g.items.filter(i => i.must).length;
+                const optCount  = g.selectedIds ? [...g.selectedIds].filter(id => {
+                    const item = g.items.find(i => i.id === id);
+                    return item && !item.must;
+                }).length : 0;
+                selCountEl.textContent = mustCount > 0
+                    ? `必買${mustCount}件${optCount > 0 ? `+選購${optCount}件` : ''}`
+                    : `已選 ${g.selectedIds ? g.selectedIds.size : 0} 件`;
+            }
 
             if (bar) {
                 const wasOver = bar.classList.contains('over');

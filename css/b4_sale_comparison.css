@@ -791,3 +791,16 @@
     text-align: center;
     animation: bFadeIn 0.4s ease;
 }
+
+/* ── Round 39：B4 累計節省徽章 ── */
+.b4-savings-tally {
+    font-size: 12px;
+    font-weight: 700;
+    color: #065f46;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    animation: bFadeIn 0.4s ease;
+}
