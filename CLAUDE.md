@@ -571,6 +571,9 @@ toolbarConfig: {
 | B4 較貴商品差額標籤（2026-03-29）| B4 | 兩商店 select 答對時，wrong card 加 `.b4-exp-delta`「比較貴 +N元」紅色標籤（`b4DeltaIn` 動畫）；unit mode 跳過（單位不同）|
 | B6 收集進度動畫（2026-03-29）| B6 | 收集商品後 `_showCollectionProgress(collected, needed)` 右側浮動「+1 X/Y」；全收完時橘色；`.b6-col-progress/.b6-cp-plus/count` CSS；`b6CpIn` 動畫 |
 | B2 易模式週收支統計（2026-03-29）| B2 | `_animateEasyEntries` 動畫進行中，倒數第 1 步後插入 `#b2-week-summary`：「📥 收入X元 ｜ 📤 支出Y元」；動畫結束時移除；`.b2-week-summary/.b2-ws-item` CSS |
+| B6 精準付款特效（2026-03-29）| B6 | `_showChangeResult` 加 `change===0` 分支：「💯 精準付款！不需找零」黃色 banner + 語音；易/普通模式補充結果語音；`.b6-change-section.exact-payment` CSS；`b6ExactGlow` 動畫 |
+| B4 差額算式閃現（2026-03-29）| B4 | `handleDiffAnswer` 正確分支：`_showDiffCalcFlash(highPrice, lowPrice, diff)` 底部顯示「X − Y = Z元」；`.b4-calc-flash/.b4-cf-num/op/ans` CSS；`b4CfIn` 動畫；B6 change formula pattern |
+| B3 平均每週存款統計（2026-03-29）| B3 | 結果頁 `b3-goal-summary` 新增第 4 格「平均每週存款 X 元」（黃色高亮）；`g.weekly` 平均值；`.b3-gs-item.highlight` CSS |
 
 ---
 

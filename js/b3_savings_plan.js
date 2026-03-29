@@ -2608,6 +2608,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b3-gs-label">平均需要週數</span>
                     <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
                 </div>
+                <div class="b3-gs-item highlight">
+                    <span class="b3-gs-label">平均每週存款</span>
+                    <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.weekly, 0) / q.achievedGoals.length)} 元</span>
+                </div>
             </div>` : ''}
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

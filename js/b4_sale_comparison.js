@@ -1401,6 +1401,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return [...opts].sort(() => Math.random() - 0.5);
         },
 
+        // ── Diff Correct 算式閃現（Round 28）────────────────────
+        _showDiffCalcFlash(highPrice, lowPrice, diff) {
+            const prev = document.getElementById('b4-calc-flash');
+            if (prev) prev.remove();
+            const flash = document.createElement('div');
+            flash.id = 'b4-calc-flash';
+            flash.className = 'b4-calc-flash';
+            flash.innerHTML = `
+                <span class="b4-cf-num">${highPrice}</span>
+                <span class="b4-cf-op">−</span>
+                <span class="b4-cf-num">${lowPrice}</span>
+                <span class="b4-cf-op">=</span>
+                <span class="b4-cf-ans">${diff} 元</span>`;
+            document.body.appendChild(flash);
+            Game.TimerManager.setTimeout(() => {
+                flash.classList.add('b4-cf-fade');
+                Game.TimerManager.setTimeout(() => { if (flash.parentNode) flash.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
+        },
+
         // ── Diff Formula Hint ───────────────────────────────────
         _showDiffFormulaHint() {
             const item = this.state.currentDiffItem;
@@ -1523,7 +1543,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 this._showSavingsToast(correctDiff);
+                // 差額算式閃現（Round 28）
                 const ci2 = this.state.currentDiffItem;
+                if (ci2 && !ci2.isUnit) {
+                    this._showDiffCalcFlash(ci2.optA.price, ci2.optB.price, correctDiff);
+                }
                 const diffSpeech = (ci2 && ci2.isUnit)
                     ? `答對了！每${ci2.unit}便宜了${correctDiff}元`
                     : `答對了！便宜了${toTWD(correctDiff)}`;

@@ -1415,6 +1415,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
 
+            // 易/普通模式結果語音（困難模式語音已在 _showChangeQuiz 播出）
+            if (this.state.settings.difficulty !== 'hard') {
+                if (change === 0) {
+                    Game.Speech.speak(`精準付款！剛好${toTWD(paid)}，不需找零，買菜成功！`);
+                } else {
+                    Game.Speech.speak(`付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);
+                }
+            }
+
             g.correctCount++;
             g.streak = (g.streak || 0) + 1;
             if (g.streak === 3 || g.streak === 5) {
@@ -1433,10 +1442,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="game-container">
-                <div class="b6-change-section">
-                    <div class="b6-change-icon">🎉</div>
-                    <div class="b6-change-text">付了 ${paid} 元，找回</div>
-                    <div class="b6-change-amount">${change} 元</div>
+                <div class="b6-change-section${change === 0 ? ' exact-payment' : ''}">
+                    <div class="b6-change-icon">${change === 0 ? '💯' : '🎉'}</div>
+                    ${change === 0
+                        ? `<div class="b6-change-text exact-text">精準付款！</div>
+                           <div class="b6-change-amount exact-amt">${paid} 元，不需找零</div>`
+                        : `<div class="b6-change-text">付了 ${paid} 元，找回</div>
+                           <div class="b6-change-amount">${change} 元</div>`}
                     <div style="font-size:14px;color:#065f46;margin-top:4px;">買菜成功！</div>
                 </div>
                 <button class="b5-next-btn" id="b6-next-btn">

@@ -1622,3 +1622,12 @@
     0%, 100% { transform: scale(1); }
     50%       { transform: scale(1.25); }
 }
+
+/* ── B3 Goal Summary Highlight (Round 28) ── */
+.b3-gs-item.highlight {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 6px;
+}
+.b3-gs-item.highlight .b3-gs-val { color: #92400e; }

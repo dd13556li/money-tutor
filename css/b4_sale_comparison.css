@@ -640,3 +640,31 @@
     from { transform: scale(0.5); opacity: 0; }
     to   { transform: scale(1);   opacity: 1; }
 }
+
+/* ── B4 Diff 算式閃現 (Round 28) ── */
+.b4-calc-flash {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    z-index: 9000;
+    animation: b4CfIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.2);
+}
+.b4-cf-num { font-size: 16px; color: #1f2937; background: #f3f4f6; border-radius: 6px; padding: 4px 8px; }
+.b4-cf-op  { font-size: 18px; font-weight: 900; color: #9ca3af; }
+.b4-cf-ans { font-size: 17px; font-weight: 900; color: #059669; background: #d1fae5; border-radius: 8px; padding: 4px 12px; }
+.b4-cf-fade { transition: opacity 0.4s; opacity: 0; }
+@keyframes b4CfIn {
+    from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}

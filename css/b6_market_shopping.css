@@ -829,3 +829,23 @@
     from { transform: translateY(-50%) scale(0.5); opacity: 0; }
     to   { transform: translateY(-50%) scale(1);   opacity: 1; }
 }
+
+/* ── B6 精準付款 (Round 28) ── */
+.b6-change-section.exact-payment {
+    background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+    border: 3px solid #d97706 !important;
+    animation: b6ExactGlow 1s ease-in-out 2;
+}
+.b6-change-text.exact-text {
+    font-size: 22px;
+    font-weight: 900;
+    color: #78350f;
+}
+.b6-change-amount.exact-amt {
+    font-size: 24px;
+    color: #92400e;
+}
+@keyframes b6ExactGlow {
+    0%, 100% { box-shadow: 0 4px 16px rgba(217,119,6,0.3); }
+    50%       { box-shadow: 0 8px 32px rgba(217,119,6,0.7); }
+}
