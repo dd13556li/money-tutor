@@ -849,3 +849,25 @@
     0%, 100% { box-shadow: 0 4px 16px rgba(217,119,6,0.3); }
     50%       { box-shadow: 0 8px 32px rgba(217,119,6,0.7); }
 }
+
+/* ── Round 30：B6 浮動購物籃計數 ── */
+.b6-cart-badge {
+    position: fixed;
+    bottom: 72px;
+    right: 16px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    z-index: 500;
+    pointer-events: none;
+}
+.b6-cart-badge.done { background: #059669; }
+@keyframes b6CartPop {
+    0%   { transform: scale(0.85); }
+    60%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

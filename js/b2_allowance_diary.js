@@ -1035,6 +1035,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
                 const runningEl = document.getElementById('b2-running-total');
                 if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
+
+                // 餘額走勢條（Round 30）
+                const endBalance = balances[balances.length - 1] ?? question.startAmount;
+                const pct = question.startAmount > 0 ? Math.max(0, Math.min(100, Math.round(endBalance / question.startAmount * 100))) : 0;
+                const trendCls = pct >= 80 ? 'good' : pct >= 50 ? 'ok' : 'low';
+                const trendEl = document.createElement('div');
+                trendEl.className = 'b2-balance-trend';
+                trendEl.innerHTML = `
+                    <span class="b2-bt-label">餘額比例</span>
+                    <div class="b2-bt-bar"><div class="b2-bt-fill ${trendCls}" style="width:${pct}%"></div></div>
+                    <span class="b2-bt-pct ${trendCls}">${pct}%</span>`;
+                summary.insertAdjacentElement('afterend', trendEl);
             }, summaryDelay, 'ui');
 
             const showDelay = 500 + entries.length * 800 + 500;
@@ -1042,6 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
                 if (runEl.parentNode) runEl.remove();
                 document.getElementById('b2-week-summary')?.remove();
+                document.querySelector('.b2-balance-trend')?.remove();
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');

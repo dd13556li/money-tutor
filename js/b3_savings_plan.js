@@ -1116,8 +1116,15 @@ document.addEventListener('DOMContentLoaded', () => {
             changedDenoms = changedDenoms || {};
             const pile  = c.denomPile || {};
 
+            const pctRing = c.item ? Math.min(100, Math.round((total / c.item.price) * 100)) : 0;
+            const ringDeg = pctRing * 3.6;
             const pigSectionHd = `<div class="b3-pig-section-hd">
                 <span class="b3-pig-section-title">🐷 我的撲滿</span>
+                <div class="b3-progress-ring-wrap">
+                    <div class="b3-progress-ring" id="b3-progress-ring" style="background:conic-gradient(#f59e0b ${ringDeg}deg, #e5e7eb ${ringDeg}deg)">
+                        <div class="b3-progress-ring-inner"><span id="b3-ring-pct">${pctRing}%</span></div>
+                    </div>
+                </div>
                 <span class="b3-pig-section-total"><strong>${total}</strong> 元</span>
             </div>`;
 
@@ -1256,6 +1263,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pctEl) pctEl.textContent = pct + '%';
             const remEl = document.getElementById('b3-cal-remaining');
             if (remEl) remEl.textContent = remaining;
+            // 進度環（Round 30）
+            const ringEl = document.getElementById('b3-progress-ring');
+            if (ringEl) {
+                ringEl.style.background = `conic-gradient(#f59e0b ${pct * 3.6}deg, #e5e7eb ${pct * 3.6}deg)`;
+                const ringLabelEl = document.getElementById('b3-ring-pct');
+                if (ringLabelEl) ringLabelEl.textContent = pct + '%';
+            }
             // 距完成天數（Round 26）
             const daysLeftEl = document.getElementById('b3-days-left');
             if (daysLeftEl) {

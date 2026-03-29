@@ -654,3 +654,22 @@
     .b-coin-btn      { min-width: 54px; padding: 8px 4px 4px; }
     .b-coin-img.md   { width: 48px; height: 48px; }
 }
+
+/* ── Round 30：B1 今日路線條 ── */
+.b1-route-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: #fef3c7;
+    border-radius: 20px;
+    font-size: 15px;
+    color: #78350f;
+    animation: bFadeIn 0.5s ease 0.3s both;
+}
+.b1-rs-home { font-size: 18px; }
+.b1-rs-dest { font-size: 22px; }
+.b1-rs-arrow { color: #d97706; font-weight: 700; }
+.b1-rs-label { font-size: 13px; color: #92400e; font-weight: 600; }

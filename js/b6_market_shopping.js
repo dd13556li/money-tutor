@@ -1018,6 +1018,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const basketEl  = document.querySelector('.b6-basket-total');
                     if (basketEl) basketEl.textContent = total;
 
+                    // 浮動購物籃計數（Round 30）
+                    this._updateCartBadge(g.collectedIds.size, g.mission.items.length);
+
                     const allDone   = g.mission.items.every(({ id }) => g.collectedIds.has(id));
                     const checkoutBtn = document.getElementById('b6-checkout-btn');
                     if (checkoutBtn) {
@@ -1124,6 +1127,23 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
         },
 
+        // ── 浮動購物籃計數徽章（Round 30）────────────────────────────
+        _updateCartBadge(collected, needed) {
+            let badge = document.getElementById('b6-cart-badge');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.id = 'b6-cart-badge';
+                badge.className = 'b6-cart-badge';
+                document.body.appendChild(badge);
+            }
+            const done = collected >= needed;
+            badge.className = 'b6-cart-badge' + (done ? ' done' : '');
+            badge.textContent = done ? `✓ ${collected}/${needed} 全收集！` : `🛒 ${collected}/${needed}`;
+            badge.style.animation = 'none';
+            void badge.offsetWidth;
+            badge.style.animation = 'b6CartPop 0.3s ease';
+        },
+
         // ── 找到商品彈出價格動畫（A4 transaction tag pattern）────────
         _showPricePopup(anchor, price) {
             const rect = anchor.getBoundingClientRect();
@@ -1148,6 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderPaymentUI() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
+            document.getElementById('b6-cart-badge')?.remove();
 
             const g     = this.state.game;
             const total = this._calcMissionTotal();

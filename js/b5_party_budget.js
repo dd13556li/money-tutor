@@ -762,9 +762,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (remEl)   remEl.textContent = rem >= 0 ? `還剩 ${rem} 元` : `超出 ${-rem} 元`;
 
             if (bar) {
+                const wasOver = bar.classList.contains('over');
                 bar.className = 'b5-total-bar';
-                if (total > g.budget)         bar.classList.add('over');
-                else if (total > g.budget * 0.9) bar.classList.add('near');
+                if (total > g.budget) {
+                    bar.classList.add('over');
+                    if (!wasOver) {
+                        bar.classList.add('b5-shake');
+                        Game.TimerManager.setTimeout(() => bar.classList.remove('b5-shake'), 600, 'ui');
+                    }
+                } else if (total > g.budget * 0.9) bar.classList.add('near');
                 else                          bar.classList.add('ok');
             }
 

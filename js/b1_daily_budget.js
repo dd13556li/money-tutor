@@ -620,6 +620,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${totalTag}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
+                <div class="b1-route-strip">
+                    <span class="b1-rs-home">🏠</span>
+                    <span class="b1-rs-arrow">→</span>
+                    <span class="b1-rs-dest">${q.icon}</span>
+                    <span class="b1-rs-label">${q.label}</span>
+                    <span class="b1-rs-arrow">→</span>
+                    <span class="b1-rs-home">🏠</span>
+                </div>
             </div>`;
         },
 
