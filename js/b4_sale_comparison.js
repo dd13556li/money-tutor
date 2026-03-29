@@ -825,7 +825,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         easyCorrectSpeech = `答對了！${cheapSide.store}${cheapSide.price}元，比${expSide.store}${expSide.price}元便宜！`;
                     }
-                    Game.Speech.speak(easyCorrectSpeech);
+                    // 即時數字語音（Round 37：F4 instant feedback pattern）
+                    const priceSpeech = curr.isUnit
+                        ? `${cheapSide.store}每${curr.unit}${cheapSide.price === (curr.optA.store === cheapSide.store ? curr.perA : curr.perB)}元，比較划算！`
+                        : `${cheapSide.store}，${cheapSide.price}元，比較便宜！`;
+                    Game.Speech.speak(priceSpeech);
                     this._showChampionBadge(cheapSide.store); // 冠軍徽章（Round 31）
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {

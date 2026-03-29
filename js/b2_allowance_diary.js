@@ -823,6 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
+                    ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
                         <span class="b2-start-label">💼 開始有</span>
                         <span class="b2-start-amount">${question.startAmount} 元</span>

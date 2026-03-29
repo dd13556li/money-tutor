@@ -1160,6 +1160,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 .sort((a, b) => b[0] - a[0])
                 .map(([d, c]) => `${c > 1 ? c + '個' : ''}${toTWD(parseInt(d))}`);
             Game.Speech.speak(`提示：放${parts.join('加')}，共${toTWD(curr.total)}`);
+            // 顯示建議面額浮動卡（Round 37）
+            const prevCard = document.getElementById('b1-hint-combo-card');
+            if (prevCard) prevCard.remove();
+            const card = document.createElement('div');
+            card.id = 'b1-hint-combo-card';
+            card.className = 'b1-hint-combo-card';
+            card.innerHTML = `<span class="b1-hcc-icon">💡</span><span>建議：${parts.join(' + ')}</span>`;
+            document.body.appendChild(card);
+            Game.TimerManager.setTimeout(() => card.remove(), 5000, 'ui');
 
             Game.TimerManager.setTimeout(() => {
                 document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-coin-hint'));

@@ -1074,6 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b3-cal-stats-line">共 ${daysNeeded} 天</div>
                     <div class="b3-cal-stat-sep">｜</div>
                     <div class="b3-cal-stats-line b3-days-left-line">距完成 <span id="b3-days-left" class="b3-days-left-num">${daysNeeded}</span> 天</div>
+                    <div class="b3-est-date" id="b3-est-date">計算中…</div>
                 </div>
             </div>
         </div>
@@ -1270,12 +1271,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ringLabelEl = document.getElementById('b3-ring-pct');
                 if (ringLabelEl) ringLabelEl.textContent = pct + '%';
             }
-            // 距完成天數（Round 26）
+            // 距完成天數 + 完成預測日期（Round 37）
             const daysLeftEl = document.getElementById('b3-days-left');
+            const daysLeft   = remaining > 0 ? Math.ceil(remaining / (c.dailyAmount || 1)) : 0;
             if (daysLeftEl) {
-                const daysLeft = Math.ceil(remaining / c.dailyAmount);
                 daysLeftEl.textContent = daysLeft;
                 daysLeftEl.className = 'b3-days-left-num' + (daysLeft <= 3 ? ' near' : '');
+            }
+            const estDateEl = document.getElementById('b3-est-date');
+            if (estDateEl) {
+                if (remaining <= 0) {
+                    estDateEl.textContent = '🎉 達標！';
+                    estDateEl.className = 'b3-est-date reached';
+                } else {
+                    const today = new Date();
+                    today.setDate(today.getDate() + daysLeft);
+                    const mm = today.getMonth() + 1;
+                    const dd = today.getDate();
+                    estDateEl.textContent = `預計 ${mm}/${dd} 達標`;
+                    estDateEl.className = 'b3-est-date' + (daysLeft <= 5 ? ' soon' : '');
+                }
             }
 
             // Update clicked cell: active → done

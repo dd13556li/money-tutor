@@ -1015,6 +1015,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
+                    // 收據飛出（Round 37）
+                    if (itemData) this._showItemReceiptFlyout(listItem, itemData);
+
                     // Update total and checkout button
                     const total     = this._calcMissionTotal();
                     const basketEl  = document.querySelector('.b6-basket-total');
@@ -1140,6 +1143,21 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = `<span class="b-cf-icon">${icon}</span>${text ? `<span class="b-cf-text">${text}</span>` : ''}`;
             document.body.appendChild(overlay);
             Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
+        },
+
+        // ── 商品收據飛出（Round 37）──────────────────────────────────
+        _showItemReceiptFlyout(anchor, item) {
+            const flyout = document.createElement('div');
+            flyout.className = 'b6-item-flyout';
+            flyout.innerHTML = `<span class="b6-if-icon">${item.icon || '🛒'}</span><span class="b6-if-name">${item.name}</span><span class="b6-if-price">+${item.price}元</span>`;
+            const rect = anchor ? anchor.getBoundingClientRect() : null;
+            if (rect) {
+                flyout.style.cssText = `position:fixed;top:${rect.top - 36}px;left:${Math.min(rect.left, window.innerWidth - 160)}px;z-index:600;pointer-events:none;`;
+            } else {
+                flyout.style.cssText = `position:fixed;top:120px;right:20px;z-index:600;pointer-events:none;`;
+            }
+            document.body.appendChild(flyout);
+            Game.TimerManager.setTimeout(() => flyout.remove(), 1000, 'ui');
         },
 
         // ── 浮動購物籃計數徽章（Round 30）────────────────────────────

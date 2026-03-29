@@ -920,3 +920,24 @@
     100% { background: ''; box-shadow: none; }
 }
 .b6-stall-done-flash { animation: b6StallFlash 0.8s ease; }
+
+/* ── Round 37：B6 商品收據飛出 ── */
+@keyframes b6FlyoutUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-36px); }
+}
+.b6-item-flyout {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: b6FlyoutUp 1s ease forwards;
+    white-space: nowrap;
+}
+.b6-if-price { color: #bfdbfe; }

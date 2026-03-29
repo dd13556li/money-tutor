@@ -1684,3 +1684,16 @@
     line-height: 1.2;
 }
 .b3-choice-btn.correct .b3-choice-pace { color: #065f46; }
+
+/* ── Round 37：B3 完成預測日期 ── */
+.b3-est-date {
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    padding: 2px 4px;
+    margin-top: 2px;
+    border-radius: 4px;
+    transition: color 0.3s;
+}
+.b3-est-date.soon    { color: #d97706; font-weight: 700; }
+.b3-est-date.reached { color: #059669; font-weight: 700; }

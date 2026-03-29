@@ -971,3 +971,25 @@
     color: #14532d;
     font-weight: 600;
 }
+
+/* ── Round 37：B1 建議面額卡 ── */
+.b1-hint-combo-card {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e3a5f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 600;
+    pointer-events: none;
+    animation: bFadeIn 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.b1-hcc-icon { font-size: 18px; }
