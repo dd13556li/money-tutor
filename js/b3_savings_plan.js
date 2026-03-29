@@ -27,26 +27,26 @@ function b3CompressImage(file, maxWidth = 200, quality = 0.7) {
 
 // ── 商品資料庫（依難度篩選）─────────────────────────────────────
 const B3_ALL_ITEMS = [
-    { name: '食譜書',    price: 200,  icon: '📖', img: 'icon-b3-art-set.png' },
-    { name: '拼圖遊戲',  price: 250,  icon: '🧩', img: 'icon-b3-puzzle.png' },
-    { name: '兒童繪本',  price: 280,  icon: '📕', img: 'icon-b3-recipe-book.png' },
-    { name: '玩具機器人', price: 300,  icon: '🤖', img: 'icon-b3-robot-toy.png' },
-    { name: '望遠鏡',    price: 350,  icon: '🔭', img: 'icon-b3-telescope.png' },
-    { name: '桌遊組',    price: 380,  icon: '🎲', img: 'icon-b3-board-game.png' },
-    { name: '烹飪玩具組', price: 420,  icon: '🍳', img: 'icon-b3-cooking-toy.png' },
-    { name: '故事書套組', price: 450,  icon: '📚', img: 'icon-b3-story-books.png' },
-    { name: '科學實驗組', price: 480,  icon: '🔬', img: 'icon-b3-science-kit.png' },
-    { name: '遊樂園門票', price: 500,  icon: '🎡', img: 'icon-b3-amusement-ticket.png' },
-    { name: '魔術道具組', price: 550,  icon: '🎩', img: 'icon-b3-magic-set.png' },
-    { name: '生日蛋糕',  price: 600,  icon: '🎂', img: 'icon-b3-birthday-cake.png' },
-    { name: '音樂盒',    price: 650,  icon: '🎵', img: 'icon-b3-music-box.png' },
-    { name: '積木套組',  price: 700,  icon: '🧱', img: 'icon-b3-lego-set.png' },
-    { name: '運動鞋',    price: 800,  icon: '👟', img: 'icon-b3-sneakers.png' },
-    { name: '數位相機',  price: 1000, icon: '📷', img: 'icon-b3-digital-camera.png' },
-    { name: '水族箱',    price: 1200, icon: '🐠', img: 'icon-b3-fish-tank.png' },
-    { name: '電動遊戲機', price: 1500, icon: '🎮', img: 'icon-b3-game-console.png' },
-    { name: '腳踏車',    price: 2400, icon: '🚴', img: 'icon-b3-bicycle.png' },
-    { name: '平板電腦',  price: 3500, icon: '💻', img: 'icon-b3-tablet.png' },
+    { name: '食譜書',    price: 200,  icon: '📖', img: 'icon-b3-art-set.png',           cat: 'book' },
+    { name: '拼圖遊戲',  price: 250,  icon: '🧩', img: 'icon-b3-puzzle.png',            cat: 'toy' },
+    { name: '兒童繪本',  price: 280,  icon: '📕', img: 'icon-b3-recipe-book.png',       cat: 'book' },
+    { name: '玩具機器人', price: 300,  icon: '🤖', img: 'icon-b3-robot-toy.png',         cat: 'toy' },
+    { name: '望遠鏡',    price: 350,  icon: '🔭', img: 'icon-b3-telescope.png',         cat: 'outdoor' },
+    { name: '桌遊組',    price: 380,  icon: '🎲', img: 'icon-b3-board-game.png',        cat: 'toy' },
+    { name: '烹飪玩具組', price: 420,  icon: '🍳', img: 'icon-b3-cooking-toy.png',       cat: 'toy' },
+    { name: '故事書套組', price: 450,  icon: '📚', img: 'icon-b3-story-books.png',       cat: 'book' },
+    { name: '科學實驗組', price: 480,  icon: '🔬', img: 'icon-b3-science-kit.png',       cat: 'outdoor' },
+    { name: '遊樂園門票', price: 500,  icon: '🎡', img: 'icon-b3-amusement-ticket.png',  cat: 'outdoor' },
+    { name: '魔術道具組', price: 550,  icon: '🎩', img: 'icon-b3-magic-set.png',         cat: 'toy' },
+    { name: '音樂盒',    price: 600,  icon: '🎵', img: 'icon-b3-music-box.png',         cat: 'tech' },
+    { name: '生日蛋糕',  price: 650,  icon: '🎂', img: 'icon-b3-birthday-cake.png',     cat: 'book' },
+    { name: '積木套組',  price: 700,  icon: '🧱', img: 'icon-b3-lego-set.png',          cat: 'toy' },
+    { name: '運動鞋',    price: 800,  icon: '👟', img: 'icon-b3-sneakers.png',          cat: 'outdoor' },
+    { name: '數位相機',  price: 1000, icon: '📷', img: 'icon-b3-digital-camera.png',    cat: 'tech' },
+    { name: '水族箱',    price: 1200, icon: '🐠', img: 'icon-b3-fish-tank.png',         cat: 'tech' },
+    { name: '電動遊戲機', price: 1500, icon: '🎮', img: 'icon-b3-game-console.png',      cat: 'tech' },
+    { name: '腳踏車',    price: 2400, icon: '🚴', img: 'icon-b3-bicycle.png',           cat: 'outdoor' },
+    { name: '平板電腦',  price: 3500, icon: '💻', img: 'icon-b3-tablet.png',            cat: 'tech' },
 ];
 
 const B3_ITEMS_BY_DIFF = {
@@ -202,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dailyAmount: null,    // easy only (null = auto)
                 priceRange: null,     // easy only (max price of items)
                 clickMode: null,      // hard mode quiz only
+                itemCat: 'all',       // item category filter (all/toy/book/outdoor/tech)
             },
             quiz: {
                 currentQuestion: 0,
@@ -468,6 +469,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>
+                <div class="b-setting-group b3-quiz-settings" style="display:none">
+                    <label class="b-setting-label">🗂️ 目標類別：</label>
+                    <div class="b-btn-group" id="b3-cat-group">
+                        <button class="b-sel-btn active" data-cat="all">全部</button>
+                        <button class="b-sel-btn" data-cat="toy">🎮 玩具</button>
+                        <button class="b-sel-btn" data-cat="book">📚 書本</button>
+                        <button class="b-sel-btn" data-cat="outdoor">🌿 戶外</button>
+                        <button class="b-sel-btn" data-cat="tech">💻 科技</button>
+                    </div>
+                </div>
                 <div class="b-setting-group b3-hard-settings" style="display:none">
                     <label class="b-setting-label">🤖 輔助點擊</label>
                     <div class="b-btn-group" id="assist-group">
@@ -512,6 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.b3-cal-settings').forEach(el => el.style.display = diff === 'easy' ? '' : 'none');
                     document.querySelectorAll('.b3-normal-settings').forEach(el => el.style.display = diff === 'normal' ? '' : 'none');
                     document.querySelectorAll('.b3-hard-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
+                    document.querySelectorAll('.b3-quiz-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
                     if (diff === 'hard') {
                         // Reset calendar settings
                         this.state.settings.startDate = null;
@@ -708,6 +720,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const params = new URLSearchParams({ unit: 'b3' });
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
+
+            document.querySelectorAll('#b3-cat-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b3-cat-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.itemCat = btn.dataset.cat;
+                    this._updateDaysPreview();
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
 
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -1995,10 +2017,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 10. 題目產生 ──────────────────────────────────────
         _generateQuestions(count) {
             const diff    = this.state.settings.difficulty;
+            const cat     = this.state.settings.itemCat || 'all';
             const builtIn = B3_ITEMS_BY_DIFF[diff];
+            const filtered = (cat && cat !== 'all') ? builtIn.filter(i => i.cat === cat) : builtIn;
+            const catPool  = filtered.length >= 2 ? filtered : builtIn; // fallback if too few
             const pool    = this.state.customItems.length > 0
-                ? [...this.state.customItems, ...builtIn]
-                : builtIn;
+                ? [...this.state.customItems, ...catPool]
+                : catPool;
             const items   = pool.slice().sort(() => Math.random() - 0.5);
             const weekly  = B3_WEEKLY_OPTIONS[diff];
             const result  = [];
@@ -2529,7 +2554,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             ${q.achievedGoals && q.achievedGoals.length > 0 ? `
             <div class="b3-res-goals">
-                <h3>🐷 存錢目標清單</h3>
+                <h3>🐷 存錢目標清單${ (() => { const catLabels = { toy:'🎮 玩具類', book:'📚 書本類', outdoor:'🌿 戶外類', tech:'💻 科技類' }; const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })() }</h3>
                 <div class="b3-goal-list">
                     ${q.achievedGoals.map(g => `
                     <div class="b3-goal-row">
