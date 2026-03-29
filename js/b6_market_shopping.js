@@ -776,19 +776,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 return item ? item.name : '';
             }).filter(Boolean).join('、');
 
+            const mktKey = mission._mktKey || this.state.settings.marketType;
+            const mkt = B6_MARKETS[mktKey] || B6_MARKETS.traditional;
+            const mktLabel = `${mkt.icon} ${mkt.name}`;
+            const isFirstRound = roundNum === 1;
+            const roundTitle = isFirstRound ? `${mktLabel} 第 ${roundNum} 關` : `第 ${roundNum} 關`;
+
             const modal = document.createElement('div');
             modal.id = 'b6-mission-intro';
             modal.className = 'b6-mission-intro';
             modal.innerHTML = `
                 <div class="b6-mi-card">
-                    <div class="b6-mi-round">第 ${roundNum} 關</div>
+                    <div class="b6-mi-round">${roundTitle}</div>
                     <div class="b6-mi-title">🛒 今天的採購任務</div>
                     <div class="b6-mi-items">${items}</div>
                     <div class="b6-mi-budget">預算：<b>${mission.budget}</b> 元</div>
                     <div class="b6-mi-hint">點任意處開始</div>
                 </div>`;
             document.body.appendChild(modal);
-            Game.Speech.speak(`第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`);
+            const welcomePrefix = isFirstRound ? `歡迎來到${mkt.name}！` : '';
+            Game.Speech.speak(`${welcomePrefix}第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`);
 
             const dismiss = () => {
                 if (!modal.parentNode) return;
