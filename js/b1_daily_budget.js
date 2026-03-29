@@ -4,41 +4,53 @@
 // =============================================================
 'use strict';
 
-// ── 場景資料庫 ─────────────────────────────────────────────────
+// ── 場景資料庫（含 category 欄位供類別篩選）──────────────────────
+// 類別：school（學校）| food（飲食）| outdoor（戶外）| entertainment（娛樂）| shopping（購物）
 const B1_SCENARIOS = {
     easy: [
-        { icon:'🏫', label:'去學校',   items:[{ name:'午餐費', cost:50  }] },
-        { icon:'🏪', label:'去超商',   items:[{ name:'飲料',   cost:25  }] },
-        { icon:'📚', label:'圖書館',   items:[{ name:'影印費', cost:10  }] },
-        { icon:'🎭', label:'看表演',   items:[{ name:'門票',   cost:100 }] },
-        { icon:'🏊', label:'游泳課',   items:[{ name:'入場費', cost:80  }] },
-        { icon:'🎨', label:'美術課',   items:[{ name:'材料費', cost:30  }] },
-        { icon:'🚌', label:'搭公車',   items:[{ name:'公車費', cost:15  }] },
-        { icon:'🌿', label:'逛公園',   items:[{ name:'停車費', cost:20  }] },
-        { icon:'☕', label:'買早餐',   items:[{ name:'早餐',   cost:35  }] },
-        { icon:'🐟', label:'買魚飼料', items:[{ name:'飼料',   cost:45  }] },
+        { icon:'🏫', label:'去學校',   cat:'school',        items:[{ name:'午餐費', cost:50  }] },
+        { icon:'🏪', label:'去超商',   cat:'shopping',      items:[{ name:'飲料',   cost:25  }] },
+        { icon:'📚', label:'圖書館',   cat:'school',        items:[{ name:'影印費', cost:10  }] },
+        { icon:'🎭', label:'看表演',   cat:'entertainment', items:[{ name:'門票',   cost:100 }] },
+        { icon:'🏊', label:'游泳課',   cat:'outdoor',       items:[{ name:'入場費', cost:80  }] },
+        { icon:'🎨', label:'美術課',   cat:'school',        items:[{ name:'材料費', cost:30  }] },
+        { icon:'🚌', label:'搭公車',   cat:'school',        items:[{ name:'公車費', cost:15  }] },
+        { icon:'🌿', label:'逛公園',   cat:'outdoor',       items:[{ name:'停車費', cost:20  }] },
+        { icon:'☕', label:'買早餐',   cat:'food',          items:[{ name:'早餐',   cost:35  }] },
+        { icon:'🐟', label:'買魚飼料', cat:'shopping',      items:[{ name:'飼料',   cost:45  }] },
+        { icon:'🎬', label:'看電影',   cat:'entertainment', items:[{ name:'票價',   cost:120 }] },
+        { icon:'🍜', label:'吃點心',   cat:'food',          items:[{ name:'點心',   cost:40  }] },
+        { icon:'🛒', label:'買文具',   cat:'shopping',      items:[{ name:'文具',   cost:55  }] },
+        { icon:'⛺', label:'踏青',     cat:'outdoor',       items:[{ name:'門票',   cost:60  }] },
     ],
     normal: [
-        { icon:'🏫', label:'上學日',   items:[{ name:'午餐費', cost:60  }, { name:'公車費', cost:20  }] },
-        { icon:'🎨', label:'才藝課',   items:[{ name:'課程費', cost:150 }, { name:'材料費', cost:50  }] },
-        { icon:'🏥', label:'看醫生',   items:[{ name:'掛號費', cost:150 }, { name:'藥費',   cost:80  }] },
-        { icon:'🎬', label:'看電影',   items:[{ name:'票價',   cost:280 }, { name:'爆米花', cost:90  }] },
-        { icon:'🚂', label:'搭火車',   items:[{ name:'票價',   cost:250 }, { name:'便當',   cost:75  }] },
-        { icon:'🏊', label:'去游泳',   items:[{ name:'入場費', cost:80  }, { name:'飲料',   cost:25  }] },
-        { icon:'📖', label:'買書',     items:[{ name:'故事書', cost:180 }, { name:'文具',   cost:45  }] },
-        { icon:'🌄', label:'爬山',     items:[{ name:'門票',   cost:100 }, { name:'食物',   cost:120 }] },
-        { icon:'🎮', label:'遊樂場',   items:[{ name:'門票',   cost:200 }, { name:'遊戲',   cost:50  }] },
-        { icon:'🍜', label:'吃午飯',   items:[{ name:'午餐',   cost:85  }, { name:'飲料',   cost:30  }] },
+        { icon:'🏫', label:'上學日',   cat:'school',        items:[{ name:'午餐費', cost:60  }, { name:'公車費', cost:20  }] },
+        { icon:'🎨', label:'才藝課',   cat:'school',        items:[{ name:'課程費', cost:150 }, { name:'材料費', cost:50  }] },
+        { icon:'🏥', label:'看醫生',   cat:'school',        items:[{ name:'掛號費', cost:150 }, { name:'藥費',   cost:80  }] },
+        { icon:'🎬', label:'看電影',   cat:'entertainment', items:[{ name:'票價',   cost:280 }, { name:'爆米花', cost:90  }] },
+        { icon:'🚂', label:'搭火車',   cat:'outdoor',       items:[{ name:'票價',   cost:250 }, { name:'便當',   cost:75  }] },
+        { icon:'🏊', label:'去游泳',   cat:'outdoor',       items:[{ name:'入場費', cost:80  }, { name:'飲料',   cost:25  }] },
+        { icon:'📖', label:'買書',     cat:'shopping',      items:[{ name:'故事書', cost:180 }, { name:'文具',   cost:45  }] },
+        { icon:'🌄', label:'爬山',     cat:'outdoor',       items:[{ name:'門票',   cost:100 }, { name:'食物',   cost:120 }] },
+        { icon:'🎮', label:'遊樂場',   cat:'entertainment', items:[{ name:'門票',   cost:200 }, { name:'遊戲',   cost:50  }] },
+        { icon:'🍜', label:'吃午飯',   cat:'food',          items:[{ name:'午餐',   cost:85  }, { name:'飲料',   cost:30  }] },
+        { icon:'🏫', label:'補習班',   cat:'school',        items:[{ name:'課程費', cost:200 }, { name:'文具費', cost:30  }] },
+        { icon:'🍰', label:'下午茶',   cat:'food',          items:[{ name:'飲料',   cost:55  }, { name:'點心',   cost:65  }] },
+        { icon:'🛒', label:'買玩具',   cat:'shopping',      items:[{ name:'玩具',   cost:280 }, { name:'電池',   cost:45  }] },
+        { icon:'🎡', label:'遊樂場',   cat:'entertainment', items:[{ name:'入場費', cost:150 }, { name:'零食',   cost:60  }] },
     ],
     hard: [
-        { icon:'🛒', label:'大採購',   items:[{ name:'衣服', cost:350 }, { name:'鞋子', cost:490 }, { name:'書',    cost:180 }] },
-        { icon:'🎂', label:'買禮物',   items:[{ name:'禮物', cost:280 }, { name:'蛋糕', cost:420 }, { name:'卡片',  cost:35  }] },
-        { icon:'🌿', label:'出遊',     items:[{ name:'公車費', cost:20 }, { name:'冰淇淋', cost:45 }, { name:'門票', cost:100 }, { name:'飲料', cost:30 }] },
-        { icon:'🏕️', label:'露營',    items:[{ name:'食材', cost:350 }, { name:'裝備費', cost:200 }, { name:'入場費', cost:150 }] },
-        { icon:'🎡', label:'遊樂園',   items:[{ name:'門票', cost:580 }, { name:'餐費',  cost:250 }, { name:'紀念品', cost:180 }] },
-        { icon:'🌍', label:'校外教學', items:[{ name:'車費', cost:80  }, { name:'午餐',  cost:120 }, { name:'門票', cost:200 }, { name:'零用', cost:100 }] },
-        { icon:'🎓', label:'畢業典禮', items:[{ name:'服裝', cost:450 }, { name:'花束',  cost:280 }, { name:'聚餐', cost:350 }] },
-        { icon:'🏖️', label:'去海邊',  items:[{ name:'防曬乳', cost:180 }, { name:'餐費', cost:300 }, { name:'停車費', cost:100 }, { name:'飲料', cost:60 }] },
+        { icon:'🛒', label:'大採購',   cat:'shopping',      items:[{ name:'衣服', cost:350 }, { name:'鞋子',   cost:490 }, { name:'書',    cost:180 }] },
+        { icon:'🎂', label:'買禮物',   cat:'shopping',      items:[{ name:'禮物', cost:280 }, { name:'蛋糕',   cost:420 }, { name:'卡片',  cost:35  }] },
+        { icon:'🌿', label:'出遊',     cat:'outdoor',       items:[{ name:'公車費', cost:20 }, { name:'冰淇淋', cost:45  }, { name:'門票', cost:100 }, { name:'飲料', cost:30 }] },
+        { icon:'🏕️', label:'露營',    cat:'outdoor',       items:[{ name:'食材', cost:350 }, { name:'裝備費', cost:200 }, { name:'入場費', cost:150 }] },
+        { icon:'🎡', label:'遊樂園',   cat:'entertainment', items:[{ name:'門票', cost:580 }, { name:'餐費',   cost:250 }, { name:'紀念品', cost:180 }] },
+        { icon:'🌍', label:'校外教學', cat:'school',        items:[{ name:'車費', cost:80  }, { name:'午餐',   cost:120 }, { name:'門票', cost:200 }, { name:'零用', cost:100 }] },
+        { icon:'🎓', label:'畢業典禮', cat:'school',        items:[{ name:'服裝', cost:450 }, { name:'花束',   cost:280 }, { name:'聚餐', cost:350 }] },
+        { icon:'🏖️', label:'去海邊',  cat:'outdoor',       items:[{ name:'防曬乳', cost:180 }, { name:'餐費', cost:300 }, { name:'停車費', cost:100 }, { name:'飲料', cost:60 }] },
+        { icon:'🍱', label:'辦桌聚餐', cat:'food',          items:[{ name:'餐費', cost:450 }, { name:'飲料',   cost:120 }, { name:'甜點',  cost:150 }] },
+        { icon:'🏫', label:'暑期課程', cat:'school',        items:[{ name:'課程費', cost:500 }, { name:'教材費', cost:180 }, { name:'午餐費', cost:120 }] },
+        { icon:'🛍️', label:'換季採購', cat:'shopping',      items:[{ name:'外套', cost:680 }, { name:'褲子',   cost:350 }, { name:'包包',  cost:420 }] },
     ]
 };
 
@@ -175,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null, sceneCategory: null },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -277,6 +289,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🗂️ 場景類別</label>
+                            <div class="b-btn-group" id="cat-group" style="flex-wrap:wrap;">
+                                <button class="b-sel-btn" data-cat="all">全部 🎲</button>
+                                <button class="b-sel-btn" data-cat="school">學校 🏫</button>
+                                <button class="b-sel-btn" data-cat="food">飲食 🍜</button>
+                                <button class="b-sel-btn" data-cat="outdoor">戶外 🌿</button>
+                                <button class="b-sel-btn" data-cat="entertainment">娛樂 🎭</button>
+                                <button class="b-sel-btn" data-cat="shopping">購物 🛒</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                選擇特定類別可以專注練習該情境的金額計算
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">📋 題目數量</label>
                             <div class="b-btn-group" id="count-group">
                                 <button class="b-sel-btn" data-count="1">1題</button>
@@ -349,6 +375,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _bindSettingsEvents() {
             Game.EventManager.removeByCategory('settings');
+            // 場景類別
+            document.querySelectorAll('#cat-group [data-cat]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#cat-group [data-cat]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.sceneCategory = btn.dataset.cat;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             // 難度
             document.querySelectorAll('[data-diff]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -415,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode || !s.sceneCategory;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -442,21 +478,28 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _generateQuestions(count) {
-            const diff   = this.state.settings.difficulty;
-            const pool   = [...(B1_SCENARIOS[diff] || B1_SCENARIOS.easy)];
-            const result = [];
+            const diff = this.state.settings.difficulty;
+            const cat  = this.state.settings.sceneCategory;
+            const allScenarios = B1_SCENARIOS[diff] || B1_SCENARIOS.easy;
+            // 依類別篩選（'all' 不篩選）
+            const filtered = (cat && cat !== 'all')
+                ? allScenarios.filter(s => s.cat === cat)
+                : allScenarios;
+            const basePool = filtered.length > 0 ? filtered : allScenarios; // 防空集合回退
+            const pool     = [...basePool];
+            const result   = [];
 
             for (let i = 0; i < count; i++) {
                 if (pool.length === 0) {
                     // 補滿：重新洗牌原始資料
-                    pool.push(...B1_SCENARIOS[diff]);
+                    pool.push(...basePool);
                 }
                 const idx = Math.floor(Math.random() * pool.length);
                 const scenario = pool.splice(idx, 1)[0];
                 const total = scenario.items.reduce((s, item) => s + item.cost, 0);
                 result.push({ ...scenario, total });
             }
-            Game.Debug.log('question', '產生題目', result.length, '題');
+            Game.Debug.log('question', `產生題目 ${result.length} 題（類別：${cat}）`);
             return result;
         },
 
@@ -512,12 +555,15 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderHeader() {
             const q = this.state.quiz;
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
+            const catLabels = { all:'全部', school:'學校 🏫', food:'飲食 🍜', outdoor:'戶外 🌿', entertainment:'娛樂 🎭', shopping:'購物 🛒' };
+            const catLabel  = catLabels[this.state.settings.sceneCategory] || '';
+            const centerText = catLabel && catLabel !== '全部' ? `${diffLabel} ·  ${catLabel}` : diffLabel;
             return `
             <div class="b-header">
                 <div class="b-header-left">
                     <span class="b-header-unit">💰 今天帶多少錢</span>
                 </div>
-                <div class="b-header-center">${diffLabel}</div>
+                <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
                     <button class="b-reward-btn" id="reward-btn-game">🎁 獎勵</button>
@@ -1162,6 +1208,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 計算出行所需費用</div>
                     <div class="b-res-ach-item">✅ 選擇正確面額錢幣</div>
                     <div class="b-res-ach-item">✅ 累計總金額達到目標</div>
+                    ${(() => {
+                        const catNames = { school:'學校活動', food:'飲食消費', outdoor:'戶外活動', entertainment:'娛樂活動', shopping:'購物消費' };
+                        const sc = this.state.settings.sceneCategory;
+                        return sc && sc !== 'all' ? `<div class="b-res-ach-item">✅ 專注練習：${catNames[sc] || sc}場景</div>` : '';
+                    })()}
                 </div>
             </div>
 
