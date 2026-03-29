@@ -797,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 if (correctCard) {
-                    correctCard.classList.add('selected-correct');
+                    correctCard.classList.add('selected-correct', 'b4-card-glow'); // 卡片光暈（Round 33）
                     const cheapTag = curr.isUnit ? '比較划算！' : '比較便宜！';
                     correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
                         <div class="b4-cheaper-tag">${cheapTag}</div>`;

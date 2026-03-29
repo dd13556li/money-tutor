@@ -1025,11 +1025,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = g.totalRounds > 0
                 ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
 
-            let badge, badgeColor;
-            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            let badge, badgeColor, medalIcon;
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; medalIcon = '🥇'; }
+            else if (accuracy >= 90) { badge = '優異 🏆'; badgeColor = '#f59e0b'; medalIcon = '🥇'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; medalIcon = '🥈'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; medalIcon = '🥉'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; medalIcon = '⭐'; }
 
             // 各關預算使用統計（F5 量比較 pattern）
             const roundStatsHTML = g.roundStats && g.roundStats.length > 0 ? (() => {

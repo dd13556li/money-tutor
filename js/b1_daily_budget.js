@@ -967,7 +967,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(`需要${toTWD(requiredTotal)}，繼續下一題`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 } else {
-                    Game.Speech.speak(`還不夠喔！需要${toTWD(requiredTotal)}，你只有${toTWD(walletTotal)}`);
+                    const shortage = requiredTotal - walletTotal;
+                    Game.Speech.speak(`還差${toTWD(shortage)}，再多加一些！`);
                     this.state.isProcessing = false;
                     const walletArea = document.getElementById('wallet-area');
                     if (walletArea) {

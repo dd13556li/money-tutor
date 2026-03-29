@@ -953,6 +953,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (v === chosen && !isCorrect) btn.classList.add('wrong');
             });
 
+            // 答題動畫（Round 33）
+            const qCard = document.querySelector('.b2-question-card') || document.querySelector('#b2-question-card');
+            if (qCard) {
+                qCard.classList.add(isCorrect ? 'b2-answer-correct' : 'b2-answer-wrong');
+                Game.TimerManager.setTimeout(() => qCard.classList.remove('b2-answer-correct', 'b2-answer-wrong'), 600, 'ui');
+            }
+
             if (isCorrect) {
                 this.state.quiz.correctCount++;
                 this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
@@ -1163,9 +1170,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showCalcBreakdown(question); // 答錯即顯示計算過程
+                // 錯誤辨識語音（Round 33）
+                const userVal = parseInt(this.state.quiz.currentInput);
+                const diff33 = !isNaN(userVal) ? userVal - question.answer : 0;
+                const errSpeech = !isNaN(userVal) && diff33 !== 0
+                    ? (diff33 > 0 ? `算太多了，多了${diff33}元` : `還有${-diff33}元沒算到`)
+                    : `不對喔`;
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，參考算式再試一次`);
+                    Game.Speech.speak(errSpeech + '，參考算式再試一次');
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.quiz.currentInput = '';

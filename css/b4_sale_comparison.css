@@ -715,3 +715,11 @@
 .b4-st-lo  { color: #86efac; font-weight: 700; }
 .b4-st-op  { color: #d1d5db; }
 .b4-st-diff { color: #fde68a; font-weight: 900; }
+
+/* ── Round 33：B4 卡片光暈 ── */
+@keyframes b4CardGlow {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%  { box-shadow: 0 0 30px 8px rgba(16,185,129,0.55); }
+    100% { box-shadow: 0 0 20px 4px rgba(16,185,129,0.2); }
+}
+.b4-card-glow { animation: b4CardGlow 0.8s ease forwards; }

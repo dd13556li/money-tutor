@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 paidAmount: 0,
                 receipts: [],
                 stallStats: {},   // { stallKey: totalSpent }
+                exactPayments: 0, // 精準付款次數（Round 33）
             },
             isEndingGame: false,
             isProcessing: false,
@@ -521,7 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
             g.phase        = 'shopping';
             g.paidAmount   = 0;
             g.receipts     = [];
-            g.stallStats   = {};
+            g.stallStats     = {};
+            g.exactPayments  = 0;
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B6] 遊戲狀態已重置');
@@ -1447,6 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             g.correctCount++;
+            if (change === 0) g.exactPayments = (g.exactPayments || 0) + 1; // 精準付款計數（Round 33）
             g.streak = (g.streak || 0) + 1;
             if (g.streak === 3 || g.streak === 5) {
                 Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
@@ -1575,6 +1578,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             })();
 
+            // 付款效率分析（Round 33）
+            const exactCount  = g.exactPayments || 0;
+            const totalRounds = g.totalRounds || 1;
+            const effPct = Math.round(exactCount / totalRounds * 100);
+            const effLabel = effPct === 100 ? '💯 全部精準！' : effPct >= 60 ? '⭐ 表現不錯！' : '💪 繼續練習！';
+            const efficiencyHTML = exactCount > 0 ? `
+            <div class="b6-res-efficiency">
+                <h3>🎯 付款效率</h3>
+                <div class="b6-eff-row">
+                    <div class="b6-eff-ring" style="--eff-pct:${effPct}">
+                        <svg viewBox="0 0 36 36" class="b6-eff-svg">
+                            <circle class="b6-eff-bg" cx="18" cy="18" r="15.9"/>
+                            <circle class="b6-eff-fill" cx="18" cy="18" r="15.9"
+                                stroke-dasharray="${effPct} ${100 - effPct}" stroke-dashoffset="25"/>
+                        </svg>
+                        <span class="b6-eff-pct">${effPct}%</span>
+                    </div>
+                    <div class="b6-eff-info">
+                        <div class="b6-eff-label">${effLabel}</div>
+                        <div class="b6-eff-detail">精準付款 <strong>${exactCount}</strong> 次 / 共 <strong>${totalRounds}</strong> 關</div>
+                    </div>
+                </div>
+            </div>` : '';
+
             // 採購收據（A3/A4 收據風格）
             const receiptHTML = g.receipts.length > 0 ? `
             <div class="b6-res-receipt">
@@ -1655,6 +1682,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 選擇正確付款金額與找零</div>
                 </div>
             </div>
+
+            ${efficiencyHTML}
 
             ${receiptHTML}
 

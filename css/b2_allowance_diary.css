@@ -647,3 +647,19 @@
 }
 .b2-ft-icon { font-size: 18px; flex-shrink: 0; }
 .b2-ft-text { line-height: 1.4; }
+
+/* ── Round 33：B2 答題動畫 ── */
+@keyframes b2AnswerGlow {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%  { box-shadow: 0 0 20px 6px rgba(16,185,129,0.5); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+@keyframes b2AnswerShake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+}
+.b2-answer-correct { animation: b2AnswerGlow 0.6s ease; }
+.b2-answer-wrong   { animation: b2AnswerShake 0.5s ease; }
