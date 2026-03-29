@@ -80,17 +80,28 @@
     text-align: right;
 }
 
-.b2-event-amount.income {
-    color: #059669;
+.b2-event-amount.income { color: #059669; }
+.b2-event-amount.expense { color: #dc2626; }
+
+/* ── 收入/支出 類型徽章 ──────────────────────────────────────── */
+.b2-type-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
-
-.b2-event-amount.income::before { content: '▲ +'; }
-
-.b2-event-amount.expense {
-    color: #dc2626;
+.b2-type-badge.income {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
 }
-
-.b2-event-amount.expense::before { content: '▼ -'; }
+.b2-type-badge.expense {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
 
 /* ── 問題列（最後一行）─────────────────────────────────────── */
 .b2-question-row {
