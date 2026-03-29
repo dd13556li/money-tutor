@@ -851,12 +851,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="b5-bd-sep"></div>
                             <div class="b5-bd-row b5-bd-total"><span>合計</span><span>${total}元</span></div>
                             <div class="b5-bd-row b5-bd-budget"><span>預算</span><span>${g.budget}元</span></div>
-                            <div class="b5-bd-row b5-bd-over-row"><span>超出</span><span>${overBy}元</span></div>
+                            <div class="b5-bd-row b5-bd-over-row"><span>超出</span><span>${overBy}元（${Math.round(overBy/g.budget*100)}%）</span></div>
                         </div>`;
                     resultArea.innerHTML = `
                         <div class="b5-result-banner fail">
                             💸 超出預算了！請重新選擇
-                            <div class="b5-result-sub">超出 ${overBy} 元</div>
+                            <div class="b5-result-sub">超出 ${overBy} 元（超出預算 ${Math.round(overBy/g.budget*100)}%）</div>
                             ${suggestionHTML}
                         </div>
                         ${breakdownHTML}`;
