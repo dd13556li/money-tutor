@@ -229,6 +229,97 @@ const B2_TEMPLATES = {
     ],
 };
 
+// ── 日記主題（B5 partyTheme pattern）──────────────────────────
+const B2_THEMES = {
+    school: {
+        name: '學校週記', icon: '🏫',
+        templates: {
+            easy: [
+                { startAmount: 80,  events: [{ type:'income', name:'媽媽給零用錢', amount:50,  icon:'💰'}, { type:'expense', name:'買文具',  amount:30, icon:'✏️'}]},  // 100
+                { startAmount: 60,  events: [{ type:'expense',name:'買便當',       amount:40,  icon:'🍱'}, { type:'income',  name:'幫忙打掃', amount:20, icon:'🧹'}]},  // 40
+                { startAmount: 120, events: [{ type:'income', name:'作業獎勵',     amount:30,  icon:'🌟'}, { type:'expense', name:'買橡皮擦', amount:15, icon:'✏️'}]},  // 135
+                { startAmount: 50,  events: [{ type:'income', name:'爸爸零用錢',   amount:100, icon:'💰'}, { type:'expense', name:'買書包配件', amount:45, icon:'🎒'}]},  // 105
+                { startAmount: 200, events: [{ type:'expense',name:'買課外讀物',   amount:80,  icon:'📚'}, { type:'income',  name:'節省獎金', amount:30, icon:'🏅'}]},  // 150
+                { startAmount: 90,  events: [{ type:'income', name:'阿嬤零用錢',   amount:40,  icon:'💝'}, { type:'expense', name:'買貼紙',  amount:20, icon:'🌸'}]},  // 110
+                { startAmount: 150, events: [{ type:'expense',name:'買彩色筆',     amount:60,  icon:'🎨'}, { type:'income',  name:'幫忙整理書桌', amount:25, icon:'🗂️'}]},  // 115
+                { startAmount: 70,  events: [{ type:'income', name:'優良獎勵',     amount:50,  icon:'🏆'}, { type:'expense', name:'買點心',  amount:35, icon:'🍪'}]},  // 85
+            ],
+            normal: [
+                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢', amount:100, icon:'💰'}, { type:'expense', name:'買文具',   amount:45, icon:'✏️'}, { type:'expense', name:'買便當', amount:55, icon:'🍱'}, { type:'income', name:'幫忙家事', amount:20, icon:'🧹'}]},  // 220
+                { startAmount: 150, events: [{ type:'income', name:'期末獎勵',   amount:200, icon:'🏆'}, { type:'expense', name:'買參考書', amount:120, icon:'📚'}, { type:'expense', name:'買文具', amount:60, icon:'✏️'}, { type:'expense', name:'買飲料', amount:30, icon:'🧋'}]},  // 140
+                { startAmount: 300, events: [{ type:'expense',name:'買書包',     amount:180, icon:'🎒'}, { type:'income',  name:'幫鄰居抄筆記', amount:50, icon:'📝'}, { type:'expense', name:'買早餐', amount:40, icon:'🥐'}, { type:'income', name:'媽媽獎勵', amount:80, icon:'💝'}]},  // 210
+                { startAmount: 500, events: [{ type:'expense',name:'補習費',     amount:350, icon:'🏫'}, { type:'income',  name:'成績進步獎', amount:100, icon:'🌟'}, { type:'expense', name:'買作業本', amount:55, icon:'📓'}, { type:'income', name:'節省零用錢', amount:50, icon:'💵'}]},  // 245
+                { startAmount: 100, events: [{ type:'income', name:'幫同學收作業', amount:30, icon:'📋'}, { type:'expense', name:'買測驗卷', amount:25, icon:'📄'}, { type:'income', name:'老師獎勵券換現', amount:50, icon:'🎟️'}, { type:'expense', name:'買零食', amount:40, icon:'🍬'}]},  // 115
+                { startAmount: 250, events: [{ type:'expense',name:'買計算機',   amount:100, icon:'🔢'}, { type:'income',  name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買橡皮擦文具', amount:35, icon:'✏️'}, { type:'expense', name:'喝飲料', amount:45, icon:'🥤'}]},  // 220
+            ],
+            hard: [
+                { startAmount: 600, events: [{ type:'expense',name:'買教科書',   amount:400, icon:'📘'}, { type:'income',  name:'打工薪資', amount:300, icon:'💼'}, { type:'expense', name:'買制服', amount:280, icon:'👔'}, { type:'income', name:'考試獎勵', amount:150, icon:'🏅'}, { type:'expense', name:'交通費', amount:120, icon:'🚌'}]},  // 250
+                { startAmount: 800, events: [{ type:'income', name:'課輔獎助學金', amount:500, icon:'🎓'}, { type:'expense', name:'買學習平板', amount:650, icon:'💻'}, { type:'income', name:'作業優良獎', amount:100, icon:'🌟'}, { type:'expense', name:'買文具組', amount:95, icon:'✏️'}, { type:'income', name:'節省零用錢', amount:80, icon:'💵'}]},  // 735
+                { startAmount: 1000, events: [{ type:'expense',name:'語言補習費', amount:700, icon:'🗣️'}, { type:'income',  name:'打掃工讀', amount:300, icon:'🧹'}, { type:'expense', name:'買參考書', amount:200, icon:'📚'}, { type:'income', name:'媽媽獎勵', amount:250, icon:'💝'}, { type:'expense', name:'買文具', amount:85, icon:'✏️'}]},  // 565
+                { startAmount: 400, events: [{ type:'income', name:'英文競賽獎', amount:300, icon:'🏆'}, { type:'expense', name:'補習費',   amount:350, icon:'🏫'}, { type:'income', name:'爸爸補貼', amount:200, icon:'👨'}, { type:'expense', name:'買作業組', amount:75, icon:'📓'}, { type:'income', name:'節約獎勵', amount:50, icon:'💰'}]},  // 525
+            ],
+        },
+    },
+    holiday: {
+        name: '假期日記', icon: '🎉',
+        templates: {
+            easy: [
+                { startAmount: 100, events: [{ type:'income', name:'過年紅包',   amount:200, icon:'🧧'}, { type:'expense', name:'買玩具',  amount:150, icon:'🎮'}]},  // 150
+                { startAmount: 80,  events: [{ type:'expense',name:'看電影',     amount:60,  icon:'🎬'}, { type:'income',  name:'壓歲錢', amount:50, icon:'🎊'}]},  // 70
+                { startAmount: 200, events: [{ type:'income', name:'阿姨紅包',   amount:100, icon:'💝'}, { type:'expense', name:'買糖果',  amount:45, icon:'🍬'}]},  // 255
+                { startAmount: 50,  events: [{ type:'income', name:'中秋紅包',   amount:100, icon:'🎑'}, { type:'expense', name:'買月餅',  amount:60, icon:'🥮'}]},  // 90
+                { startAmount: 150, events: [{ type:'expense',name:'遊樂園票',   amount:100, icon:'🎡'}, { type:'income',  name:'幫忙家事', amount:40, icon:'🧹'}]},  // 90
+                { startAmount: 120, events: [{ type:'income', name:'聖誕紅包',   amount:80,  icon:'🎄'}, { type:'expense', name:'買禮物',  amount:65, icon:'🎁'}]},  // 135
+                { startAmount: 80,  events: [{ type:'expense',name:'買冰淇淋',   amount:35,  icon:'🍦'}, { type:'income',  name:'爺爺獎勵', amount:50, icon:'👴'}]},  // 95
+                { startAmount: 200, events: [{ type:'expense',name:'買書',       amount:90,  icon:'📚'}, { type:'income',  name:'叔叔紅包', amount:120, icon:'🧧'}]},  // 230
+            ],
+            normal: [
+                { startAmount: 200, events: [{ type:'income', name:'過年紅包',   amount:500, icon:'🧧'}, { type:'expense', name:'買玩具', amount:220, icon:'🎮'}, { type:'expense', name:'看電影', amount:80, icon:'🎬'}, { type:'expense', name:'買零食', amount:45, icon:'🍿'}]},  // 355
+                { startAmount: 150, events: [{ type:'income', name:'生日禮金',   amount:300, icon:'🎂'}, { type:'expense', name:'買遊樂園票', amount:150, icon:'🎡'}, { type:'expense', name:'買紀念品', amount:85, icon:'🎠'}, { type:'expense', name:'買飲料', amount:40, icon:'🧋'}]},  // 175
+                { startAmount: 300, events: [{ type:'expense',name:'聖誕購物',   amount:180, icon:'🎄'}, { type:'income',  name:'爺爺紅包', amount:200, icon:'👴'}, { type:'expense', name:'買裝飾', amount:65, icon:'✨'}, { type:'income', name:'幫忙家事', amount:50, icon:'🧹'}]},  // 305
+                { startAmount: 500, events: [{ type:'expense',name:'暑期夏令營', amount:350, icon:'⛺'}, { type:'income',  name:'壓歲錢', amount:300, icon:'🎊'}, { type:'expense', name:'買游泳用品', amount:120, icon:'🏊'}, { type:'income', name:'叔叔補貼', amount:100, icon:'👨'}]},  // 430
+                { startAmount: 100, events: [{ type:'income', name:'中秋紅包',   amount:200, icon:'🎑'}, { type:'expense', name:'買月餅盒', amount:90, icon:'🥮'}, { type:'income', name:'幫忙採購', amount:30, icon:'🛒'}, { type:'expense', name:'買燈籠', amount:50, icon:'🏮'}]},  // 190
+                { startAmount: 250, events: [{ type:'expense',name:'跨年煙火行', amount:120, icon:'🎆'}, { type:'income',  name:'阿姨紅包', amount:150, icon:'💝'}, { type:'expense', name:'買飲料零食', amount:65, icon:'🥤'}, { type:'expense', name:'買帽子', amount:45, icon:'🎩'}]},  // 170
+            ],
+            hard: [
+                { startAmount: 600,  events: [{ type:'income', name:'過年紅包合計', amount:800, icon:'🧧'}, { type:'expense', name:'買電動', amount:680, icon:'🎮'}, { type:'expense', name:'春節旅遊', amount:350, icon:'🚌'}, { type:'income', name:'爺爺另外給', amount:200, icon:'👴'}, { type:'expense', name:'買紀念品', amount:120, icon:'🎁'}]},  // 450
+                { startAmount: 800,  events: [{ type:'expense',name:'暑期日本旅遊', amount:1200, icon:'✈️'}, { type:'income',  name:'打工收入', amount:600, icon:'💼'}, { type:'expense', name:'買伴手禮', amount:280, icon:'🎀'}, { type:'income', name:'叔叔補助', amount:400, icon:'👨'}, { type:'expense', name:'逛夜市', amount:150, icon:'🌙'}]},  // 170
+                { startAmount: 1000, events: [{ type:'income', name:'生日禮金合計', amount:700, icon:'🎂'}, { type:'expense', name:'買電動遊戲機', amount:980, icon:'🎮'}, { type:'income', name:'爸媽補貼', amount:400, icon:'💰'}, { type:'expense', name:'買生日蛋糕', amount:200, icon:'🎂'}, { type:'expense', name:'買衣服', amount:150, icon:'👗'}]},  // 770
+                { startAmount: 500,  events: [{ type:'expense',name:'聖誕購物節', amount:450, icon:'🎄'}, { type:'income',  name:'聖誕紅包', amount:300, icon:'🎅'}, { type:'expense', name:'買裝飾品', amount:180, icon:'✨'}, { type:'income', name:'義賣義工', amount:120, icon:'💚'}, { type:'expense', name:'買聖誕禮', amount:95, icon:'🎁'}]},  // 195
+            ],
+        },
+    },
+    family: {
+        name: '家庭日記', icon: '👨‍👩‍👧',
+        templates: {
+            easy: [
+                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢', amount:50,  icon:'💰'}, { type:'expense', name:'買早餐',   amount:30, icon:'🥐'}]},  // 120
+                { startAmount: 60,  events: [{ type:'income', name:'幫忙洗碗',   amount:20,  icon:'🍽️'}, { type:'expense', name:'買點心',   amount:15, icon:'🍪'}]},  // 65
+                { startAmount: 150, events: [{ type:'expense',name:'家庭採購幫手', amount:50, icon:'🛒'}, { type:'income',  name:'爸爸獎勵', amount:30, icon:'👨'}]},  // 130
+                { startAmount: 80,  events: [{ type:'income', name:'幫忙打掃',   amount:30,  icon:'🧹'}, { type:'expense', name:'買衛生紙', amount:20, icon:'🧻'}]},  // 90
+                { startAmount: 200, events: [{ type:'expense',name:'買洗碗精',   amount:40,  icon:'🧴'}, { type:'income',  name:'媽媽感謝', amount:50, icon:'💝'}]},  // 210
+                { startAmount: 70,  events: [{ type:'income', name:'幫忙倒垃圾', amount:15,  icon:'🗑️'}, { type:'expense', name:'買水果',   amount:35, icon:'🍎'}]},  // 50
+                { startAmount: 120, events: [{ type:'income', name:'幫做家常菜', amount:40,  icon:'🍳'}, { type:'expense', name:'買食材',   amount:55, icon:'🥦'}]},  // 105
+                { startAmount: 90,  events: [{ type:'expense',name:'買家用品',   amount:25,  icon:'🏠'}, { type:'income',  name:'阿嬤零用錢', amount:60, icon:'👵'}]},  // 125
+            ],
+            normal: [
+                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢', amount:100, icon:'💰'}, { type:'expense', name:'買菜',     amount:80, icon:'🥦'}, { type:'income', name:'幫忙買菜', amount:20, icon:'🛒'}, { type:'expense', name:'買調味料', amount:35, icon:'🧂'}]},  // 205
+                { startAmount: 300, events: [{ type:'expense',name:'家庭聚餐費', amount:200, icon:'🍜'}, { type:'income',  name:'奶奶紅包', amount:150, icon:'💝'}, { type:'expense', name:'買甜點', amount:60, icon:'🎂'}, { type:'expense', name:'買飲料', amount:40, icon:'🧃'}]},  // 150
+                { startAmount: 150, events: [{ type:'income', name:'幫忙家務',   amount:80,  icon:'🧹'}, { type:'expense', name:'買清潔劑', amount:45, icon:'🧴'}, { type:'income', name:'媽媽感謝金', amount:50, icon:'💰'}, { type:'expense', name:'買零食', amount:30, icon:'🍬'}]},  // 205
+                { startAmount: 400, events: [{ type:'expense',name:'買廚房用品', amount:250, icon:'🍳'}, { type:'income',  name:'叔叔給的', amount:200, icon:'👨'}, { type:'expense', name:'買食材', amount:90, icon:'🥕'}, { type:'income', name:'幫忙採購獎', amount:60, icon:'🌟'}]},  // 320
+                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買菜',     amount:60, icon:'🥬'}, { type:'expense', name:'買水果', amount:45, icon:'🍊'}, { type:'income', name:'爸爸嘉獎', amount:30, icon:'👨'}]},  // 175
+                { startAmount: 250, events: [{ type:'expense',name:'家庭旅遊費', amount:180, icon:'🚌'}, { type:'income',  name:'阿公零用', amount:150, icon:'👴'}, { type:'expense', name:'買零食', amount:40, icon:'🍿'}, { type:'income', name:'幫忙整理', amount:25, icon:'🗂️'}]},  // 205
+            ],
+            hard: [
+                { startAmount: 500,  events: [{ type:'expense',name:'買冰箱（家電）', amount:600, icon:'🧊'}, { type:'income',  name:'爸爸補貼', amount:400, icon:'👨'}, { type:'expense', name:'電費', amount:150, icon:'⚡'}, { type:'income', name:'媽媽補貼', amount:300, icon:'💰'}, { type:'expense', name:'買食材', amount:120, icon:'🥦'}]},  // 330
+                { startAmount: 800,  events: [{ type:'income', name:'年終家庭獎金', amount:500, icon:'💵'}, { type:'expense', name:'買家具',   amount:650, icon:'🛋️'}, { type:'income', name:'舊物變賣', amount:200, icon:'♻️'}, { type:'expense', name:'買裝飾品', amount:180, icon:'🖼️'}, { type:'expense', name:'外送費', amount:90, icon:'🛵'}]},  // 580
+                { startAmount: 1000, events: [{ type:'expense',name:'全家旅遊費', amount:800,  icon:'✈️'}, { type:'income',  name:'幫忙打工', amount:350, icon:'💼'}, { type:'expense', name:'買旅行用品', amount:200, icon:'🧳'}, { type:'income', name:'爺爺補貼', amount:300, icon:'👴'}, { type:'expense', name:'景點紀念品', amount:150, icon:'🗺️'}]},  // 500
+                { startAmount: 400,  events: [{ type:'income', name:'家庭分工獎勵', amount:600, icon:'🏡'}, { type:'expense', name:'買洗衣機', amount:700, icon:'🌀'}, { type:'income', name:'二手拍賣', amount:250, icon:'♻️'}, { type:'expense', name:'買清潔用品', amount:80, icon:'🧼'}, { type:'income', name:'爸爸零用', amount:100, icon:'👨'}]},  // 570
+            ],
+        },
+    },
+};
+
 // ── 金額語音轉換（安全版）──────────────────────────────────────
 const toTWD = v => typeof convertToTraditionalCurrency === 'function'
     ? convertToTraditionalCurrency(v) : `${v}元`;
@@ -349,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null, diaryTheme: null },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -455,6 +546,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">📓 日記主題：</label>
+                            <div class="b-btn-group" id="theme-group">
+                                <button class="b-sel-btn" data-theme="school">🏫 學校</button>
+                                <button class="b-sel-btn" data-theme="holiday">🎉 假期</button>
+                                <button class="b-sel-btn" data-theme="family">👨‍👩‍👧 家庭</button>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">🤖 輔助點擊：</label>
                             <div class="b-btn-group" id="assist-group">
                                 <button class="b-sel-btn" data-val="on">✓ 啟用</button>
@@ -541,6 +640,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
             }, {}, 'settings');
 
+            document.querySelectorAll('#theme-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#theme-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.diaryTheme = btn.dataset.theme;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -563,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode || !s.diaryTheme;
         },
 
         // ── 9. 遊戲開始 ───────────────────────────────────────
@@ -589,8 +697,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 10. 題目產生 ──────────────────────────────────────
         _generateQuestions(count) {
-            const diff      = this.state.settings.difficulty;
-            const templates = B2_TEMPLATES[diff].slice().sort(() => Math.random() - 0.5);
+            const diff    = this.state.settings.difficulty;
+            const theme   = this.state.settings.diaryTheme;
+            const themeData = B2_THEMES[theme];
+            const basePool  = themeData ? themeData.templates[diff] : B2_TEMPLATES[diff];
+            const templates = (basePool && basePool.length > 0 ? basePool : B2_TEMPLATES[diff]).slice().sort(() => Math.random() - 0.5);
             const result    = [];
 
             for (let i = 0; i < count; i++) {
@@ -683,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-header-left">
                     <span class="b-header-unit">📒 零用錢日記</span>
                 </div>
-                <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}</div>
+                <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}${ (() => { const t = B2_THEMES[this.state.settings.diaryTheme]; return t ? ` · ${t.icon}${t.name}` : ''; })() }</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
                     <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
@@ -1136,7 +1247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('');
                 return `
                 <div class="b2-res-diary">
-                    <h3>📒 記帳日記回顧</h3>
+                    <h3>${(() => { const t = B2_THEMES[this.state.settings.diaryTheme]; return t ? `${t.icon} ${t.name}回顧` : '📒 記帳日記回顧'; })()}</h3>
                     <table class="b2-hist-table">
                         <thead><tr>
                             <th>#</th><th>起始</th><th>收支事件</th><th>結餘</th>
