@@ -1438,7 +1438,14 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.id = 'b4-savings-toast';
             toast.className = 'b4-savings-toast';
             const ci3 = this.state.currentDiffItem;
-            toast.textContent = (ci3 && ci3.isUnit) ? `💰 每${ci3.unit}省了 ${amount} 元！` : `💰 省了 ${amount} 元！`;
+            if (ci3 && ci3.isUnit) {
+                const pctU = ci3.perA > 0 ? Math.round((amount / ci3.perA) * 100) : 0;
+                toast.textContent = `💰 每${ci3.unit}省了 ${amount} 元（省 ${pctU}%）！`;
+            } else {
+                const highPrice = ci3 ? (ci3.optA?.price || (ci3.optA?.price)) : 0;
+                const pct = highPrice > 0 ? Math.round((amount / highPrice) * 100) : 0;
+                toast.textContent = pct > 0 ? `💰 省了 ${amount} 元（省 ${pct}%）！` : `💰 省了 ${amount} 元！`;
+            }
             document.body.appendChild(toast);
             Game.TimerManager.setTimeout(() => {
                 toast.classList.add('b4-toast-fade');
