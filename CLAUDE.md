@@ -574,6 +574,21 @@ toolbarConfig: {
 | B6 精準付款特效（2026-03-29）| B6 | `_showChangeResult` 加 `change===0` 分支：「💯 精準付款！不需找零」黃色 banner + 語音；易/普通模式補充結果語音；`.b6-change-section.exact-payment` CSS；`b6ExactGlow` 動畫 |
 | B4 差額算式閃現（2026-03-29）| B4 | `handleDiffAnswer` 正確分支：`_showDiffCalcFlash(highPrice, lowPrice, diff)` 底部顯示「X − Y = Z元」；`.b4-calc-flash/.b4-cf-num/op/ans` CSS；`b4CfIn` 動畫；B6 change formula pattern |
 | B3 平均每週存款統計（2026-03-29）| B3 | 結果頁 `b3-goal-summary` 新增第 4 格「平均每週存款 X 元」（黃色高亮）；`g.weekly` 平均值；`.b3-gs-item.highlight` CSS |
+| B1 錢包進度條（2026-03-29/Round 29）| B1 | `_renderWalletArea` 新增 `#b1-wallet-progress` 橫條；`_updateWalletDisplay` 依 `pct` 更新填充（藍→橙70%→綠100%）；`.b1-wallet-progress-wrap/.fill` CSS |
+| B5 各關總計摘要（2026-03-29/Round 29）| B5 | `roundStatsHTML` 改 IIFE 計算 `totalBudget/totalSpent/totalSaved/avgPct`；`.b5-res-total-row` 顯示 4 欄；`.saved`（綠）/ `.over`（紅）CSS |
+| B1 今日路線條（Round 30）| B1 | `_renderScheduleCard` 末尾加 `.b1-route-strip`：「🏠 → icon label → 🏠」；`bFadeIn 0.3s 0.5s both`；CSS `.b1-rs-*` |
+| B2 餘額走勢條（Round 30）| B2 | `_animateEasyEntries` summaryDelay 回呼加 `b2-balance-trend`：進度條顯示 `endBalance/startAmount * 100%`（good≥80/ok≥50/low）；`.b2-bt-*` CSS |
+| B3 進度環（Round 30）| B3 | `_renderPiggyBankCard` 加 `b3-progress-ring`（conic-gradient）+ `b3-ring-pct`；`_updateCalendarUI` 同步更新 deg；`.b3-progress-ring/.inner` CSS |
+| B5 超限震動（Round 30）| B5 | `_updateTotalBar` 加 `wasOver` 偵測；首次超出時加 `b5-shake` class（600ms 後移除）；`@keyframes b5Shake` CSS |
+| B6 浮動購物籃徽章（Round 30）| B6 | `_bindShoppingEvents` 收集後呼叫 `_updateCartBadge(collected, needed)`；藍色→綠色（done）；`_renderPaymentUI` 移除；`@keyframes b6CartPop`；`.b6-cart-badge` CSS |
+| B2 即時餘額預覽（Round 31）| B2 | `_updateInputDisplay` 同步更新 `#b2-input-preview`：`diff===0` exact（綠）/ `diff>0` over（紅）/ `diff<0` under（橙）；`_renderNumpadHTML` 插入元素；`.b2-input-preview.exact/over/under` CSS |
+| B3 最佳存法提示（Round 31）| B3 | `_handleNumpadAnswer` 答錯加 `_showBestSavingHint(question)`：顯示半量/原量/雙量三行對比（slow灰/correct綠/fast藍）；`.b3-best-hint/.b3-bh-*` CSS |
+| B4 冠軍徽章（Round 31）| B4 | `handleSelectClick` easy 答對後呼叫 `_showChampionBadge(storeName)`；中央「🥇X最便宜！」淡入淡出 1.6s；`@keyframes b4ChampIn/Out`；`.b4-champion-badge` CSS |
+| B5 預算效率星評（Round 31）| B5 | `showResults` 在 `roundStatsHTML` 後插入 IIFE 星評：avgPct≥90→3星/≥60→2星/其他→1星；`.b5-star-rating/.b5-star.lit` CSS |
+| B1 面額計數摘要（Round 32）| B1 | `_updateWalletDisplay` 統計各面額數量→更新 `#b1-denom-summary`；膠囊標籤顯示「N元×M」；`_renderWalletArea` 加 `b1-denom-summary` 元素（初始 `display:none`）；`.b1-ds-item` CSS |
+| B2 理財建議卡（Round 32）| B2 | `_handleChoiceAnswer`/`_handleNumpadAnswer` 答對後呼叫 `_showFinancialTip(question)`；依 net>0/0/<0 隨機顯示建議語句；底部深色 toast 1.4s 後消失；`.b2-fin-tip/.b2-ft-*` CSS |
+| B4 減法學習要點（Round 32）| B4 | `handleDiffAnswer` 正確分支加 `_showSubtractionTip(high, low, diff)`：底部「X − Y = Z元」算式 toast（1.2s+fade）；`.b4-sub-tip/.b4-st-*` CSS |
+| B6 結帳平均金額（Round 32）| B6 | `_showCheckoutConfirm` 清單新增 `.b6-cc-avg` 列：「共N項，平均每項M元」；`.b6-cc-avg` 虛線分隔灰色文字 CSS |
 
 ---
 
