@@ -809,9 +809,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                         Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
                     }
-                    const cheapWord = curr.isUnit ? '比較划算' : '比較便宜';
-                    Game.Speech.speak(`答對了！${correctCard?.querySelector('.b4-store-name')?.textContent || ''}${cheapWord}`);
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                    const cheapSide = correctSide === 'left' ? left : right;
+                    const expSide   = correctSide === 'left' ? right : left;
+                    let easyCorrectSpeech;
+                    if (curr.isUnit) {
+                        easyCorrectSpeech = `答對了！${cheapSide.store}每${curr.unit}${curr.perB}元，比${expSide.store}每${curr.unit}${curr.perA}元便宜！`;
+                    } else {
+                        easyCorrectSpeech = `答對了！${cheapSide.store}${cheapSide.price}元，比${expSide.store}${expSide.price}元便宜！`;
+                    }
+                    Game.Speech.speak(easyCorrectSpeech);
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     // 普通/困難：顯示差額問題
                     Game.TimerManager.setTimeout(() => {
