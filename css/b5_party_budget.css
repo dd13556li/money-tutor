@@ -539,3 +539,20 @@
     0%, 100% { transform: scale(1); }
     50%       { transform: scale(1.04); }
 }
+
+/* ── B5 Total Summary Row (Round 29) ── */
+.b5-res-total-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    justify-content: center;
+    padding: 10px 12px;
+    margin-top: 10px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+    border-radius: 0 0 10px 10px;
+    font-size: 13px;
+    color: #374151;
+}
+.b5-res-total-row .saved { color: #059669; font-weight: 700; }
+.b5-res-total-row .over  { color: #dc2626; font-weight: 700; }

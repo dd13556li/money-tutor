@@ -1026,7 +1026,12 @@ document.addEventListener('DOMContentLoaded', () => {
             else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
 
             // 各關預算使用統計（F5 量比較 pattern）
-            const roundStatsHTML = g.roundStats && g.roundStats.length > 0 ? `
+            const roundStatsHTML = g.roundStats && g.roundStats.length > 0 ? (() => {
+                const totalBudget = g.roundStats.reduce((s, r) => s + r.budget, 0);
+                const totalSpent  = g.roundStats.reduce((s, r) => s + r.spent,  0);
+                const totalSaved  = totalBudget - totalSpent;
+                const avgPct = Math.round(totalSpent / totalBudget * 100);
+                return `
             <div class="b5-res-budget-stats">
                 <h3>📊 各關預算使用</h3>
                 <div class="b5-budget-bars">
@@ -1042,7 +1047,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                     }).join('')}
                 </div>
-            </div>` : '';
+                <div class="b5-res-total-row">
+                    <span>總預算：<strong>${totalBudget}元</strong></span>
+                    <span>總花費：<strong>${totalSpent}元</strong></span>
+                    <span class="${totalSaved >= 0 ? 'saved' : 'over'}">節省：<strong>${totalSaved >= 0 ? '+'+totalSaved : totalSaved}元</strong></span>
+                    <span>平均使用率：<strong>${avgPct}%</strong></span>
+                </div>
+            </div>`;
+            })() : '';
 
             // 派對物品回顧（A4 交易摘要模式）
             const themeForResult = this.state.settings.partyTheme === 'random'

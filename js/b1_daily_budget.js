@@ -642,6 +642,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b1-wallet-goal-tag">需要 ${requiredTotal} 元</span>
                     </div>
                 </div>
+                <div class="b1-wallet-progress-wrap">
+                    <div class="b1-wallet-progress" id="b1-wallet-progress"><div class="b1-wallet-progress-fill" id="b1-wallet-progress-fill"></div></div>
+                </div>
                 <div class="b1-wallet-coins b1-drop-zone" id="wallet-coins">
                     <span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>
                 </div>
@@ -741,6 +744,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (totalEl) {
                 totalEl.textContent = `${total} 元`;
                 totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+            }
+            // 更新進度條（Round 29）
+            const fillEl = document.getElementById('b1-wallet-progress-fill');
+            if (fillEl && required > 0) {
+                const pct = Math.min(100, Math.round((total / required) * 100));
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b1-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
             }
 
             // 更新錢包幣列

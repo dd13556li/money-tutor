@@ -932,3 +932,21 @@
     from { transform: translateX(-50%) translateY(20px); opacity: 0; }
     to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
+
+/* ── B1 Wallet Progress Bar (Round 29) ── */
+.b1-wallet-progress-wrap { padding: 4px 12px 0; }
+.b1-wallet-progress {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.b1-wallet-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.35s ease, background 0.3s;
+}
+.b1-wallet-progress-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b1-wallet-progress-fill.full { background: linear-gradient(90deg, #10b981, #34d399); }
