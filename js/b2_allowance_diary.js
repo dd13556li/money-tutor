@@ -946,7 +946,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                this._showNetTrend(question);
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1105,7 +1106,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                this._showNetTrend(question);
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1127,6 +1129,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
+        },
+
+        // ── 收支趨勢指示（Round 26）───────────────────────────
+        _showNetTrend(question) {
+            const net = question.answer - question.startAmount;
+            if (net === 0) return; // 完全平衡，不顯示
+            const prev = document.getElementById('b2-net-trend');
+            if (prev) prev.remove();
+            const isUp = net > 0;
+            const sign = isUp ? '+' : '';
+            const trend = document.createElement('div');
+            trend.id = 'b2-net-trend';
+            trend.className = `b2-net-trend ${isUp ? 'up' : 'down'}`;
+            trend.innerHTML = `<span class="b2-nt-arrow">${isUp ? '↑' : '↓'}</span><span>${isUp ? '本週盈餘' : '本週赤字'} ${sign}${net} 元</span>`;
+            document.body.appendChild(trend);
+            Game.TimerManager.setTimeout(() => {
+                trend.classList.add('b2-nt-fade');
+                Game.TimerManager.setTimeout(() => { if (trend.parentNode) trend.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────

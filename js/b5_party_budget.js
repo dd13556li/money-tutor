@@ -817,19 +817,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rem = g.budget - total;
                 if (isCorrect) {
                     const remPct = g.budget > 0 ? Math.round((rem / g.budget) * 100) : 0;
+                    const isPerfectBudget = rem === 0;
                     const savingsBadge = rem > 0
                         ? `<div class="b5-savings-badge">💰 節省了 ${rem} 元（節省 ${remPct}%）！</div>`
                         : '';
                     const usePct = g.budget > 0 ? Math.round((total / g.budget) * 100) : 0;
-                    const effInfo = usePct >= 95 ? { icon: '💎', label: '完美預算！', cls: 'perfect' }
+                    const effInfo = isPerfectBudget ? { icon: '💯', label: '完美！剛好用完預算！', cls: 'perfect-exact' }
+                        : usePct >= 95 ? { icon: '💎', label: '完美預算！', cls: 'perfect' }
                         : usePct >= 80 ? { icon: '⭐', label: '善用預算！', cls: 'good' }
                         : usePct >= 60 ? { icon: '👍', label: '不錯預算！', cls: 'ok' }
                         : { icon: '💡', label: '節省模式', cls: 'save' };
                     const effBadge = `<div class="b5-eff-badge ${effInfo.cls}">${effInfo.icon} ${effInfo.label} <span class="b5-eff-pct">${usePct}%</span></div>`;
                     resultArea.innerHTML = `
-                        <div class="b5-result-banner success">
-                            🎉 太棒了！派對辦起來！
-                            <div class="b5-result-sub">共花了 ${total} 元，還剩 ${rem} 元</div>
+                        <div class="b5-result-banner success${isPerfectBudget ? ' perfect-budget' : ''}">
+                            ${isPerfectBudget ? '🎯 完美配額！' : '🎉 太棒了！派對辦起來！'}
+                            <div class="b5-result-sub">共花了 ${total} 元${isPerfectBudget ? '，剛好用完！' : `，還剩 ${rem} 元`}</div>
                         </div>
                         ${effBadge}
                         ${savingsBadge}`;
@@ -901,9 +903,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         g.successfulRoundItems.push(`${i.icon} ${i.name}`);
                 });
                 this.audio.play('correct');
-                this._showCenterFeedback('✅', '太棒了！');
                 const rem = g.budget - total;
-                Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
+                if (rem === 0) {
+                    this._showCenterFeedback('💯', '完美配額！');
+                    Game.Speech.speak(`完美！剛好花了${toTWD(total)}，用完全部預算！`);
+                } else {
+                    this._showCenterFeedback('✅', '太棒了！');
+                    Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
+                }
             } else {
                 g.streak = 0;
                 this.audio.play('error');

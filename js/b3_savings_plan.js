@@ -1072,6 +1072,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b3-cal-stats-line">每天存 ${c.dailyAmount} 元</div>
                     <div class="b3-cal-stat-sep">｜</div>
                     <div class="b3-cal-stats-line">共 ${daysNeeded} 天</div>
+                    <div class="b3-cal-stat-sep">｜</div>
+                    <div class="b3-cal-stats-line b3-days-left-line">距完成 <span id="b3-days-left" class="b3-days-left-num">${daysNeeded}</span> 天</div>
                 </div>
             </div>
         </div>
@@ -1254,6 +1256,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pctEl) pctEl.textContent = pct + '%';
             const remEl = document.getElementById('b3-cal-remaining');
             if (remEl) remEl.textContent = remaining;
+            // 距完成天數（Round 26）
+            const daysLeftEl = document.getElementById('b3-days-left');
+            if (daysLeftEl) {
+                const daysLeft = Math.ceil(remaining / c.dailyAmount);
+                daysLeftEl.textContent = daysLeft;
+                daysLeftEl.className = 'b3-days-left-num' + (daysLeft <= 3 ? ' near' : '');
+            }
 
             // Update clicked cell: active → done
             const clickedCell = document.querySelector(`.b3-cal-cell[data-day="${justClickedDay}"]`);

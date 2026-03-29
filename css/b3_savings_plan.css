@@ -1608,3 +1608,17 @@
     from { transform: translateX(-50%) translateY(20px); opacity: 0; }
     to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
+
+/* ── B3 距完成天數 (Round 26) ── */
+.b3-days-left-line { font-size: 13px; }
+.b3-days-left-num {
+    font-weight: 900;
+    color: #3b82f6;
+    font-size: 15px;
+    transition: color 0.3s;
+}
+.b3-days-left-num.near { color: #10b981; animation: b3DlPulse 1s ease-in-out 2; }
+@keyframes b3DlPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.25); }
+}

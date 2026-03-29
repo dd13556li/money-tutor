@@ -565,6 +565,9 @@ toolbarConfig: {
 | B5 預算效率徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`usePct=total/budget*100`；≥95% 💎完美/≥80% ⭐善用/≥60% 👍不錯/<60% 💡節省；`.b5-eff-badge.perfect/good/ok/save` CSS；B4 savings toast pattern |
 | B6 攤位小計提示（2026-03-29）| B6 | 切換攤位時若已收集商品，`_showStallSubtotal(stallName, subtotal)` 顯示離開攤位已花金額；`.b6-stall-subtotal/.b6-ss-name/total` CSS；`b6SsIn` 動畫 |
 | B1 找零說明動畫（2026-03-29）| B1 | 答對且 `diff>0` 時 300ms 後顯示 `_showChangeTip(paid, required, change)`：「付X − 需Y = 找回Z元」公式卡；`.b1-change-tip/.b1-ct-row/item/op/ans` CSS；`b1CtIn` 動畫；B6 change formula pattern |
+| B2 收支趨勢指示（2026-03-29）| B2 | 答對後 `_showNetTrend(question)`：net>0 顯示「↑ 本週盈餘+X元」（綠）/ net<0 顯示「↓ 本週赤字-X元」（紅）；`.b2-net-trend.up/down` CSS；`b2NtIn` 動畫 |
+| B3 月曆距完成天數（2026-03-29）| B3 | 月曆 info card 新增「距完成 N 天」，`_updateCalendarUI` 同步更新 `#b3-days-left`；≤3天時 `near` class + `b3DlPulse` 脈動；`.b3-days-left-num.near` CSS |
+| B5 完美配額特效（2026-03-29）| B5 | `rem===0` 時：banner 改「🎯 完美配額！」黃色主題；feedback 改「💯」；語音「完美！剛好花了X元，用完全部預算！」；eff-badge 改 `perfect-exact` 粉色 + `b5PerfectPulse` 2次脈動 |
 
 ---
 
