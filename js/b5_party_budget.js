@@ -837,12 +837,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const suggestionHTML = suggestion
                         ? `<div class="b5-removal-hint">💡 試試取消勾選「${suggestion.icon} ${suggestion.name}」（${suggestion.price}元）！</div>`
                         : '';
+                    // 費用明細（B1/B2 breakdown pattern）
+                    const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
+                    const breakdownRows = selectedItems.map(i =>
+                        `<div class="b5-bd-row${i === suggestion ? ' b5-bd-over' : ''}">
+                            <span>${i.icon} ${i.name}</span><span>${i.price}元</span>
+                         </div>`
+                    ).join('');
+                    const breakdownHTML = `
+                        <div class="b5-breakdown">
+                            <div class="b5-bd-title">📋 費用明細</div>
+                            ${breakdownRows}
+                            <div class="b5-bd-sep"></div>
+                            <div class="b5-bd-row b5-bd-total"><span>合計</span><span>${total}元</span></div>
+                            <div class="b5-bd-row b5-bd-budget"><span>預算</span><span>${g.budget}元</span></div>
+                            <div class="b5-bd-row b5-bd-over-row"><span>超出</span><span>${overBy}元</span></div>
+                        </div>`;
                     resultArea.innerHTML = `
                         <div class="b5-result-banner fail">
                             💸 超出預算了！請重新選擇
                             <div class="b5-result-sub">超出 ${overBy} 元</div>
                             ${suggestionHTML}
-                        </div>`;
+                        </div>
+                        ${breakdownHTML}`;
                     // 高亮建議移除的商品（B5 _showBudgetHint pattern）
                     if (suggestion) {
                         Game.TimerManager.setTimeout(() => {

@@ -1276,6 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 答錯
                         btn.classList.add('b6-change-opt-wrong');
                         this.audio.play('error');
+                        this._showChangeFormula(paid, total, change);
                         const retryMode = this.state.settings.retryMode;
                         if (retryMode === 'retry') {
                             btn.disabled = true;
@@ -1294,6 +1295,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             });
+        },
+
+        _showChangeFormula(paid, total, change) {
+            const existing = document.getElementById('b6-change-formula');
+            if (existing) return;
+            const hint = document.createElement('div');
+            hint.id = 'b6-change-formula';
+            hint.className = 'b6-change-formula';
+            hint.innerHTML = `
+                <span class="b6-cf-item">${paid}元</span>
+                <span class="b6-cf-op">−</span>
+                <span class="b6-cf-item">${total}元</span>
+                <span class="b6-cf-op">=</span>
+                <span class="b6-cf-ans">${change}元</span>`;
+            const optsEl = document.getElementById('b6-change-opts');
+            if (optsEl) optsEl.insertAdjacentElement('afterend', hint);
         },
 
         _showChangeResult(paid, change) {
