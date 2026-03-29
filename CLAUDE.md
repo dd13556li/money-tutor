@@ -551,6 +551,13 @@ toolbarConfig: {
 | B1 行程卡精準金額綠光（2026-03-28）| B1 | `_updateWalletDisplay` 加 `.b1-schedule-card.exact-match`；剛好符合時 `b1ExactGlow` 脈動綠框；移除時同步清除 CSS class |
 | B4 三商店困難自動提示（2026-03-28）| B4 | `_bindTripleEvents` hard 模式：10 秒無點擊後 `tcard-cheapestIdx` 加 `.b4-triple-auto-hint`（綠框 `b4AutoHintPulse` 3 次）+ 語音「提示：先找最便宜的」|
 | B1~B6 輔助點擊模式（2026-03-28/29）| B1~B6 | `AssistClick` 模組（`Game.init()` 前獨立區塊）；設定頁新增「🤖 輔助點擊」啟用/停用選項；`_checkCanStart` 加 `clickMode` 守衛；B2：easy 高亮正確選項，normal/hard 逐位數+確認；B4：select 高亮正確卡，diff normal 高亮 `.b4-diff-opt`，diff hard 逐位數+`btn-ok`，三商店 hard 依 `rankOrder` 逐張；B1：`_pendingAction` 單步模式，貪婪選最大面額，不足→投幣，足夠→confirm；B3：hard quiz only，純 numpad 逐位數+ok；B5：confirm 直接可點則高亮，否則高亮可負擔商品；B6：shopping→切換攤位→點商品→checkout，payment→貪婪選面額→pay，change quiz→正確選項；`b-series.css` 新增 `.assist-click-hint`/`bAssistPulse`；搜尋 `b1-assist-overlay`、`b2-assist-overlay`、`b3-assist-overlay`、`b4-assist-overlay`、`b5-assist-overlay`、`b6-assist-overlay` |
+| B4 商品類別篩選（2026-03-29）| B4 | `cat` 欄位加入 `B4_ITEMS`/`B4_TRIPLE_ITEMS`/`B4_UNIT_ITEMS`（food/stationery/daily/clothing）；`itemCat:'all'` 預設（非必選）；設定頁「🏷️ 商品類別」5 選項；`_generateQuestions` 依 `cat` 篩選，少於 2 項 fallback；header 顯示類別；B3 itemCat pattern |
+| B4 開題商品介紹彈窗（2026-03-29）| B4 | `_showItemIntroModal(curr)`：每題渲染後顯示商品 icon+名稱+兩店價格 vs 對比；1800ms 自動關閉或點擊；`.b4-intro-card/.b4-intro-store/.b4-intro-vs/.b4-intro-question` CSS；`b4IntroIn` 動畫；B1 `_showTaskModal` + B6 mission intro pattern |
+| B5 超支費用明細展開（2026-03-29）| B5 | `_handleConfirm` 超支分支：渲染所有已選商品的費用明細表格（合計/預算/超出）；超出金額同時顯示百分比「超出 X%」；`.b5-breakdown/.b5-bd-row/.b5-bd-over/.b5-bd-total` CSS；B1/B2 breakdown pattern |
+| B6 找零算式提示（2026-03-29）| B6 | `_showChangeFormula(paid,total,change)`：change quiz 答錯時在選項下方顯示「付X元 − 商品Y元 = Z元」公式；`.b6-change-formula/.b6-cf-item/.b6-cf-op/.b6-cf-ans` CSS；B4 diff formula pattern |
+| B4 節省百分比（2026-03-29）| B4 | `_showSavingsToast` 改為「省了 X 元（省 Y%）」；高價格 optA.price 為計算基準；unit 模式用 perA；B4 savings toast pattern |
+| B2 收支類型徽章（2026-03-29）| B2 | `_renderQuestionHTML` 每條事件行加 `.b2-type-badge income/expense`（「收入 📥」/「支出 📤」）；金額前加 +/- 符號；移除舊 `::before` 偽元素；CSS 綠/紅膠囊徽章 |
+| B6 第一關進場語音（2026-03-29）| B6 | `_showMissionIntroModal` roundNum===1 時加「歡迎來到{市場名}！」前綴；`roundTitle` 顯示市場 icon+名稱；隨機市場模式讀 `mission._mktKey` |
 
 ---
 
