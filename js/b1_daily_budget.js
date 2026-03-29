@@ -748,11 +748,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const required   = this.state.quiz.questions[this.state.quiz.currentQuestion]?.total ?? 0;
             const enough     = total >= required;
 
-            // 更新合計顯示
+            // 更新合計顯示 + 達標彈跳動畫（Round 36）
             const totalEl = document.getElementById('wallet-total');
             if (totalEl) {
                 totalEl.textContent = `${total} 元`;
+                const wasEnough = totalEl.classList.contains('enough');
                 totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+                if (enough && !wasEnough && total > 0) {
+                    totalEl.classList.add('b1-total-pop');
+                    Game.TimerManager.setTimeout(() => totalEl.classList.remove('b1-total-pop'), 500, 'ui');
+                }
             }
             // 更新進度條（Round 29）
             const fillEl = document.getElementById('b1-wallet-progress-fill');

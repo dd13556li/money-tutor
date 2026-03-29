@@ -600,3 +600,27 @@
 /* ── Round 35：B5 困難模式隱藏價格 ── */
 .b5-price-hidden .b5-item-price { color: #9ca3af; font-style: italic; }
 .b5-price-hidden { opacity: 0.88; }
+
+/* ── Round 36：B5 必買分隔線 ── */
+.b5-must-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #f59e0b;
+    border-radius: 2px;
+    z-index: 2;
+    transition: left 0.5s ease;
+}
+.b5-must-marker::after {
+    content: '必';
+    position: absolute;
+    top: -16px;
+    left: -6px;
+    font-size: 9px;
+    color: #92400e;
+    font-weight: 700;
+    background: #fef3c7;
+    padding: 1px 3px;
+    border-radius: 3px;
+}

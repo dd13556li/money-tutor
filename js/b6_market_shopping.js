@@ -1030,6 +1030,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         checkoutBtn.disabled = !allDone;
                         if (allDone && !wasDone) Game.Speech.speak('所有商品收集完成，可以去結帳了！');
                     }
+
+                    // 攤位完成慶祝（Round 36）
+                    const currentStall = g.activeStall;
+                    if (currentStall) {
+                        const stallItems = g.mission.items.filter(i => i.stall === currentStall);
+                        const stallDone  = stallItems.every(i => g.collectedIds.has(i.id));
+                        const stallTab   = document.querySelector(`.b6-stall-tab[data-stall="${currentStall}"]`);
+                        if (stallDone && stallTab && !stallTab.classList.contains('stall-celebrated')) {
+                            stallTab.classList.add('stall-celebrated', 'b6-stall-done-flash');
+                            Game.TimerManager.setTimeout(() => stallTab.classList.remove('b6-stall-done-flash'), 800, 'ui');
+                        }
+                    }
                 }, {}, 'gameUI');
             });
 

@@ -912,3 +912,11 @@
     text-align: center;
     animation: bFadeIn 0.3s ease;
 }
+
+/* ── Round 36：B6 攤位完成閃光 ── */
+@keyframes b6StallFlash {
+    0%   { background: #d1fae5; box-shadow: 0 0 12px rgba(16,185,129,0.7); }
+    50%  { background: #a7f3d0; box-shadow: 0 0 20px rgba(16,185,129,0.9); }
+    100% { background: ''; box-shadow: none; }
+}
+.b6-stall-done-flash { animation: b6StallFlash 0.8s ease; }

@@ -1259,6 +1259,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const maxP = Math.max(curr.optA.price, curr.optB.price);
             const pctA = Math.round(curr.optA.price / maxP * 100);
             const pctB = Math.round(curr.optB.price / maxP * 100);
+            // 加上差距百分比標籤（Round 36）
+            const diffPct = maxP > 0 ? Math.round((maxP - Math.min(curr.optA.price, curr.optB.price)) / maxP * 100) : 0;
             return `
             <div class="b4-price-bars">
                 <div class="b4-pbar-row">
@@ -1275,6 +1277,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <span class="b4-pbar-price">${curr.optB.price} 元</span>
                 </div>
+                ${diffPct > 0 ? `<div class="b4-pbar-diff-pct">便宜了 ${diffPct}%</div>` : ''}
             </div>`;
         },
 

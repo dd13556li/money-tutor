@@ -682,3 +682,12 @@
     from { opacity: 0; transform: translateX(-20px); }
     to   { opacity: 1; transform: translateX(0); }
 }
+
+/* ── Round 36：B1 達標彈跳 ── */
+@keyframes b1TotalPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+.b1-total-pop { animation: b1TotalPop 0.5s ease; }

@@ -668,8 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>已選：<span class="b5-total-amount" id="b5-total-amount">0</span> 元</span>
                     <span class="b5-remaining" id="b5-remaining">還剩 ${g.budget} 元</span>
                 </div>
-                <div class="b5-budget-meter">
+                <div class="b5-budget-meter" style="position:relative">
                     <div class="b5-budget-meter-fill ok" id="b5-budget-meter-fill" style="width:0%"></div>
+                    <div class="b5-must-marker" id="b5-must-marker" title="必買"></div>
                     <span class="b5-meter-label" id="b5-meter-label">0%</span>
                 </div>
 
@@ -804,6 +805,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     (total > g.budget ? ' over' : total > g.budget * 0.9 ? ' near' : ' ok');
                 const label = document.getElementById('b5-meter-label');
                 if (label) label.textContent = `${pct}%`;
+            }
+
+            // 必買/選購分隔視覺（Round 36）
+            const mustTotal  = g.items.filter(i => i.must).reduce((s, i) => s + i.price, 0);
+            const mustPct    = g.budget > 0 ? Math.min(100, Math.round(mustTotal / g.budget * 100)) : 0;
+            const mustMarker = document.getElementById('b5-must-marker');
+            if (mustMarker) {
+                mustMarker.style.left = mustPct + '%';
+                mustMarker.title = `必買 ${mustTotal} 元（${mustPct}%）`;
             }
 
             const canConfirm = total > 0 && total <= g.budget;

@@ -734,3 +734,13 @@
     font-size: 13px;
     color: #78350f;
 }
+
+/* ── Round 36：B4 價差百分比標籤 ── */
+.b4-pbar-diff-pct {
+    text-align: right;
+    font-size: 11px;
+    color: #059669;
+    font-weight: 700;
+    margin-top: 2px;
+    padding-right: 4px;
+}
