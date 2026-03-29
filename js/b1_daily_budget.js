@@ -51,6 +51,19 @@ const B1_SCENARIOS = {
         { icon:'🍱', label:'辦桌聚餐', cat:'food',          items:[{ name:'餐費', cost:450 }, { name:'飲料',   cost:120 }, { name:'甜點',  cost:150 }] },
         { icon:'🏫', label:'暑期課程', cat:'school',        items:[{ name:'課程費', cost:500 }, { name:'教材費', cost:180 }, { name:'午餐費', cost:120 }] },
         { icon:'🛍️', label:'換季採購', cat:'shopping',      items:[{ name:'外套', cost:680 }, { name:'褲子',   cost:350 }, { name:'包包',  cost:420 }] },
+        // 追加（2026-03-29）
+        { icon:'🍣', label:'吃壽司',   cat:'food',          items:[{ name:'迴轉壽司', cost:180 }, { name:'飲料', cost:30 }] },
+        { icon:'🍦', label:'吃冰淇淋', cat:'food',          items:[{ name:'冰淇淋', cost:55  }, { name:'飲料', cost:25  }] },
+        { icon:'🍕', label:'吃披薩',   cat:'food',          items:[{ name:'披薩', cost:350 }, { name:'飲料', cost:60 }, { name:'甜點', cost:80 }] },
+        { icon:'🥐', label:'買麵包',   cat:'food',          items:[{ name:'麵包', cost:45  }, { name:'咖啡', cost:55  }] },
+        { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', items:[{ name:'包廂費', cost:400 }, { name:'飲料費', cost:120 }, { name:'小食', cost:80 }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', cost:150 }, { name:'租鞋費', cost:50 }] },
+        { icon:'🎰', label:'夾娃娃機', cat:'entertainment', items:[{ name:'投幣費', cost:100 }] },
+        { icon:'🧸', label:'逛玩具展', cat:'entertainment', items:[{ name:'門票', cost:200 }, { name:'紀念品', cost:150 }, { name:'餐費', cost:120 }] },
+        { icon:'💇', label:'去剪髮',   cat:'shopping',      items:[{ name:'剪髮費', cost:200 }] },
+        { icon:'📱', label:'買手機殼', cat:'shopping',      items:[{ name:'手機殼', cost:180 }, { name:'保護貼', cost:50 }] },
+        { icon:'🏋️', label:'健身房',  cat:'outdoor',       items:[{ name:'會員費', cost:350 }, { name:'運動飲料', cost:35 }] },
+        { icon:'🎻', label:'音樂課',   cat:'school',        items:[{ name:'課程費', cost:400 }, { name:'樂器耗材', cost:80 }] },
     ]
 };
 
