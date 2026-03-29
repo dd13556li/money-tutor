@@ -64,6 +64,105 @@ const B5_SCENARIOS = {
     ],
 };
 
+// ── 派對主題資料（除 birthday 外的額外主題）──────────────────────
+const B5_THEMES = {
+    birthday: {
+        name: '生日派對', icon: '🎂',
+        allItems: B5_ALL_ITEMS,
+        scenarios: B5_SCENARIOS,
+    },
+    halloween: {
+        name: '萬聖節派對', icon: '🎃',
+        allItems: [
+            { id:'pumpkin',  name:'南瓜燈',    price:150, icon:'🎃', must:true  },
+            { id:'costume',  name:'萬聖節服裝', price:250, icon:'👻', must:true  },
+            { id:'candy_bag',name:'糖果袋',     price:80,  icon:'🍬', must:false },
+            { id:'witch_hat',name:'巫師帽',     price:60,  icon:'🧙', must:false },
+            { id:'spider',   name:'蜘蛛網裝飾', price:45,  icon:'🕸️', must:false },
+            { id:'skull',    name:'骷髏擺件',   price:70,  icon:'💀', must:false },
+            { id:'glow',     name:'螢光棒',     price:25,  icon:'🌟', must:false },
+            { id:'ghost',    name:'鬼臉面具',   price:90,  icon:'😱', must:false },
+            { id:'treat',    name:'糖果包裝袋', price:40,  icon:'🛍️', must:false },
+            { id:'fangs',    name:'吸血鬼牙齒', price:30,  icon:'🦷', must:false },
+        ],
+        scenarios: {
+            easy: [
+                { budget:600, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow'] },
+                { budget:550, availableIds:['pumpkin','costume','spider','skull','fangs'] },
+                { budget:580, availableIds:['pumpkin','costume','treat','glow','witch_hat'] },
+                { budget:620, availableIds:['pumpkin','costume','ghost','candy_bag','glow'] },
+                { budget:570, availableIds:['pumpkin','costume','skull','treat','spider'] },
+                { budget:610, availableIds:['pumpkin','costume','witch_hat','fangs','glow'] },
+                { budget:590, availableIds:['pumpkin','costume','candy_bag','spider','glow'] },
+                { budget:600, availableIds:['pumpkin','costume','glow','treat','fangs'] },
+            ],
+            normal: [
+                { budget:640, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow','skull','spider'] },
+                { budget:700, availableIds:['pumpkin','costume','ghost','treat','fangs','witch_hat','skull'] },
+                { budget:680, availableIds:['pumpkin','costume','candy_bag','spider','skull','glow','fangs'] },
+                { budget:660, availableIds:['pumpkin','costume','witch_hat','ghost','treat','candy_bag','glow'] },
+                { budget:720, availableIds:['pumpkin','costume','skull','fangs','candy_bag','witch_hat','treat'] },
+                { budget:650, availableIds:['pumpkin','costume','spider','glow','ghost','witch_hat','candy_bag'] },
+                { budget:690, availableIds:['pumpkin','costume','fangs','skull','treat','ghost','spider'] },
+                { budget:670, availableIds:['pumpkin','costume','candy_bag','glow','skull','witch_hat','ghost'] },
+            ],
+            hard: [
+                { budget:640, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow','skull','spider','ghost','treat'] },
+                { budget:680, availableIds:['pumpkin','costume','ghost','treat','fangs','witch_hat','skull','spider','glow'] },
+                { budget:660, availableIds:['pumpkin','costume','candy_bag','spider','skull','glow','fangs','treat','witch_hat'] },
+                { budget:700, availableIds:['pumpkin','costume','witch_hat','ghost','treat','candy_bag','glow','fangs','skull'] },
+                { budget:650, availableIds:['pumpkin','costume','skull','fangs','candy_bag','witch_hat','treat','ghost','spider'] },
+                { budget:720, availableIds:['pumpkin','costume','spider','glow','ghost','witch_hat','candy_bag','fangs','skull'] },
+            ],
+        },
+    },
+    picnic: {
+        name: '春日野餐', icon: '🌸',
+        allItems: [
+            { id:'sandwich', name:'三明治',    price:120, icon:'🥪', must:true  },
+            { id:'blanket',  name:'野餐墊',    price:180, icon:'🧺', must:true  },
+            { id:'fruit',    name:'水果盒',    price:95,  icon:'🍓', must:false },
+            { id:'juice',    name:'果汁飲料',  price:60,  icon:'🧃', must:false },
+            { id:'cookies',  name:'餅乾點心',  price:75,  icon:'🍪', must:false },
+            { id:'sunhat',   name:'遮陽帽',    price:150, icon:'👒', must:false },
+            { id:'frisbee',  name:'飛盤',      price:85,  icon:'🥏', must:false },
+            { id:'bubble',   name:'泡泡水',    price:30,  icon:'🫧', must:false },
+            { id:'balloon',  name:'彩色汽球',  price:50,  icon:'🎈', must:false },
+            { id:'kite',     name:'風箏',      price:160, icon:'🪁', must:false },
+        ],
+        scenarios: {
+            easy: [
+                { budget:500, availableIds:['sandwich','blanket','juice','bubble','cookies'] },
+                { budget:480, availableIds:['sandwich','blanket','fruit','balloon','bubble'] },
+                { budget:520, availableIds:['sandwich','blanket','cookies','juice','balloon'] },
+                { budget:490, availableIds:['sandwich','blanket','bubble','fruit','juice'] },
+                { budget:510, availableIds:['sandwich','blanket','balloon','cookies','bubble'] },
+                { budget:500, availableIds:['sandwich','blanket','juice','fruit','balloon'] },
+                { budget:480, availableIds:['sandwich','blanket','cookies','bubble','fruit'] },
+                { budget:520, availableIds:['sandwich','blanket','balloon','juice','bubble'] },
+            ],
+            normal: [
+                { budget:600, availableIds:['sandwich','blanket','fruit','juice','cookies','frisbee','bubble'] },
+                { budget:650, availableIds:['sandwich','blanket','frisbee','balloon','cookies','juice','fruit'] },
+                { budget:620, availableIds:['sandwich','blanket','bubble','kite','juice','cookies','balloon'] },
+                { budget:580, availableIds:['sandwich','blanket','fruit','frisbee','balloon','bubble','cookies'] },
+                { budget:640, availableIds:['sandwich','blanket','cookies','juice','kite','bubble','fruit'] },
+                { budget:610, availableIds:['sandwich','blanket','balloon','frisbee','fruit','cookies','bubble'] },
+                { budget:630, availableIds:['sandwich','blanket','juice','kite','frisbee','balloon','bubble'] },
+                { budget:600, availableIds:['sandwich','blanket','frisbee','fruit','cookies','bubble','balloon'] },
+            ],
+            hard: [
+                { budget:630, availableIds:['sandwich','blanket','fruit','juice','cookies','frisbee','bubble','balloon','kite'] },
+                { budget:660, availableIds:['sandwich','blanket','frisbee','balloon','cookies','juice','fruit','bubble','kite'] },
+                { budget:640, availableIds:['sandwich','blanket','bubble','kite','juice','cookies','balloon','fruit','frisbee'] },
+                { budget:620, availableIds:['sandwich','blanket','fruit','frisbee','balloon','bubble','cookies','juice','kite'] },
+                { budget:680, availableIds:['sandwich','blanket','cookies','juice','kite','bubble','fruit','frisbee','balloon'] },
+                { budget:650, availableIds:['sandwich','blanket','balloon','frisbee','fruit','cookies','bubble','kite','juice'] },
+            ],
+        },
+    },
+};
+
 // ── Game 物件 ────────────────────────────────────────────────────
 // 金額語音轉換（安全版：若 number-speech-utils.js 未載入則退回原始格式）
 const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertToTraditionalCurrency(v) : `${v}元`;
@@ -183,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: null },
+            settings: { difficulty: null, rounds: null, clickMode: null, partyTheme: null },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -269,6 +368,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🎪 派對主題</label>
+                            <div class="b-btn-group" id="theme-group">
+                                <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
+                                <button class="b-sel-btn" data-theme="halloween">萬聖節 🎃</button>
+                                <button class="b-sel-btn" data-theme="picnic">春日野餐 🌸</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                每個主題有不同的必買商品和預算挑戰！
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">難度：</label>
                             <div class="b-btn-group" id="diff-group">
                                 <button class="b-sel-btn b-diff-easy"   data-val="easy">簡單</button>
@@ -337,6 +447,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _bindSettingsEvents() {
             Game.EventManager.removeByCategory('settings');
+
+            document.querySelectorAll('#theme-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#theme-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.partyTheme = btn.dataset.theme;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             document.querySelectorAll('#diff-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#diff-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -386,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode;
+            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode || !s.partyTheme;
         },
 
         // ── 9. 遊戲開始 ───────────────────────────────────────
@@ -410,7 +530,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _pickScenarios(count, diff) {
-            const pool = B5_SCENARIOS[diff].slice().sort(() => Math.random() - 0.5);
+            const theme = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
+            const pool = (theme.scenarios[diff] || theme.scenarios.normal).slice().sort(() => Math.random() - 0.5);
             const result = [];
             for (let i = 0; i < count; i++) {
                 result.push(pool[i % pool.length]);
@@ -428,7 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const g        = this.state.game;
             const scenario = g.scenarios[g.currentRound];
             g.budget       = scenario.budget;
-            g.items        = scenario.availableIds.map(id => B5_ALL_ITEMS.find(i => i.id === id)).filter(Boolean);
+            const themeData = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
+            g.items        = scenario.availableIds.map(id => themeData.allItems.find(i => i.id === id)).filter(Boolean);
             g.selectedIds  = new Set(g.items.filter(i => i.must).map(i => i.id));
             g.submitted    = false;
 
@@ -452,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="b5-ri-inner">
                     <div class="b5-ri-round">第 ${roundNum} 關</div>
-                    <div class="b5-ri-icon">🎂</div>
+                    <div class="b5-ri-icon">${(B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday).icon}</div>
                     <div class="b5-ri-label">本關預算</div>
                     <div class="b5-ri-budget">${budget} 元</div>
                     <div class="b5-ri-hint">點任意處開始</div>
@@ -872,9 +994,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>` : '';
 
             // 派對物品回顧（A4 交易摘要模式）
+            const themeForResult = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
             const partyReviewHTML = g.successfulRoundItems.length > 0 ? `
             <div class="b5-res-party-review">
-                <h3>🎉 本次派對採購物品</h3>
+                <h3>${themeForResult.icon} 本次${themeForResult.name}採購物品</h3>
                 <div class="b5-party-tags">
                     ${g.successfulRoundItems.map(item =>
                         `<span class="b5-party-tag">${item}</span>`).join('')}
