@@ -663,3 +663,15 @@
 }
 .b2-answer-correct { animation: b2AnswerGlow 0.6s ease; }
 .b2-answer-wrong   { animation: b2AnswerShake 0.5s ease; }
+
+/* ── Round 34：B2 範圍提示 ── */
+.b2-range-hint {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #78350f;
+    animation: b2FadeIn 0.4s ease;
+}

@@ -1673,3 +1673,14 @@
 .b3-bh-row.slow    { color: #6b7280; background: #f3f4f6; }
 .b3-bh-row.correct { color: #065f46; background: #d1fae5; font-weight: 700; }
 .b3-bh-row.fast    { color: #1e3a8a; background: #dbeafe; }
+
+/* ── Round 34：B3 選項配速預覽 ── */
+.b3-choice-pace {
+    display: block;
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 400;
+    margin-top: 3px;
+    line-height: 1.2;
+}
+.b3-choice-btn.correct .b3-choice-pace { color: #065f46; }

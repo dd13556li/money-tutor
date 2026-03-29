@@ -592,6 +592,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5-ri-icon">${(B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday).icon}</div>
                     <div class="b5-ri-label">本關預算</div>
                     <div class="b5-ri-budget">${budget} 元</div>
+                    ${(() => {
+                        const g = this.state.game;
+                        const mustTotal = (g.items || []).filter(i => i.must).reduce((s, i) => s + i.price, 0);
+                        const optBudget = budget - mustTotal;
+                        return mustTotal > 0 ? `
+                        <div class="b5-ri-alloc">
+                            <span class="b5-ri-must">必買 ${mustTotal} 元</span>
+                            <span class="b5-ri-sep">＋</span>
+                            <span class="b5-ri-opt">選購 ${Math.max(0, optBudget)} 元</span>
+                        </div>` : '';
+                    })()}
                     <div class="b5-ri-hint">點任意處開始</div>
                 </div>`;
             document.body.appendChild(card);

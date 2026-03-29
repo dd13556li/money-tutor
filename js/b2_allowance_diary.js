@@ -1169,7 +1169,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
-                this._showCalcBreakdown(question); // 答錯即顯示計算過程
+                // 漸進提示（Round 34）：第1次錯→範圍提示，第2次以上→完整算式
+                this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
+                if (this.state.quiz.errorCount === 1 && this.state.settings.difficulty !== 'easy') {
+                    const lo = Math.min(question.startAmount, question.answer);
+                    const hi = Math.max(question.startAmount, question.answer);
+                    this._showRangeHint(lo, hi);
+                } else {
+                    this._showCalcBreakdown(question); // 答錯即顯示計算過程
+                }
                 // 錯誤辨識語音（Round 33）
                 const userVal = parseInt(this.state.quiz.currentInput);
                 const diff33 = !isNaN(userVal) ? userVal - question.answer : 0;
@@ -1212,6 +1220,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 trend.classList.add('b2-nt-fade');
                 Game.TimerManager.setTimeout(() => { if (trend.parentNode) trend.remove(); }, 400, 'ui');
             }, 1400, 'ui');
+        },
+
+        // ── 範圍提示（Round 34：第1次錯誤時）────────────────────
+        _showRangeHint(lo, hi) {
+            const container = document.querySelector('.b2-numpad-section');
+            if (!container || document.querySelector('.b2-range-hint')) return;
+            const hint = document.createElement('div');
+            hint.className = 'b2-range-hint';
+            hint.innerHTML = `💡 提示：答案介於 <strong>${lo}</strong> 元 ~ <strong>${hi}</strong> 元 之間`;
+            container.appendChild(hint);
         },
 
         // ── 理財建議卡（Round 32）────────────────────────────────
@@ -1279,10 +1297,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
             let badge, badgeColor;
-            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 本期收支總計（B4 savings banner pattern）
             const incomeTotalHTML = (() => {

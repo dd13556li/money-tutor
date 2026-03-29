@@ -1652,10 +1652,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
             let badge, badgeColor;
-            if      (accuracy >= 90) { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 省錢排行榜（C1 統計 + A4 交易摘要 pattern）
             const savingsRankHTML = (() => {

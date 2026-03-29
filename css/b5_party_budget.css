@@ -581,3 +581,18 @@
 .b5-star { opacity: 0.2; filter: grayscale(1); transition: opacity 0.3s, filter 0.3s; }
 .b5-star.lit { opacity: 1; filter: none; }
 .b5-star-label { font-size: 14px; font-weight: 700; color: #92400e; }
+
+/* ── Round 34：B5 預算分配說明 ── */
+.b5-ri-alloc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 4px;
+    font-size: 13px;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 12px;
+}
+.b5-ri-must { color: #fef9c3; font-weight: 700; }
+.b5-ri-sep  { color: rgba(255,255,255,0.7); }
+.b5-ri-opt  { color: #d1fae5; font-weight: 700; }

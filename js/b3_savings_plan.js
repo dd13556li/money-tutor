@@ -2202,11 +2202,17 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderChoicesHTML(question) {
-            const btns = question.choices.map(c => `
+            // 每個選項下方顯示配速預覽（Round 34）
+            const btns = question.choices.map(c => {
+                const totalSaved = question.weekly * c;
+                const paceNote = `每週${question.weekly}元 × ${c}週 = ${totalSaved}元`;
+                return `
                 <button class="b3-choice-btn" data-val="${c}">
                     ${c}
                     <span class="b3-choice-suffix">週</span>
-                </button>`).join('');
+                    <span class="b3-choice-pace">${paceNote}</span>
+                </button>`;
+            }).join('');
             return `
             <div class="b3-question-box">請選擇正確的週數</div>
             <div class="b3-choices">${btns}</div>`;
@@ -2522,11 +2528,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let perfText;
-            if (accuracy >= 90)      perfText = `🏆 完成了 ${q.correctCount} 題，表現優異！`;
-            else if (accuracy >= 70) perfText = `👍 完成了 ${q.correctCount} 題，表現良好！`;
-            else if (accuracy >= 50) perfText = `💪 完成了 ${q.correctCount} 題，繼續努力！`;
-            else                     perfText = `📚 完成了 ${q.correctCount} 題，多多練習，你可以的！`;
+            let perfText, perfMedal;
+            if (accuracy === 100)    { perfText = `🥇 完美！全部答對！`;                         perfMedal = '🥇'; }
+            else if (accuracy >= 90) { perfText = `🥇 完成了 ${q.correctCount} 題，表現優異！`;   perfMedal = '🥇'; }
+            else if (accuracy >= 70) { perfText = `🥈 完成了 ${q.correctCount} 題，表現良好！`;   perfMedal = '🥈'; }
+            else if (accuracy >= 50) { perfText = `🥉 完成了 ${q.correctCount} 題，繼續努力！`;   perfMedal = '🥉'; }
+            else                     { perfText = `⭐ 完成了 ${q.correctCount} 題，多多練習加油！`; perfMedal = '⭐'; }
 
             // 取最後一題物品做購買展示
             const lastQ      = q.questions[q.totalQuestions - 1] || {};

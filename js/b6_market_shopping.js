@@ -1333,6 +1333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _showChangeQuiz(paid, total, change) {
+            this._changeQuizErrors = 0; // 重置計數（Round 34）
             const g = this.state.game;
 
             Game.Speech.speak(`你付了${toTWD(paid)}，買菜共花了${toTWD(total)}元，應該找回多少元？`);
@@ -1387,10 +1388,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             }, 800, 'turnTransition');
                         });
                     } else {
-                        // 答錯
+                        // 答錯：漸進提示（Round 34）
+                        this._changeQuizErrors = (this._changeQuizErrors || 0) + 1;
                         btn.classList.add('b6-change-opt-wrong');
                         this.audio.play('error');
-                        this._showChangeFormula(paid, total, change);
+                        if (this._changeQuizErrors === 1) {
+                            // 第1次：只顯示算式 (付-商品=?)
+                            this._showChangeRangeHint(paid, total);
+                        } else {
+                            this._showChangeFormula(paid, total, change);
+                        }
                         const retryMode = this.state.settings.retryMode;
                         if (retryMode === 'retry') {
                             btn.disabled = true;
@@ -1409,6 +1416,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             });
+        },
+
+        // ── 找零第1次錯誤：顯示算式架構（Range hint, Round 34）─
+        _showChangeRangeHint(paid, total) {
+            if (document.querySelector('.b6-change-range-hint')) return;
+            const hint = document.createElement('div');
+            hint.className = 'b6-change-range-hint';
+            hint.innerHTML = `💡 提示：付 <strong>${paid}</strong> 元 − 商品 <strong>${total}</strong> 元 = <strong>？</strong> 元`;
+            const opts = document.querySelector('.b6-change-opts');
+            if (opts) opts.insertAdjacentElement('beforebegin', hint);
         },
 
         _showChangeFormula(paid, total, change) {
@@ -1544,10 +1561,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
 
             let badge, badgeColor;
-            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 攤位消費分析（B5 roundStats pattern）
             const stallBreakdownHTML = (() => {
