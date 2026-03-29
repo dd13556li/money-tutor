@@ -675,6 +675,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
             }
+
+            // 10秒無操作提示（A5 hintDelay pattern）
+            if (diff !== 'hard') {
+                this._clearSelectHintTimer();
+                this._selectHintTimer = Game.TimerManager.setTimeout(() => {
+                    if (this.state.phase === 'select') {
+                        const curr = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                        if (!curr || curr.isTriple) return;
+                        // highlight correct side
+                        const correctSide = curr.swapped ? 'left' : 'right';
+                        const card = document.getElementById(`card-${correctSide}`);
+                        if (card) {
+                            card.classList.add('b4-auto-select-hint');
+                            Game.TimerManager.setTimeout(() => card.classList.remove('b4-auto-select-hint'), 3000, 'ui');
+                            Game.Speech.speak('提示：哪個比較便宜？');
+                        }
+                    }
+                }, 10000, 'ui');
+            }
         },
 
         // ── 困難記憶倒數（Round 38）─────────────────────────────
@@ -829,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Select Phase Handler ────────────────────────────────
         handleSelectClick(isCorrect, curr, correctSide, left, right) {
+            this._clearSelectHintTimer();
             const diff = this.state.settings.difficulty;
 
             // 視覺回饋
@@ -1470,6 +1490,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 flash.classList.add('b4-cf-fade');
                 Game.TimerManager.setTimeout(() => { if (flash.parentNode) flash.remove(); }, 400, 'ui');
             }, 1400, 'ui');
+        },
+
+        // ── Select 階段計時提示（清除函數）──────────────────────
+        _clearSelectHintTimer() {
+            if (this._selectHintTimer) {
+                // TimerManager handles clearing, just reset the ref
+                this._selectHintTimer = null;
+            }
         },
 
         // ── Diff Formula Hint ───────────────────────────────────

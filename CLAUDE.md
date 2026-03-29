@@ -629,6 +629,9 @@ toolbarConfig: {
 | B6 找零計算輔助面板（2026-03-30）| B6 | `_showChangeQuiz` 新增「🧮 幫我算一算」切換按鈕；展開 `.b6-calc-panel` 顯示直式減法（付了X − 花了Y = 找零？元）；EventManager 綁定 toggle；CSS：`.b6-calc-toggle`/`.b6-calc-panel`/`.b6-cp-*`；搜尋 `b6-calc-panel`、`b6-calc-toggle` |
 | B3 週存視覺模擬積木（2026-03-30）| B3 | `_showDivisionHint` 答錯後在提示下方新增 `.b3-wsim` 積木列；最多 8 個 `.b3-wsim-block` 顯示第N週+累計金額；每塊延遲 90ms 彈出（`b3WsimPop`）；超過8週顯示「…共N週」溢出徽章；搜尋 `b3-wsim`、`b3WsimPop` |
 | B1 最佳硬幣組合逐一動畫（2026-03-30）| B1 | `_showCoinHint` 末尾呼叫 `_animateHintCoins(coins)`；在 `#b1-hint-combo-card` 建立 `#b1-hint-anim`；每 280ms 依序顯示硬幣圖片+面額+累計金額；`b1HintCoinIn` scale/opacity 進場；搜尋 `_animateHintCoins`、`b1-hint-anim` |
+| B1 硬幣放入浮動標籤（2026-03-30）| B1 | `addCoin(denom)` 末尾建立 `.b1-coin-popup`（綠色膠囊 `+N元`）；fixed 定位於錢包區正上方；`b1CoinPopup` 0.85s 上飄淡出；900ms 後移除；搜尋 `b1-coin-popup`、`b1CoinPopup` |
+| B2 困難模式語音重聽按鈕（2026-03-30）| B2 | `_renderNumpadHTML` hard 模式加 `#b2-replay-btn`（🔊 小藍按鈕）；`_bindQuestionEvents` 綁定 click→講出全部事件列表；`.b2-replay-btn` 淺藍膠囊；搜尋 `b2-replay-btn`、`b2ReplayBtn` |
+| B4 10秒無操作自動提示（2026-03-30）| B4 | `renderQuestion` easy/normal 末尾啟動 10s timer；`_clearSelectHintTimer()` 取消；`phase==='select'` 時高亮正確卡 `.b4-auto-select-hint`（綠框 `b4AutoHint` 2次脈動）+ 語音「提示：哪個比較便宜？」；搜尋 `_selectHintTimer`、`b4-auto-select-hint` |
 
 ---
 

@@ -740,6 +740,17 @@ document.addEventListener('DOMContentLoaded', () => {
             this._updateWalletDisplay();
             // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
             Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+            // 硬幣浮動標籤（A4 price popup pattern）
+            const coinArea = document.querySelector('.b1-coin-tray') || document.getElementById('wallet-coins') || document.getElementById('wallet-area');
+            if (coinArea) {
+                const rect = coinArea.getBoundingClientRect();
+                const popup = document.createElement('div');
+                popup.className = 'b1-coin-popup';
+                popup.textContent = `+${denom}元`;
+                popup.style.cssText = `position:fixed;left:${rect.left + rect.width/2}px;top:${rect.top + 10}px;`;
+                document.body.appendChild(popup);
+                Game.TimerManager.setTimeout(() => { if (popup.parentNode) popup.remove(); }, 900, 'ui');
+            }
         },
 
         removeCoin(uid) {

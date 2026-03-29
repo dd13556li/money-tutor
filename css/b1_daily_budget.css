@@ -1066,3 +1066,22 @@
     padding-top: 4px;
     border-top: 1px solid #bbf7d0;
 }
+
+/* ── 硬幣放入浮動標籤 ── */
+.b1-coin-popup {
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: b1CoinPopup 0.85s ease-out forwards;
+    white-space: nowrap;
+}
+@keyframes b1CoinPopup {
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-55px); }
+}

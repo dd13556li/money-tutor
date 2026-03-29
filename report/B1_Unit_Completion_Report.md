@@ -806,3 +806,35 @@ C2 逐一計數動畫（每枚硬幣依序進場）與 F4 積木依序出現（s
 - 圖片顯示真實硬幣外觀，結合 B1 現有 `_renderCoinImages()` 風格
 - 累計金額欄位強化「每加一枚，金額增加」的直觀感受
 - 與 `_showMinCoinsHint`（最少張數提示）搭配，形成「建議組合 → 視覺演示」的完整提示流程
+
+## 二十、硬幣放入浮動標籤（2026-03-30）
+
+### 背景
+
+A4 超市單元在商品加入購物車時顯示浮動「+X元」標籤（`b6PriceFloat`）；B6 也已採用此 pattern。B1 放入硬幣時只有語音反饋，缺乏視覺即時確認。
+
+### 實作
+
+在 `addCoin(denom)` 末尾，偵測 `.b1-coin-tray` / `#wallet-coins` 等錢包容器，建立浮動標籤：
+
+```javascript
+const popup = document.createElement('div');
+popup.className = 'b1-coin-popup';
+popup.textContent = `+${denom}元`;
+popup.style.cssText = `position:fixed;left:${cx}px;top:${top}px;`;
+document.body.appendChild(popup);
+Game.TimerManager.setTimeout(() => popup.remove(), 900, 'ui');
+```
+
+### CSS
+
+| 類別 | 說明 |
+|------|------|
+| `.b1-coin-popup` | 綠色漸層膠囊，`transform:translateX(-50%)` 水平置中 |
+| `@keyframes b1CoinPopup` | 0→1 opacity，Y 0→-55px，0.85s ease-out |
+
+### 教學設計
+
+- 遵循 **A4 price popup / B6 item receipt flyout** pattern
+- 語音（`${denom}元`）+ 視覺標籤雙軌確認，強化「投幣→金額累加」的感知
+- 使用 `TimerManager` 管理移除，不洩漏 DOM 元素

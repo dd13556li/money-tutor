@@ -8872,3 +8872,36 @@ entries 動畫時間軸：
 
 *本附錄由 Claude Sonnet 4.6 協助撰寫，日期：2026-03-30*
 
+
+---
+
+## 拾玖、2026-03-30 第二波豐富化（Round 40 + A/C/F 跨系列移植）
+
+> 更新日期：2026-03-30（第二波）
+
+### 19.1 Round 40 新功能（3 單元完成畫面強化）
+
+| 單元 | 功能 | 關鍵類別/函數 |
+|------|------|--------------|
+| B2 | 收支平衡評語（4 段評語：理財優等生/平衡/略赤字/高赤字）| `.b2-balance-comment`, `.b2-bal-great/ok/warn/bad` |
+| B4 | 類別節省分析橫條圖（food/stationery/daily/clothing）| `.b4-cat-savings`, `.b4-cat-bar`, `comparisonHistory[].cat` |
+| B5 | 必買 vs 選購比例條（累計各關 mustSpent/optSpent）| `.b5-res-ratio`, `.b5-ratio-must/opt`, `roundStats[].mustSpent` |
+
+### 19.2 A/C/F 跨系列移植（3 項）
+
+| 功能 | 參照來源 | 實作單元 | 說明 |
+|------|---------|---------|------|
+| 硬幣放入浮動標籤 | A4 price popup / B6 flyout | **B1** | `addCoin` 末尾建立 `+N元` 綠色膠囊，0.85s 上飄淡出 |
+| 困難模式語音重聽 | C1 困難模式 / F 系列 | **B2** | numpad hard 模式加 🔊 按鈕，重播完整事件列表語音 |
+| 10秒無操作自動提示 | A5 hintDelay pattern | **B4** | easy/normal select 階段 10s 後自動高亮正確卡 + 語音 |
+
+### 19.3 文件更新
+
+- `CLAUDE.md`：補入 B1/B2/B4 三條搜尋關鍵字（`b1-coin-popup`, `b2-replay-btn`, `b4-auto-select-hint`）
+- `report/B1_Unit_Completion_Report.md`：新增 §二十 硬幣放入浮動標籤
+- `report/B2_Unit_Completion_Report.md`：新增 §十九 困難模式語音重聽按鈕
+- `report/B4_Unit_Completion_Report.md`：新增 §二十二 10秒無操作自動提示
+
+---
+
+*本節由 Claude Sonnet 4.6 協助撰寫，日期：2026-03-30（第二波）*

@@ -869,10 +869,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderNumpadHTML() {
             const digits = [7, 8, 9, 4, 5, 6, 1, 2, 3];
+            const diff = this.state.settings.difficulty;
             return `
             <div class="b2-numpad-section">
                 <div class="b2-input-display" id="b2-input-display">
                     <span id="b2-input-value">＿</span><span class="b2-unit-hint">元</span>
+                    ${diff === 'hard' ? `<button class="b2-replay-btn" id="b2-replay-btn" title="重聽題目">🔊</button>` : ''}
                 </div>
                 <div class="b2-input-preview" id="b2-input-preview"></div>
                 <div class="b2-numpad">
@@ -921,6 +923,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const text = this.state.quiz.lastSpeechText;
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
+            }
+            // 困難模式專屬重聽鈕（inline numpad 區域）
+            if (diff === 'hard') {
+                const hardReplayBtn = document.getElementById('b2-replay-btn');
+                if (hardReplayBtn) {
+                    Game.EventManager.on(hardReplayBtn, 'click', () => {
+                        const q = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                        if (q) {
+                            const evtText = q.events.map(e => `${e.amount > 0 ? '收入' : '支出'}${Math.abs(e.amount)}元`).join('，');
+                            Game.Speech.speak(`起始${q.startAmount}元，${evtText}，最後餘額是多少？`);
+                        }
+                    }, {}, 'gameUI');
+                }
             }
         },
 
