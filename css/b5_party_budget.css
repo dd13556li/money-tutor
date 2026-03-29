@@ -596,3 +596,7 @@
 .b5-ri-must { color: #fef9c3; font-weight: 700; }
 .b5-ri-sep  { color: rgba(255,255,255,0.7); }
 .b5-ri-opt  { color: #d1fae5; font-weight: 700; }
+
+/* ── Round 35：B5 困難模式隱藏價格 ── */
+.b5-price-hidden .b5-item-price { color: #9ca3af; font-style: italic; }
+.b5-price-hidden { opacity: 0.88; }

@@ -1918,12 +1918,15 @@ document.addEventListener('DOMContentLoaded', () => {
         _showMilestoneBadge(pct) {
             const existing = document.getElementById('b3-milestone-badge');
             if (existing) existing.remove();
-            const labels = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
+            const labels  = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
+            const speeches = { 25: '太棒了！已經存了四分之一！', 50: '好棒！已經存了一半了！', 75: '快到了！再加油！' };
             const badge = document.createElement('div');
             badge.id = 'b3-milestone-badge';
             badge.className = 'b3-milestone-badge';
             badge.innerHTML = `<span class="b3-milestone-pct">${pct}%</span><span>${labels[pct]}</span>`;
             document.body.appendChild(badge);
+            this.audio.play('correct');
+            Game.TimerManager.setTimeout(() => Game.Speech.speak(speeches[pct]), 200, 'ui'); // 里程碑語音（Round 35）
             Game.TimerManager.setTimeout(() => {
                 if (document.body.contains(badge)) badge.remove();
             }, 2200, 'ui');

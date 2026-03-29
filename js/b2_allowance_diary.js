@@ -1072,6 +1072,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b2-bt-bar"><div class="b2-bt-fill ${trendCls}" style="width:${pct}%"></div></div>
                     <span class="b2-bt-pct ${trendCls}">${pct}%</span>`;
                 summary.insertAdjacentElement('afterend', trendEl);
+
+                // 起始/結束對比條（Round 35）
+                const beforeAfterEl = document.createElement('div');
+                beforeAfterEl.className = 'b2-before-after';
+                const startPct = 100;
+                const endPct   = pct;
+                beforeAfterEl.innerHTML = `
+                    <div class="b2-ba-row">
+                        <span class="b2-ba-label">起始</span>
+                        <div class="b2-ba-bar"><div class="b2-ba-fill start" style="width:${startPct}%"></div></div>
+                        <span class="b2-ba-val">${question.startAmount}元</span>
+                    </div>
+                    <div class="b2-ba-row">
+                        <span class="b2-ba-label">結束</span>
+                        <div class="b2-ba-bar"><div class="b2-ba-fill end ${endPct >= 80 ? 'good' : endPct >= 50 ? 'ok' : 'low'}" style="width:${endPct}%"></div></div>
+                        <span class="b2-ba-val">${question.answer}元</span>
+                    </div>`;
+                trendEl.insertAdjacentElement('afterend', beforeAfterEl);
             }, summaryDelay, 'ui');
 
             const showDelay = 500 + entries.length * 800 + 500;
@@ -1080,6 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (runEl.parentNode) runEl.remove();
                 document.getElementById('b2-week-summary')?.remove();
                 document.querySelector('.b2-balance-trend')?.remove();
+                document.querySelector('.b2-before-after')?.remove();
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');

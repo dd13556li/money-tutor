@@ -723,3 +723,14 @@
     100% { box-shadow: 0 0 20px 4px rgba(16,185,129,0.2); }
 }
 .b4-card-glow { animation: b4CardGlow 0.8s ease forwards; }
+
+/* ── Round 35：B4 最佳比價摘要 ── */
+.b4-best-deal {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #78350f;
+}

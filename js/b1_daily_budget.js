@@ -587,8 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderScheduleCard(q, showTotal) {
             const isHard   = this.state.settings.difficulty === 'hard';
-            const itemsHtml = q.items.map(it => `
-                <div class="b1-schedule-item">
+            const itemsHtml = q.items.map((it, idx) => `
+                <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}</span>
                     ${isHard
                         ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`

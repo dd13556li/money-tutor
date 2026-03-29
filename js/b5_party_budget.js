@@ -628,13 +628,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const pct      = Math.round((g.currentRound / g.totalRounds) * 100);
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
 
+            const isHardPriceHide = this.state.settings.difficulty === 'hard';
             const itemsHTML = g.items.map(item => `
-                <div class="b5-item-card ${item.must ? 'locked' : ''}" data-id="${item.id}">
+                <div class="b5-item-card ${item.must ? 'locked' : ''}${isHardPriceHide && !item.must ? ' b5-price-hidden' : ''}" data-id="${item.id}">
                     <span class="b5-check-mark">✅</span>
                     ${item.must ? '<span class="b5-must-badge">🔒 必買</span>' : ''}
                     <span class="b5-item-icon">${item.icon}</span>
                     <span class="b5-item-name">${item.name}</span>
-                    <span class="b5-item-price">${item.price} 元</span>
+                    <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide && !item.must ? '??? 元' : item.price + ' 元'}</span>
                 </div>`).join('');
 
             return `
@@ -692,6 +693,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (g.submitted) return;
                     const id = card.dataset.id;
                     const item = g.items.find(i => i.id === id);
+                    // 困難模式：首次點擊先揭示價格（Round 35）
+                    if (card.classList.contains('b5-price-hidden')) {
+                        card.classList.remove('b5-price-hidden');
+                        const priceEl = card.querySelector('.b5-item-price');
+                        if (priceEl) priceEl.textContent = priceEl.dataset.price + ' 元';
+                        if (item) Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                        this.audio.play('click');
+                        return; // 第一次只揭示，不選
+                    }
                     if (g.selectedIds.has(id)) {
                         g.selectedIds.delete(id);
                         card.classList.remove('selected');

@@ -675,3 +675,21 @@
     color: #78350f;
     animation: b2FadeIn 0.4s ease;
 }
+
+/* ── Round 35：B2 起始/結束對比條 ── */
+.b2-before-after {
+    padding: 8px 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin: 4px 0;
+    animation: b2FadeIn 0.4s ease;
+}
+.b2-ba-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; font-size: 12px; }
+.b2-ba-label { width: 28px; color: #6b7280; flex-shrink: 0; }
+.b2-ba-bar { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+.b2-ba-fill { height: 100%; border-radius: 4px; }
+.b2-ba-fill.start { background: #94a3b8; width: 100%; }
+.b2-ba-fill.end.good { background: #10b981; }
+.b2-ba-fill.end.ok   { background: #f59e0b; }
+.b2-ba-fill.end.low  { background: #ef4444; }
+.b2-ba-val { font-size: 12px; color: #374151; font-weight: 600; white-space: nowrap; }

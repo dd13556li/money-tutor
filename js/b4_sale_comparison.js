@@ -1663,10 +1663,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hist = q.comparisonHistory;
                 if (!hist || hist.length === 0) return '';
                 const medals = ['🥇', '🥈', '🥉'];
-                const top = [...hist].sort((a, b) => b.saved - a.saved).slice(0, 3);
+                const sorted = [...hist].sort((a, b) => b.saved - a.saved);
+                const top = sorted.slice(0, 3);
+                // 最佳比價摘要（Round 35）
+                const best = sorted[0];
+                const bestLine = best ? `<div class="b4-best-deal">🌟 最划算的一次：<strong>${best.icon} ${best.name}</strong> 在 ${best.cheapStore} 買，省了 <strong>${best.saved}</strong> 元！</div>` : '';
                 return `
                 <div class="b4-res-ranking">
                     <h3>🏅 省錢排行榜</h3>
+                    ${bestLine}
                     <div class="b4-rank-list">
                         ${top.map((h, i) => `
                         <div class="b4-rank-row">
