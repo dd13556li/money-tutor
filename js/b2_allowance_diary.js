@@ -551,6 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-theme="school">🏫 學校</button>
                                 <button class="b-sel-btn" data-theme="holiday">🎉 假期</button>
                                 <button class="b-sel-btn" data-theme="family">👨‍👩‍👧 家庭</button>
+                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -699,9 +700,17 @@ document.addEventListener('DOMContentLoaded', () => {
         _generateQuestions(count) {
             const diff    = this.state.settings.difficulty;
             const theme   = this.state.settings.diaryTheme;
-            const themeData = B2_THEMES[theme];
-            const basePool  = themeData ? themeData.templates[diff] : B2_TEMPLATES[diff];
-            const templates = (basePool && basePool.length > 0 ? basePool : B2_TEMPLATES[diff]).slice().sort(() => Math.random() - 0.5);
+            let templates;
+            if (theme === 'random') {
+                // 隨機模式：每題從三主題各自隨機抽取
+                const keys = ['school', 'holiday', 'family'];
+                const merged = keys.flatMap(k => (B2_THEMES[k].templates[diff] || []).map(t => ({ ...t, _theme: k })));
+                templates = merged.sort(() => Math.random() - 0.5);
+            } else {
+                const themeData = B2_THEMES[theme];
+                const basePool  = themeData ? themeData.templates[diff] : B2_TEMPLATES[diff];
+                templates = (basePool && basePool.length > 0 ? basePool : B2_TEMPLATES[diff]).slice().sort(() => Math.random() - 0.5);
+            }
             const result    = [];
 
             for (let i = 0; i < count; i++) {
