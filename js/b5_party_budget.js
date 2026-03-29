@@ -1134,6 +1134,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             ${roundStatsHTML}
 
+            ${/* 預算效率星評（Round 31 pattern）*/ (() => {
+                if (!g.roundStats || g.roundStats.length === 0) return '';
+                const avgPct2 = Math.round(g.roundStats.reduce((s,r) => s + r.spent/r.budget*100, 0) / g.roundStats.length);
+                const stars = avgPct2 >= 90 ? 3 : avgPct2 >= 60 ? 2 : 1;
+                const starHTML = ['⭐','⭐','⭐'].map((s, i) => `<span class="b5-star${i < stars ? ' lit' : ''}">${s}</span>`).join('');
+                const label = stars === 3 ? '預算大師！' : stars === 2 ? '不錯的控制！' : '繼續練習！';
+                return `<div class="b5-star-rating">
+                    <div class="b5-star-row">${starHTML}</div>
+                    <div class="b5-star-label">${label}（平均使用率 ${avgPct2}%）</div>
+                </div>`;
+            })()}
+
             ${partyReviewHTML}
 
             <div class="b-res-btns">

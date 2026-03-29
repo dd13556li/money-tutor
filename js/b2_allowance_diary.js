@@ -859,6 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b2-input-display" id="b2-input-display">
                     <span id="b2-input-value">＿</span><span class="b2-unit-hint">元</span>
                 </div>
+                <div class="b2-input-preview" id="b2-input-preview"></div>
                 <div class="b2-numpad">
                     ${digits.map(n => `<button class="b2-numpad-btn" data-digit="${n}">${n}</button>`).join('')}
                     <button class="b2-numpad-btn btn-del" data-action="del">⌫</button>
@@ -911,6 +912,22 @@ document.addEventListener('DOMContentLoaded', () => {
         _updateInputDisplay() {
             const el = document.getElementById('b2-input-value');
             if (el) el.textContent = this.state.quiz.currentInput || '＿';
+            // 即時餘額預覽（Round 31）
+            const previewEl = document.getElementById('b2-input-preview');
+            if (previewEl) {
+                const q   = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                const val = parseInt(this.state.quiz.currentInput);
+                if (q && !isNaN(val)) {
+                    const diff  = val - q.answer;
+                    const cls   = diff === 0 ? 'exact' : diff > 0 ? 'over' : 'under';
+                    const label = diff === 0 ? '✓ 剛好！' : diff > 0 ? `多了 ${diff} 元` : `少了 ${-diff} 元`;
+                    previewEl.className = 'b2-input-preview ' + cls;
+                    previewEl.textContent = label;
+                } else {
+                    previewEl.className = 'b2-input-preview';
+                    previewEl.textContent = '';
+                }
+            }
         },
 
         _showCenterFeedback(icon, text = '') {

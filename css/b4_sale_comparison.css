@@ -668,3 +668,25 @@
     from { transform: translateX(-50%) translateY(16px); opacity: 0; }
     to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
+
+/* ── Round 31：B4 冠軍徽章 ── */
+.b4-champion-badge {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 3px solid #f59e0b;
+    border-radius: 16px;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 800;
+    pointer-events: none;
+    animation: b4ChampIn 0.4s ease, b4ChampOut 0.4s ease 1.2s forwards;
+}
+.b4-champ-icon { font-size: 32px; }
+.b4-champ-text { font-size: 20px; font-weight: 900; color: #78350f; }
+@keyframes b4ChampIn  { from { transform: translate(-50%,-50%) scale(0.6); opacity:0; } to { transform: translate(-50%,-50%) scale(1); opacity:1; } }
+@keyframes b4ChampOut { from { opacity:1; } to { opacity:0; } }

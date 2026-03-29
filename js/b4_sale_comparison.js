@@ -826,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         easyCorrectSpeech = `答對了！${cheapSide.store}${cheapSide.price}元，比${expSide.store}${expSide.price}元便宜！`;
                     }
                     Game.Speech.speak(easyCorrectSpeech);
+                    this._showChampionBadge(cheapSide.store); // 冠軍徽章（Round 31）
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     // 普通/困難：顯示差額問題
@@ -1500,6 +1501,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Diff Answer Handler ─────────────────────────────────
         // 省錢 toast（A4 _showPricePopup pattern）
+        // ── 冠軍徽章（Round 31）──────────────────────────────────
+        _showChampionBadge(storeName) {
+            const prev = document.getElementById('b4-champion-badge');
+            if (prev) prev.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b4-champion-badge';
+            badge.className = 'b4-champion-badge';
+            badge.innerHTML = `<span class="b4-champ-icon">🥇</span><span class="b4-champ-text">${storeName}最便宜！</span>`;
+            document.body.appendChild(badge);
+            Game.TimerManager.setTimeout(() => badge.remove(), 1600, 'ui');
+        },
+
         _showSavingsToast(amount) {
             const prev = document.getElementById('b4-savings-toast');
             if (prev) prev.remove();

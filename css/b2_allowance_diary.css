@@ -612,3 +612,16 @@
 .b2-bt-pct.good { color: #059669; }
 .b2-bt-pct.ok   { color: #d97706; }
 .b2-bt-pct.low  { color: #dc2626; }
+
+/* ── Round 31：B2 即時餘額預覽 ── */
+.b2-input-preview {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    height: 18px;
+    margin: 2px 0;
+    transition: color 0.2s;
+}
+.b2-input-preview.exact { color: #059669; }
+.b2-input-preview.over  { color: #dc2626; }
+.b2-input-preview.under { color: #d97706; }

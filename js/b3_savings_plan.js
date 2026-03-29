@@ -2349,6 +2349,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 最佳存法提示（Round 31）─────────────────────────────
+        _showBestSavingHint(question) {
+            if (document.querySelector('.b3-best-hint')) return;
+            // 計算其他週存金額對應的週數（展示對比）
+            const target = question.item.price;
+            const weekly = question.weekly;
+            const correct = question.answer;
+            const half = Math.ceil(target / (weekly / 2));
+            const double = Math.ceil(target / (weekly * 2));
+            const container = document.querySelector('.b3-numpad-section') || document.querySelector('.b3-quiz-area');
+            if (!container) return;
+            const hint = document.createElement('div');
+            hint.className = 'b3-best-hint';
+            hint.innerHTML = `<span class="b3-bh-label">💡 換個方式比較：</span>
+                <div class="b3-bh-rows">
+                    <span class="b3-bh-row slow">每週存 ${Math.round(weekly/2)} 元 → ${half} 週</span>
+                    <span class="b3-bh-row correct">✓ 每週存 ${weekly} 元 → ${correct} 週</span>
+                    <span class="b3-bh-row fast">每週存 ${weekly * 2} 元 → ${double} 週</span>
+                </div>`;
+            container.appendChild(hint);
+        },
+
         // ── 除法提示（答錯後顯示計算公式）───────────────────────
         _showDivisionHint(question) {
             if (document.querySelector('.b3-div-hint')) return;
@@ -2394,6 +2416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showDivisionHint(question); // 答錯即顯示除法公式
+                this._showBestSavingHint(question); // 最佳存法提示（Round 31）
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
                     Game.Speech.speak(`不對喔，參考提示再試一次`);
