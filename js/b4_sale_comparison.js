@@ -802,6 +802,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
                         <div class="b4-cheaper-tag">${cheapTag}</div>`;
                 }
+                // 貴的那張顯示「比較貴 +N元」（Round 27）
+                if (wrongCard && !curr.isUnit) {
+                    const delta = Math.abs((left.price || 0) - (right.price || 0));
+                    if (delta > 0) {
+                        wrongCard.classList.add('selected-wrong');
+                        wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴 +${delta}元</div>`;
+                    }
+                }
                 if (diff === 'easy') {
                     // 簡單：直接下一題
                     this.state.quiz.correctCount++;

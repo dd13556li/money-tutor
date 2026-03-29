@@ -571,3 +571,21 @@
     from { transform: translateX(-50%) translateY(-14px); opacity: 0; }
     to   { transform: translateX(-50%) translateY(0);     opacity: 1; }
 }
+
+/* ── B2 每週收支統計 (Round 27) ── */
+.b2-week-summary {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin: 6px 0;
+    font-size: 14px;
+    font-weight: 700;
+    animation: b2FadeIn 0.3s ease;
+}
+.b2-ws-item.income  { color: #065f46; }
+.b2-ws-item.expense { color: #991b1b; }
+.b2-ws-sep { color: #9ca3af; }

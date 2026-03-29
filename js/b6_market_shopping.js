@@ -994,6 +994,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('correct');
                     btn.classList.add('collected');
                     btn.disabled = true;
+                    // 收集進度動畫（Round 27）
+                    const collected = g.collectedIds.size;
+                    const needed    = g.mission.items.length;
+                    this._showCollectionProgress(collected, needed);
 
                     // Update list item + 彈出價格動畫（A4 transaction pattern）
                     const listItem = document.querySelector(`.b6-list-item[data-item-id="${itemId}"]`);
@@ -1078,6 +1082,22 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) { Game.TimerManager.clearTimeout(autoT); go(); }
             });
+        },
+
+        // ── 收集進度動畫（Round 27）──────────────────────────────
+        _showCollectionProgress(collected, needed) {
+            const prev = document.getElementById('b6-col-progress');
+            if (prev) prev.remove();
+            const isAll = collected >= needed;
+            const prog = document.createElement('div');
+            prog.id = 'b6-col-progress';
+            prog.className = `b6-col-progress${isAll ? ' all-done' : ''}`;
+            prog.innerHTML = `<span class="b6-cp-plus">+1</span><span class="b6-cp-count">${collected}/${needed}</span>`;
+            document.body.appendChild(prog);
+            Game.TimerManager.setTimeout(() => {
+                prog.classList.add('b6-cp-fade');
+                Game.TimerManager.setTimeout(() => { if (prog.parentNode) prog.remove(); }, 400, 'ui');
+            }, 1200, 'ui');
         },
 
         // ── 攤位小計提示（Round 25）──────────────────────────────

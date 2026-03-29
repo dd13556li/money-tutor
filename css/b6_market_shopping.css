@@ -802,3 +802,30 @@
     from { transform: translateX(-50%) translateY(-16px); opacity: 0; }
     to   { transform: translateX(-50%) translateY(0);      opacity: 1; }
 }
+
+/* ── B6 收集進度動畫 (Round 27) ── */
+.b6-col-progress {
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: rgba(6,95,70,0.92);
+    color: #fff;
+    border-radius: 16px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 700;
+    z-index: 9500;
+    animation: b6CpIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b6-col-progress.all-done { background: rgba(217,119,6,0.95); }
+.b6-cp-plus  { font-size: 18px; font-weight: 900; color: #6ee7b7; }
+.b6-cp-count { font-size: 20px; font-weight: 900; }
+.b6-cp-fade  { transition: opacity 0.4s; opacity: 0; }
+@keyframes b6CpIn {
+    from { transform: translateY(-50%) scale(0.5); opacity: 0; }
+    to   { transform: translateY(-50%) scale(1);   opacity: 1; }
+}

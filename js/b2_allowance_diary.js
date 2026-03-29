@@ -1019,10 +1019,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500 + i * 800, 'ui');
             });
 
+            // 動畫結束前：顯示本週收支統計（Round 27）
+            const totalIncome  = question.events.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+            const totalExpense = question.events.filter(e => e.type !== 'income').reduce((s, e) => s + e.amount, 0);
+            const summaryDelay = 500 + entries.length * 800 + 100;
+            Game.TimerManager.setTimeout(() => {
+                const summaryEl = document.getElementById('b2-week-summary');
+                if (summaryEl) summaryEl.remove();
+                const summary = document.createElement('div');
+                summary.id = 'b2-week-summary';
+                summary.className = 'b2-week-summary';
+                summary.innerHTML = `
+                    <span class="b2-ws-item income">📥 收入 ${totalIncome} 元</span>
+                    <span class="b2-ws-sep">｜</span>
+                    <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
+                const runningEl = document.getElementById('b2-running-total');
+                if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
+            }, summaryDelay, 'ui');
+
             const showDelay = 500 + entries.length * 800 + 500;
             Game.TimerManager.setTimeout(() => {
                 entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
                 if (runEl.parentNode) runEl.remove();
+                document.getElementById('b2-week-summary')?.remove();
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');

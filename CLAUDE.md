@@ -568,6 +568,9 @@ toolbarConfig: {
 | B2 收支趨勢指示（2026-03-29）| B2 | 答對後 `_showNetTrend(question)`：net>0 顯示「↑ 本週盈餘+X元」（綠）/ net<0 顯示「↓ 本週赤字-X元」（紅）；`.b2-net-trend.up/down` CSS；`b2NtIn` 動畫 |
 | B3 月曆距完成天數（2026-03-29）| B3 | 月曆 info card 新增「距完成 N 天」，`_updateCalendarUI` 同步更新 `#b3-days-left`；≤3天時 `near` class + `b3DlPulse` 脈動；`.b3-days-left-num.near` CSS |
 | B5 完美配額特效（2026-03-29）| B5 | `rem===0` 時：banner 改「🎯 完美配額！」黃色主題；feedback 改「💯」；語音「完美！剛好花了X元，用完全部預算！」；eff-badge 改 `perfect-exact` 粉色 + `b5PerfectPulse` 2次脈動 |
+| B4 較貴商品差額標籤（2026-03-29）| B4 | 兩商店 select 答對時，wrong card 加 `.b4-exp-delta`「比較貴 +N元」紅色標籤（`b4DeltaIn` 動畫）；unit mode 跳過（單位不同）|
+| B6 收集進度動畫（2026-03-29）| B6 | 收集商品後 `_showCollectionProgress(collected, needed)` 右側浮動「+1 X/Y」；全收完時橘色；`.b6-col-progress/.b6-cp-plus/count` CSS；`b6CpIn` 動畫 |
+| B2 易模式週收支統計（2026-03-29）| B2 | `_animateEasyEntries` 動畫進行中，倒數第 1 步後插入 `#b2-week-summary`：「📥 收入X元 ｜ 📤 支出Y元」；動畫結束時移除；`.b2-week-summary/.b2-ws-item` CSS |
 
 ---
 

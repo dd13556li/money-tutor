@@ -621,3 +621,22 @@
     from { transform: translateY(50px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
 }
+
+/* ── B4 貴的標籤 (Round 27) ── */
+.b4-exp-delta {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239,68,68,0.9);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    animation: b4DeltaIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    z-index: 10;
+}
+@keyframes b4DeltaIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
