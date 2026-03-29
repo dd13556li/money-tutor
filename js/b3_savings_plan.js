@@ -1874,6 +1874,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const crossed = [25, 50, 75].find(m => prevPct < m && newPct >= m);
             if (crossed) this._showMilestoneBadge(crossed);
 
+            // 存錢粒子特效（Round 38）
+            this._showSavingsSparkle();
+
             // 更新 denomPile（不做自動兌換，逐枚加入）
             const changedDenoms = {};
             draggedItems.forEach(item => {
@@ -1928,6 +1931,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 hint.classList.add('b3-cd-fade');
                 Game.TimerManager.setTimeout(() => { if (hint.parentNode) hint.remove(); }, 400, 'ui');
             }, 2000, 'ui');
+        },
+
+        // ── 存錢粒子特效（Round 38）──────────────────────────────
+        _showSavingsSparkle() {
+            const emojis = ['✨', '💫', '⭐', '🌟', '💰'];
+            const pigBank = document.getElementById('b3-pig-bank');
+            const rect = pigBank ? pigBank.getBoundingClientRect() : null;
+            const baseLeft = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+            const baseTop  = rect ? rect.top : window.innerHeight / 2;
+            for (let i = 0; i < 5; i++) {
+                const sp = document.createElement('div');
+                sp.className = 'b3-sparkle';
+                sp.textContent = emojis[i % emojis.length];
+                sp.style.cssText = `left:${baseLeft - 40 + Math.random() * 80}px;top:${baseTop + Math.random() * 30}px;animation-delay:${Math.random() * 0.25}s;position:fixed;`;
+                document.body.appendChild(sp);
+                Game.TimerManager.setTimeout(() => sp.remove(), 1400, 'ui');
+            }
         },
 
         _showMilestoneBadge(pct) {

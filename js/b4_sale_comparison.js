@@ -641,6 +641,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
             this._showItemIntroModal(curr);
+            // 困難模式記憶挑戰倒數（Round 38）
+            if (diff === 'hard' && !curr.isTriple) {
+                Game.TimerManager.setTimeout(() => this._startMemoryCountdown(), 1900, 'ui');
+            }
 
             // 語音引導（含雙店資訊，對齊 A/C/F 讀出題目數字 pattern）
             Game.TimerManager.setTimeout(() => {
@@ -671,6 +675,44 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
             }
+        },
+
+        // ── 困難記憶倒數（Round 38）─────────────────────────────
+        _startMemoryCountdown() {
+            const existing = document.getElementById('b4-memory-bar');
+            if (existing) existing.remove();
+            let sec = 3;
+            const bar = document.createElement('div');
+            bar.id = 'b4-memory-bar';
+            bar.className = 'b4-memory-bar';
+            bar.innerHTML = `<span>⏱</span><span>記住價格！還有 <strong id="b4-mem-sec">3</strong> 秒</span><div class="b4-mem-track"><div class="b4-mem-fill" id="b4-mem-fill" style="width:100%"></div></div>`;
+            const app = document.getElementById('app');
+            if (app) app.insertAdjacentElement('afterbegin', bar);
+            else return;
+
+            const tick = () => {
+                sec--;
+                const secEl = document.getElementById('b4-mem-sec');
+                const fill  = document.getElementById('b4-mem-fill');
+                if (secEl) secEl.textContent = sec;
+                if (fill)  fill.style.width = `${Math.round((sec / 3) * 100)}%`;
+                if (sec <= 0) {
+                    if (document.body.contains(bar)) bar.remove();
+                    // 模糊所有價格
+                    document.querySelectorAll('.b4-price').forEach(el => el.classList.add('b4-mem-blur'));
+                    const hero = document.querySelector('.b4-item-hero');
+                    if (hero) {
+                        const hint = document.createElement('div');
+                        hint.className = 'b4-mem-challenge';
+                        hint.textContent = '🤔 靠記憶回答！';
+                        hero.appendChild(hint);
+                        Game.TimerManager.setTimeout(() => { if (document.body.contains(hint)) hint.remove(); }, 2200, 'ui');
+                    }
+                } else {
+                    Game.TimerManager.setTimeout(tick, 1000, 'ui');
+                }
+            };
+            Game.TimerManager.setTimeout(tick, 1000, 'ui');
         },
 
         _showItemIntroModal(curr) {

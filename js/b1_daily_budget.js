@@ -587,14 +587,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderScheduleCard(q, showTotal) {
             const isHard   = this.state.settings.difficulty === 'hard';
-            const itemsHtml = q.items.map((it, idx) => `
+            const itemsHtml = q.items.map((it, idx) => {
+                const pctBar = !isHard && q.total > 0
+                    ? `<div class="b1-item-pct-bar-wrap"><div class="b1-item-pct-bar" style="width:${Math.round(it.cost / q.total * 100)}%"></div></div>`
+                    : '';
+                return `
                 <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}</span>
                     ${isHard
                         ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`
                         : `<span class="b1-item-cost">${it.cost} 元</span>`
                     }
-                </div>`).join('');
+                    ${pctBar}
+                </div>`;
+            }).join('');
 
             const totalTag = showTotal
                 ? `<div class="b1-total-right">

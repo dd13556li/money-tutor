@@ -1697,3 +1697,16 @@
 }
 .b3-est-date.soon    { color: #d97706; font-weight: 700; }
 .b3-est-date.reached { color: #059669; font-weight: 700; }
+
+/* ── Round 38：B3 存錢粒子 ── */
+@keyframes b3SparkleUp {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(0.5); }
+}
+.b3-sparkle {
+    position: fixed;
+    font-size: 22px;
+    pointer-events: none;
+    z-index: 5000;
+    animation: b3SparkleUp 1.2s ease forwards;
+}

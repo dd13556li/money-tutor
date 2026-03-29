@@ -706,3 +706,18 @@
 .b2-legend-in  { color: #059669; }
 .b2-legend-out { color: #dc2626; }
 .b2-legend-sep { color: #9ca3af; }
+
+/* ── Round 38：B2 事件累計金額列 ── */
+.b2-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.b2-running-val {
+    margin-left: auto;
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    white-space: nowrap;
+    padding-left: 4px;
+}

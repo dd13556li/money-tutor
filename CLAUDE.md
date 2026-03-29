@@ -605,6 +605,21 @@ toolbarConfig: {
 | B3 里程碑語音（Round 35）| B3 | `_showMilestoneBadge` 加 `audio.play('correct')` + `Game.Speech.speak` 里程碑語音 |
 | B4 最佳比價摘要（Round 35）| B4 | `savingsRankHTML` 頂部加 `.b4-best-deal` 卡「🌟 最划算：X在Y買，省了Z元！」|
 | B5 困難模式隱藏價格（Round 35）| B5 | hard mode 非必買商品顯示「??? 元」；首次點擊揭示價格（`.b5-price-hidden` CSS）；第二次點擊才選取 |
+| B1 投幣足額彈出動畫（Round 36）| B1 | `_updateWalletDisplay` 加 `wasEnough` 旗標；首次足額時加 `b1-total-pop` class（500ms 後移除）；`b1TotalPop` keyframe |
+| B4 差額百分比標示（Round 36）| B4 | `_renderPriceBars` 加 `.b4-pbar-diff-pct`「便宜了X%」橙色標籤 |
+| B5 必買門檻標線（Round 36）| B5 | `_updateTotalBar` 計算 `mustPct`；`#b5-must-marker` 琥珀色垂直標線 |
+| B6 攤位完成閃光（Round 36）| B6 | 攤位商品全收後加 `b6-stall-done-flash`（800ms 後移除）；`b6StallFlash` keyframe |
+| B1 建議硬幣組合卡（Round 37）| B1 | `_showCoinHint` 改為 DOM 卡片 `#b1-hint-combo-card`；顯示建議面額文字；5秒後自動移除 |
+| B2 Easy 圖例行（Round 37）| B2 | `_renderQuestionHTML` easy 模式加 `.b2-legend` 行說明 📥 收入 / 📤 支出 符號 |
+| B3 月曆預估達標日（Round 37）| B3 | `_updateCalendarUI` 計算剩餘存款節奏；`#b3-est-date` 顯示「預計 M/D 達標」或「🎉 達標！」 |
+| B4 選對即播報語音（Round 37）| B4 | `handleSelectClick` 正確分支即時語音「X店，Y元，比較便宜！」 |
+| B6 商品飛出收據（Round 37）| B6 | `_showItemReceiptFlyout(anchor, item)` 收集商品時從錨點彈出 icon+name+價格浮標（`b6FlyoutUp` 1s）|
+| B1 費用佔比條（Round 38）| B1 | `_renderScheduleCard` 每個 item 下加 `.b1-item-pct-bar-wrap` + `.b1-item-pct-bar`（寬度依 `cost/total*100%`）；困難模式不顯示 |
+| B2 事件累計金額列（Round 38）| B2 | `_renderQuestionHTML` 中計算 `runningAmt`（起始→逐步加減）；每個 `b2-event-row` 末尾加 `.b2-running-val` 灰色小字 |
+| B3 存錢粒子（Round 38）| B3 | `_completeDragSession` 後呼叫 `_showSavingsSparkle()`；5顆 ✨💫⭐🌟💰 從撲滿上方飛散（`b3SparkleUp` 1.2s）|
+| B4 困難記憶倒數（Round 38）| B4 | `renderQuestion` hard 模式 1900ms 後啟動 `_startMemoryCountdown()`；3秒後 `.b4-mem-blur` 模糊價格，顯示「🤔 靠記憶回答！」|
+| B5 可負擔商品高亮（Round 38）| B5 | `_updateTotalBar` 末尾對非必買未選卡片 toggle `.b5-affordable`（`price <= remBudget`）；綠色虛線外框 |
+| B6 全部收集閃光（Round 38）| B6 | `allDone && !wasDone` 時呼叫 `_showAllCollectedFlash()`；中央深綠全屏閃光卡（`b6AllDoneIn` 1.5s）|
 
 ---
 

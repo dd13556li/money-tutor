@@ -941,3 +941,27 @@
     white-space: nowrap;
 }
 .b6-if-price { color: #bfdbfe; }
+
+/* ── Round 38：B6 全部收集完成閃光 ── */
+@keyframes b6AllDoneIn {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    65%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+.b6-all-done-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #065f46, #10b981);
+    color: #fff;
+    font-size: 1.4em;
+    font-weight: bold;
+    padding: 16px 28px;
+    border-radius: 16px;
+    z-index: 5000;
+    animation: b6AllDoneIn 1.5s forwards;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}

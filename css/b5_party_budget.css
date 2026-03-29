@@ -624,3 +624,10 @@
     padding: 1px 3px;
     border-radius: 3px;
 }
+
+/* ── Round 38：B5 可負擔商品高亮 ── */
+.b5-item-card.b5-affordable {
+    outline: 2px dashed #10b981;
+    outline-offset: 2px;
+    transition: outline 0.3s ease;
+}

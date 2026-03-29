@@ -821,6 +821,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = !canConfirm;
                 btn.classList.toggle('ready', canConfirm);
             }
+
+            // 可負擔商品高亮（Round 38）：未選的選購商品中，標示仍買得起的
+            const remBudget = g.budget - total;
+            document.querySelectorAll('.b5-item-card:not(.locked)').forEach(card => {
+                const item = g.items.find(i => i.id === card.dataset.id);
+                if (!item || item.must) return;
+                const isSelected = g.selectedIds.has(item.id);
+                card.classList.toggle('b5-affordable', !isSelected && item.price <= remBudget);
+            });
         },
 
         _showCenterFeedback(icon, text = '') {

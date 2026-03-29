@@ -1031,7 +1031,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (checkoutBtn) {
                         const wasDone = !checkoutBtn.disabled;
                         checkoutBtn.disabled = !allDone;
-                        if (allDone && !wasDone) Game.Speech.speak('所有商品收集完成，可以去結帳了！');
+                        if (allDone && !wasDone) {
+                            Game.Speech.speak('所有商品收集完成，可以去結帳了！');
+                            this._showAllCollectedFlash();
+                        }
                     }
 
                     // 攤位完成慶祝（Round 36）
@@ -1119,6 +1122,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 prog.classList.add('b6-cp-fade');
                 Game.TimerManager.setTimeout(() => { if (prog.parentNode) prog.remove(); }, 400, 'ui');
             }, 1200, 'ui');
+        },
+
+        // ── 全部收集完成中央閃光（Round 38）─────────────────────
+        _showAllCollectedFlash() {
+            const existing = document.getElementById('b6-all-done-flash');
+            if (existing) existing.remove();
+            const el = document.createElement('div');
+            el.id = 'b6-all-done-flash';
+            el.className = 'b6-all-done-flash';
+            el.textContent = '🎉 全部收集完成！';
+            document.body.appendChild(el);
+            Game.TimerManager.setTimeout(() => { if (document.body.contains(el)) el.remove(); }, 1500, 'ui');
         },
 
         // ── 攤位小計提示（Round 25）──────────────────────────────
