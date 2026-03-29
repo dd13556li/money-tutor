@@ -373,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
                                 <button class="b-sel-btn" data-theme="halloween">萬聖節 🎃</button>
                                 <button class="b-sel-btn" data-theme="picnic">春日野餐 🌸</button>
+                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                             </div>
                             <div style="margin-top:4px;font-size:12px;color:#6b7280;">
                                 每個主題有不同的必買商品和預算挑戰！
@@ -530,7 +531,20 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _pickScenarios(count, diff) {
-            const theme = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
+            const themeKey = this.state.settings.partyTheme;
+            // 隨機模式：每關從三個主題中各自隨機一個情境
+            if (themeKey === 'random') {
+                const keys = ['birthday', 'halloween', 'picnic'];
+                const result = [];
+                for (let i = 0; i < count; i++) {
+                    const rKey = keys[Math.floor(Math.random() * keys.length)];
+                    const rTheme = B5_THEMES[rKey];
+                    const pool = (rTheme.scenarios[diff] || rTheme.scenarios.normal).slice().sort(() => Math.random() - 0.5);
+                    result.push({ ...pool[0], _themeKey: rKey });
+                }
+                return result;
+            }
+            const theme = B5_THEMES[themeKey] || B5_THEMES.birthday;
             const pool = (theme.scenarios[diff] || theme.scenarios.normal).slice().sort(() => Math.random() - 0.5);
             const result = [];
             for (let i = 0; i < count; i++) {
@@ -549,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const g        = this.state.game;
             const scenario = g.scenarios[g.currentRound];
             g.budget       = scenario.budget;
-            const themeData = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
+            const effectiveThemeKey = scenario._themeKey || this.state.settings.partyTheme;
+            const themeData = B5_THEMES[effectiveThemeKey] || B5_THEMES.birthday;
             g.items        = scenario.availableIds.map(id => themeData.allItems.find(i => i.id === id)).filter(Boolean);
             g.selectedIds  = new Set(g.items.filter(i => i.must).map(i => i.id));
             g.submitted    = false;
@@ -994,7 +1009,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>` : '';
 
             // 派對物品回顧（A4 交易摘要模式）
-            const themeForResult = B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday;
+            const themeForResult = this.state.settings.partyTheme === 'random'
+                ? { icon: '🎲', name: '隨機派對' }
+                : (B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday);
             const partyReviewHTML = g.successfulRoundItems.length > 0 ? `
             <div class="b5-res-party-review">
                 <h3>${themeForResult.icon} 本次${themeForResult.name}採購物品</h3>
