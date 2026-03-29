@@ -1727,3 +1727,55 @@
     background: #d1fae5;
     border-color: #6ee7b7;
 }
+
+/* ── 週存視覺模擬（F4 方塊動畫 + C2 逐一計數 pattern）── */
+.b3-wsim {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #fde68a;
+}
+.b3-wsim-title {
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 6px;
+}
+.b3-wsim-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+@keyframes b3WsimPop {
+    0%   { opacity: 0; transform: scale(0.5) translateY(6px); }
+    60%  { opacity: 1; transform: scale(1.1) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.b3-wsim-block {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1.5px solid #f59e0b;
+    border-radius: 8px;
+    padding: 4px 7px;
+    text-align: center;
+    min-width: 52px;
+    opacity: 0;
+    animation: b3WsimPop 0.35s ease forwards;
+}
+.b3-wsim-week {
+    font-size: 10px;
+    color: #78350f;
+    font-weight: 600;
+}
+.b3-wsim-acc {
+    font-size: 12px;
+    color: #064e3b;
+    font-weight: 700;
+}
+.b3-wsim-more {
+    background: #e0e7ff;
+    border: 1px solid #a5b4fc;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #3730a3;
+    font-weight: 600;
+    align-self: center;
+}

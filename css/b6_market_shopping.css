@@ -965,3 +965,48 @@
     pointer-events: none;
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
 }
+
+/* ── 幫我算一算 計算輔助面板（C6 計算機 pattern）── */
+.b6-calc-toggle {
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+    color: #92400e;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 8px auto 0;
+    display: block;
+    transition: background 0.2s;
+}
+.b6-calc-toggle:hover { background: #fef3c7; }
+.b6-calc-panel {
+    display: none;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin: 6px auto;
+    max-width: 260px;
+    animation: bFadeIn 0.3s ease;
+}
+.b6-calc-panel.visible { display: block; }
+.b6-cp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 15px;
+}
+.b6-cp-label { color: #6b7280; font-size: 12px; width: 32px; }
+.b6-cp-num   { font-size: 1.3em; font-weight: 700; color: #064e3b; }
+.b6-cp-unit  { font-size: 12px; color: #6b7280; }
+.b6-cp-op    { font-size: 1.4em; font-weight: 700; color: #dc2626; width: 18px; }
+.b6-cp-sub .b6-cp-num { color: #b45309; }
+.b6-cp-divider {
+    border-top: 2px solid #86efac;
+    margin: 4px 0;
+}
+.b6-cp-ans .b6-cp-num { color: #1d4ed8; }
+.b6-cp-q { letter-spacing: 2px; }

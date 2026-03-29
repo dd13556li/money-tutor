@@ -1183,6 +1183,48 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => {
                 document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-coin-hint'));
             }, 5000, 'ui');
+
+            this._animateHintCoins(optimal);
+        },
+
+        // ── 提示硬幣逐枚動畫（C2 逐一計數 pattern）──
+        _animateHintCoins(coins) {
+            const card = document.getElementById('b1-hint-combo-card');
+            if (!card) return;
+            // 在卡片下方加動畫區
+            const existing = document.getElementById('b1-hint-anim');
+            if (existing) existing.remove();
+            const wrap = document.createElement('div');
+            wrap.id = 'b1-hint-anim';
+            wrap.className = 'b1-hint-anim';
+            card.appendChild(wrap);
+            let cumulative = 0;
+            let i = 0;
+            const step = () => {
+                if (i >= coins.length) return;
+                const denom = coins[i];
+                cumulative += denom;
+                const el = document.createElement('div');
+                el.className = 'b1-hint-coin';
+                el.style.animationDelay = `${i * 200}ms`;
+                // 嘗試從錢幣盤找對應圖片
+                const src = `../images/money/${denom}_yuan_front.png`;
+                el.innerHTML = `<img src="${src}" onerror="this.parentNode.innerHTML='<span>${denom}</span>'" width="36" height="36"><span class="b1-hc-denom">${denom}元</span>`;
+                wrap.appendChild(el);
+                // 累計金額更新
+                let total = wrap.querySelector('.b1-hc-total');
+                if (!total) {
+                    total = document.createElement('div');
+                    total.className = 'b1-hc-total';
+                    wrap.appendChild(total);
+                }
+                total.textContent = `合計：${cumulative} 元`;
+                i++;
+                if (i < coins.length) {
+                    Game.TimerManager.setTimeout(step, 280, 'ui');
+                }
+            };
+            Game.TimerManager.setTimeout(step, 100, 'ui');
         },
 
         // ── Next Question / Results ────────────────────────────
@@ -1220,19 +1262,33 @@ document.addEventListener('DOMContentLoaded', () => {
             else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 行程費用清單（B6 採購收據 pattern）
-            const scheduleListHTML = q.solvedSchedules && q.solvedSchedules.length > 0 ? `
-            <div class="b1-res-schedules">
-                <h3>📋 完成的行程</h3>
-                <div class="b1-schedule-rows">
-                    ${q.solvedSchedules.map(s => `
-                    <div class="b1-schedule-row">
-                        <span class="b1-sch-icon">${s.icon}</span>
-                        <span class="b1-sch-label">${s.label}</span>
-                        <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
-                        <span class="b1-sch-total">${s.total}元</span>
-                    </div>`).join('')}
-                </div>
-            </div>` : '';
+            const scheduleListHTML = (() => {
+                if (!q.solvedSchedules || q.solvedSchedules.length === 0) return '';
+                // 最貴/最便宜標記（Round 40）
+                const maxTotal = Math.max(...q.solvedSchedules.map(s => s.total));
+                const minTotal = Math.min(...q.solvedSchedules.map(s => s.total));
+                return `
+                <div class="b1-res-schedules">
+                    <h3>📋 完成的行程</h3>
+                    <div class="b1-schedule-rows">
+                        ${q.solvedSchedules.map(s => {
+                            const tag = s.total === maxTotal && q.solvedSchedules.length > 1
+                                ? `<span class="b1-sch-tag most-exp">最貴 💸</span>`
+                                : s.total === minTotal && q.solvedSchedules.length > 1
+                                ? `<span class="b1-sch-tag cheapest">最便宜 💚</span>`
+                                : '';
+                            return `
+                            <div class="b1-schedule-row">
+                                <span class="b1-sch-icon">${s.icon}</span>
+                                <span class="b1-sch-label">${s.label}</span>
+                                <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
+                                <span class="b1-sch-total">${s.total}元</span>
+                                ${tag}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            })();
 
             // 面額使用統計（C1 統計模式）
             const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));

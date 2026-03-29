@@ -1426,6 +1426,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-change-icon">🤔</div>
                     <div class="b6-change-text">付了 <strong>${paid}</strong> 元，買菜花了 <strong>${total}</strong> 元</div>
                     <div class="b6-change-question">應該找回多少元？</div>
+                    <button class="b6-calc-toggle" id="b6-calc-toggle">🧮 幫我算一算</button>
+                    <div class="b6-calc-panel" id="b6-calc-panel">
+                        <div class="b6-cp-row">
+                            <span class="b6-cp-label">付了</span>
+                            <span class="b6-cp-num">${paid}</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                        <div class="b6-cp-row b6-cp-sub">
+                            <span class="b6-cp-op">−</span>
+                            <span class="b6-cp-label">花了</span>
+                            <span class="b6-cp-num">${total}</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                        <div class="b6-cp-divider"></div>
+                        <div class="b6-cp-row b6-cp-ans">
+                            <span class="b6-cp-op">=</span>
+                            <span class="b6-cp-label">找零</span>
+                            <span class="b6-cp-num b6-cp-q">？</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                    </div>
                     <div class="b6-change-opts" id="b6-change-opts">${optionsHTML}</div>
                 </div>
             </div>`;
@@ -1473,6 +1494,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             });
+            // 幫我算一算 toggle（C6 計算機模式）
+            const calcToggle = document.getElementById('b6-calc-toggle');
+            const calcPanel  = document.getElementById('b6-calc-panel');
+            if (calcToggle && calcPanel) {
+                Game.EventManager.on(calcToggle, 'click', () => {
+                    const shown = calcPanel.classList.toggle('visible');
+                    calcToggle.textContent = shown ? '🙈 收起計算' : '🧮 幫我算一算';
+                }, {}, 'gameUI');
+            }
         },
 
         // ── 找零第1次錯誤：顯示算式架構（Range hint, Round 34）─
@@ -1726,6 +1756,13 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="b-res-container">
+            ${/* 市場類型 banner（Round 40）*/ (() => {
+                const mkt = this.state.settings.marketType;
+                if (!mkt) return '';
+                const mktLabels = { traditional: { name: '傳統市場', icon: '🏪' }, supermarket: { name: '超級市場', icon: '🏬' }, nightmarket: { name: '夜市', icon: '🌙' }, random: { name: '隨機市場', icon: '🎲' } };
+                const info = mktLabels[mkt] || mktLabels.traditional;
+                return `<div class="b6-mkt-banner">${info.icon} 本次練習：${info.name}</div>`;
+            })()}
             <div class="b-res-grid">
                 <div class="b-res-card b-res-card-1">
                     <div class="b-res-icon">✅</div>

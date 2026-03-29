@@ -2428,11 +2428,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!section) return;
             const hint = document.createElement('div');
             hint.className = 'b3-div-hint';
+
+            // 算式行
             hint.innerHTML = `<span class="b3-hint-label">💡 計算方式：</span>`
                 + `${question.item.price} 元 <span class="b3-hint-op">÷</span> `
                 + `${question.weekly} 元/週 `
                 + `<span class="b3-hint-op">≈</span> `
                 + `<span class="b3-hint-ans">${question.answer}</span> 週（無條件進位）`;
+
+            // 視覺週存模擬（F4 方塊動畫 + C2 逐一計數 pattern）
+            const maxShow   = 8;
+            const total     = question.answer;
+            const show      = Math.min(total, maxShow);
+            const overflow  = total > maxShow ? total - maxShow : 0;
+            const blocksHTML = Array.from({ length: show }, (_, i) => {
+                const acc = question.weekly * (i + 1);
+                return `<div class="b3-wsim-block" style="animation-delay:${(i * 90)}ms">`
+                    + `<div class="b3-wsim-week">第${i + 1}週</div>`
+                    + `<div class="b3-wsim-acc">${acc}元</div>`
+                    + `</div>`;
+            }).join('');
+            const overflowHTML = overflow > 0
+                ? `<div class="b3-wsim-more">… 共 ${total} 週</div>` : '';
+
+            const simDiv = document.createElement('div');
+            simDiv.className = 'b3-wsim';
+            simDiv.innerHTML = `<div class="b3-wsim-title">每週存 <strong>${question.weekly}</strong> 元，累積進度：</div>`
+                + `<div class="b3-wsim-blocks">${blocksHTML}${overflowHTML}</div>`;
+            hint.appendChild(simDiv);
             section.appendChild(hint);
         },
 
