@@ -180,6 +180,151 @@ const B6_MISSIONS = {
     ],
 };
 
+// ── 市場類型（B5_THEMES pattern）────────────────────────────
+const B6_MARKETS = {
+    traditional: {
+        name: '傳統市場', icon: '🏪',
+        stalls: B6_STALLS,
+        missions: B6_MISSIONS,
+    },
+    supermarket: {
+        name: '超市購物', icon: '🛒',
+        stalls: {
+            bakery: {
+                name: '烘焙區', icon: '🥖',
+                items: [
+                    { id: 'bread',      name: '麵包',   price: 30,  unit: '個', icon: '🍞' },
+                    { id: 'croissant',  name: '可頌',   price: 45,  unit: '個', icon: '🥐' },
+                    { id: 'toast',      name: '吐司',   price: 35,  unit: '條', icon: '🍞' },
+                    { id: 'muffin',     name: '馬芬',   price: 25,  unit: '個', icon: '🧁' },
+                    { id: 'bun',        name: '小餐包', price: 20,  unit: '包', icon: '🥖' },
+                    { id: 'cake_slice', name: '蛋糕',   price: 60,  unit: '片', icon: '🎂' },
+                ],
+            },
+            dairy: {
+                name: '乳品區', icon: '🥛',
+                items: [
+                    { id: 'milk',   name: '牛奶',   price: 50,  unit: '瓶', icon: '🥛' },
+                    { id: 'yogurt', name: '優格',   price: 40,  unit: '杯', icon: '🫙' },
+                    { id: 'cheese', name: '起司',   price: 80,  unit: '片', icon: '🧀' },
+                    { id: 'butter', name: '奶油',   price: 65,  unit: '盒', icon: '🧈' },
+                    { id: 'cream',  name: '鮮奶油', price: 45,  unit: '瓶', icon: '🫙' },
+                    { id: 'sm_egg', name: '雞蛋',   price: 55,  unit: '盒', icon: '🥚' },
+                ],
+            },
+            frozen: {
+                name: '冷凍區', icon: '🧊',
+                items: [
+                    { id: 'dumpling',  name: '水餃',   price: 75,  unit: '包', icon: '🥟' },
+                    { id: 'sausage',   name: '香腸',   price: 60,  unit: '包', icon: '🌭' },
+                    { id: 'ice_cream', name: '冰淇淋', price: 45,  unit: '支', icon: '🍦' },
+                    { id: 'nugget',    name: '雞塊',   price: 80,  unit: '包', icon: '🍗' },
+                    { id: 'fish_ball', name: '魚丸',   price: 50,  unit: '包', icon: '🫙' },
+                    { id: 'edamame',   name: '毛豆',   price: 35,  unit: '包', icon: '🫘' },
+                ],
+            },
+        },
+        missions: {
+            easy: [
+                { budget: 100, items: [{ stall:'bakery',  id:'bun'    }, { stall:'bakery',  id:'bread'   }]},  // 50元，找零50
+                { budget: 100, items: [{ stall:'dairy',   id:'yogurt' }, { stall:'bakery',  id:'muffin'  }]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'frozen',  id:'ice_cream'},{ stall:'bakery', id:'toast'   }]},  // 80元，找零70
+                { budget: 100, items: [{ stall:'dairy',   id:'cream'  }, { stall:'bakery',  id:'muffin'  }]},  // 70元，找零30
+                { budget: 200, items: [{ stall:'bakery',  id:'bread'  }, { stall:'frozen',  id:'edamame' }]},  // 65元，找零135
+                { budget: 100, items: [{ stall:'frozen',  id:'ice_cream'},{ stall:'bakery', id:'bun'     }]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'dairy',   id:'yogurt' }, { stall:'frozen',  id:'edamame' }, { stall:'bakery', id:'bun' }]},  // 95元，找零55
+                { budget: 200, items: [{ stall:'bakery',  id:'toast'  }, { stall:'frozen',  id:'fish_ball'}]},  // 85元，找零115
+            ],
+            normal: [
+                { budget: 200, items: [{ stall:'bakery', id:'bread'   }, { stall:'bakery',  id:'croissant'}, { stall:'dairy',  id:'yogurt' }]},  // 115，找零85
+                { budget: 300, items: [{ stall:'dairy',  id:'milk'    }, { stall:'frozen',  id:'dumpling' }, { stall:'bakery', id:'bun'    }]},  // 145，找零155
+                { budget: 250, items: [{ stall:'bakery', id:'cake_slice'},{ stall:'dairy',  id:'cream'   }, { stall:'frozen', id:'ice_cream'},{ stall:'bakery',id:'muffin'}]},  // 170，找零80
+                { budget: 200, items: [{ stall:'frozen', id:'sausage' }, { stall:'dairy',   id:'yogurt'  }, { stall:'bakery', id:'toast'   }]},  // 135，找零65
+                { budget: 300, items: [{ stall:'dairy',  id:'sm_egg'  }, { stall:'frozen',  id:'fish_ball'}, { stall:'bakery', id:'croissant'}]},  // 140，找零160
+                { budget: 250, items: [{ stall:'frozen', id:'nugget'  }, { stall:'dairy',   id:'cream'   }, { stall:'bakery', id:'bread'   }, { stall:'bakery',id:'bun'}]},  // 185，找零65
+                { budget: 250, items: [{ stall:'bakery', id:'cake_slice'},{ stall:'dairy',  id:'butter'  }, { stall:'frozen', id:'edamame' }]},  // 160，找零90
+                { budget: 300, items: [{ stall:'frozen', id:'dumpling' },{ stall:'dairy',   id:'yogurt'  }, { stall:'frozen', id:'edamame' }, { stall:'bakery',id:'toast'}]},  // 185，找零115
+            ],
+            hard: [
+                { budget: 500, items: [{ stall:'dairy',  id:'milk'    }, { stall:'dairy',   id:'cheese'  }, { stall:'frozen', id:'dumpling'}, { stall:'bakery', id:'bread' }, { stall:'bakery', id:'croissant'}]},  // 280，找零220
+                { budget: 300, items: [{ stall:'frozen', id:'nugget'  }, { stall:'frozen',  id:'sausage' }, { stall:'dairy',  id:'yogurt'  }, { stall:'bakery', id:'cake_slice'}]},  // 245，找零55
+                { budget: 400, items: [{ stall:'dairy',  id:'butter'  }, { stall:'frozen',  id:'dumpling'}, { stall:'bakery', id:'toast'   }, { stall:'dairy',  id:'cream'   }]},  // 220，找零180
+                { budget: 500, items: [{ stall:'dairy',  id:'cheese'  }, { stall:'frozen',  id:'nugget'  }, { stall:'bakery', id:'cake_slice'},{ stall:'frozen', id:'sausage' },{ stall:'bakery',id:'bread'}]},  // 295，找零205
+                { budget: 300, items: [{ stall:'frozen', id:'fish_ball'},{ stall:'dairy',   id:'sm_egg'  }, { stall:'bakery', id:'croissant'}, { stall:'frozen', id:'edamame' }]},  // 185，找零115
+                { budget: 400, items: [{ stall:'dairy',  id:'milk'    }, { stall:'bakery',  id:'cake_slice'},{ stall:'frozen', id:'dumpling'}, { stall:'dairy',  id:'butter'  }, { stall:'bakery',id:'muffin'}]},  // 295，找零105
+            ],
+        },
+    },
+    nightmarket: {
+        name: '夜市美食', icon: '🏮',
+        stalls: {
+            snack: {
+                name: '小吃攤', icon: '🍜',
+                items: [
+                    { id: 'oysternoodle', name: '蚵仔麵線', price: 50,  unit: '碗', icon: '🍜' },
+                    { id: 'beefnoodle',  name: '牛肉麵',   price: 80,  unit: '碗', icon: '🍲' },
+                    { id: 'pancake',     name: '蔥抓餅',   price: 35,  unit: '份', icon: '🥞' },
+                    { id: 'popcorn_chk', name: '鹹酥雞',   price: 60,  unit: '份', icon: '🍗' },
+                    { id: 'stinky_tofu', name: '臭豆腐',   price: 45,  unit: '份', icon: '🫙' },
+                    { id: 'takoyaki',    name: '章魚燒',   price: 50,  unit: '份', icon: '🐙' },
+                ],
+            },
+            drink: {
+                name: '飲料攤', icon: '🧋',
+                items: [
+                    { id: 'bubble_tea', name: '珍珠奶茶', price: 55,  unit: '杯', icon: '🧋' },
+                    { id: 'lemon_tea',  name: '檸檬茶',   price: 40,  unit: '杯', icon: '🍋' },
+                    { id: 'sugarcane',  name: '甘蔗汁',   price: 30,  unit: '杯', icon: '🌿' },
+                    { id: 'milk_tea',   name: '奶茶',     price: 45,  unit: '杯', icon: '🍵' },
+                    { id: 'smoothie',   name: '果汁',     price: 50,  unit: '杯', icon: '🍹' },
+                    { id: 'soymilk',    name: '豆花',     price: 35,  unit: '碗', icon: '🥛' },
+                ],
+            },
+            souvenir: {
+                name: '紀念品攤', icon: '🎁',
+                items: [
+                    { id: 'phone_case', name: '手機殼',   price: 80,  unit: '個', icon: '📱' },
+                    { id: 'keychain',   name: '鑰匙圈',   price: 45,  unit: '個', icon: '🔑' },
+                    { id: 'hairpin',    name: '髮夾',     price: 30,  unit: '個', icon: '💎' },
+                    { id: 'bookmark',   name: '書籤',     price: 20,  unit: '個', icon: '📖' },
+                    { id: 'magnet',     name: '磁鐵',     price: 35,  unit: '個', icon: '🧲' },
+                    { id: 'wristband',  name: '手環',     price: 60,  unit: '個', icon: '⌚' },
+                ],
+            },
+        },
+        missions: {
+            easy: [
+                { budget: 100, items: [{ stall:'drink',    id:'sugarcane' }, { stall:'drink',    id:'soymilk'  }]},  // 65元，找零35
+                { budget: 100, items: [{ stall:'snack',    id:'pancake'   }, { stall:'drink',    id:'sugarcane'}]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'souvenir', id:'hairpin'   }, { stall:'souvenir', id:'bookmark' }, { stall:'drink', id:'sugarcane'}]},  // 80元，找零70
+                { budget: 100, items: [{ stall:'drink',    id:'lemon_tea' }, { stall:'drink',    id:'soymilk'  }]},  // 75元，找零25
+                { budget: 200, items: [{ stall:'snack',    id:'pancake'   }, { stall:'souvenir', id:'magnet'   }]},  // 70元，找零130
+                { budget: 100, items: [{ stall:'snack',    id:'stinky_tofu'},{ stall:'drink',    id:'sugarcane'}]},  // 75元，找零25
+                { budget: 150, items: [{ stall:'drink',    id:'milk_tea'  }, { stall:'souvenir', id:'hairpin'  }, { stall:'drink', id:'sugarcane'}]},  // 105元，找零45
+                { budget: 200, items: [{ stall:'souvenir', id:'keychain'  }, { stall:'drink',    id:'lemon_tea'}]},  // 85元，找零115
+            ],
+            normal: [
+                { budget: 200, items: [{ stall:'snack',    id:'oysternoodle'},{ stall:'drink',   id:'milk_tea'  }, { stall:'souvenir',id:'hairpin'  }]},  // 125，找零75
+                { budget: 300, items: [{ stall:'snack',    id:'beefnoodle' }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'magnet'   }]},  // 170，找零130
+                { budget: 250, items: [{ stall:'snack',    id:'pancake'    }, { stall:'drink',   id:'lemon_tea' }, { stall:'snack',   id:'takoyaki'  },{ stall:'drink',id:'sugarcane'}]},  // 155，找零95
+                { budget: 200, items: [{ stall:'souvenir', id:'keychain'   }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',   id:'milk_tea'  }]},  // 140，找零60
+                { budget: 300, items: [{ stall:'souvenir', id:'wristband'  }, { stall:'snack',   id:'popcorn_chk'},{ stall:'drink',   id:'smoothie'  }]},  // 170，找零130
+                { budget: 250, items: [{ stall:'drink',    id:'bubble_tea' }, { stall:'souvenir',id:'magnet'    }, { stall:'snack',   id:'oysternoodle'},{ stall:'drink',id:'sugarcane'}]},  // 165，找零85
+                { budget: 250, items: [{ stall:'snack',    id:'takoyaki'   }, { stall:'drink',   id:'smoothie'  }, { stall:'souvenir',id:'keychain'  }]},  // 145，找零105
+                { budget: 300, items: [{ stall:'snack',    id:'pancake'    }, { stall:'souvenir',id:'wristband' }, { stall:'drink',   id:'milk_tea'  }, { stall:'drink',id:'lemon_tea'}]},  // 180，找零120
+            ],
+            hard: [
+                { budget: 500, items: [{ stall:'snack',    id:'beefnoodle' }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'phone_case'}, { stall:'snack',   id:'oysternoodle'},{ stall:'drink',id:'milk_tea'}]},  // 330，找零170
+                { budget: 300, items: [{ stall:'souvenir', id:'phone_case' }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',   id:'smoothie'  }, { stall:'souvenir',id:'magnet'   }]},  // 210，找零90
+                { budget: 400, items: [{ stall:'snack',    id:'popcorn_chk'},{ stall:'drink',   id:'bubble_tea' }, { stall:'souvenir',id:'wristband' }, { stall:'snack',   id:'pancake'   }]},  // 210，找零190
+                { budget: 500, items: [{ stall:'souvenir', id:'phone_case' }, { stall:'souvenir',id:'keychain'  }, { stall:'snack',   id:'beefnoodle'}, { stall:'drink',   id:'smoothie'  },{ stall:'drink',id:'sugarcane'}]},  // 310，找零190
+                { budget: 300, items: [{ stall:'snack',    id:'takoyaki'   }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'keychain'  }, { stall:'drink',   id:'soymilk'   }]},  // 185，找零115
+                { budget: 400, items: [{ stall:'snack',    id:'oysternoodle'},{ stall:'souvenir',id:'phone_case'},{ stall:'drink',   id:'lemon_tea'  }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',id:'milk_tea'}]},  // 305，找零95
+            ],
+        },
+    },
+};
+
 // ── 付款面額 ────────────────────────────────────────────────
 const B6_BILLS = [
     { value: 1000, label: '千元',   color: '#7c3aed' },
@@ -190,6 +335,10 @@ const B6_BILLS = [
     { value: 5,    label: '五元',   color: '#b91c1c' },
     { value: 1,    label: '一元',   color: '#374151' },
 ];
+
+// ── 市場類型動態切換（startGame 時設定）─────────────────────────
+let _currentStalls   = B6_STALLS;
+let _currentMissions = B6_MISSIONS;
 
 // ── Game 物件 ────────────────────────────────────────────────────
 // 金額語音轉換（安全版：若 number-speech-utils.js 未載入則退回原始格式）
@@ -310,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: null },
+            settings: { difficulty: null, rounds: null, clickMode: null, marketType: null },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -321,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // current round state
                 mission: null,
                 collectedIds: new Set(),
-                activeStall: 'vegetable',
+                activeStall: Object.keys(_currentStalls)[0],
                 phase: 'shopping', // 'shopping' | 'payment' | 'change'
                 paidAmount: 0,
                 receipts: [],
@@ -434,6 +583,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">🏪 市場類型：</label>
+                            <div class="b-btn-group" id="market-group">
+                                <button class="b-sel-btn" data-market="traditional">🏪 傳統市場</button>
+                                <button class="b-sel-btn" data-market="supermarket">🛒 超市</button>
+                                <button class="b-sel-btn" data-market="nightmarket">🏮 夜市</button>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">🤖 輔助點擊：</label>
                             <div class="b-btn-group" id="assist-group">
                                 <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
@@ -499,6 +656,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
 
+            document.querySelectorAll('#market-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#market-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.marketType = btn.dataset.market;
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -514,13 +680,18 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode;
+            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode || !s.marketType;
         },
 
         // ── 8. 遊戲開始 ───────────────────────────────────────
         startGame() {
             Game.EventManager.removeByCategory('settings');
             Game.TimerManager.clearAll();
+
+            // 設定當前市場類型
+            const mkt = B6_MARKETS[this.state.settings.marketType] || B6_MARKETS.traditional;
+            _currentStalls   = mkt.stalls;
+            _currentMissions = mkt.missions;
 
             const s = this.state.settings;
             const g = this.state.game;
@@ -538,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _pickMissions(count, diff) {
-            const pool = B6_MISSIONS[diff].slice().sort(() => Math.random() - 0.5);
+            const pool = _currentMissions[diff].slice().sort(() => Math.random() - 0.5);
             const result = [];
             for (let i = 0; i < count; i++) {
                 result.push(pool[i % pool.length]);
@@ -556,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const g       = this.state.game;
             g.mission     = g.missions[g.currentRound];
             g.collectedIds = new Set();
-            g.activeStall = 'vegetable';
+            g.activeStall = Object.keys(_currentStalls)[0];
             g.phase       = 'shopping';
             g.paidAmount  = 0;
 
@@ -574,11 +745,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existing) existing.remove();
             const g = this.state.game;
             const items = mission.items.map(({ stall, id }) => {
-                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                const item = _currentStalls[stall]?.items.find(i => i.id === id);
                 return item ? `<span class="b6-mi-item">${item.icon} ${item.name}</span>` : '';
             }).filter(Boolean).join('');
             const names = mission.items.map(({ stall, id }) => {
-                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                const item = _currentStalls[stall]?.items.find(i => i.id === id);
                 return item ? item.name : '';
             }).filter(Boolean).join('、');
 
@@ -631,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pct     = Math.round((g.currentRound / g.totalRounds) * 100);
 
             const listHTML = mission.items.map(({ stall, id }) => {
-                const item  = B6_STALLS[stall].items.find(i => i.id === id);
+                const item  = _currentStalls[stall].items.find(i => i.id === id);
                 const done  = g.collectedIds.has(id);
                 return `
                 <div class="b6-list-item ${done ? 'checked' : ''}" data-item-id="${id}">
@@ -641,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             }).join('');
 
-            const stallKeys = Object.keys(B6_STALLS);
+            const stallKeys = Object.keys(_currentStalls);
             const stallTabsHTML = stallKeys.map(k => {
                 const stallNeedIds  = mission.items.filter(i => i.stall === k).map(i => i.id);
                 const remaining     = stallNeedIds.filter(id => !g.collectedIds.has(id)).length;
@@ -652,11 +823,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     : '';
                 return `
                 <button class="b6-stall-tab ${g.activeStall === k ? 'active' : ''}" data-stall="${k}">
-                    ${B6_STALLS[k].icon} ${B6_STALLS[k].name}${badge}
+                    ${_currentStalls[k].icon} ${_currentStalls[k].name}${badge}
                 </button>`;
             }).join('');
 
-            const stallItems = B6_STALLS[g.activeStall].items;
+            const stallItems = _currentStalls[g.activeStall].items;
             const needIds    = new Set(mission.items.map(i => i.id));
             const productsHTML = stallItems.map(item => {
                 const collected  = g.collectedIds.has(item.id);
@@ -677,7 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">🛒 菜市場買菜</span>
+                    <span class="b-header-unit">${(() => { const m = B6_MARKETS[this.state.settings.marketType]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
                 <div class="b-header-right">
@@ -709,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- 商品格子 -->
                 <div class="b6-stall-panel">
                     <div class="b6-stall-panel-header">
-                        ${B6_STALLS[g.activeStall].icon} ${B6_STALLS[g.activeStall].name}
+                        ${_currentStalls[g.activeStall].icon} ${_currentStalls[g.activeStall].name}
                     </div>
                     <div class="b6-products-grid">${productsHTML}</div>
                 </div>
@@ -735,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (g.activeStall === tab.dataset.stall) return;
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
-                    Game.Speech.speak(B6_STALLS[tab.dataset.stall].name);
+                    Game.Speech.speak(_currentStalls[tab.dataset.stall].name);
                     this._renderShoppingUI();
                 }, {}, 'gameUI');
             });
@@ -749,13 +920,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!needIds.has(itemId)) {
                         this.audio.play('error');
-                        const itemData = B6_STALLS[stall].items.find(i => i.id === itemId);
+                        const itemData = _currentStalls[stall].items.find(i => i.id === itemId);
                         const itemName = itemData ? itemData.name : '這個';
                         // 找出此攤位還需要收集的商品
                         const neededAtStall = g.mission.items
                             .filter(mi => mi.stall === stall && !g.collectedIds.has(mi.id))
                             .map(mi => {
-                                const d = B6_STALLS[stall]?.items.find(p => p.id === mi.id);
+                                const d = _currentStalls[stall]?.items.find(p => p.id === mi.id);
                                 return d ? `${d.icon} ${d.name}` : mi.id;
                             });
                         const tipId = 'b6-wrong-tip';
@@ -791,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.TimerManager.setTimeout(
                             () => listItem.classList.remove('b6-list-bounce'), 600, 'ui'
                         );
-                        const itemData = B6_STALLS[stall].items.find(i => i.id === itemId);
+                        const itemData = _currentStalls[stall].items.find(i => i.id === itemId);
                         if (itemData) {
                             this._showPricePopup(listItem, itemData.price);
                             Game.Speech.speak(`${itemData.name}，${itemData.price}元`);
@@ -855,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _calcMissionTotal() {
             const g = this.state.game;
             return g.mission.items.reduce((sum, { stall, id }) => {
-                const item = B6_STALLS[stall].items.find(i => i.id === id);
+                const item = _currentStalls[stall].items.find(i => i.id === id);
                 return sum + (item ? item.price : 0);
             }, 0);
         },
@@ -878,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">🛒 菜市場買菜</span>
+                    <span class="b-header-unit">${(() => { const m = B6_MARKETS[this.state.settings.marketType]; return m ? `${m.icon} ${m.name}` : '🛒 菜市場買菜'; })()}</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
                 <div class="b-header-right">
@@ -1108,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 儲存本關收據（A3/A4 交易摘要模式）
             const total = this._calcMissionTotal();
             const items = g.mission.items.map(({ stall, id }) => {
-                const item = B6_STALLS[stall]?.items.find(i => i.id === id);
+                const item = _currentStalls[stall]?.items.find(i => i.id === id);
                 if (item) g.stallStats[stall] = (g.stallStats[stall] || 0) + item.price;
                 return item ? { name: item.name, price: item.price } : null;
             }).filter(Boolean);
@@ -1218,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const stallOrder = ['vegetable', 'fruit', 'grocery'];
                 const entries = stallOrder
                     .filter(k => stats[k])
-                    .map(k => ({ key: k, name: B6_STALLS[k].name, icon: B6_STALLS[k].icon, total: stats[k] }));
+                    .map(k => ({ key: k, name: _currentStalls[k].name, icon: _currentStalls[k].icon, total: stats[k] }));
                 if (entries.length === 0) return '';
                 const grandTotal = entries.reduce((s, e) => s + e.total, 0);
                 return `
