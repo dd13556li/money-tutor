@@ -642,3 +642,46 @@
     padding: 2px 8px;
     white-space: nowrap;
 }
+
+/* ── Round 40：B5 必買vs選購比例條 ── */
+.b5-res-ratio {
+    background: #fff;
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 0;
+}
+.b5-res-ratio h3 { font-size: 14px; color: #6d28d9; margin: 0 0 8px; }
+.b5-ratio-bar {
+    display: flex;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 700;
+}
+.b5-ratio-must {
+    background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    transition: width 0.5s ease;
+}
+.b5-ratio-opt {
+    background: linear-gradient(90deg, #a78bfa, #c4b5fd);
+    color: #4c1d95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    transition: width 0.5s ease;
+}
+.b5-ratio-vals {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}

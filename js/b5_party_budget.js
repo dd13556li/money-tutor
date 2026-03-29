@@ -955,7 +955,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
                 }
                 // 記錄各關預算使用（B6 receipts pattern）
-                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
+                const mustSpent = g.items.filter(i => i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
+                const optSpent  = g.items.filter(i => !i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
+                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total, mustSpent, optSpent });
                 // 記錄本關選購物品（A4 交易摘要模式）
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
@@ -1201,6 +1203,27 @@ document.addEventListener('DOMContentLoaded', () => {
             })()}
 
             ${partyReviewHTML}
+
+            ${/* 必買vs選購比例條（Round 40）*/ (() => {
+                if (!g.roundStats || g.roundStats.length === 0) return '';
+                const totalMust = g.roundStats.reduce((s, r) => s + (r.mustSpent || 0), 0);
+                const totalOpt  = g.roundStats.reduce((s, r) => s + (r.optSpent  || 0), 0);
+                const total     = totalMust + totalOpt;
+                if (total === 0) return '';
+                const mustPct = Math.round(totalMust / total * 100);
+                const optPct  = 100 - mustPct;
+                return `<div class="b5-res-ratio">
+                    <h3>🛒 必買 vs 選購比例</h3>
+                    <div class="b5-ratio-bar">
+                        <div class="b5-ratio-must" style="width:${mustPct}%">必買 ${mustPct}%</div>
+                        <div class="b5-ratio-opt"  style="width:${optPct}%">選購 ${optPct}%</div>
+                    </div>
+                    <div class="b5-ratio-vals">
+                        <span>必買：${totalMust}元</span>
+                        <span>選購：${totalOpt}元</span>
+                    </div>
+                </div>`;
+            })()}
 
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">

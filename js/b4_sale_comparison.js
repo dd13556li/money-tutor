@@ -1615,7 +1615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ci = this.state.currentDiffItem;
                 if (ci) {
                     this.state.quiz.comparisonHistory.push({
-                        name: ci.name, icon: ci.icon,
+                        name: ci.name, icon: ci.icon, cat: ci.cat || 'other',
                         cheapStore: ci.optB.store, cheapPrice: ci.isUnit ? ci.perB : ci.optB.price,
                         expStore: ci.optA.store,   expPrice:  ci.isUnit ? ci.perA : ci.optA.price,
                         saved: correctDiff,
@@ -1803,6 +1803,32 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>` : ''}
 
             ${savingsRankHTML}
+
+            ${(() => {
+                // 類別節省分析（Round 40）
+                const hist = q.comparisonHistory;
+                if (!hist || hist.length < 2) return '';
+                const catNames = { food:'食品飲料', stationery:'文具書籍', daily:'生活用品', clothing:'服飾配件' };
+                const catMap = {};
+                hist.forEach(h => {
+                    const cat = h.cat || 'other';
+                    if (!catMap[cat]) catMap[cat] = { saved: 0, count: 0, name: catNames[cat] || cat };
+                    catMap[cat].saved += h.saved || 0;
+                    catMap[cat].count++;
+                });
+                const entries = Object.entries(catMap).filter(([, v]) => v.saved > 0).sort((a, b) => b[1].saved - a[1].saved);
+                if (entries.length === 0) return '';
+                const maxSaved = entries[0][1].saved;
+                return `<div class="b4-cat-savings">
+                    <h3>🏷️ 類別節省分析</h3>
+                    ${entries.map(([cat, v]) => `
+                    <div class="b4-cat-row">
+                        <span class="b4-cat-name">${catNames[cat] || cat}</span>
+                        <div class="b4-cat-bar-wrap"><div class="b4-cat-bar" style="width:${Math.round(v.saved/maxSaved*100)}%"></div></div>
+                        <span class="b4-cat-val">省 ${v.saved}元</span>
+                    </div>`).join('')}
+                </div>`;
+            })()}
 
             ${q.comparisonHistory && q.comparisonHistory.length > 0 ? `
             <div class="b4-res-compare">

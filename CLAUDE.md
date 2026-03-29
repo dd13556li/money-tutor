@@ -626,6 +626,9 @@ toolbarConfig: {
 | B4 累計節省徽章（Round 39）| B4 | `_renderHeader` header-right 加 `b4-savings-tally`：`q.totalSaved > 0` 顯示「💰 已省X元」綠色小徽章 |
 | B5 即時選擇計數（Round 39）| B5 | total-bar 新增 `#b5-sel-count`；`_updateTotalBar` 更新「必買N件+選購M件」；`.b5-sel-count` 藍色膠囊 |
 | B6 攤位商品語音引導（Round 39）| B6 | 切換攤位時語音改為「X攤，要找Y和Z」；全部收集時說「已全部收集！」 |
+| B6 找零計算輔助面板（2026-03-30）| B6 | `_showChangeQuiz` 新增「🧮 幫我算一算」切換按鈕；展開 `.b6-calc-panel` 顯示直式減法（付了X − 花了Y = 找零？元）；EventManager 綁定 toggle；CSS：`.b6-calc-toggle`/`.b6-calc-panel`/`.b6-cp-*`；搜尋 `b6-calc-panel`、`b6-calc-toggle` |
+| B3 週存視覺模擬積木（2026-03-30）| B3 | `_showDivisionHint` 答錯後在提示下方新增 `.b3-wsim` 積木列；最多 8 個 `.b3-wsim-block` 顯示第N週+累計金額；每塊延遲 90ms 彈出（`b3WsimPop`）；超過8週顯示「…共N週」溢出徽章；搜尋 `b3-wsim`、`b3WsimPop` |
+| B1 最佳硬幣組合逐一動畫（2026-03-30）| B1 | `_showCoinHint` 末尾呼叫 `_animateHintCoins(coins)`；在 `#b1-hint-combo-card` 建立 `#b1-hint-anim`；每 280ms 依序顯示硬幣圖片+面額+累計金額；`b1HintCoinIn` scale/opacity 進場；搜尋 `_animateHintCoins`、`b1-hint-anim` |
 
 ---
 

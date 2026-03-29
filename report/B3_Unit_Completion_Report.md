@@ -778,3 +778,38 @@ CSS：`.b3-goal-summary`、`.b3-gs-item`、`.b3-gs-val`。
 
 `.b3-streak-badge`、`b3SbPop` — 連勝 3/5 題彈跳動畫，橘金色漸層背景。
 
+
+## 十九、週存視覺模擬積木（2026-03-30）
+
+### 背景
+
+F4 排序積木動畫（`b4BlockPop`）與 C2 逐一計數動畫（每格延遲出現）已廣泛用於 A/C/F 系列。B3 的除法提示（`_showDivisionHint`）顯示文字公式時，學生仍難以感受「每週存一次」的時間跨度。
+
+### 實作
+
+在 `_showDivisionHint(question)` 原有文字公式下方，追加 `.b3-wsim` 視覺積木列：
+
+- 最多顯示 8 個 `.b3-wsim-block`
+- 每個積木顯示「第 N 週」+ 累計金額（`question.weekly * (i+1)`）
+- 每塊 `animation-delay: i * 90ms`，使用 `b3WsimPop`（`scale(0.5)→scale(1.1)→scale(1)`）
+- 超過 8 週時，顯示 `.b3-wsim-more`「… 共 N 週」溢出徽章
+
+### CSS 類別
+
+| 類別 | 用途 |
+|------|------|
+| `.b3-wsim` | 容器（上方 8px margin，fade-in） |
+| `.b3-wsim-title` | 標題「📅 每週存款模擬」 |
+| `.b3-wsim-blocks` | 積木 flexbox 容器 |
+| `@keyframes b3WsimPop` | `scale(0.5)→scale(1.1)→scale(1)` |
+| `.b3-wsim-block` | 單週積木（藍色漸層，圓角，stagger delay） |
+| `.b3-wsim-week` | 「第N週」標籤（細白字） |
+| `.b3-wsim-acc` | 累計金額（粗白字） |
+| `.b3-wsim-more` | 溢出徽章（橙色，`+X 週`）|
+
+### 教學設計
+
+- 遵循 **F4 積木排序 + C2 逐一計數** double pattern
+- 積木數量對應週數，讓「需要幾週」變成可數的視覺單位
+- 累計金額顯示強化「每週累加」的概念
+- 上限 8 格防止畫面過長，超出部分以溢出徽章標示

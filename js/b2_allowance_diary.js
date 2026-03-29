@@ -1349,6 +1349,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
                 const net = totalIncome - totalExpense;
+                // 收支平衡評語（Round 40）
+                let balanceComment, balanceClass;
+                if (totalIncome === 0 && totalExpense === 0) { balanceComment = ''; balanceClass = ''; }
+                else if (net > totalIncome * 0.3)  { balanceComment = '💚 理財優等生！收入遠大於支出'; balanceClass = 'b2-bal-great'; }
+                else if (net >= 0)                 { balanceComment = '😊 收支平衡，繼續保持！'; balanceClass = 'b2-bal-ok'; }
+                else if (-net < totalExpense * 0.2){ balanceComment = '⚠️ 略有赤字，要多注意支出！'; balanceClass = 'b2-bal-warn'; }
+                else                               { balanceComment = '😰 赤字偏高，可以減少一些支出！'; balanceClass = 'b2-bal-bad'; }
+                const commentHTML = balanceComment
+                    ? `<div class="b2-balance-comment ${balanceClass}">${balanceComment}</div>`
+                    : '';
                 return `
                 <div class="b2-res-totals">
                     <h3>💰 本期收支總計</h3>
@@ -1366,6 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b2-total-val">${net >= 0 ? '＋' : ''}${net}元</span>
                         </div>
                     </div>
+                    ${commentHTML}
                 </div>`;
             })();
 

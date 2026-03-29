@@ -771,3 +771,38 @@ CSS：`.b-res-denom-stats`、`.b1-stat-grid`、`.b1-stat-item`。
 | ≥50% | 🥉 努力 |
 | 其他 | ⭐ 練習 |
 
+
+## 十九、最佳硬幣組合逐一動畫（2026-03-30）
+
+### 背景
+
+C2 逐一計數動畫（每枚硬幣依序進場）與 F4 積木依序出現（stagger delay）已在 C/F 系列廣泛使用。B1 的 `_showCoinHint()` 原本只顯示靜態文字「建議用 X 元 + Y 元 + ...」，學生難以感受「拿起每枚硬幣」的動作序列。
+
+### 實作
+
+`_showCoinHint()` 末尾呼叫 `_animateHintCoins(hintCoins)`：
+
+1. 在 `#b1-hint-combo-card` 內建立 `#b1-hint-anim` 容器
+2. 每 **280ms** 使用 `Game.TimerManager.setTimeout(step, 280, 'ui')` 依序顯示一枚硬幣
+3. 每枚顯示：
+   - 硬幣圖片（`../images/money/${denom}_yuan_front.png`，onerror fallback 為文字）
+   - 面額標籤（`.b1-hc-denom`）
+   - 當前累計金額（`.b1-hc-total`，格式：`累計：X 元`）
+4. 使用 `b1HintCoinIn`（`opacity: 0 + translateY(12px)` → `opacity: 1 + translateY(0)`）進場動畫
+
+### CSS 類別
+
+| 類別 | 用途 |
+|------|------|
+| `@keyframes b1HintCoinIn` | opacity+translateY 進場（0.25s ease-out） |
+| `.b1-hint-anim` | 動畫硬幣容器（flex wrap，上方 8px gap） |
+| `.b1-hint-coin` | 單枚硬幣卡（白色圓角，淺陰影，`animation: b1HintCoinIn`） |
+| `.b1-hc-denom` | 面額文字（粗橙色） |
+| `.b1-hc-total` | 累計金額文字（小字灰色） |
+
+### 教學設計
+
+- 遵循 **C2 逐一計數 pattern**：每步間距 280ms，讓學生視線能跟上
+- 圖片顯示真實硬幣外觀，結合 B1 現有 `_renderCoinImages()` 風格
+- 累計金額欄位強化「每加一枚，金額增加」的直觀感受
+- 與 `_showMinCoinsHint`（最少張數提示）搭配，形成「建議組合 → 視覺演示」的完整提示流程
