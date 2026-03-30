@@ -1433,44 +1433,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = g.totalRounds > 0
                 ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
 
-            let badge, badgeColor;
-            if (accuracy >= 90)      { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            let badge;
+            if (accuracy >= 90)      { badge = '優異 🏆'; }
+            else if (accuracy >= 70) { badge = '良好 👍'; }
+            else if (accuracy >= 50) { badge = '努力 💪'; }
+            else                     { badge = '練習 📚'; }
 
-            // 攤位消費分析（B5 roundStats pattern）
-            const stallBreakdownHTML = (() => {
-                const stats = g.stallStats;
-                if (!stats || Object.keys(stats).length === 0) return '';
-                const stallOrder = ['vegetable', 'fruit', 'grocery'];
-                const entries = stallOrder
-                    .filter(k => stats[k])
-                    .map(k => ({ key: k, name: _currentStalls[k].name, icon: _currentStalls[k].icon, total: stats[k] }));
-                if (entries.length === 0) return '';
-                const grandTotal = entries.reduce((s, e) => s + e.total, 0);
-                return `
-                <div class="b6-res-stall-stats">
-                    <h3>🏪 攤位消費分析</h3>
-                    <div class="b6-stall-bars">
-                        ${entries.map(e => {
-                            const pct = Math.round(e.total / grandTotal * 100);
-                            return `<div class="b6-stall-bar-row">
-                                <span class="b6-stall-icon">${e.icon}</span>
-                                <span class="b6-stall-name">${e.name}</span>
-                                <div class="b6-stall-track">
-                                    <div class="b6-stall-fill" style="width:${pct}%"></div>
-                                </div>
-                                <span class="b6-stall-total">${e.total}元</span>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-            })();
-
-            // 採購收據（A3/A4 收據風格）
-            const receiptHTML = g.receipts.length > 0 ? `
-            <div class="b6-res-receipt">
+            // 採購收據
+            const receiptCardHTML = g.receipts.length > 0 ? `
+            <div class="b-review-card">
                 <h3>🧾 採購收據</h3>
                 <table class="b6-receipt-table">
                     <thead>
@@ -1492,12 +1463,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 </table>
             </div>` : '';
 
+            // 攤位消費分析
+            const stallCardHTML = (() => {
+                const stats = g.stallStats;
+                if (!stats || Object.keys(stats).length === 0) return '';
+                const stallOrder = Object.keys(_currentStalls);
+                const entries = stallOrder
+                    .filter(k => stats[k])
+                    .map(k => ({ key: k, name: _currentStalls[k].name, icon: _currentStalls[k].icon, total: stats[k] }));
+                if (entries.length === 0) return '';
+                const grandTotal = entries.reduce((s, e) => s + e.total, 0);
+                return `
+                <div class="b-review-card">
+                    <h3>🏪 攤位消費分析</h3>
+                    <div class="b6-stall-bars">
+                        ${entries.map(e => {
+                            const pct = Math.round(e.total / grandTotal * 100);
+                            return `<div class="b6-stall-bar-row">
+                                <span class="b6-stall-icon">${e.icon}</span>
+                                <span class="b6-stall-name">${e.name}</span>
+                                <div class="b6-stall-track">
+                                    <div class="b6-stall-fill" style="width:${pct}%"></div>
+                                </div>
+                                <span class="b6-stall-total">${e.total}元</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            })();
+
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
+            // ── 第一頁：測驗回顧 ──
             app.innerHTML = `
+<div class="b-review-wrapper">
+    <div class="b-review-screen">
+        <div class="b-review-header">
+            <div class="b-review-emoji">🧾</div>
+            <h1 class="b-review-title">採購回顧</h1>
+            <p class="b-review-subtitle">看看這次的市場採購記錄！</p>
+        </div>
+        ${receiptCardHTML}
+        ${stallCardHTML}
+        <button id="b6-view-summary-btn" class="b-review-next-btn">
+            📊 查看測驗總結
+        </button>
+    </div>
+</div>`;
+
+            Game.TimerManager.setTimeout(() => {
+                document.getElementById('success-sound')?.play();
+            }, 100, 'confetti');
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak('完成了！來看看採購回顧吧！');
+            }, 600, 'speech');
+
+            Game.EventManager.on(document.getElementById('b6-view-summary-btn'), 'click', () => {
+                Game.EventManager.removeByCategory('gameUI');
+
+                // ── 第二頁：測驗總結 ──
+                app.innerHTML = `
 <div class="b-res-wrapper">
     <div class="b-res-screen">
         <div class="b-res-header">
@@ -1509,13 +1537,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="b-res-mascot-spacer"></span>
             </div>
         </div>
-
         <div class="b-res-reward-wrap">
             <a href="#" id="endgame-reward-link" class="b-res-reward-link">
                 🎁 開啟獎勵系統
             </a>
         </div>
-
         <div class="b-res-container">
             <div class="b-res-grid">
                 <div class="b-res-card b-res-card-1">
@@ -1534,12 +1560,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-value">${mins > 0 ? mins + '分' : ''}${secs}秒</div>
                 </div>
             </div>
-
             <div class="b-res-perf-section">
                 <h3>📊 表現評價</h3>
                 <div class="b-res-perf-badge">${badge}</div>
             </div>
-
             <div class="b-res-achievements">
                 <h3>🏆 學習成果</h3>
                 <div class="b-res-ach-list">
@@ -1548,11 +1572,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 選擇正確付款金額與找零</div>
                 </div>
             </div>
-
-            ${receiptHTML}
-
-            ${stallBreakdownHTML}
-
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -1565,32 +1584,26 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>`;
 
-            Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
-                () => this.startGame(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
-                () => this.showSettings(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
-                e.preventDefault();
-                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
-                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
-            }, {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
+                    () => this.startGame(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
+                    () => this.showSettings(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
+                    e.preventDefault();
+                    if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                    else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                }, {}, 'gameUI');
 
-            Game.TimerManager.setTimeout(() => {
-                document.getElementById('success-sound')?.play();
                 this._fireConfetti();
-            }, 100, 'confetti');
-
-            // 完成語音
-            Game.TimerManager.setTimeout(() => {
-                const accuracy = g.totalRounds > 0
-                    ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
-                let msg;
-                if (accuracy === 100)    msg = '太厲害了，全部完成了！';
-                else if (accuracy >= 80) msg = `很棒喔，完成了${g.correctCount}關！`;
-                else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
-                else                     msg = '要再加油喔，多練習幾次！';
-                Game.Speech.speak(msg);
-            }, 800, 'speech');
+                Game.TimerManager.setTimeout(() => {
+                    let msg;
+                    if (accuracy === 100)    msg = '太厲害了，全部完成了！';
+                    else if (accuracy >= 80) msg = `很棒喔，完成了${g.correctCount}關！`;
+                    else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
+                    else                     msg = '要再加油喔，多練習幾次！';
+                    Game.Speech.speak(msg);
+                }, 300, 'speech');
+            }, {}, 'gameUI');
         },
 
         _fireConfetti() {

@@ -2473,44 +2473,77 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
-            // ── 第一畫面：達成存錢目標 ──
+            // 存錢目標清單（review card）
+            const catLabels = { toy:'🎮 玩具類', book:'📚 書本類', outdoor:'🌿 戶外類', tech:'💻 科技類' };
+            const catLabel  = (() => { const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })();
+            const goalsCardHTML = q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b-review-card">
+                <h3>🐷 存錢目標清單${catLabel}</h3>
+                <div class="b3-goal-list">
+                    ${q.achievedGoals.map(g => `
+                    <div class="b3-goal-row">
+                        <span class="b3-goal-icon">${g.item.icon || '🎁'}</span>
+                        <span class="b3-goal-name">${g.item.name}</span>
+                        <span class="b3-goal-price">${g.item.price}元</span>
+                        <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
+                    </div>`).join('')}
+                </div>
+            </div>` : '';
+
+            const summaryCardHTML = q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b-review-card">
+                <h3>📊 存錢統計摘要</h3>
+                <div class="b3-goal-summary">
+                    <div class="b3-gs-item">
+                        <span class="b3-gs-label">目標數量</span>
+                        <span class="b3-gs-val">${q.achievedGoals.length} 個</span>
+                    </div>
+                    <div class="b3-gs-item">
+                        <span class="b3-gs-label">合計目標金額</span>
+                        <span class="b3-gs-val">${q.achievedGoals.reduce((s, g) => s + g.item.price, 0)} 元</span>
+                    </div>
+                    <div class="b3-gs-item">
+                        <span class="b3-gs-label">平均需要週數</span>
+                        <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
+                    </div>
+                </div>
+            </div>` : '';
+
+            // ── 第一頁：測驗回顧 ──
             app.innerHTML = `
-<div class="b-res-wrapper">
-    <div class="b-res-screen">
-        <div class="b-res-header">
-            <div class="b-res-trophy" style="font-size:3rem;animation:none;">🎉</div>
-            <h1 class="b-res-title">達成存錢目標！</h1>
+<div class="b-review-wrapper">
+    <div class="b-review-screen">
+        <div class="b-review-header">
+            <div class="b-review-emoji">🐷</div>
+            <h1 class="b-review-title">存錢目標達成！</h1>
+            <p class="b-review-subtitle">看看完成了哪些存錢目標</p>
         </div>
-        <div class="b-res-container">
-            <div class="b3-cal-success-item">
-                <span class="b3-cal-success-icon">${this._itemIconHTML(lastItem, '160px')}</span>
+        ${lastItem.name ? `
+        <div class="b-review-card" style="text-align:center;">
+            <div class="b3-cal-success-item" style="margin:0;">
+                <span class="b3-cal-success-icon">${this._itemIconHTML(lastItem, '120px')}</span>
                 <div class="b3-cal-success-name">${lastItem.name} 買到了！</div>
                 <div class="b3-cal-success-price">${lastItem.price} 元</div>
             </div>
-            <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
-                <div class="b-res-card b-res-card-1">
-                    <div class="b-res-icon">📅</div>
-                    <div class="b-res-label">存錢週數</div>
-                    <div class="b-res-value">${lastAnswer} 週</div>
-                </div>
-                <div class="b-res-card b-res-card-2">
-                    <div class="b-res-icon">💰</div>
-                    <div class="b-res-label">每週存款</div>
-                    <div class="b-res-value">${lastWeekly} 元</div>
-                </div>
-            </div>
-            <div class="b-res-btns">
-                <button id="b3-view-summary-btn" class="b-res-play-btn">
-                    <span class="btn-icon">📊</span><span class="btn-text">查看測驗總結</span>
-                </button>
-            </div>
-        </div>
+        </div>` : ''}
+        ${goalsCardHTML}
+        ${summaryCardHTML}
+        <button id="b3-view-summary-btn" class="b-review-next-btn">
+            📊 查看測驗總結
+        </button>
     </div>
 </div>`;
 
+            Game.TimerManager.setTimeout(() => {
+                document.getElementById('success-sound')?.play();
+            }, 100, 'confetti');
+            Game.TimerManager.setTimeout(() => {
+                if (lastItem.name) Game.Speech.speak(`太棒了！${lastItem.name}買到了！`);
+            }, 600, 'speech');
+
             Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
                 Game.EventManager.removeByCategory('gameUI');
-                // ── 第二畫面：測驗總結 ──
+                // ── 第二頁：測驗總結 ──
                 app.innerHTML = `
 <div class="b-res-wrapper">
     <div class="b-res-screen">
@@ -2553,33 +2586,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 練習加法累積計算</div>
                 </div>
             </div>
-            ${q.achievedGoals && q.achievedGoals.length > 0 ? `
-            <div class="b3-res-goals">
-                <h3>🐷 存錢目標清單${ (() => { const catLabels = { toy:'🎮 玩具類', book:'📚 書本類', outdoor:'🌿 戶外類', tech:'💻 科技類' }; const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })() }</h3>
-                <div class="b3-goal-list">
-                    ${q.achievedGoals.map(g => `
-                    <div class="b3-goal-row">
-                        <span class="b3-goal-icon">${g.item.icon || '🎁'}</span>
-                        <span class="b3-goal-name">${g.item.name}</span>
-                        <span class="b3-goal-price">${g.item.price}元</span>
-                        <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
-                    </div>`).join('')}
-                </div>
-            </div>
-            <div class="b3-goal-summary">
-                <div class="b3-gs-item">
-                    <span class="b3-gs-label">目標數量</span>
-                    <span class="b3-gs-val">${q.achievedGoals.length} 個</span>
-                </div>
-                <div class="b3-gs-item">
-                    <span class="b3-gs-label">合計目標金額</span>
-                    <span class="b3-gs-val">${q.achievedGoals.reduce((s, g) => s + g.item.price, 0)} 元</span>
-                </div>
-                <div class="b3-gs-item">
-                    <span class="b3-gs-label">平均需要週數</span>
-                    <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
-                </div>
-            </div>` : ''}
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -2610,14 +2616,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(msg);
                 }, 300, 'speech');
             }, {}, 'gameUI');
-
-            Game.TimerManager.setTimeout(() => {
-                document.getElementById('success-sound')?.play();
-                this._fireConfetti();
-            }, 100, 'confetti');
-            Game.TimerManager.setTimeout(() => {
-                if (lastItem.name) Game.Speech.speak(`太棒了！${lastItem.name}買到了！`);
-            }, 800, 'speech');
         },
 
         _fireConfetti() {

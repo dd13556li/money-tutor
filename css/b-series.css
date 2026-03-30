@@ -514,6 +514,61 @@
     .b-res-play-btn, .b-res-back-btn { width: 100%; max-width: 250px; }
 }
 
+/* ── 測驗回顧頁（Review Page, Page 1）────────────────────────────── */
+.b-review-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fed7aa 100%);
+    padding: 20px 16px 32px;
+    box-sizing: border-box;
+}
+.b-review-screen {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.b-review-header { text-align: center; padding: 20px 0 16px; }
+.b-review-emoji  { font-size: 3em; margin-bottom: 6px; }
+.b-review-title  { font-size: 1.6rem; font-weight: 700; color: #92400e; margin: 0 0 4px; }
+.b-review-subtitle { font-size: 0.9rem; color: #b45309; margin: 0; }
+.b-review-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    border-left: 4px solid #f59e0b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.b-review-card h3 {
+    font-size: 1rem;
+    color: #92400e;
+    margin: 0 0 10px;
+    font-weight: 700;
+}
+.b-review-next-btn {
+    display: block;
+    width: 100%;
+    margin: 20px 0 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    transition: all 0.2s ease;
+}
+.b-review-next-btn:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+}
+@media (max-width: 480px) {
+    .b-review-wrapper { padding: 12px 10px 24px; }
+    .b-review-title   { font-size: 1.35rem; }
+}
+
 /* ── Animations ─────────────────────────────────────────────────── */
 @keyframes bResCelebrate { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
 @keyframes bResBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }

@@ -1144,15 +1144,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let badge, badgeColor;
-            if      (accuracy >= 90) { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            let badge;
+            if      (accuracy >= 90) { badge = '優異 🏆'; }
+            else if (accuracy >= 70) { badge = '良好 👍'; }
+            else if (accuracy >= 50) { badge = '努力 💪'; }
+            else                     { badge = '練習 📚'; }
 
-            // 行程費用清單（B6 採購收據 pattern）
-            const scheduleListHTML = q.solvedSchedules && q.solvedSchedules.length > 0 ? `
-            <div class="b1-res-schedules">
+            // 行程費用清單
+            const scheduleCardHTML = q.solvedSchedules && q.solvedSchedules.length > 0 ? `
+            <div class="b-review-card">
                 <h3>📋 完成的行程</h3>
                 <div class="b1-schedule-rows">
                     ${q.solvedSchedules.map(s => `
@@ -1165,10 +1165,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>` : '';
 
-            // 面額使用統計（C1 統計模式）
+            // 面額使用統計
             const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
-            const denomStatsHTML = denomEntries.length > 0 ? `
-            <div class="b-res-denom-stats">
+            const denomCardHTML = denomEntries.length > 0 ? `
+            <div class="b-review-card">
                 <h3>🪙 面額使用統計</h3>
                 <div class="b1-stat-grid">
                     ${denomEntries.map(([d, c]) => `
@@ -1188,7 +1188,35 @@ document.addEventListener('DOMContentLoaded', () => {
             app.style.height    = 'auto';
             app.style.minHeight = '100vh';
 
+            // ── 第一頁：測驗回顧 ──
             app.innerHTML = `
+<div class="b-review-wrapper">
+    <div class="b-review-screen">
+        <div class="b-review-header">
+            <div class="b-review-emoji">📋</div>
+            <h1 class="b-review-title">測驗回顧</h1>
+            <p class="b-review-subtitle">看看這次完成了哪些行程！</p>
+        </div>
+        ${scheduleCardHTML}
+        ${denomCardHTML}
+        <button id="b1-view-summary-btn" class="b-review-next-btn">
+            📊 查看測驗總結
+        </button>
+    </div>
+</div>`;
+
+            Game.TimerManager.setTimeout(() => {
+                document.getElementById('success-sound')?.play();
+            }, 100, 'confetti');
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak('完成了！來看看測驗回顧吧！');
+            }, 600, 'speech');
+
+            Game.EventManager.on(document.getElementById('b1-view-summary-btn'), 'click', () => {
+                Game.EventManager.removeByCategory('gameUI');
+
+                // ── 第二頁：測驗總結 ──
+                app.innerHTML = `
 <div class="b-res-wrapper">
     <div class="b-res-screen">
         <div class="b-res-header">
@@ -1200,13 +1228,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="b-res-mascot-spacer"></span>
             </div>
         </div>
-
         <div class="b-res-reward-wrap">
             <a href="#" id="endgame-reward-link" class="b-res-reward-link">
                 🎁 開啟獎勵系統
             </a>
         </div>
-
         <div class="b-res-container">
             <div class="b-res-grid">
                 <div class="b-res-card b-res-card-1">
@@ -1225,12 +1251,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-value">${mins > 0 ? mins + '分' : ''}${secs}秒</div>
                 </div>
             </div>
-
             <div class="b-res-perf-section">
                 <h3>📊 表現評價</h3>
                 <div class="b-res-perf-badge">${badge}</div>
             </div>
-
             <div class="b-res-achievements">
                 <h3>🏆 學習成果</h3>
                 <div class="b-res-ach-list">
@@ -1244,11 +1268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     })()}
                 </div>
             </div>
-
-            ${scheduleListHTML}
-
-            ${denomStatsHTML}
-
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -1261,34 +1280,26 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>`;
 
-            // 綁定完成畫面按鈕
-            Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
-                () => this.startGame(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
-                () => this.showSettings(), {}, 'gameUI');
-            Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
-                e.preventDefault();
-                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
-                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
-            }, {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('play-again-btn'), 'click',
+                    () => this.startGame(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
+                    () => this.showSettings(), {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
+                    e.preventDefault();
+                    if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                    else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+                }, {}, 'gameUI');
 
-            // 音效 + 煙火
-            Game.TimerManager.setTimeout(() => {
-                document.getElementById('success-sound')?.play();
                 this._fireConfetti();
-            }, 100, 'confetti');
-
-            // 完成語音
-            Game.TimerManager.setTimeout(() => {
-                const accuracy = q.totalQuestions > 0
-                    ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
-                let msg;
-                if (accuracy === 100)    msg = '太厲害了，全部答對了！';
-                else if (accuracy >= 80) msg = `很棒喔，答對了${q.correctCount}題！`;
-                else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
-                else                     msg = '要再加油喔，多練習幾次！';
-                Game.Speech.speak(msg);
-            }, 800, 'speech');
+                Game.TimerManager.setTimeout(() => {
+                    let msg;
+                    if (accuracy === 100)    msg = '太厲害了，全部答對了！';
+                    else if (accuracy >= 80) msg = `很棒喔，答對了${q.correctCount}題！`;
+                    else if (accuracy >= 60) msg = '不錯喔，繼續加油！';
+                    else                     msg = '要再加油喔，多練習幾次！';
+                    Game.Speech.speak(msg);
+                }, 300, 'speech');
+            }, {}, 'gameUI');
 
             Game.Debug.log('state', `遊戲結束 正確=${q.correctCount}/${q.totalQuestions}`);
         },
