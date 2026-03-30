@@ -1779,3 +1779,12 @@
     font-weight: 600;
     align-self: center;
 }
+/* ── Round 42：4選項 2×2 格局（C1 adaptive pool pattern）── */
+.b3-choices-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.b3-choices-4 .b3-choice-btn { width: 100%; }

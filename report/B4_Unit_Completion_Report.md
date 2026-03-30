@@ -5,6 +5,7 @@
 > **更新日期**：2026-03-25（第十二輪：完成畫面累計節省統計 `totalSaved`，A4 交易摘要 pattern）
 > **更新日期**：2026-03-29（三商店排序模式 `B4_TRIPLE_ITEMS`；單位比價模式 `B4_UNIT_ITEMS`；商品類別篩選；開題商品介紹彈窗；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：冠軍徽章/省錢%/差額百分比/記憶倒數/獎台動畫/貴差標籤完整記錄）
+> **更新日期**：2026-03-31（Round 41：普通/困難模式動態價格浮動 ±10%/±20%，C5 PriceStrategy pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B4 — 特賣比一比（Sale Comparison）
 > **系列**：B 預算規劃
@@ -819,3 +820,53 @@ _clearSelectHintTimer() {
 - **三商店跳過**：`curr.isTriple` 為真時跳過（三商店邏輯不同）
 - **不干擾錯誤計數提示**：此為獨立 timer，與 `selectErrorCount >= 3` 的高亮提示並行
 - 遵循 **A5 hintDelay** pattern，以時間衡量困難度而非只看錯誤次數
+
+---
+
+## 十二、價格動態變化（2026-03-31，Round 41）
+
+### 背景
+
+B4 原本所有商品使用固定價格（`B4_ITEMS` 資料表中的 `optA.price` / `optB.price`），每次遊玩答案完全相同，學生可能依靠記憶而非真正比較。參照 **A4 ±10-15% 動態定價**與 **C5 PriceStrategy（seeded random）** 模式，在普通/困難模式加入隨機價格浮動，讓每次遊玩都有不同數字。
+
+### 技術實作
+
+**JS 修改**（`_generateQuestions`，`else` 兩商店分支）：
+
+```javascript
+// 價格動態變化（普通/困難模式 ±10%/±20%）
+let finalItem = item;
+const difficulty = this.state.settings.difficulty;
+if (difficulty === 'normal' || difficulty === 'hard') {
+    const pct = difficulty === 'hard' ? 0.20 : 0.10;
+    let priceA = Math.round(item.optA.price * (1 + (Math.random() * 2 - 1) * pct) / 5) * 5;
+    let priceB = Math.round(item.optB.price * (1 + (Math.random() * 2 - 1) * pct) / 5) * 5;
+    priceA = Math.max(priceA, 5);
+    priceB = Math.max(priceB, 5);
+    // 確保 optA 仍較貴（若隨機使 A ≤ B，則不套用變化）
+    if (priceA > priceB) {
+        finalItem = { ...item, optA: { ...item.optA, price: priceA }, optB: { ...item.optB, price: priceB } };
+    }
+}
+const swapped = Math.random() < 0.5;
+const diff    = finalItem.optA.price - finalItem.optB.price;
+result.push({ ...finalItem, swapped, diff, isTriple: false, isUnit: false });
+```
+
+### 設計決策
+
+| 難度 | 浮動範圍 | 取整單位 | 說明 |
+|------|---------|---------|------|
+| easy | 無變化（固定） | — | 初學者需一致性，建立比較基礎 |
+| normal | ±10% | 5 元 | 適度變化，訓練真實比價能力 |
+| hard | ±20% | 5 元 | 最大浮動，每次算法不同 |
+
+- **取整到 5 元**：`Math.round(price / 5) * 5`，避免奇怪數字（如 37、83），貼近真實市場定價
+- **安全守衛**：變化後若 `priceA ≤ priceB`（極少發生，機率 < 5%），**不套用變化**，使用原始固定價，確保題目永遠有正確答案
+- **最低 5 元**：`Math.max(priceA, 5)` 防止極端低價商品被 round 為 0
+- **三商店/單位比價跳過**：只在兩商店模式（`else` 分支）套用；三商店排序保持固定避免邏輯混亂；單位比價有自己的 `perA/perB` 計算邏輯
+
+### 搜尋關鍵字
+
+- `價格動態變化`、`pct = difficulty === 'hard'`、`finalItem`、`priceA = Math.max`
+- 參照：`A4 amountLevels`、`C5 PriceStrategy`、`B4_ITEMS`

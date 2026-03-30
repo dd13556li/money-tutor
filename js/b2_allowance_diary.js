@@ -819,7 +819,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const eventsHTML = question.events.map((e, idx) => {
                 runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
                 return `
-                <div class="b2-event-row" style="animation-delay:${0.05 * (idx + 1)}s">
+                <div class="b2-event-row ${e.type}" style="animation-delay:${0.05 * (idx + 1)}s">
                     <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
                     <span class="b2-event-icon">${e.icon}</span>
                     <span class="b2-event-name">${e.name}</span>
@@ -846,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
 
-                <div class="b2-diary">
+                <div class="b2-diary" data-diff="${diff}">
                     <div class="b2-diary-header">
                         <span class="b2-diary-icon">📒</span>
                         <span class="b2-diary-title">本週零用錢記錄</span>

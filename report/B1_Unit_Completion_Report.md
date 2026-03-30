@@ -6,6 +6,7 @@
 > **更新日期**：2026-03-25（第十三輪：放幣語音反饋 `addCoin` 80ms 延遲語音，F4/C1 coin recognition pattern）
 > **更新日期**：2026-03-29（場景類別篩選 `cat` / `sceneCategory`，39 組題庫，5 種場景；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29-39 豐富化：進度條/找零算式/路線條/面額摘要/投幣特效/場景色標完整記錄）
+> **更新日期**：2026-03-31（Round 42：費用項目逐一語音播報 `_speakItemsOneByOne`，C2 逐項朗讀 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B1 — 今天帶多少錢（Daily Budget）
 > **系列**：B 預算規劃
@@ -838,3 +839,55 @@ Game.TimerManager.setTimeout(() => popup.remove(), 900, 'ui');
 - 遵循 **A4 price popup / B6 item receipt flyout** pattern
 - 語音（`${denom}元`）+ 視覺標籤雙軌確認，強化「投幣→金額累加」的感知
 - 使用 `TimerManager` 管理移除，不洩漏 DOM 元素
+
+---
+
+## 十三、費用項目逐一語音播報（2026-03-31，Round 42）
+
+### 背景
+
+B1 簡單模式原本的語音為單一整句「今天要去X，需要準備午餐費、公車費，共N元」，所有費用名稱一次唸出，對認知負擔較重的學生來說難以跟上。參照 **C2 逐一計數（coin-by-coin reading）** 模式，在簡單模式加入費用逐項播報，讓學生能「一邊聽、一邊看、一邊理解」。
+
+### 技術實作
+
+**JS 新增**（`js/b1_daily_budget.js`）：
+
+1. `renderQuestion` 簡單模式：原始語音文字縮短為「今天要去X，需要準備名稱」（去掉總金額）；額外在 2400ms 後啟動 `_speakItemsOneByOne(curr)`。
+
+2. 新函數 `_speakItemsOneByOne(q)`：遞迴讀出每個費用項目，950ms/項，全部讀完後 500ms 再說「總共N元」。
+
+```javascript
+_speakItemsOneByOne(q) {
+    const items = q.items;
+    let idx = 0;
+    const next = () => {
+        if (idx < items.length) {
+            const it = items[idx++];
+            Game.Speech.speak(`${it.name}，${toTWD(it.cost)}`);
+            Game.TimerManager.setTimeout(next, 950, 'speech');
+        } else {
+            Game.TimerManager.setTimeout(
+                () => Game.Speech.speak(`總共${toTWD(q.total)}`),
+                500, 'speech'
+            );
+        }
+    };
+    next();
+},
+```
+
+### 為何設計此方式
+
+| 模式 | 播報時機 | 內容 |
+|------|---------|------|
+| 簡單（easy）| 400ms：場景簡介<br>2400ms：逐項播報 | 先聽場景→彈窗關閉→逐項聽費用→聽總計 |
+| 普通（normal）| 400ms 一次整句 | 所有費用名稱一次唸出 |
+| 困難（hard）| 400ms 一次整句 | 只知道名稱，金額需自行計算 |
+
+- 2400ms 時機 = 任務彈窗自動關閉（2000ms）後 400ms，確保不干擾彈窗語音
+- 使用遞迴 TimerManager（非 setInterval），頁面切換時 `TimerManager.clearAll()` 自動中止播報
+- 遵循 **C2 逐一計數** + **F4 instant feedback** pattern
+
+### 搜尋關鍵字
+
+- `_speakItemsOneByOne`、`逐項播報費用`、`C2 逐項朗讀 pattern`

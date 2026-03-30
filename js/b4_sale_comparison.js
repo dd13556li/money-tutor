@@ -595,10 +595,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const swapped = Math.random() < 0.5;
                     result.push({ ...item, swapped, perA, perB, diff, isTriple: false, isUnit: true });
                 } else {
+                    // 價格動態變化（普通/困難模式 ±10%/±20%，C5 PriceStrategy pattern）
+                    let finalItem = item;
+                    const difficulty = this.state.settings.difficulty;
+                    if (difficulty === 'normal' || difficulty === 'hard') {
+                        const pct = difficulty === 'hard' ? 0.20 : 0.10;
+                        let priceA = Math.round(item.optA.price * (1 + (Math.random() * 2 - 1) * pct) / 5) * 5;
+                        let priceB = Math.round(item.optB.price * (1 + (Math.random() * 2 - 1) * pct) / 5) * 5;
+                        priceA = Math.max(priceA, 5);
+                        priceB = Math.max(priceB, 5);
+                        // 確保 optA 仍較貴（若隨機使 A ≤ B，則不套用變化）
+                        if (priceA > priceB) {
+                            finalItem = { ...item, optA: { ...item.optA, price: priceA }, optB: { ...item.optB, price: priceB } };
+                        }
+                    }
                     // 隨機決定左右交換
                     const swapped = Math.random() < 0.5;
-                    const diff    = item.optA.price - item.optB.price; // optB 永遠便宜
-                    result.push({ ...item, swapped, diff, isTriple: false, isUnit: false });
+                    const diff    = finalItem.optA.price - finalItem.optB.price; // optB 永遠便宜
+                    result.push({ ...finalItem, swapped, diff, isTriple: false, isUnit: false });
                 }
             }
             return result;

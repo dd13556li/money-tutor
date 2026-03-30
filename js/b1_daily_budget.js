@@ -565,10 +565,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 語音播報
             Game.TimerManager.setTimeout(() => {
                 const names = curr.items.map(it => it.name).join('、');
-                const diff  = this.state.settings.difficulty;
                 let text;
                 if (diff === 'easy') {
-                    text = `今天要去${curr.label}，需要準備${names}，共${toTWD(curr.total)}`;
+                    text = `今天要去${curr.label}，需要準備${names}`;
                 } else if (diff === 'normal') {
                     text = `今天要去${curr.label}，需要準備${names}，把錢幣放進錢包。`;
                 } else {
@@ -577,11 +576,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.lastSpeechText = text;
                 Game.Speech.speak(text);
             }, 400, 'speech');
+            // 簡單模式：彈窗關閉後逐項播報費用（C2 逐項朗讀 pattern，Round 42）
+            if (diff === 'easy') {
+                Game.TimerManager.setTimeout(() => this._speakItemsOneByOne(curr), 2400, 'speech');
+            }
 
             // 輔助點擊啟動
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
             }
+        },
+
+        // 逐項朗讀費用（C2 逐項朗讀 pattern，Round 42）
+        _speakItemsOneByOne(q) {
+            const items = q.items;
+            let idx = 0;
+            const next = () => {
+                if (idx < items.length) {
+                    const it = items[idx++];
+                    Game.Speech.speak(`${it.name}，${toTWD(it.cost)}`);
+                    Game.TimerManager.setTimeout(next, 950, 'speech');
+                } else {
+                    Game.TimerManager.setTimeout(
+                        () => Game.Speech.speak(`總共${toTWD(q.total)}`),
+                        500, 'speech'
+                    );
+                }
+            };
+            next();
         },
 
         _renderHeader() {

@@ -1,8 +1,9 @@
 # B 系列：預算規劃 — 教學設計完整報告
 
 > **建立日期**：2026-03-30
-> **版本**：v1.1（2026-03-31 更新：Round 40 功能、B3 輔助點擊修正、B3 商品擴充 14→20 件）
-> **前次版本**：v1.0（2026-03-30，整合 Rounds 1–39 豐富化成果，對齊 A/C/F 系列報告格式）
+> **版本**：v1.3（2026-03-31 更新：Round 42 — B5 分組佈局、B3 4選項、B1 逐項語音）
+> **前次版本**：v1.2（2026-03-31，Round 41 — B2 簡單模式卡片視覺化、B4 動態價格浮動）
+> **前次版本**：v1.1（2026-03-31，Round 40 功能、B3 輔助點擊修正、B3 商品擴充 14→20 件）
 > **專案**：Money Tutor 金錢教學系統
 > **系列**：B 預算規劃（B1～B6）
 > **定位**：連接 C 系列「貨幣知識」與 A 系列「真實交易」的橋樑課程
@@ -840,6 +841,39 @@ TouchDragUtility.cleanupAll();  // 場景切換時必須呼叫
 - `clickMode` 預設值：`null` → `'off'`
 - 切換難度時，若非簡單模式則自動重置 clickMode 並清除 active 狀態
 - 搜尋關鍵字：`assist-click-group`、`clickMode: 'off'`
+
+### 2026-03-31（Round 42）：B5 必買/選購分組 + B3 4選項 + B1 逐項語音
+
+**B5 必買/選購分組佈局（A4 商品分類 pattern）**
+- `_renderRoundHTML` 拆成兩個 `b5-section-group`：必買（琥珀色頭部）+ 選購（翠綠頭部）
+- 必買區顯示固定小計（元），選購區顯示可用預算（動態更新）
+- `_updateTotalBar` 加 `#b5-opt-budget` 即時顯示選購餘額（含超出紅字提示）
+- 所有 `.b5-item-card` 選擇器不受 HTML 分組影響（class 選擇器）
+
+**B3 簡單模式選項擴充4個 + 結構化干擾項（C1 adaptive pool pattern）**
+- `_generateChoices` 由 `opts.size < 3` 改為 `< 4`
+- 結構化干擾：`correct-1`（最常見忘進位）、`correct+1`、`ceil(correct*0.6)`、`correct+2`
+- `b3-choices-4` CSS grid `grid-template-columns: 1fr 1fr`（2×2 格局）
+- `_renderChoicesHTML` 依 `choices.length >= 4` 動態加 class
+
+**B1 費用項目逐一語音播報（C2 逐項朗讀 pattern）**
+- `renderQuestion` 簡單模式：400ms 說場景簡介，2400ms 啟動 `_speakItemsOneByOne`
+- `_speakItemsOneByOne`：遞迴 `next()`，950ms/項，結束後 500ms 說「總共N元」
+- 僅 easy 模式啟動；頁面切換時 `TimerManager.clearAll()` 自動中止
+
+### 2026-03-31（Round 41）：B2 簡單模式事件卡片視覺強化
+- **B2**：`.b2-diary` 加 `data-diff="${diff}"` + `.b2-event-row` 加 `${e.type}` class
+- CSS 屬性選擇器 `[data-diff="easy"]`：收入列→淡綠卡片（左 5px 綠框）、支出列→淡紅卡片（左 5px 紅框）
+- 字體放大（icon 28px，name 17px bold，amount 1.45rem），無須改動 HTML 結構
+- 不影響普通/困難模式，`_animateEasyEntries` 的 class 操作不受額外 class 干擾
+- 遵循 **F1 視覺配對大色塊** + **A4 彩色邊框卡片** 雙 pattern
+
+### 2026-03-31（Round 41）：B4 動態價格浮動（普通/困難模式 ±10%/±20%）
+- **B4**：`_generateQuestions` 兩商店分支加入隨機浮動（C5 PriceStrategy pattern）
+- 普通 ±10%、困難 ±20%，取整到 5 元（避免奇怪數字）
+- 安全守衛：若浮動後 `priceA ≤ priceB` 則不套用（保持 optA 恆貴）
+- 簡單模式固定、三商店/單位比價跳過，確保向後相容
+- 搜尋關鍵字：`價格動態變化`、`pct = difficulty === 'hard'`、`finalItem`
 
 ### 2026-03-31：B3 商品資料庫擴充（14 → 20 件）
 - 新增 6 件商品（均使用現有 C5 圖片，無需新增圖片）

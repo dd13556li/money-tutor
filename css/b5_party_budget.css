@@ -685,3 +685,27 @@
     color: #6b7280;
     margin-top: 4px;
 }
+
+/* ── Round 42：必買/選購分組佈局（A4 商品分類 pattern）── */
+.b5-section-group { margin-bottom: 10px; }
+.b5-section-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 10px 10px 0 0;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+.b5-section-hd-must {
+    background: linear-gradient(90deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border-left: 5px solid #f59e0b;
+}
+.b5-section-hd-opt {
+    background: linear-gradient(90deg, #ecfdf5, #d1fae5);
+    color: #065f46;
+    border-left: 5px solid #10b981;
+}
+.b5-section-sub { font-size: 13px; font-weight: 600; }

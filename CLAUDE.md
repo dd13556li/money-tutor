@@ -632,6 +632,11 @@ toolbarConfig: {
 | B1 硬幣放入浮動標籤（2026-03-30）| B1 | `addCoin(denom)` 末尾建立 `.b1-coin-popup`（綠色膠囊 `+N元`）；fixed 定位於錢包區正上方；`b1CoinPopup` 0.85s 上飄淡出；900ms 後移除；搜尋 `b1-coin-popup`、`b1CoinPopup` |
 | B2 困難模式語音重聽按鈕（2026-03-30）| B2 | `_renderNumpadHTML` hard 模式加 `#b2-replay-btn`（🔊 小藍按鈕）；`_bindQuestionEvents` 綁定 click→講出全部事件列表；`.b2-replay-btn` 淺藍膠囊；搜尋 `b2-replay-btn`、`b2ReplayBtn` |
 | B4 10秒無操作自動提示（2026-03-30）| B4 | `renderQuestion` easy/normal 末尾啟動 10s timer；`_clearSelectHintTimer()` 取消；`phase==='select'` 時高亮正確卡 `.b4-auto-select-hint`（綠框 `b4AutoHint` 2次脈動）+ 語音「提示：哪個比較便宜？」；搜尋 `_selectHintTimer`、`b4-auto-select-hint` |
+| B2 簡單模式事件卡片視覺化（2026-03-31）| B2 | `.b2-diary` 加 `data-diff="${diff}"`；`.b2-event-row` 加 `${e.type}` class；CSS `[data-diff="easy"]` 選擇器：income→綠漸層+左5px綠框，expense→紅漸層+左5px紅框；icon 28px/name 17px bold/amount 1.45rem；搜尋 `data-diff`、`b2-event-row income` |
+| B4 動態價格浮動（2026-03-31）| B4 | `_generateQuestions` 兩商店分支：normal ±10%、hard ±20%，取整到5元；安全守衛：浮動後 `priceA ≤ priceB` 不套用；三商店/單位比價跳過；搜尋 `價格動態變化`、`finalItem`、`pct = difficulty` |
+| B5 必買/選購分組佈局（2026-03-31）| B5 | `_renderRoundHTML` 分拆 mustItems/optItems 兩組；`b5-section-hd-must`（琥珀）/`b5-section-hd-opt`（翠綠）；`#b5-opt-budget` 即時顯示可用餘額；`_updateTotalBar` 加 optBudgetEl 更新；搜尋 `b5-section-group`、`b5-opt-budget` |
+| B3 選項擴充4個 + 結構化干擾項（2026-03-31）| B3 | `_generateChoices` 擴充 `opts.size < 3` → `4`；加結構化干擾：`correct-1`（忘進位）/ `correct+1`（過度進位）/ `ceil(correct*0.6)`（低估）；`b3-choices-4` 2×2 grid CSS；搜尋 `structured`、`b3-choices-4` |
+| B1 費用逐項語音播報（2026-03-31）| B1 | `renderQuestion` easy 模式加 `_speakItemsOneByOne`（2400ms 後啟動）；遞迴 `next()`，950ms/項，完成後說「總共N元」；搜尋 `_speakItemsOneByOne`、`C2 逐項朗讀 pattern` |
 
 ---
 

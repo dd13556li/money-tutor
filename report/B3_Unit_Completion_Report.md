@@ -11,6 +11,7 @@
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：進度環/存錢粒子/最佳存法提示/預估達標日/週剩餘標籤完整記錄）
 > **更新日期**：2026-03-30（商品全面重建：廢棄 images/b3/，改用 C5 現有圖片 14 件；渲染路徑改為通用 `../images/${item.img}`）
 > **更新日期**：2026-03-31（商品資料庫再擴充 14→20 件：新增鉛筆盒/日記本/計算機/運動上衣/運動褲/手機；輔助點擊設定頁修正—改為簡單模式才顯示，對齊 B1 規範）
+> **更新日期**：2026-03-31（Round 42：簡單模式選項擴充4個 + 結構化干擾項 `_generateChoices`；2×2 格局 CSS）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B3 — 存錢計畫（Savings Plan）
 > **系列**：B 預算規劃
@@ -865,3 +866,76 @@ HTML 結構改變：
 
 輔助點擊適合「需要多一點引導」的學習者，而簡單模式正是針對這群學生設計的（月曆拖曳存錢，每日小額累積，視覺化即時回饋）。困難模式（週數計算 quiz）的學生已具備計算能力，不需要自動輔助。此修正確保輔助點擊顯示邏輯在 B 系列全系列一致。
 
+
+---
+
+## 二十一、簡單模式選項擴充4個 + 結構化干擾項（2026-03-31，Round 42）
+
+### 背景
+
+B3 簡單模式原本只提供 3 個選項，干擾項完全隨機（±1~4 週）。這導致干擾項可能「太遠」（學生一眼就排除）或「沒有針對性」（無法讓學生理解錯誤類型）。參照 **C1 adaptive pool pattern**，擴充到 4 個選項並設計針對特定計算錯誤類型的干擾項。
+
+### 技術實作
+
+**JS 修改**（`_generateChoices`）：
+
+```javascript
+_generateChoices(correct) {
+    // 4選項 + 結構化干擾項（C1 adaptive pool pattern，Round 42）
+    const structured = [
+        Math.max(1, correct - 1),               // 忘記進位（最常見錯誤）
+        correct + 1,                            // 多算1週
+        Math.max(2, Math.ceil(correct * 0.6)), // 估算不足
+        correct + 2,                            // 寬鬆估算
+    ];
+    const opts = new Set([correct]);
+    for (const c of structured) {
+        if (opts.size >= 4) break;
+        if (c > 0 && c !== correct) opts.add(c);
+    }
+    // 不足4個時隨機補足
+    let attempts = 0;
+    while (opts.size < 4 && attempts < 60) {
+        attempts++;
+        const delta = Math.floor(Math.random() * 4) + 1;
+        const candidate = Math.random() < 0.5 ? correct + delta : Math.max(1, correct - delta);
+        if (candidate > 0 && candidate !== correct) opts.add(candidate);
+    }
+    return Array.from(opts).sort(() => Math.random() - 0.5);
+},
+```
+
+**CSS 新增**（`b3_savings_plan.css`）：
+
+```css
+.b3-choices-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.b3-choices-4 .b3-choice-btn { width: 100%; }
+```
+
+**HTML 條件**（`_renderChoicesHTML`）：
+```javascript
+const gridClass = question.choices.length >= 4 ? 'b3-choices b3-choices-4' : 'b3-choices';
+```
+
+### 干擾項設計哲學
+
+| 干擾項類型 | 計算方式 | 針對的錯誤 |
+|-----------|---------|-----------|
+| 少1週 | `correct - 1` | 忘記「無條件進位」（最常見）|
+| 多1週 | `correct + 1` | 過度進位 |
+| 低估 | `ceil(correct * 0.6)` | 粗略估算不足 |
+| 高估 | `correct + 2` | 過度寬鬆估算 |
+
+- 正確答案永遠由 `Math.ceil(price / weekly)` 決定，干擾項針對此計算的常見錯誤
+- 若結構化干擾項與正確答案重複（如 correct=1 時 correct-1=0），自動跳過
+- 遵循 **C1 選項池自適應** pattern：選項數由內容決定，不強制固定數量
+
+### 搜尋關鍵字
+
+- `_generateChoices`、`b3-choices-4`、`structured`、`C1 adaptive pool pattern`

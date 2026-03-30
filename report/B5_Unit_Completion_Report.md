@@ -6,6 +6,7 @@
 > **更新日期**：2026-03-25（第十三輪：關卡轉場卡 `_showRoundTransition`，C6 transitionText pattern）
 > **更新日期**：2026-03-29（派對主題篩選 `B5_THEMES`；預算儀表條；確認鈕脈動；預算效率徽章；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：星評/困難隱藏價格/完美配額/分配說明/可負擔高亮完整記錄）
+> **更新日期**：2026-03-31（Round 42：必買/選購分組佈局 `b5-section-group`；選購剩餘預算即時更新；A4 商品分類 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）
 > **系列**：B 預算規劃
@@ -658,3 +659,72 @@ CSS：`.b5-star-rating`、`.b5-star.lit`。
 
 🥇🥇🥈🥉⭐ 分層勳章，與全 B 系列對齊。
 
+
+---
+
+## 十九、必買/選購分組佈局（2026-03-31，Round 42）
+
+### 背景
+
+B5 原本所有商品放在一個平鋪 grid 中，學生必須靠 `🔒 必買` 徽章來區分必買與選購商品。認知負擔較高。參照 **A4 商品分類 pattern**（不同商店類型使用不同卡片分組），將商品分為兩個視覺區段，讓「必買固定費用」與「可用選購預算」一目了然。
+
+### 技術實作
+
+**JS 修改**（`_renderRoundHTML`）：
+
+```javascript
+// 分拆為必買 / 選購兩組
+const renderCard = item => `<div class="b5-item-card ..." data-id="${item.id}">...</div>`;
+const mustItems   = g.items.filter(i => i.must);
+const optItems    = g.items.filter(i => !i.must);
+const mustTotal   = mustItems.reduce((s, i) => s + i.price, 0);
+const optBudget   = Math.max(0, g.budget - mustTotal);
+
+// HTML 結構：兩個 b5-section-group
+<div class="b5-section-group">
+    <div class="b5-section-hd b5-section-hd-must">
+        <span>🔒 必買商品</span>
+        <span class="b5-section-sub">${mustTotal} 元（固定）</span>
+    </div>
+    <div class="b5-items-grid">${mustItemsHTML}</div>
+</div>
+<div class="b5-section-group">
+    <div class="b5-section-hd b5-section-hd-opt">
+        <span>✨ 選購商品</span>
+        <span class="b5-section-sub" id="b5-opt-budget">可用 ${optBudget} 元</span>
+    </div>
+    <div class="b5-items-grid" id="b5-items-grid">${optItemsHTML}</div>
+</div>
+```
+
+**JS 修改**（`_updateTotalBar`）：即時更新 `#b5-opt-budget`：
+```javascript
+const optBudget = Math.max(0, g.budget - mustTotal);
+const optSpent  = total - mustTotal;
+const optRem    = optBudget - Math.max(0, optSpent);
+optBudgetEl.textContent = optRem >= 0 ? `可用 ${optBudget} 元（剩 ${optRem}）` : `超出 ${-optRem} 元`;
+optBudgetEl.style.color = optRem < 0 ? '#dc2626' : '';
+```
+
+**CSS 新增**（`b5_party_budget.css`）：
+```css
+.b5-section-hd-must { background: 琥珀漸層; border-left: 5px solid #f59e0b; }
+.b5-section-hd-opt  { background: 翠綠漸層; border-left: 5px solid #10b981; }
+```
+
+### 教學設計
+
+| 區段 | 顏色 | 功能 |
+|------|------|------|
+| 🔒 必買商品 | 琥珀/黃色 | 固定成本，無法不選，顯示小計 |
+| ✨ 選購商品 | 翠綠色 | 彈性預算，顯示可用金額+即時剩餘 |
+
+- 琥珀色（警示色）對應「必要支出」心理框架
+- 翠綠色（機會色）對應「彈性選擇」心理框架  
+- `b5-opt-budget` 即時更新讓學生清楚感知「我還能花多少」
+- `_bindRoundEvents` / `_showBudgetHint` / `_updateTotalBar` 均使用 class 選擇器，不受 HTML 結構分組影響
+
+### 搜尋關鍵字
+
+- `b5-section-group`、`b5-section-hd-must`、`b5-section-hd-opt`、`b5-opt-budget`
+- 參照：A4 商品分類、B6 攤位分組

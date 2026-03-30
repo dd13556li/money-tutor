@@ -5,6 +5,7 @@
 > **更新日期**：2026-03-25（第十三輪：easy 模式逐項小計顯示 `b2-running-total`，F5 視覺化 pattern）
 > **更新日期**：2026-03-29（日記主題篩選：`B2_THEMES`（school/holiday/family）；設定頁「📓 日記主題」3 選項；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：收支徽章/趨勢條/理財建議/漸進提示/前後對比/週收支統計完整記錄）
+> **更新日期**：2026-03-31（Round 41：簡單模式事件卡片視覺強化，綠/紅卡片區分收支）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
 > **系列**：B 預算規劃
@@ -651,3 +652,71 @@ if (replayBtn && diff === 'hard') {
 - 只在困難模式顯示，普通/簡單模式已有充足視覺資訊
 - 語音內容為完整問題重述，包含起始金額與各筆事件
 - 使用 `EventManager` 綁定，不洩漏事件監聽器
+
+---
+
+## 十二、簡單模式事件卡片視覺強化（2026-03-31，Round 41）
+
+### 背景
+
+B2 簡單模式的事件列（`.b2-event-row`）原為細字排列，視覺密度高，對認知負擔較重的學生較難區分收入與支出。參照 **F1 視覺配對模式**（大色塊圖示）與 **A4 商品卡片**（彩色邊框）設計語言，為簡單模式增加卡片視覺。
+
+### 技術實作
+
+**JS 修改**（`_renderQuestionHTML`）：
+
+1. 在 `.b2-diary` 加入 `data-diff="${diff}"` 屬性，讓 CSS 可依難度套用不同樣式。
+2. 在 `.b2-event-row` 加入 `${e.type}` class（`income` 或 `expense`），讓 CSS 精準選取。
+
+```javascript
+// Before
+<div class="b2-diary">
+<div class="b2-event-row" style="animation-delay:...">
+
+// After
+<div class="b2-diary" data-diff="${diff}">
+<div class="b2-event-row ${e.type}" style="animation-delay:...">
+```
+
+**CSS 新增**（`b2_allowance_diary.css` 末尾）：
+
+```css
+/* ── Round 41：B2 簡單模式事件卡片視覺強化 ── */
+.b2-diary[data-diff="easy"] .b2-event-row {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border-bottom: none;
+    margin-bottom: 8px;
+    min-height: 60px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+.b2-diary[data-diff="easy"] .b2-event-row.income {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-left: 5px solid #22c55e;  /* 綠色 = 收入 */
+}
+.b2-diary[data-diff="easy"] .b2-event-row.expense {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-left: 5px solid #ef4444;  /* 紅色 = 支出 */
+}
+.b2-diary[data-diff="easy"] .b2-event-icon { font-size: 28px; }
+.b2-diary[data-diff="easy"] .b2-event-name { font-size: 17px; font-weight: 700; }
+.b2-diary[data-diff="easy"] .b2-event-amount { font-size: 1.45rem; }
+.b2-diary[data-diff="easy"] .b2-type-badge { font-size: 12px; padding: 3px 9px; }
+.b2-diary[data-diff="easy"] .b2-running-val { font-size: 12px; margin-left: auto; }
+```
+
+### 為何用 CSS 屬性選擇器而非 JS 條件渲染
+
+- **零 HTML 結構差異**：普通/困難模式的 `_animateEasyEntries`、`_renderQuestionHTML` 不需分支
+- **向後相容**：`_animateEasyEntries` 的 `.b2-entry-dim` / `.b2-entry-active` 操作不受影響，因為只額外加了 class，querySelector 仍抓到所有 `.b2-event-row`
+- **CSS cascade 安全**：`[data-diff="easy"]` specificity 為 0-1-1（屬性+類別），高於原本的 0-0-1（只有類別），不需 `!important`
+
+### 視覺設計
+
+| 類型 | 背景 | 左邊框 | 意義 |
+|------|------|--------|------|
+| 收入（income） | 淡綠漸層 `#f0fdf4→#dcfce7` | 5px `#22c55e` 綠 | 錢進來了 |
+| 支出（expense） | 淡紅漸層 `#fef2f2→#fee2e2` | 5px `#ef4444` 紅 | 錢出去了 |
+
+- 普通/困難模式維持原本細字排列，不受影響（屬性選擇器 `[data-diff="easy"]` 精準隔離）
+- 搜尋關鍵字：`data-diff`, `b2-event-row income`, `b2-event-row expense`

@@ -754,3 +754,26 @@
 }
 .b2-replay-btn:hover { background: #dbeafe; transform: scale(1.08); }
 .b2-replay-btn:active { transform: scale(0.95); }
+
+/* ── Round 41：B2 簡單模式事件卡片視覺強化 ── */
+.b2-diary[data-diff="easy"] .b2-event-row {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border-bottom: none;
+    margin-bottom: 8px;
+    min-height: 60px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+.b2-diary[data-diff="easy"] .b2-event-row.income {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-left: 5px solid #22c55e;
+}
+.b2-diary[data-diff="easy"] .b2-event-row.expense {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-left: 5px solid #ef4444;
+}
+.b2-diary[data-diff="easy"] .b2-event-icon { font-size: 28px; }
+.b2-diary[data-diff="easy"] .b2-event-name { font-size: 17px; font-weight: 700; }
+.b2-diary[data-diff="easy"] .b2-event-amount { font-size: 1.45rem; }
+.b2-diary[data-diff="easy"] .b2-type-badge { font-size: 12px; padding: 3px 9px; }
+.b2-diary[data-diff="easy"] .b2-running-val { font-size: 12px; margin-left: auto; }

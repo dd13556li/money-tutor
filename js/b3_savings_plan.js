@@ -2135,9 +2135,22 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _generateChoices(correct) {
+            // 4選項 + 結構化干擾項（C1 adaptive pool pattern，Round 42）
+            // 針對常見計算錯誤設計干擾：少算1週、忘記無條件進位、算一半
+            const structured = [
+                Math.max(1, correct - 1),               // 忘記進位（最常見錯誤）
+                correct + 1,                            // 多算1週
+                Math.max(2, Math.ceil(correct * 0.6)), // 估算不足
+                correct + 2,                            // 寬鬆估算
+            ];
             const opts = new Set([correct]);
+            for (const c of structured) {
+                if (opts.size >= 4) break;
+                if (c > 0 && c !== correct) opts.add(c);
+            }
+            // 不足4個時隨機補足
             let attempts = 0;
-            while (opts.size < 3 && attempts < 60) {
+            while (opts.size < 4 && attempts < 60) {
                 attempts++;
                 const delta = Math.floor(Math.random() * 4) + 1;
                 const candidate = Math.random() < 0.5 ? correct + delta : Math.max(1, correct - delta);
@@ -2254,7 +2267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderChoicesHTML(question) {
-            // 每個選項下方顯示配速預覽（Round 34）
+            // 每個選項下方顯示配速預覽（Round 34）；4選項時改 2×2 格局（Round 42）
             const btns = question.choices.map(c => {
                 const totalSaved = question.weekly * c;
                 const paceNote = `每週${question.weekly}元 × ${c}週 = ${totalSaved}元`;
@@ -2265,9 +2278,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b3-choice-pace">${paceNote}</span>
                 </button>`;
             }).join('');
+            const gridClass = question.choices.length >= 4 ? 'b3-choices b3-choices-4' : 'b3-choices';
             return `
             <div class="b3-question-box">請選擇正確的週數</div>
-            <div class="b3-choices">${btns}</div>`;
+            <div class="${gridClass}">${btns}</div>`;
         },
 
         _renderNumpadHTML() {

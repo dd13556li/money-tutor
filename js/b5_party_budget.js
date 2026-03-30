@@ -638,14 +638,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
 
             const isHardPriceHide = this.state.settings.difficulty === 'hard';
-            const itemsHTML = g.items.map(item => `
+
+            // 必買/選購分組（A4 商品分類 pattern，Round 42）
+            const renderCard = item => `
                 <div class="b5-item-card ${item.must ? 'locked' : ''}${isHardPriceHide && !item.must ? ' b5-price-hidden' : ''}" data-id="${item.id}">
                     <span class="b5-check-mark">✅</span>
                     ${item.must ? '<span class="b5-must-badge">🔒 必買</span>' : ''}
                     <span class="b5-item-icon">${item.icon}</span>
                     <span class="b5-item-name">${item.name}</span>
                     <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide && !item.must ? '??? 元' : item.price + ' 元'}</span>
-                </div>`).join('');
+                </div>`;
+            const mustItems   = g.items.filter(i => i.must);
+            const optItems    = g.items.filter(i => !i.must);
+            const mustTotal   = mustItems.reduce((s, i) => s + i.price, 0);
+            const optBudget   = Math.max(0, g.budget - mustTotal);
+            const mustItemsHTML = mustItems.map(renderCard).join('');
+            const optItemsHTML  = optItems.map(renderCard).join('');
 
             return `
             <div class="b-header">
@@ -684,8 +692,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b5-meter-label" id="b5-meter-label">0%</span>
                 </div>
 
-                <div class="b5-items-grid" id="b5-items-grid">
-                    ${itemsHTML}
+                ${mustItems.length > 0 ? `
+                <div class="b5-section-group">
+                    <div class="b5-section-hd b5-section-hd-must">
+                        <span>🔒 必買商品</span>
+                        <span class="b5-section-sub">${mustTotal} 元（固定）</span>
+                    </div>
+                    <div class="b5-items-grid">${mustItemsHTML}</div>
+                </div>` : ''}
+                <div class="b5-section-group">
+                    <div class="b5-section-hd b5-section-hd-opt">
+                        <span>✨ 選購商品</span>
+                        <span class="b5-section-sub" id="b5-opt-budget">可用 ${optBudget} 元</span>
+                    </div>
+                    <div class="b5-items-grid" id="b5-items-grid">${optItemsHTML}</div>
                 </div>
 
                 <div id="b5-result-area"></div>
@@ -829,8 +849,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (label) label.textContent = `${pct}%`;
             }
 
-            // 必買/選購分隔視覺（Round 36）
+            // 選購剩餘預算即時更新（Round 42）
             const mustTotal  = g.items.filter(i => i.must).reduce((s, i) => s + i.price, 0);
+            const optBudgetEl = document.getElementById('b5-opt-budget');
+            if (optBudgetEl) {
+                const optBudget = Math.max(0, g.budget - mustTotal);
+                const optSpent  = total - mustTotal;
+                const optRem    = optBudget - Math.max(0, optSpent);
+                optBudgetEl.textContent = optRem >= 0 ? `可用 ${optBudget} 元（剩 ${optRem}）` : `超出 ${-optRem} 元`;
+                optBudgetEl.style.color = optRem < 0 ? '#dc2626' : '';
+            }
+            // 必買/選購分隔視覺（Round 36）
             const mustPct    = g.budget > 0 ? Math.min(100, Math.round(mustTotal / g.budget * 100)) : 0;
             const mustMarker = document.getElementById('b5-must-marker');
             if (mustMarker) {
