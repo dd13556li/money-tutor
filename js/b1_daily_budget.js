@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: null, sceneCategory: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', sceneCategory: null },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -301,6 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
+                        <div class="b-setting-group" id="assist-click-group" style="display:none;">
+                            <label class="b-setting-label">🤖 輔助點擊</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn${this.state.settings.clickMode === 'on' ? ' active' : ''}" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn${this.state.settings.clickMode !== 'on' ? ' active' : ''}" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">🗂️ 場景類別</label>
                             <div class="b-btn-group" id="cat-group" style="flex-wrap:wrap;">
@@ -354,16 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">🤖 輔助點擊</label>
-                            <div class="b-btn-group" id="assist-group">
-                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
-                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                啟用後，只要偵測到點擊便會自動執行下一個步驟
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 看行程清單，準備好正確的錢幣，出發！<br>
                                 簡單：硬幣；普通：硬幣+紙鈔；困難：自行加總所有費用
@@ -408,6 +408,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (desc) {
                         desc.textContent = this._diffDescriptions[btn.dataset.diff];
                         desc.classList.add('show');
+                    }
+                    // 輔助點擊：只有簡單模式才顯示
+                    const assistGroup = document.getElementById('assist-click-group');
+                    if (assistGroup) {
+                        if (btn.dataset.diff === 'easy') {
+                            assistGroup.style.display = '';
+                        } else {
+                            assistGroup.style.display = 'none';
+                            this.state.settings.clickMode = 'off';
+                        }
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -464,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.clickMode || !s.sceneCategory;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.sceneCategory;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -537,6 +547,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-game-wrap">
                 ${this._renderScheduleCard(curr, showTotal)}
                 ${this._renderWalletArea(curr.total)}
+                <div style="display:flex;justify-content:center;margin:8px 0;">
+                    <button class="b1-confirm-btn" id="confirm-btn" disabled>✅ 準備好了，出發！</button>
+                </div>
                 ${this._renderCoinTray(diff)}
             </div>`;
 
@@ -645,9 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b1-wallet-coins b1-drop-zone" id="wallet-coins">
                     <span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>
                 </div>
-                <button class="b1-confirm-btn" id="confirm-btn" disabled>
-                    ✅ 準備好了，出發！
-                </button>
             </div>`;
         },
 
@@ -759,7 +769,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                  style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
                                  onerror="this.style.display='none'">
                             <button class="b1-remove-btn" data-uid="${coin.uid}" title="移除">×</button>
-                            <span class="b1-coin-denom">${coin.denom}元</span>
                         </div>`;
                     }).join('');
 
@@ -1314,9 +1323,11 @@ document.addEventListener('DOMContentLoaded', () => {
         activate(curr) {
             if (this._overlay) return;
             this._curr = curr;
+            const tbEl = document.querySelector('.b-header');
+            const tbBottom = tbEl ? Math.round(tbEl.getBoundingClientRect().bottom) : 60;
             this._overlay = document.createElement('div');
             this._overlay.id = 'b1-assist-overlay';
-            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            this._overlay.style.cssText = `position:fixed;top:${tbBottom}px;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;`;
             document.body.appendChild(this._overlay);
             this._handler      = (e) => { e.stopPropagation(); this._executeStep(); };
             this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };

@@ -330,9 +330,9 @@
 
 /* ── 確認出發按鈕 ──────────────────────────────────────────────── */
 .b1-confirm-btn {
-    display: block;
-    width: 100%;
-    padding: 15px 20px;
+    display: inline-block;
+    width: auto;
+    padding: 15px 32px;
     background: linear-gradient(135deg, var(--b-secondary), var(--b-secondary-dark));
     color: #fff;
     border: none;
@@ -732,7 +732,7 @@
     .b1-schedule-label { font-size: 18px; }
     .b1-total-amount { font-size: 22px; }
     .b1-wallet-total-amount { font-size: 20px; }
-    .b1-confirm-btn { font-size: 17px; padding: 13px; }
+    .b1-confirm-btn { font-size: 17px; padding: 13px 28px; }
     .b1-note-btn img { width: 80px; }
     .b1-wallet-note img { width: 72px; }
     .b1-coin-btn .coin-img     { width: 48px; height: 48px; }
