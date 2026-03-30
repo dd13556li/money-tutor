@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-27（錢不夠差額金錢圖示 + 面額預設按鈕 + 預設連動 + 困難模式提示語音）、2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
+> **更新日期**：2026-03-30（題目框新增🔊朗讀按鈕）、2026-03-27（錢不夠差額金錢圖示 + 面額預設按鈕 + 預設連動 + 困難模式提示語音）、2026-03-14（輔助點擊彈窗偵測修復 + 設定頁說明更新）
 > **單元名稱**：C5 夠不夠（Sufficient Payment）
 > **系列**：C 貨幣認知
 
@@ -15,7 +15,7 @@
 | 類型 | 檔案路徑 | 說明 |
 |------|---------|------|
 | HTML | `html/c5_sufficient_payment.html` | 主頁面（83 行，含點擊放置 CSS） |
-| JS | `js/c5_sufficient_payment.js` | 主邏輯（6,271 行） |
+| JS | `js/c5_sufficient_payment.js` | 主邏輯（6,790 行） |
 | CSS | `css/unit6.css`、`css/ai-theme.css`、`css/dark-theme.css`、`css/common-modal-responsive.css` | 共用樣式 |
 | 作業單 | `worksheet/units/c5-worksheet.js` | 作業單產生器（277 行） |
 | 共用工具 | `js/number-speech-utils.js`、`js/audio-unlocker.js`、`js/reward-launcher.js`、`js/theme-system.js`、`js/mobile-debug-panel.js`、`js/touch-drag-utility.js` | 各項支援模組 |
@@ -1372,5 +1372,25 @@ message = `恭喜你數完了！你的錢總共${currentTotal}元，不能購買
 ```
 
 **關鍵搜尋詞**：`checkEasyModeAutoJudgment`、`autoJudgmentData`、`恭喜你數完了`
+
+---
+
+## 題目框新增🔊朗讀按鈕（2026-03-30）
+
+### 需求
+
+簡單、普通、困難三種模式進入測驗後，商品名稱與價格（如「愛心貼紙 2元」）右側新增🔊喇叭按鈕，點擊後重播題目語音。
+
+### 修改
+
+**`js/c5_sufficient_payment.js`**
+
+- 新增 `speakQuestion()` 方法：讀取 `state.gameState.question`，依難度組合語音文字並呼叫 `this.speech.speak()`
+  - 簡單：`算一算，你的錢夠不夠買${item.name}`
+  - 普通/困難：`想一想，你的錢夠不夠買${item.name}，它要${itemPrice}元`
+- `renderEasyMode` / `renderNormalMode` / `renderHardMode` 各1處，`${itemPrice}元` 後加 `<button class="quiz-speak-btn" onclick="Game.speakQuestion()">🔊</button>`
+- `getCommonCSS()` 新增 `.quiz-speak-btn` 樣式（40×40px 圓形紫框，hover 填色）
+
+**關鍵搜尋詞**：`speakQuestion`、`quiz-speak-btn`
 
 ---

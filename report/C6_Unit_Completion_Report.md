@@ -2,7 +2,7 @@
 
 > **日期**：2026-02-09
 > **時間**：下午
-> **更新日期**：2026-03-27（設定頁我的錢包新增🎲隨機選項）、2026-03-14（輔助點擊重複進題修復 + 過渡語音串接 + 設定頁說明更新）
+> **更新日期**：2026-03-30（題目框新增🔊朗讀按鈕；刪除｜分隔符；已付顯示移至下列）、2026-03-27（設定頁我的錢包新增🎲隨機選項）、2026-03-14（輔助點擊重複進題修復 + 過渡語音串接 + 設定頁說明更新）
 > **單元名稱**：C6 找零與計算（Making Change）
 > **系列**：C 貨幣認知
 
@@ -15,7 +15,7 @@
 | 類型 | 檔案路徑 | 說明 |
 |------|---------|------|
 | HTML | `html/c6_making_change.html` | 主頁面（83 行，含點擊放置 CSS） |
-| JS | `js/c6_making_change.js` | 主邏輯（10,240 行，C 系列最大檔案） |
+| JS | `js/c6_making_change.js` | 主邏輯（10,490 行，C 系列最大檔案） |
 | CSS | `css/unit6.css`、`css/ai-theme.css`、`css/dark-theme.css`、`css/common-modal-responsive.css` | 共用樣式 |
 | 作業單 | `worksheet/units/c6-worksheet.js` | 作業單產生器（217 行） |
 | 共用工具 | `js/number-speech-utils.js`、`js/audio-unlocker.js`、`js/reward-launcher.js`、`js/theme-system.js`、`js/mobile-debug-panel.js`、`js/touch-drag-utility.js` | 各項支援模組 |
@@ -1357,5 +1357,30 @@ const sizeStyle = isBanknote ? 'width: 110px; height: auto;' : 'width: 60px; hei
 ```
 
 **關鍵搜尋詞**：`change-options`、`change-option`
+
+---
+
+## 題目框新增🔊朗讀按鈕 + 版面調整（2026-03-30）
+
+### 需求
+
+1. 付款頁與找零頁的商品資訊（如「橡皮擦 8元」）右側新增🔊喇叭按鈕，點擊後重播題目語音
+2. 刪除商品資訊行中的 `｜` 分隔符號
+3. 普通/困難模式「已付: X元」顯示移至商品資訊列下方，自適應寬度並水平置中
+
+### 修改
+
+**`js/c6_making_change.js`**
+
+- 新增 `speakQuestion()` 方法：語音文字 `購買物品，${item.name}共${itemPrice}元，請付錢`
+- 5 處 `<span class="iic-price">` 後各加 `<button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()">🔊</button>`
+  - 付款步驟：簡單模式（line ~3615）、普通/困難模式（line ~3709）
+  - 找零步驟：簡單模式（line ~5765）、普通模式 step2（line ~6164）、困難模式 step2（line ~6474）
+- 加 `event.stopPropagation()` 防止點擊冒泡觸發付款確認
+- 移除 2 處 `<span class="iic-divider">｜</span>`
+- `item-info-compact` CSS 加 `flex-wrap: wrap`，`payment-info-display` 改為外層容器（`width:100%; justify-content:center`）+ 內層 `iic-paid` span 自適應寬度
+- `getCommonCSS()` 新增 `.quiz-speak-btn` 樣式
+
+**關鍵搜尋詞**：`speakQuestion`、`quiz-speak-btn`、`iic-divider`、`payment-info-display`、`flex-wrap`
 
 ---
