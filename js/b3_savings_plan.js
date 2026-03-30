@@ -27,26 +27,20 @@ function b3CompressImage(file, maxWidth = 200, quality = 0.7) {
 
 // ── 商品資料庫（依難度篩選）─────────────────────────────────────
 const B3_ALL_ITEMS = [
-    { name: '食譜書',    price: 200,  icon: '📖', img: 'icon-b3-art-set.png',           cat: 'book' },
-    { name: '拼圖遊戲',  price: 250,  icon: '🧩', img: 'icon-b3-puzzle.png',            cat: 'toy' },
-    { name: '兒童繪本',  price: 280,  icon: '📕', img: 'icon-b3-recipe-book.png',       cat: 'book' },
-    { name: '玩具機器人', price: 300,  icon: '🤖', img: 'icon-b3-robot-toy.png',         cat: 'toy' },
-    { name: '望遠鏡',    price: 350,  icon: '🔭', img: 'icon-b3-telescope.png',         cat: 'outdoor' },
-    { name: '桌遊組',    price: 380,  icon: '🎲', img: 'icon-b3-board-game.png',        cat: 'toy' },
-    { name: '烹飪玩具組', price: 420,  icon: '🍳', img: 'icon-b3-cooking-toy.png',       cat: 'toy' },
-    { name: '故事書套組', price: 450,  icon: '📚', img: 'icon-b3-story-books.png',       cat: 'book' },
-    { name: '科學實驗組', price: 480,  icon: '🔬', img: 'icon-b3-science-kit.png',       cat: 'outdoor' },
-    { name: '遊樂園門票', price: 500,  icon: '🎡', img: 'icon-b3-amusement-ticket.png',  cat: 'outdoor' },
-    { name: '魔術道具組', price: 550,  icon: '🎩', img: 'icon-b3-magic-set.png',         cat: 'toy' },
-    { name: '音樂盒',    price: 600,  icon: '🎵', img: 'icon-b3-music-box.png',         cat: 'tech' },
-    { name: '生日蛋糕',  price: 650,  icon: '🎂', img: 'icon-b3-birthday-cake.png',     cat: 'book' },
-    { name: '積木套組',  price: 700,  icon: '🧱', img: 'icon-b3-lego-set.png',          cat: 'toy' },
-    { name: '運動鞋',    price: 800,  icon: '👟', img: 'icon-b3-sneakers.png',          cat: 'outdoor' },
-    { name: '數位相機',  price: 1000, icon: '📷', img: 'icon-b3-digital-camera.png',    cat: 'tech' },
-    { name: '水族箱',    price: 1200, icon: '🐠', img: 'icon-b3-fish-tank.png',         cat: 'tech' },
-    { name: '電動遊戲機', price: 1500, icon: '🎮', img: 'icon-b3-game-console.png',      cat: 'tech' },
+    { name: '食譜書',    price: 200,  icon: '📖', img: 'icon-b3-art-set.png',           cat: 'book'    },
+    { name: '故事書',    price: 220,  icon: '📕', img: 'icon-b3-story-books.png',       cat: 'book'    },
+    { name: '玩具機器人', price: 300,  icon: '🤖', img: 'icon-b3-robot-toy.png',         cat: 'toy'     },
+    { name: '籃球',      price: 320,  icon: '🏀', img: 'icon-b3-cooking-toy.png',       cat: 'outdoor' },
+    { name: '鐵皮機器人', price: 380,  icon: '🦾', img: 'icon-b3-telescope.png',         cat: 'toy'     },
+    { name: '生日蛋糕',  price: 400,  icon: '🎂', img: 'icon-b3-birthday-cake.png',     cat: 'outdoor' },
+    { name: '羽毛球拍',  price: 450,  icon: '🏸', img: 'icon-b3-music-box.png',         cat: 'outdoor' },
+    { name: '運動鞋',    price: 500,  icon: '👟', img: 'icon-b3-fish-tank.png',         cat: 'outdoor' },
+    { name: '魔法星盤',  price: 550,  icon: '🔮', img: 'icon-b3-magic-set.png',         cat: 'toy'     },
+    { name: '香水',      price: 600,  icon: '🧴', img: 'icon-b3-science-kit.png',       cat: 'tech'    },
+    { name: '牛仔褲',    price: 680,  icon: '👖', img: 'icon-b3-amusement-ticket.png',  cat: 'outdoor' },
+    { name: '電動牙刷',  price: 800,  icon: '🦷', img: 'icon-b3-game-console.png',      cat: 'tech'    },
+    { name: '籃球鞋',    price: 1200, icon: '👟', img: 'icon-b3-sneakers.png',          cat: 'outdoor' },
     { name: '腳踏車',    price: 2400, icon: '🚴', img: 'icon-b3-bicycle.png',           cat: 'outdoor' },
-    { name: '平板電腦',  price: 3500, icon: '💻', img: 'icon-b3-tablet.png',            cat: 'tech' },
 ];
 
 const B3_ITEMS_BY_DIFF = {
@@ -1745,6 +1739,7 @@ document.addEventListener('DOMContentLoaded', () => {
             c.drag.placedItems.push({ denom, uid });
             c.drag.placedTotal = newTotal;
             this._updateNormalDropZone();
+            Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(newTotal)), 80, 'ui');
         },
 
         _updateNormalDropZone() {
