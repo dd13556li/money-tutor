@@ -3707,7 +3707,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
                                 <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
-                                <div id="payment-info-display" class="iic-paid" style="display:none; width:100%; text-align:center;">已付: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元</div>
+                                <div id="payment-info-display" style="display:none; width:100%; justify-content:center; align-items:center;"><span class="iic-paid">已付: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元</span></div>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
                                 <div id="payment-money-container" class="payment-overlay">
