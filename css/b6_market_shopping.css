@@ -715,3 +715,298 @@
     border-radius: 6px;
     padding: 4px 10px;
 }
+
+/* ── B6 結帳確認清單 (Round 24) ── */
+.b6-checkout-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    animation: bAssistPulse 0s, b6CcIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes b6CcIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+.b6-cc-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #065f46;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.b6-cc-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.b6-cc-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    padding: 4px 0;
+}
+.b6-cc-sep {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 4px 0;
+}
+.b6-cc-total {
+    font-weight: 800;
+    font-size: 17px;
+    color: #1d4ed8;
+}
+.b6-cc-budget {
+    font-size: 14px;
+    color: #6b7280;
+}
+.b6-cc-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+.b6-cc-btn:active { transform: scale(0.97); }
+
+/* ── B6 攤位小計提示 (Round 25) ── */
+.b6-stall-subtotal {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(6, 95, 70, 0.92);
+    color: #fff;
+    border-radius: 20px;
+    padding: 8px 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 700;
+    z-index: 9500;
+    animation: b6SsIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b6-ss-name { font-size: 14px; opacity: 0.85; }
+.b6-ss-total { font-size: 18px; font-weight: 900; }
+.b6-ss-fade { transition: opacity 0.4s; opacity: 0; }
+@keyframes b6SsIn {
+    from { transform: translateX(-50%) translateY(-16px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);      opacity: 1; }
+}
+
+/* ── B6 收集進度動畫 (Round 27) ── */
+.b6-col-progress {
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: rgba(6,95,70,0.92);
+    color: #fff;
+    border-radius: 16px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 700;
+    z-index: 9500;
+    animation: b6CpIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b6-col-progress.all-done { background: rgba(217,119,6,0.95); }
+.b6-cp-plus  { font-size: 18px; font-weight: 900; color: #6ee7b7; }
+.b6-cp-count { font-size: 20px; font-weight: 900; }
+.b6-cp-fade  { transition: opacity 0.4s; opacity: 0; }
+@keyframes b6CpIn {
+    from { transform: translateY(-50%) scale(0.5); opacity: 0; }
+    to   { transform: translateY(-50%) scale(1);   opacity: 1; }
+}
+
+/* ── B6 精準付款 (Round 28) ── */
+.b6-change-section.exact-payment {
+    background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+    border: 3px solid #d97706 !important;
+    animation: b6ExactGlow 1s ease-in-out 2;
+}
+.b6-change-text.exact-text {
+    font-size: 22px;
+    font-weight: 900;
+    color: #78350f;
+}
+.b6-change-amount.exact-amt {
+    font-size: 24px;
+    color: #92400e;
+}
+@keyframes b6ExactGlow {
+    0%, 100% { box-shadow: 0 4px 16px rgba(217,119,6,0.3); }
+    50%       { box-shadow: 0 8px 32px rgba(217,119,6,0.7); }
+}
+
+/* ── Round 30：B6 浮動購物籃計數 ── */
+.b6-cart-badge {
+    position: fixed;
+    bottom: 72px;
+    right: 16px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    z-index: 500;
+    pointer-events: none;
+}
+.b6-cart-badge.done { background: #059669; }
+@keyframes b6CartPop {
+    0%   { transform: scale(0.85); }
+    60%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ── Round 32：B6 結帳清單平均 ── */
+.b6-cc-avg {
+    font-size: 11px;
+    color: #6b7280;
+    padding-top: 4px;
+    border-top: 1px dashed #e5e7eb;
+    margin-top: 4px;
+}
+
+/* ── Round 33：B6 付款效率環形圖 ── */
+.b6-res-efficiency {
+    background: #f0f9ff;
+    border: 2px solid #7dd3fc;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 12px;
+}
+.b6-res-efficiency h3 { margin: 0 0 10px 0; font-size: 15px; color: #0369a1; }
+.b6-eff-row { display: flex; align-items: center; gap: 16px; }
+.b6-eff-ring { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.b6-eff-svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+.b6-eff-bg   { fill: none; stroke: #e0f2fe; stroke-width: 3.5; }
+.b6-eff-fill { fill: none; stroke: #0ea5e9; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
+.b6-eff-pct  { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #0369a1; }
+.b6-eff-info { display: flex; flex-direction: column; gap: 4px; }
+.b6-eff-label  { font-size: 14px; font-weight: 700; color: #0369a1; }
+.b6-eff-detail { font-size: 12px; color: #6b7280; }
+
+/* ── Round 34：B6 找零範圍提示 ── */
+.b6-change-range-hint {
+    background: #fefce8;
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #713f12;
+    text-align: center;
+    animation: bFadeIn 0.3s ease;
+}
+
+/* ── Round 36：B6 攤位完成閃光 ── */
+@keyframes b6StallFlash {
+    0%   { background: #d1fae5; box-shadow: 0 0 12px rgba(16,185,129,0.7); }
+    50%  { background: #a7f3d0; box-shadow: 0 0 20px rgba(16,185,129,0.9); }
+    100% { background: ''; box-shadow: none; }
+}
+.b6-stall-done-flash { animation: b6StallFlash 0.8s ease; }
+
+/* ── Round 37：B6 商品收據飛出 ── */
+@keyframes b6FlyoutUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-36px); }
+}
+.b6-item-flyout {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: b6FlyoutUp 1s ease forwards;
+    white-space: nowrap;
+}
+.b6-if-price { color: #bfdbfe; }
+
+/* ── Round 38：B6 全部收集完成閃光 ── */
+@keyframes b6AllDoneIn {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    65%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+.b6-all-done-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #065f46, #10b981);
+    color: #fff;
+    font-size: 1.4em;
+    font-weight: bold;
+    padding: 16px 28px;
+    border-radius: 16px;
+    z-index: 5000;
+    animation: b6AllDoneIn 1.5s forwards;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}
+
+/* ── 幫我算一算 計算輔助面板（C6 計算機 pattern）── */
+.b6-calc-toggle {
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+    color: #92400e;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 8px auto 0;
+    display: block;
+    transition: background 0.2s;
+}
+.b6-calc-toggle:hover { background: #fef3c7; }
+.b6-calc-panel {
+    display: none;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin: 6px auto;
+    max-width: 260px;
+    animation: bFadeIn 0.3s ease;
+}
+.b6-calc-panel.visible { display: block; }
+.b6-cp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 15px;
+}
+.b6-cp-label { color: #6b7280; font-size: 12px; width: 32px; }
+.b6-cp-num   { font-size: 1.3em; font-weight: 700; color: #064e3b; }
+.b6-cp-unit  { font-size: 12px; color: #6b7280; }
+.b6-cp-op    { font-size: 1.4em; font-weight: 700; color: #dc2626; width: 18px; }
+.b6-cp-sub .b6-cp-num { color: #b45309; }
+.b6-cp-divider {
+    border-top: 2px solid #86efac;
+    margin: 4px 0;
+}
+.b6-cp-ans .b6-cp-num { color: #1d4ed8; }
+.b6-cp-q { letter-spacing: 2px; }

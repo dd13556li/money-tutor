@@ -784,10 +784,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._animateEasyEntries(currentQ);
             }
             Game.TimerManager.setTimeout(() => {
+                // 主題情境語音（Round 39）
+                const themeKey = this.state.settings.diaryTheme;
+                const themeIntros = {
+                    school:  '學校週記，',
+                    holiday: '假日時光日記，',
+                    family:  '家庭生活日記，',
+                };
+                const themePrefix = (themeKey && themeKey !== 'random' && themeIntros[themeKey]) ? themeIntros[themeKey] : '';
                 const speechMap = {
-                    easy:   `看看日記，計算最後剩下多少錢？`,
-                    normal: `看看每筆收入和支出，算出最後的金額。`,
-                    hard:   `仔細看每筆記錄，輸入最後剩下多少元。`,
+                    easy:   `${themePrefix}看看日記，計算最後剩下多少錢？`,
+                    normal: `${themePrefix}看看每筆收入和支出，算出最後的金額。`,
+                    hard:   `${themePrefix}仔細看每筆記錄，輸入最後剩下多少元。`,
                 };
                 this.state.quiz.lastSpeechText = speechMap[diff];
                 Game.Speech.speak(speechMap[diff]);
@@ -806,13 +814,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const q    = this.state.quiz;
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
 
-            const eventsHTML = question.events.map((e, idx) => `
+            // 累計金額欄（Round 38）
+            let runningAmt = question.startAmount;
+            const eventsHTML = question.events.map((e, idx) => {
+                runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
+                return `
                 <div class="b2-event-row" style="animation-delay:${0.05 * (idx + 1)}s">
                     <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
                     <span class="b2-event-icon">${e.icon}</span>
                     <span class="b2-event-name">${e.name}</span>
                     <span class="b2-event-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount} 元</span>
-                </div>`).join('');
+                    <span class="b2-running-val">${runningAmt}元</span>
+                </div>`;
+            }).join('');
 
             return `
             <div class="b-header">
@@ -838,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
+                    ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
                         <span class="b2-start-label">💼 開始有</span>
                         <span class="b2-start-amount">${question.startAmount} 元</span>
@@ -869,11 +884,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderNumpadHTML() {
             const digits = [7, 8, 9, 4, 5, 6, 1, 2, 3];
+            const diff = this.state.settings.difficulty;
             return `
             <div class="b2-numpad-section">
                 <div class="b2-input-display" id="b2-input-display">
                     <span id="b2-input-value">＿</span><span class="b2-unit-hint">元</span>
+                    ${diff === 'hard' ? `<button class="b2-replay-btn" id="b2-replay-btn" title="重聽題目">🔊</button>` : ''}
                 </div>
+                <div class="b2-input-preview" id="b2-input-preview"></div>
                 <div class="b2-numpad">
                     ${digits.map(n => `<button class="b2-numpad-btn" data-digit="${n}">${n}</button>`).join('')}
                     <button class="b2-numpad-btn btn-del" data-action="del">⌫</button>
@@ -921,11 +939,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
+            // 困難模式專屬重聽鈕（inline numpad 區域）
+            if (diff === 'hard') {
+                const hardReplayBtn = document.getElementById('b2-replay-btn');
+                if (hardReplayBtn) {
+                    Game.EventManager.on(hardReplayBtn, 'click', () => {
+                        const q = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                        if (q) {
+                            const evtText = q.events.map(e => `${e.amount > 0 ? '收入' : '支出'}${Math.abs(e.amount)}元`).join('，');
+                            Game.Speech.speak(`起始${q.startAmount}元，${evtText}，最後餘額是多少？`);
+                        }
+                    }, {}, 'gameUI');
+                }
+            }
         },
 
         _updateInputDisplay() {
             const el = document.getElementById('b2-input-value');
             if (el) el.textContent = this.state.quiz.currentInput || '＿';
+            // 即時餘額預覽（Round 31）
+            const previewEl = document.getElementById('b2-input-preview');
+            if (previewEl) {
+                const q   = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                const val = parseInt(this.state.quiz.currentInput);
+                if (q && !isNaN(val)) {
+                    const diff  = val - q.answer;
+                    const cls   = diff === 0 ? 'exact' : diff > 0 ? 'over' : 'under';
+                    const label = diff === 0 ? '✓ 剛好！' : diff > 0 ? `多了 ${diff} 元` : `少了 ${-diff} 元`;
+                    previewEl.className = 'b2-input-preview ' + cls;
+                    previewEl.textContent = label;
+                } else {
+                    previewEl.className = 'b2-input-preview';
+                    previewEl.textContent = '';
+                }
+            }
         },
 
         _showCenterFeedback(icon, text = '') {
@@ -951,6 +998,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (v === chosen && !isCorrect) btn.classList.add('wrong');
             });
 
+            // 答題動畫（Round 33）
+            const qCard = document.querySelector('.b2-question-card') || document.querySelector('#b2-question-card');
+            if (qCard) {
+                qCard.classList.add(isCorrect ? 'b2-answer-correct' : 'b2-answer-wrong');
+                Game.TimerManager.setTimeout(() => qCard.classList.remove('b2-answer-correct', 'b2-answer-wrong'), 600, 'ui');
+            }
+
             if (isCorrect) {
                 this.state.quiz.correctCount++;
                 this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
@@ -961,7 +1015,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                this._showNetTrend(question);
+                this._showFinancialTip(question); // 理財建議（Round 32）
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1033,10 +1089,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500 + i * 800, 'ui');
             });
 
+            // 動畫結束前：顯示本週收支統計（Round 27）
+            const totalIncome  = question.events.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+            const totalExpense = question.events.filter(e => e.type !== 'income').reduce((s, e) => s + e.amount, 0);
+            const summaryDelay = 500 + entries.length * 800 + 100;
+            Game.TimerManager.setTimeout(() => {
+                const summaryEl = document.getElementById('b2-week-summary');
+                if (summaryEl) summaryEl.remove();
+                const summary = document.createElement('div');
+                summary.id = 'b2-week-summary';
+                summary.className = 'b2-week-summary';
+                summary.innerHTML = `
+                    <span class="b2-ws-item income">📥 收入 ${totalIncome} 元</span>
+                    <span class="b2-ws-sep">｜</span>
+                    <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
+                const runningEl = document.getElementById('b2-running-total');
+                if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
+
+                // 餘額走勢條（Round 30）
+                const endBalance = balances[balances.length - 1] ?? question.startAmount;
+                const pct = question.startAmount > 0 ? Math.max(0, Math.min(100, Math.round(endBalance / question.startAmount * 100))) : 0;
+                const trendCls = pct >= 80 ? 'good' : pct >= 50 ? 'ok' : 'low';
+                const trendEl = document.createElement('div');
+                trendEl.className = 'b2-balance-trend';
+                trendEl.innerHTML = `
+                    <span class="b2-bt-label">餘額比例</span>
+                    <div class="b2-bt-bar"><div class="b2-bt-fill ${trendCls}" style="width:${pct}%"></div></div>
+                    <span class="b2-bt-pct ${trendCls}">${pct}%</span>`;
+                summary.insertAdjacentElement('afterend', trendEl);
+
+                // 起始/結束對比條（Round 35）
+                const beforeAfterEl = document.createElement('div');
+                beforeAfterEl.className = 'b2-before-after';
+                const startPct = 100;
+                const endPct   = pct;
+                beforeAfterEl.innerHTML = `
+                    <div class="b2-ba-row">
+                        <span class="b2-ba-label">起始</span>
+                        <div class="b2-ba-bar"><div class="b2-ba-fill start" style="width:${startPct}%"></div></div>
+                        <span class="b2-ba-val">${question.startAmount}元</span>
+                    </div>
+                    <div class="b2-ba-row">
+                        <span class="b2-ba-label">結束</span>
+                        <div class="b2-ba-bar"><div class="b2-ba-fill end ${endPct >= 80 ? 'good' : endPct >= 50 ? 'ok' : 'low'}" style="width:${endPct}%"></div></div>
+                        <span class="b2-ba-val">${question.answer}元</span>
+                    </div>`;
+                trendEl.insertAdjacentElement('afterend', beforeAfterEl);
+            }, summaryDelay, 'ui');
+
             const showDelay = 500 + entries.length * 800 + 500;
             Game.TimerManager.setTimeout(() => {
                 entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
                 if (runEl.parentNode) runEl.remove();
+                document.getElementById('b2-week-summary')?.remove();
+                document.querySelector('.b2-balance-trend')?.remove();
+                document.querySelector('.b2-before-after')?.remove();
                 answerArea.style.visibility = '';
                 answerArea.style.animation = 'b2FadeIn 0.35s ease';
             }, showDelay, 'ui');
@@ -1120,14 +1227,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                this._showNetTrend(question);
+                this._showFinancialTip(question); // 理財建議（Round 32）
+                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
-                this._showCalcBreakdown(question); // 答錯即顯示計算過程
+                // 漸進提示（Round 34）：第1次錯→範圍提示，第2次以上→完整算式
+                this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
+                if (this.state.quiz.errorCount === 1 && this.state.settings.difficulty !== 'easy') {
+                    const lo = Math.min(question.startAmount, question.answer);
+                    const hi = Math.max(question.startAmount, question.answer);
+                    this._showRangeHint(lo, hi);
+                } else {
+                    this._showCalcBreakdown(question); // 答錯即顯示計算過程
+                }
+                // 錯誤辨識語音（Round 33）
+                const userVal = parseInt(this.state.quiz.currentInput);
+                const diff33 = !isNaN(userVal) ? userVal - question.answer : 0;
+                const errSpeech = !isNaN(userVal) && diff33 !== 0
+                    ? (diff33 > 0 ? `算太多了，多了${diff33}元` : `還有${-diff33}元沒算到`)
+                    : `不對喔`;
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，參考算式再試一次`);
+                    Game.Speech.speak(errSpeech + '，參考算式再試一次');
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.quiz.currentInput = '';
@@ -1142,6 +1265,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }
+        },
+
+        // ── 收支趨勢指示（Round 26）───────────────────────────
+        _showNetTrend(question) {
+            const net = question.answer - question.startAmount;
+            if (net === 0) return; // 完全平衡，不顯示
+            const prev = document.getElementById('b2-net-trend');
+            if (prev) prev.remove();
+            const isUp = net > 0;
+            const sign = isUp ? '+' : '';
+            const trend = document.createElement('div');
+            trend.id = 'b2-net-trend';
+            trend.className = `b2-net-trend ${isUp ? 'up' : 'down'}`;
+            trend.innerHTML = `<span class="b2-nt-arrow">${isUp ? '↑' : '↓'}</span><span>${isUp ? '本週盈餘' : '本週赤字'} ${sign}${net} 元</span>`;
+            document.body.appendChild(trend);
+            Game.TimerManager.setTimeout(() => {
+                trend.classList.add('b2-nt-fade');
+                Game.TimerManager.setTimeout(() => { if (trend.parentNode) trend.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
+        },
+
+        // ── 範圍提示（Round 34：第1次錯誤時）────────────────────
+        _showRangeHint(lo, hi) {
+            const container = document.querySelector('.b2-numpad-section');
+            if (!container || document.querySelector('.b2-range-hint')) return;
+            const hint = document.createElement('div');
+            hint.className = 'b2-range-hint';
+            hint.innerHTML = `💡 提示：答案介於 <strong>${lo}</strong> 元 ~ <strong>${hi}</strong> 元 之間`;
+            container.appendChild(hint);
+        },
+
+        // ── 理財建議卡（Round 32）────────────────────────────────
+        _showFinancialTip(question) {
+            const net = question.answer - question.startAmount;
+            const tips = net > 0
+                ? ['收入大於支出，可以把多出來的錢存起來！', '有盈餘真好！記得把剩餘的錢放進撲滿。']
+                : net < 0
+                ? ['支出超過收入要小心喔，記得控制花費。', '赤字時，思考哪些費用可以減少。']
+                : ['收支剛好平衡，繼續保持！'];
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const prev = document.getElementById('b2-fin-tip');
+            if (prev) prev.remove();
+            const card = document.createElement('div');
+            card.id = 'b2-fin-tip';
+            card.className = 'b2-fin-tip';
+            card.innerHTML = `<span class="b2-ft-icon">💡</span><span class="b2-ft-text">${tip}</span>`;
+            const app = document.getElementById('app');
+            if (app) app.appendChild(card);
+            Game.TimerManager.setTimeout(() => { if (card.parentNode) card.remove(); }, 1400, 'ui');
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────
@@ -1189,11 +1361,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let badge;
-            if (accuracy >= 90)      { badge = '優異 🏆'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; }
-            else                     { badge = '練習 📚'; }
+            let badge, badgeColor;
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 本期收支總計
             const totalCardHTML = (() => {
@@ -1207,6 +1380,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
                 const net = totalIncome - totalExpense;
+                // 收支平衡評語（Round 40）
+                let balanceComment, balanceClass;
+                if (totalIncome === 0 && totalExpense === 0) { balanceComment = ''; balanceClass = ''; }
+                else if (net > totalIncome * 0.3)  { balanceComment = '💚 理財優等生！收入遠大於支出'; balanceClass = 'b2-bal-great'; }
+                else if (net >= 0)                 { balanceComment = '😊 收支平衡，繼續保持！'; balanceClass = 'b2-bal-ok'; }
+                else if (-net < totalExpense * 0.2){ balanceComment = '⚠️ 略有赤字，要多注意支出！'; balanceClass = 'b2-bal-warn'; }
+                else                               { balanceComment = '😰 赤字偏高，可以減少一些支出！'; balanceClass = 'b2-bal-bad'; }
+                const commentHTML = balanceComment
+                    ? `<div class="b2-balance-comment ${balanceClass}">${balanceComment}</div>`
+                    : '';
                 return `
                 <div class="b-review-card">
                     <h3>💰 本期收支總計</h3>
@@ -1224,6 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b2-total-val">${net >= 0 ? '＋' : ''}${net}元</span>
                         </div>
                     </div>
+                    ${commentHTML}
                 </div>`;
             })();
 

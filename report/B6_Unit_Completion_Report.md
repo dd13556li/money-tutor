@@ -2,8 +2,9 @@
 
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-25（第十一輪：正確商品彈出價格動畫 `_showPricePopup`，A4 交易摘要 pattern）
-> **更新日期**：2026-03-29（市場類型篩選：`B6_MARKETS`（traditional/supermarket/nightmarket）各含 `stalls{}`+`missions{}`；`_currentStalls`/`_currentMissions` 模組變數；`marketType: null`；設定頁「🏪 市場類型」3 選項；header 動態顯示市場名稱）
 > **更新日期**：2026-03-25（第十二輪：攤位分頁需求件數徽章，C5 指示燈 pattern）
+> **更新日期**：2026-03-29（市場類型篩選 `B6_MARKETS`；關卡開場任務彈窗；關卡完成轉場卡；結帳確認清單；輔助點擊 AssistClick）
+> **更新日期**：2026-03-30（Rounds 29–39 豐富化：找零算式/攤位小計/收集進度/購物籃徽章/精準付款/收據飛出/效率環完整記錄）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B6 — 菜市場買菜（Market Shopping）
 > **系列**：B 預算規劃
@@ -16,8 +17,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b6_market_shopping.html` | — |
-| JS | `js/b6_market_shopping.js` | ~980 行，v3.8 |
-| CSS（專用）| `css/b6_market_shopping.css` | ~375 行 |
+| JS | `js/b6_market_shopping.js` | ~1,997 行，v3.8（2026-03-30）|
+| CSS（專用）| `css/b6_market_shopping.css` | ~967 行（2026-03-30）|
 | 作業單 | `worksheet/units/b6-worksheet.js` | 131 行 |
 
 ---
@@ -690,3 +691,167 @@ hard：三選一問答 → 轉場卡（非最後關）/ 完成畫面
 | 錯誤 toast 雙行 | 紅字錯誤 + 綠字建議 | 錯誤後立即給出正確引導 |
 | 關卡完成轉場卡 | 深綠全屏 + 商品列表 + 付款摘要 | 強化每關完成的儀式感 |
 | 採購收據 | 5 欄完整表格 | 模擬真實購物單據 |
+
+---
+
+## 十九、市場類型篩選（2026-03-29）
+
+### 19.1 市場資料結構（`B6_MARKETS`）
+
+| 市場 ID | 中文名稱 | 攤位特色 |
+|---------|---------|---------|
+| `traditional` | 傳統市場 🏪 | 蔬菜攤 / 水果攤 / 雜貨攤 |
+| `supermarket` | 超市 🛒 | 生鮮區 / 零食區 / 日用品區 |
+| `nightmarket` | 夜市 🏮 | 小吃攤 / 甜點攤 / 飲料攤 |
+
+- `_currentStalls` / `_currentMissions`：`startGame` 時依選擇設定
+- 隨機模式：每關 `_mktKey` 動態切換，header 顯示當關市場名稱
+- 語音：第一關進場加「歡迎來到{市場名}！」
+
+---
+
+## 二十、輔助點擊模式（AssistClick，2026-03-29）
+
+B6 流程最複雜，AssistClick 覆蓋三個 Phase：
+
+| Phase | 狀態 | 策略 |
+|-------|------|------|
+| Shopping | 有需求商品且攤位有貨 | 高亮目標商品項目 |
+| Shopping | 當前攤位所需已全收，另一攤位有需求 | 高亮對應攤位 Tab |
+| Shopping | 全部商品收集完畢 | 高亮結帳按鈕 |
+| Payment | 付款中 | 貪婪選面額（點面額 → 點面額 → ... → pay 按鈕）|
+| Change quiz | 題目顯示 | 高亮正確找零選項 |
+| Checkout confirm | 顯示確認卡 | 高亮 `#b6-cc-go`（確認去付款）|
+
+---
+
+## 二十一、Rounds 26–39 豐富化紀錄
+
+### 21.1 關卡開場任務彈窗（2026-03-28）
+
+`renderRound()` 呼叫 `_showMissionIntroModal(mission, roundNum)`：顯示本關購買清單（綠色膠囊）+ 預算大字；語音「第 N 關，今天要買：X、Y，預算 M 元」；2.8s 自動關閉或點擊關閉。
+
+CSS：`.b6-mission-intro`、`.b6-mi-card`、`.b6-mi-item`（B1 `_showTaskModal` pattern）。
+
+### 21.2 關卡完成轉場卡（2026-03-27）
+
+非最後關「下一關」改呼叫 `_showRoundCompleteCard(…)`：深綠全屏卡含關卡號 / 商品列表 / 付款摘要；1.5s 自動或點任意處前進，`@keyframes b6RcIn`。
+
+### 21.3 結帳確認清單（Round 29）
+
+結帳按鈕 → 先顯示 `_showCheckoutConfirm(g, callback)`：商品清單 + 合計 + 預算確認卡，語音「合計 X 元，預算 Y 元，確認去付款」；5s 自動 / 點背景關閉。CSS：`.b6-checkout-card`、`.b6-cc-*`。
+
+### 21.4 找零算式提示（Round 29）
+
+`_showChangeFormula(paid, total, change)`：change quiz 答錯時在選項下方顯示「付 X 元 − 商品 Y 元 = Z 元」公式。CSS：`.b6-change-formula`、`b6` formula 系列。
+
+### 21.5 攤位小計提示（Round 29）
+
+切換攤位時若已收集商品，`_showStallSubtotal(stallName, subtotal)` 顯示「在 XXX 攤花了 YYY 元」浮動卡，`b6SsIn` 動畫。
+
+### 21.6 收集進度動畫（Round 29）
+
+收集商品後 `_showCollectionProgress(collected, needed)` 右側浮動「+1 X/Y」；全收完時橘色。CSS：`.b6-col-progress`、`b6CpIn` 動畫。
+
+### 21.7 浮動購物籃徽章（Round 30）
+
+`_bindShoppingEvents` 收集後呼叫 `_updateCartBadge(collected, needed)`，藍色 → 綠色（done），`@keyframes b6CartPop`，`.b6-cart-badge` CSS。
+
+### 21.8 攤位完成閃光（Round 36）
+
+攤位商品全收後加 `b6-stall-done-flash`（800ms 後移除），`b6StallFlash` keyframe。
+
+### 21.9 商品收據飛出（Round 37）
+
+`_showItemReceiptFlyout(anchor, item)` 收集商品時從錨點彈出 icon + name + 價格浮標（`b6FlyoutUp` 1s）。
+
+### 21.10 全部收集閃光（Round 38）
+
+`allDone && !wasDone` 時呼叫 `_showAllCollectedFlash()`：中央深綠全屏閃光卡（`b6AllDoneIn` 1.5s）。
+
+### 21.11 精準付款特效（Round 29）
+
+`_showChangeResult` 加 `change === 0` 分支：「💯 精準付款！不需找零」黃色 banner + 語音；`.b6-change-section.exact-payment` CSS，`b6ExactGlow` 動畫。
+
+### 21.12 付款效率環形圖（Round 33）
+
+`g.exactPayments` 計數精準付款次數；`showResults` 新增 `efficiencyHTML`（SVG 圓弧圖顯示精準付款比率）。
+
+### 21.13 錯誤商品攤位提示（2026-03-28）
+
+點到不在清單的商品時，額外顯示「這裡需要：X、Y」（`.b6-wt-hint` 綠字），`neededAtStall` 過濾此攤位未收集需求；`.b6-wrong-tip` 整合容器（深色背景 + `b6WtIn` 動畫）。
+
+### 21.14 找零兩段漸進提示（Round 34）
+
+`_changeQuizErrors` 計數：
+- 第 1 次 → `_showChangeRangeHint`（「答案在 A 和 B 之間」架構提示）
+- 第 2 次 → 完整找零算式（`_showChangeFormula`）
+
+### 21.15 攤位商品語音引導（Round 39）
+
+切換攤位時語音改為「X 攤，要找 Y 和 Z」；全部收集時說「已全部收集！」；`b6 Speech.speak` 整合。
+
+---
+
+## 二十二、完成畫面豐富化
+
+### 22.1 採購收據（2026-03-27）
+
+`state.game.receipts[]`，`_showChangeResult` 儲存 `{items, total, paid, change}`，渲染 5 欄表格（關卡 / 商品 / 小計 / 付款 / 找零）。
+
+CSS：`.b6-res-receipt`、`.b6-receipt-table`（A3/A4 收據風格 pattern）。
+
+### 22.2 攤位消費分析（2026-03-27）
+
+`state.game.stallStats{}`，`_showChangeResult()` items 迴圈累計，`showResults()` 渲染黃框比例條。
+
+CSS：`.b6-res-stall-stats`、`.b6-stall-fill`。
+
+### 22.3 勳章制（Round 33）
+
+🥇🥇🥈🥉⭐ 分層勳章，與全 B 系列對齊。
+
+
+## 二十三、找零計算輔助面板（2026-03-30）
+
+### 背景
+
+C6 單元具備內建計算輔助工具（可展開的算式提示），B6 找零測驗（`_showChangeQuiz`）答題時，學生需要自行計算 `付款金額 − 商品總金額`，難度較高。
+
+### 實作
+
+在 `_showChangeQuiz(paid, total, change)` 的選項區塊上方插入「🧮 幫我算一算」切換按鈕與可摺疊面板：
+
+```
+付了   X 元
+− 花了 Y 元
+──────────
+= 找零 ？元
+```
+
+**HTML 結構**：`.b6-calc-toggle` 按鈕 + `.b6-calc-panel`（預設隱藏，`.visible` 顯示）
+
+**事件綁定**：`Game.EventManager.on(calcToggle, 'click', fn, {}, 'gameUI')`，切換時改按鈕文字為「🙈 收起計算」/ 「🧮 幫我算一算」。
+
+### CSS 類別
+
+| 類別 | 用途 |
+|------|------|
+| `.b6-calc-toggle` | 切換按鈕（黃橙色漸層） |
+| `.b6-calc-panel` | 摺疊面板（預設 `display:none`） |
+| `.b6-calc-panel.visible` | 展開狀態 |
+| `.b6-cp-row` | 每列容器 |
+| `.b6-cp-label` | 左側說明文字（「付了」/「花了」/「找零」） |
+| `.b6-cp-num` | 金額數字（橙色大字） |
+| `.b6-cp-unit` | 「元」單位 |
+| `.b6-cp-op` | 運算符號（`−`） |
+| `.b6-cp-sub` | 被減數行容器 |
+| `.b6-cp-divider` | 橫線分隔 |
+| `.b6-cp-ans` | 答案行容器 |
+| `.b6-cp-q` | 問號佔位（`？`） |
+
+### 教學設計
+
+- 遵循 **C6 計算輔助 pattern**：可隱藏，不強制顯示
+- 困難度降低：學生可自選是否使用輔助
+- 直式算式格式符合小學數學教學規範

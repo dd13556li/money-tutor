@@ -558,6 +558,80 @@ toolbarConfig: {
 | B4 節省百分比（2026-03-29）| B4 | `_showSavingsToast` 改為「省了 X 元（省 Y%）」；高價格 optA.price 為計算基準；unit 模式用 perA；B4 savings toast pattern |
 | B2 收支類型徽章（2026-03-29）| B2 | `_renderQuestionHTML` 每條事件行加 `.b2-type-badge income/expense`（「收入 📥」/「支出 📤」）；金額前加 +/- 符號；移除舊 `::before` 偽元素；CSS 綠/紅膠囊徽章 |
 | B6 第一關進場語音（2026-03-29）| B6 | `_showMissionIntroModal` roundNum===1 時加「歡迎來到{市場名}！」前綴；`roundTitle` 顯示市場 icon+名稱；隨機市場模式讀 `mission._mktKey` |
+| B4 三商店獎台動畫（2026-03-29）| B4 | `_showPodiumAnimation(curr)`：triple 排序正確後顯示 2nd/1st/3rd 獎台動畫；`b4PodiumRise` 動畫；F4 排序 + C5 差額圖示 pattern；搜尋 `b4-podium-overlay` |
+| B5 節省金額徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`rem>0` 時渲染 `.b5-savings-badge`「💰 節省了X元（節省Y%）！」；綠色漸層徽章；B4 savings toast pattern |
+| B6 結帳確認清單（2026-03-29）| B6 | `_showCheckoutConfirm(g, callback)`：結帳按鈕→先顯示商品清單+合計+預算確認卡（`b6-checkout-card`）；語音「合計X元，預算Y元，確認去付款」；5s 自動/點背景關閉；AssistClick 加 `b6-cc-go` 偵測；`.b6-checkout-card/.b6-cc-*` CSS；B1 `_showTaskModal` pattern |
+| B3 月曆倒數提示（2026-03-29）| B3 | `_completeDragSession` else 分支加語音「還差X元，再存Y天就達標了！」；`_showCountdownHint(remaining, daysLeft)` 底部浮動卡顯示剩餘金額+天數；`.b3-countdown-hint/.b3-cd-num/label` CSS；`b3CdIn` 動畫；B1 exact toast pattern |
+| B5 預算效率徽章（2026-03-29）| B5 | `_handleConfirm` 成功分支：`usePct=total/budget*100`；≥95% 💎完美/≥80% ⭐善用/≥60% 👍不錯/<60% 💡節省；`.b5-eff-badge.perfect/good/ok/save` CSS；B4 savings toast pattern |
+| B6 攤位小計提示（2026-03-29）| B6 | 切換攤位時若已收集商品，`_showStallSubtotal(stallName, subtotal)` 顯示離開攤位已花金額；`.b6-stall-subtotal/.b6-ss-name/total` CSS；`b6SsIn` 動畫 |
+| B1 找零說明動畫（2026-03-29）| B1 | 答對且 `diff>0` 時 300ms 後顯示 `_showChangeTip(paid, required, change)`：「付X − 需Y = 找回Z元」公式卡；`.b1-change-tip/.b1-ct-row/item/op/ans` CSS；`b1CtIn` 動畫；B6 change formula pattern |
+| B2 收支趨勢指示（2026-03-29）| B2 | 答對後 `_showNetTrend(question)`：net>0 顯示「↑ 本週盈餘+X元」（綠）/ net<0 顯示「↓ 本週赤字-X元」（紅）；`.b2-net-trend.up/down` CSS；`b2NtIn` 動畫 |
+| B3 月曆距完成天數（2026-03-29）| B3 | 月曆 info card 新增「距完成 N 天」，`_updateCalendarUI` 同步更新 `#b3-days-left`；≤3天時 `near` class + `b3DlPulse` 脈動；`.b3-days-left-num.near` CSS |
+| B5 完美配額特效（2026-03-29）| B5 | `rem===0` 時：banner 改「🎯 完美配額！」黃色主題；feedback 改「💯」；語音「完美！剛好花了X元，用完全部預算！」；eff-badge 改 `perfect-exact` 粉色 + `b5PerfectPulse` 2次脈動 |
+| B4 較貴商品差額標籤（2026-03-29）| B4 | 兩商店 select 答對時，wrong card 加 `.b4-exp-delta`「比較貴 +N元」紅色標籤（`b4DeltaIn` 動畫）；unit mode 跳過（單位不同）|
+| B6 收集進度動畫（2026-03-29）| B6 | 收集商品後 `_showCollectionProgress(collected, needed)` 右側浮動「+1 X/Y」；全收完時橘色；`.b6-col-progress/.b6-cp-plus/count` CSS；`b6CpIn` 動畫 |
+| B2 易模式週收支統計（2026-03-29）| B2 | `_animateEasyEntries` 動畫進行中，倒數第 1 步後插入 `#b2-week-summary`：「📥 收入X元 ｜ 📤 支出Y元」；動畫結束時移除；`.b2-week-summary/.b2-ws-item` CSS |
+| B6 精準付款特效（2026-03-29）| B6 | `_showChangeResult` 加 `change===0` 分支：「💯 精準付款！不需找零」黃色 banner + 語音；易/普通模式補充結果語音；`.b6-change-section.exact-payment` CSS；`b6ExactGlow` 動畫 |
+| B4 差額算式閃現（2026-03-29）| B4 | `handleDiffAnswer` 正確分支：`_showDiffCalcFlash(highPrice, lowPrice, diff)` 底部顯示「X − Y = Z元」；`.b4-calc-flash/.b4-cf-num/op/ans` CSS；`b4CfIn` 動畫；B6 change formula pattern |
+| B3 平均每週存款統計（2026-03-29）| B3 | 結果頁 `b3-goal-summary` 新增第 4 格「平均每週存款 X 元」（黃色高亮）；`g.weekly` 平均值；`.b3-gs-item.highlight` CSS |
+| B1 錢包進度條（2026-03-29/Round 29）| B1 | `_renderWalletArea` 新增 `#b1-wallet-progress` 橫條；`_updateWalletDisplay` 依 `pct` 更新填充（藍→橙70%→綠100%）；`.b1-wallet-progress-wrap/.fill` CSS |
+| B5 各關總計摘要（2026-03-29/Round 29）| B5 | `roundStatsHTML` 改 IIFE 計算 `totalBudget/totalSpent/totalSaved/avgPct`；`.b5-res-total-row` 顯示 4 欄；`.saved`（綠）/ `.over`（紅）CSS |
+| B1 今日路線條（Round 30）| B1 | `_renderScheduleCard` 末尾加 `.b1-route-strip`：「🏠 → icon label → 🏠」；`bFadeIn 0.3s 0.5s both`；CSS `.b1-rs-*` |
+| B2 餘額走勢條（Round 30）| B2 | `_animateEasyEntries` summaryDelay 回呼加 `b2-balance-trend`：進度條顯示 `endBalance/startAmount * 100%`（good≥80/ok≥50/low）；`.b2-bt-*` CSS |
+| B3 進度環（Round 30）| B3 | `_renderPiggyBankCard` 加 `b3-progress-ring`（conic-gradient）+ `b3-ring-pct`；`_updateCalendarUI` 同步更新 deg；`.b3-progress-ring/.inner` CSS |
+| B5 超限震動（Round 30）| B5 | `_updateTotalBar` 加 `wasOver` 偵測；首次超出時加 `b5-shake` class（600ms 後移除）；`@keyframes b5Shake` CSS |
+| B6 浮動購物籃徽章（Round 30）| B6 | `_bindShoppingEvents` 收集後呼叫 `_updateCartBadge(collected, needed)`；藍色→綠色（done）；`_renderPaymentUI` 移除；`@keyframes b6CartPop`；`.b6-cart-badge` CSS |
+| B2 即時餘額預覽（Round 31）| B2 | `_updateInputDisplay` 同步更新 `#b2-input-preview`：`diff===0` exact（綠）/ `diff>0` over（紅）/ `diff<0` under（橙）；`_renderNumpadHTML` 插入元素；`.b2-input-preview.exact/over/under` CSS |
+| B3 最佳存法提示（Round 31）| B3 | `_handleNumpadAnswer` 答錯加 `_showBestSavingHint(question)`：顯示半量/原量/雙量三行對比（slow灰/correct綠/fast藍）；`.b3-best-hint/.b3-bh-*` CSS |
+| B4 冠軍徽章（Round 31）| B4 | `handleSelectClick` easy 答對後呼叫 `_showChampionBadge(storeName)`；中央「🥇X最便宜！」淡入淡出 1.6s；`@keyframes b4ChampIn/Out`；`.b4-champion-badge` CSS |
+| B5 預算效率星評（Round 31）| B5 | `showResults` 在 `roundStatsHTML` 後插入 IIFE 星評：avgPct≥90→3星/≥60→2星/其他→1星；`.b5-star-rating/.b5-star.lit` CSS |
+| B1 面額計數摘要（Round 32）| B1 | `_updateWalletDisplay` 統計各面額數量→更新 `#b1-denom-summary`；膠囊標籤顯示「N元×M」；`_renderWalletArea` 加 `b1-denom-summary` 元素（初始 `display:none`）；`.b1-ds-item` CSS |
+| B2 理財建議卡（Round 32）| B2 | `_handleChoiceAnswer`/`_handleNumpadAnswer` 答對後呼叫 `_showFinancialTip(question)`；依 net>0/0/<0 隨機顯示建議語句；底部深色 toast 1.4s 後消失；`.b2-fin-tip/.b2-ft-*` CSS |
+| B4 減法學習要點（Round 32）| B4 | `handleDiffAnswer` 正確分支加 `_showSubtractionTip(high, low, diff)`：底部「X − Y = Z元」算式 toast（1.2s+fade）；`.b4-sub-tip/.b4-st-*` CSS |
+| B6 結帳平均金額（Round 32）| B6 | `_showCheckoutConfirm` 清單新增 `.b6-cc-avg` 列：「共N項，平均每項M元」；`.b6-cc-avg` 虛線分隔灰色文字 CSS |
+| B1 差額錯誤語音（Round 33）| B1 | `handleConfirm` 錯誤分支改「還差X元，再多加一些！」（精準說出短缺金額）|
+| B2 答題動畫（Round 33）| B2 | `_handleChoiceAnswer` 選題時 `.b2-answer-correct` 綠光 / `.b2-answer-wrong` 紅抖動（`b2AnswerGlow/b2AnswerShake`）|
+| B2 錯誤辨識語音（Round 33）| B2 | numpad 答錯計算 `diff33`；「算太多了，多了X元」/ 「還有X元沒算到」|
+| B4 卡片光暈（Round 33）| B4 | `handleSelectClick` 正確卡加 `.b4-card-glow`（`b4CardGlow` 0.8s）|
+| B5 勳章制（Round 33）| B5 | 100%→🥇完美；≥90%→🥇優異；≥70%→🥈良好；≥50%→🥉努力；其他→⭐練習；B1/B2/B3/B4/B6 同步升級 |
+| B6 付款效率環形圖（Round 33）| B6 | `g.exactPayments` 計數精準付款；`showResults` 新增 `efficiencyHTML`（SVG 圓弧圖）|
+| B2 漸進提示（Round 34）| B2 | numpad 第1次錯→`_showRangeHint(lo, hi)` 範圍提示；第2次以上→完整 `_showCalcBreakdown` |
+| B3 配速預覽（Round 34）| B3 | `_renderChoicesHTML` 每個按鈕下方加 `b3-choice-pace` 顯示「每週X元 × Y週 = Z元」|
+| B4/B1/B2/B3/B6 勳章全面升級（Round 34）| B1~B6 | 所有 showResults 的 badge 改為 🥇🥈🥉⭐ 分層勳章 |
+| B5 預算分配說明（Round 34）| B5 | `_showRoundIntroCard` 加 `.b5-ri-alloc`（必買X元 + 選購Y元）|
+| B6 找零兩段漸進提示（Round 34）| B6 | `_changeQuizErrors` 計數；第1次→`_showChangeRangeHint`（架構提示）；第2次→完整公式 |
+| B1 行程項目入場動畫（Round 35）| B1 | `_renderScheduleCard` 每個 `.b1-schedule-item` 加 `b1ItemSlideIn` stagger 動畫（140ms/項）|
+| B2 起始/結束對比條（Round 35）| B2 | easy 動畫後加 `.b2-before-after` 雙橫條（起始灰色/結束依餘額比例染色）|
+| B3 里程碑語音（Round 35）| B3 | `_showMilestoneBadge` 加 `audio.play('correct')` + `Game.Speech.speak` 里程碑語音 |
+| B4 最佳比價摘要（Round 35）| B4 | `savingsRankHTML` 頂部加 `.b4-best-deal` 卡「🌟 最划算：X在Y買，省了Z元！」|
+| B5 困難模式隱藏價格（Round 35）| B5 | hard mode 非必買商品顯示「??? 元」；首次點擊揭示價格（`.b5-price-hidden` CSS）；第二次點擊才選取 |
+| B1 投幣足額彈出動畫（Round 36）| B1 | `_updateWalletDisplay` 加 `wasEnough` 旗標；首次足額時加 `b1-total-pop` class（500ms 後移除）；`b1TotalPop` keyframe |
+| B4 差額百分比標示（Round 36）| B4 | `_renderPriceBars` 加 `.b4-pbar-diff-pct`「便宜了X%」橙色標籤 |
+| B5 必買門檻標線（Round 36）| B5 | `_updateTotalBar` 計算 `mustPct`；`#b5-must-marker` 琥珀色垂直標線 |
+| B6 攤位完成閃光（Round 36）| B6 | 攤位商品全收後加 `b6-stall-done-flash`（800ms 後移除）；`b6StallFlash` keyframe |
+| B1 建議硬幣組合卡（Round 37）| B1 | `_showCoinHint` 改為 DOM 卡片 `#b1-hint-combo-card`；顯示建議面額文字；5秒後自動移除 |
+| B2 Easy 圖例行（Round 37）| B2 | `_renderQuestionHTML` easy 模式加 `.b2-legend` 行說明 📥 收入 / 📤 支出 符號 |
+| B3 月曆預估達標日（Round 37）| B3 | `_updateCalendarUI` 計算剩餘存款節奏；`#b3-est-date` 顯示「預計 M/D 達標」或「🎉 達標！」 |
+| B4 選對即播報語音（Round 37）| B4 | `handleSelectClick` 正確分支即時語音「X店，Y元，比較便宜！」 |
+| B6 商品飛出收據（Round 37）| B6 | `_showItemReceiptFlyout(anchor, item)` 收集商品時從錨點彈出 icon+name+價格浮標（`b6FlyoutUp` 1s）|
+| B1 費用佔比條（Round 38）| B1 | `_renderScheduleCard` 每個 item 下加 `.b1-item-pct-bar-wrap` + `.b1-item-pct-bar`（寬度依 `cost/total*100%`）；困難模式不顯示 |
+| B2 事件累計金額列（Round 38）| B2 | `_renderQuestionHTML` 中計算 `runningAmt`（起始→逐步加減）；每個 `b2-event-row` 末尾加 `.b2-running-val` 灰色小字 |
+| B3 存錢粒子（Round 38）| B3 | `_completeDragSession` 後呼叫 `_showSavingsSparkle()`；5顆 ✨💫⭐🌟💰 從撲滿上方飛散（`b3SparkleUp` 1.2s）|
+| B4 困難記憶倒數（Round 38）| B4 | `renderQuestion` hard 模式 1900ms 後啟動 `_startMemoryCountdown()`；3秒後 `.b4-mem-blur` 模糊價格，顯示「🤔 靠記憶回答！」|
+| B5 可負擔商品高亮（Round 38）| B5 | `_updateTotalBar` 末尾對非必買未選卡片 toggle `.b5-affordable`（`price <= remBudget`）；綠色虛線外框 |
+| B6 全部收集閃光（Round 38）| B6 | `allDone && !wasDone` 時呼叫 `_showAllCollectedFlash()`；中央深綠全屏閃光卡（`b6AllDoneIn` 1.5s）|
+| B1 場景類別色標（Round 39）| B1 | `_renderScheduleCard` 依 `q.cat` 加 `b1-cat-*` CSS class；schedule card 頂部 4px 色條（school藍/food橙/outdoor綠/entertainment紫/shopping粉）|
+| B2 主題情境語音（Round 39）| B2 | `renderQuestion` 語音前加 `themePrefix`（學校週記/假日時光日記/家庭生活日記）；random 主題不加前綴 |
+| B3 即時剩餘金額標籤（Round 39）| B3 | `_updateWeekPreview` 末尾加 `.b3-week-rem` 標籤：「還差X元」（黃色）/ 「🎉 足夠！」（綠色）|
+| B4 累計節省徽章（Round 39）| B4 | `_renderHeader` header-right 加 `b4-savings-tally`：`q.totalSaved > 0` 顯示「💰 已省X元」綠色小徽章 |
+| B5 即時選擇計數（Round 39）| B5 | total-bar 新增 `#b5-sel-count`；`_updateTotalBar` 更新「必買N件+選購M件」；`.b5-sel-count` 藍色膠囊 |
+| B6 攤位商品語音引導（Round 39）| B6 | 切換攤位時語音改為「X攤，要找Y和Z」；全部收集時說「已全部收集！」 |
+| B6 找零計算輔助面板（2026-03-30）| B6 | `_showChangeQuiz` 新增「🧮 幫我算一算」切換按鈕；展開 `.b6-calc-panel` 顯示直式減法（付了X − 花了Y = 找零？元）；EventManager 綁定 toggle；CSS：`.b6-calc-toggle`/`.b6-calc-panel`/`.b6-cp-*`；搜尋 `b6-calc-panel`、`b6-calc-toggle` |
+| B3 週存視覺模擬積木（2026-03-30）| B3 | `_showDivisionHint` 答錯後在提示下方新增 `.b3-wsim` 積木列；最多 8 個 `.b3-wsim-block` 顯示第N週+累計金額；每塊延遲 90ms 彈出（`b3WsimPop`）；超過8週顯示「…共N週」溢出徽章；搜尋 `b3-wsim`、`b3WsimPop` |
+| B1 最佳硬幣組合逐一動畫（2026-03-30）| B1 | `_showCoinHint` 末尾呼叫 `_animateHintCoins(coins)`；在 `#b1-hint-combo-card` 建立 `#b1-hint-anim`；每 280ms 依序顯示硬幣圖片+面額+累計金額；`b1HintCoinIn` scale/opacity 進場；搜尋 `_animateHintCoins`、`b1-hint-anim` |
+| B1 硬幣放入浮動標籤（2026-03-30）| B1 | `addCoin(denom)` 末尾建立 `.b1-coin-popup`（綠色膠囊 `+N元`）；fixed 定位於錢包區正上方；`b1CoinPopup` 0.85s 上飄淡出；900ms 後移除；搜尋 `b1-coin-popup`、`b1CoinPopup` |
+| B2 困難模式語音重聽按鈕（2026-03-30）| B2 | `_renderNumpadHTML` hard 模式加 `#b2-replay-btn`（🔊 小藍按鈕）；`_bindQuestionEvents` 綁定 click→講出全部事件列表；`.b2-replay-btn` 淺藍膠囊；搜尋 `b2-replay-btn`、`b2ReplayBtn` |
+| B4 10秒無操作自動提示（2026-03-30）| B4 | `renderQuestion` easy/normal 末尾啟動 10s timer；`_clearSelectHintTimer()` 取消；`phase==='select'` 時高亮正確卡 `.b4-auto-select-hint`（綠框 `b4AutoHint` 2次脈動）+ 語音「提示：哪個比較便宜？」；搜尋 `_selectHintTimer`、`b4-auto-select-hint` |
 
 ---
 

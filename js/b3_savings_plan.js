@@ -1072,6 +1072,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b3-cal-stats-line">每天存 ${c.dailyAmount} 元</div>
                     <div class="b3-cal-stat-sep">｜</div>
                     <div class="b3-cal-stats-line">共 ${daysNeeded} 天</div>
+                    <div class="b3-cal-stat-sep">｜</div>
+                    <div class="b3-cal-stats-line b3-days-left-line">距完成 <span id="b3-days-left" class="b3-days-left-num">${daysNeeded}</span> 天</div>
+                    <div class="b3-est-date" id="b3-est-date">計算中…</div>
                 </div>
             </div>
         </div>
@@ -1114,8 +1117,15 @@ document.addEventListener('DOMContentLoaded', () => {
             changedDenoms = changedDenoms || {};
             const pile  = c.denomPile || {};
 
+            const pctRing = c.item ? Math.min(100, Math.round((total / c.item.price) * 100)) : 0;
+            const ringDeg = pctRing * 3.6;
             const pigSectionHd = `<div class="b3-pig-section-hd">
                 <span class="b3-pig-section-title">🐷 我的撲滿</span>
+                <div class="b3-progress-ring-wrap">
+                    <div class="b3-progress-ring" id="b3-progress-ring" style="background:conic-gradient(#f59e0b ${ringDeg}deg, #e5e7eb ${ringDeg}deg)">
+                        <div class="b3-progress-ring-inner"><span id="b3-ring-pct">${pctRing}%</span></div>
+                    </div>
+                </div>
                 <span class="b3-pig-section-total"><strong>${total}</strong> 元</span>
             </div>`;
 
@@ -1254,6 +1264,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pctEl) pctEl.textContent = pct + '%';
             const remEl = document.getElementById('b3-cal-remaining');
             if (remEl) remEl.textContent = remaining;
+            // 進度環（Round 30）
+            const ringEl = document.getElementById('b3-progress-ring');
+            if (ringEl) {
+                ringEl.style.background = `conic-gradient(#f59e0b ${pct * 3.6}deg, #e5e7eb ${pct * 3.6}deg)`;
+                const ringLabelEl = document.getElementById('b3-ring-pct');
+                if (ringLabelEl) ringLabelEl.textContent = pct + '%';
+            }
+            // 距完成天數 + 完成預測日期（Round 37）
+            const daysLeftEl = document.getElementById('b3-days-left');
+            const daysLeft   = remaining > 0 ? Math.ceil(remaining / (c.dailyAmount || 1)) : 0;
+            if (daysLeftEl) {
+                daysLeftEl.textContent = daysLeft;
+                daysLeftEl.className = 'b3-days-left-num' + (daysLeft <= 3 ? ' near' : '');
+            }
+            const estDateEl = document.getElementById('b3-est-date');
+            if (estDateEl) {
+                if (remaining <= 0) {
+                    estDateEl.textContent = '🎉 達標！';
+                    estDateEl.className = 'b3-est-date reached';
+                } else {
+                    const today = new Date();
+                    today.setDate(today.getDate() + daysLeft);
+                    const mm = today.getMonth() + 1;
+                    const dd = today.getDate();
+                    estDateEl.textContent = `預計 ${mm}/${dd} 達標`;
+                    estDateEl.className = 'b3-est-date' + (daysLeft <= 5 ? ' soon' : '');
+                }
+            }
 
             // Update clicked cell: active → done
             const clickedCell = document.querySelector(`.b3-cal-cell[data-day="${justClickedDay}"]`);
@@ -1836,6 +1874,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const crossed = [25, 50, 75].find(m => prevPct < m && newPct >= m);
             if (crossed) this._showMilestoneBadge(crossed);
 
+            // 存錢粒子特效（Round 38）
+            this._showSavingsSparkle();
+
             // 更新 denomPile（不做自動兌換，逐枚加入）
             const changedDenoms = {};
             draggedItems.forEach(item => {
@@ -1868,18 +1909,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 this._updateCalendarUI(true); // pig already updated
+                const remaining = Math.max(0, c.item.price - c.accumulated);
+                const daysLeft  = Math.ceil(remaining / c.dailyAmount);
+                const speechText = `存入${toTWD(c.dailyAmount)}！還差${toTWD(remaining)}，再存${daysLeft}天就達標了！`;
+                c.lastSpeech = speechText;
+                Game.Speech.speak(speechText);
+                this._showCountdownHint(remaining, daysLeft);
+            }
+        },
+
+        // ── 倒數提示浮動卡（B1 _showExactMatchToast pattern）─────
+        _showCountdownHint(remaining, daysLeft) {
+            const prev = document.getElementById('b3-countdown-hint');
+            if (prev) prev.remove();
+            const hint = document.createElement('div');
+            hint.id = 'b3-countdown-hint';
+            hint.className = 'b3-countdown-hint';
+            hint.innerHTML = `<span class="b3-cd-num">${remaining}</span><span class="b3-cd-label">元・再存 ${daysLeft} 天</span>`;
+            document.body.appendChild(hint);
+            Game.TimerManager.setTimeout(() => {
+                hint.classList.add('b3-cd-fade');
+                Game.TimerManager.setTimeout(() => { if (hint.parentNode) hint.remove(); }, 400, 'ui');
+            }, 2000, 'ui');
+        },
+
+        // ── 存錢粒子特效（Round 38）──────────────────────────────
+        _showSavingsSparkle() {
+            const emojis = ['✨', '💫', '⭐', '🌟', '💰'];
+            const pigBank = document.getElementById('b3-pig-bank');
+            const rect = pigBank ? pigBank.getBoundingClientRect() : null;
+            const baseLeft = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+            const baseTop  = rect ? rect.top : window.innerHeight / 2;
+            for (let i = 0; i < 5; i++) {
+                const sp = document.createElement('div');
+                sp.className = 'b3-sparkle';
+                sp.textContent = emojis[i % emojis.length];
+                sp.style.cssText = `left:${baseLeft - 40 + Math.random() * 80}px;top:${baseTop + Math.random() * 30}px;animation-delay:${Math.random() * 0.25}s;position:fixed;`;
+                document.body.appendChild(sp);
+                Game.TimerManager.setTimeout(() => sp.remove(), 1400, 'ui');
             }
         },
 
         _showMilestoneBadge(pct) {
             const existing = document.getElementById('b3-milestone-badge');
             if (existing) existing.remove();
-            const labels = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
+            const labels  = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
+            const speeches = { 25: '太棒了！已經存了四分之一！', 50: '好棒！已經存了一半了！', 75: '快到了！再加油！' };
             const badge = document.createElement('div');
             badge.id = 'b3-milestone-badge';
             badge.className = 'b3-milestone-badge';
             badge.innerHTML = `<span class="b3-milestone-pct">${pct}%</span><span>${labels[pct]}</span>`;
             document.body.appendChild(badge);
+            this.audio.play('correct');
+            Game.TimerManager.setTimeout(() => Game.Speech.speak(speeches[pct]), 200, 'ui'); // 里程碑語音（Round 35）
             Game.TimerManager.setTimeout(() => {
                 if (document.body.contains(badge)) badge.remove();
             }, 2200, 'ui');
@@ -2158,11 +2240,17 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderChoicesHTML(question) {
-            const btns = question.choices.map(c => `
+            // 每個選項下方顯示配速預覽（Round 34）
+            const btns = question.choices.map(c => {
+                const totalSaved = question.weekly * c;
+                const paceNote = `每週${question.weekly}元 × ${c}週 = ${totalSaved}元`;
+                return `
                 <button class="b3-choice-btn" data-val="${c}">
                     ${c}
                     <span class="b3-choice-suffix">週</span>
-                </button>`).join('');
+                    <span class="b3-choice-pace">${paceNote}</span>
+                </button>`;
+            }).join('');
             return `
             <div class="b3-question-box">請選擇正確的週數</div>
             <div class="b3-choices">${btns}</div>`;
@@ -2197,7 +2285,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const extra = n > 16 ? `<span class="b3-week-extra">+${n - 16}</span>` : '';
             const label = `<span class="b3-week-label">${n} 週</span>`;
-            preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}`;
+            // 即時剩餘金額標籤（Round 39）
+            const savedSoFar = n * question.weekly;
+            const remaining  = Math.max(0, question.item.price - savedSoFar);
+            const remTag = remaining > 0
+                ? `<span class="b3-week-rem">還差 ${remaining} 元</span>`
+                : `<span class="b3-week-rem enough">🎉 足夠！</span>`;
+            preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}${remTag}`;
         },
 
         // ── 12. 事件綁定 ──────────────────────────────────────
@@ -2305,6 +2399,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 最佳存法提示（Round 31）─────────────────────────────
+        _showBestSavingHint(question) {
+            if (document.querySelector('.b3-best-hint')) return;
+            // 計算其他週存金額對應的週數（展示對比）
+            const target = question.item.price;
+            const weekly = question.weekly;
+            const correct = question.answer;
+            const half = Math.ceil(target / (weekly / 2));
+            const double = Math.ceil(target / (weekly * 2));
+            const container = document.querySelector('.b3-numpad-section') || document.querySelector('.b3-quiz-area');
+            if (!container) return;
+            const hint = document.createElement('div');
+            hint.className = 'b3-best-hint';
+            hint.innerHTML = `<span class="b3-bh-label">💡 換個方式比較：</span>
+                <div class="b3-bh-rows">
+                    <span class="b3-bh-row slow">每週存 ${Math.round(weekly/2)} 元 → ${half} 週</span>
+                    <span class="b3-bh-row correct">✓ 每週存 ${weekly} 元 → ${correct} 週</span>
+                    <span class="b3-bh-row fast">每週存 ${weekly * 2} 元 → ${double} 週</span>
+                </div>`;
+            container.appendChild(hint);
+        },
+
         // ── 除法提示（答錯後顯示計算公式）───────────────────────
         _showDivisionHint(question) {
             if (document.querySelector('.b3-div-hint')) return;
@@ -2312,11 +2428,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!section) return;
             const hint = document.createElement('div');
             hint.className = 'b3-div-hint';
+
+            // 算式行
             hint.innerHTML = `<span class="b3-hint-label">💡 計算方式：</span>`
                 + `${question.item.price} 元 <span class="b3-hint-op">÷</span> `
                 + `${question.weekly} 元/週 `
                 + `<span class="b3-hint-op">≈</span> `
                 + `<span class="b3-hint-ans">${question.answer}</span> 週（無條件進位）`;
+
+            // 視覺週存模擬（F4 方塊動畫 + C2 逐一計數 pattern）
+            const maxShow   = 8;
+            const total     = question.answer;
+            const show      = Math.min(total, maxShow);
+            const overflow  = total > maxShow ? total - maxShow : 0;
+            const blocksHTML = Array.from({ length: show }, (_, i) => {
+                const acc = question.weekly * (i + 1);
+                return `<div class="b3-wsim-block" style="animation-delay:${(i * 90)}ms">`
+                    + `<div class="b3-wsim-week">第${i + 1}週</div>`
+                    + `<div class="b3-wsim-acc">${acc}元</div>`
+                    + `</div>`;
+            }).join('');
+            const overflowHTML = overflow > 0
+                ? `<div class="b3-wsim-more">… 共 ${total} 週</div>` : '';
+
+            const simDiv = document.createElement('div');
+            simDiv.className = 'b3-wsim';
+            simDiv.innerHTML = `<div class="b3-wsim-title">每週存 <strong>${question.weekly}</strong> 元，累積進度：</div>`
+                + `<div class="b3-wsim-blocks">${blocksHTML}${overflowHTML}</div>`;
+            hint.appendChild(simDiv);
             section.appendChild(hint);
         },
 
@@ -2350,6 +2489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this._showDivisionHint(question); // 答錯即顯示除法公式
+                this._showBestSavingHint(question); // 最佳存法提示（Round 31）
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
                     Game.Speech.speak(`不對喔，參考提示再試一次`);
@@ -2456,11 +2596,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let perfText;
-            if (accuracy >= 90)      perfText = `🏆 完成了 ${q.correctCount} 題，表現優異！`;
-            else if (accuracy >= 70) perfText = `👍 完成了 ${q.correctCount} 題，表現良好！`;
-            else if (accuracy >= 50) perfText = `💪 完成了 ${q.correctCount} 題，繼續努力！`;
-            else                     perfText = `📚 完成了 ${q.correctCount} 題，多多練習，你可以的！`;
+            let perfText, perfMedal;
+            if (accuracy === 100)    { perfText = `🥇 完美！全部答對！`;                         perfMedal = '🥇'; }
+            else if (accuracy >= 90) { perfText = `🥇 完成了 ${q.correctCount} 題，表現優異！`;   perfMedal = '🥇'; }
+            else if (accuracy >= 70) { perfText = `🥈 完成了 ${q.correctCount} 題，表現良好！`;   perfMedal = '🥈'; }
+            else if (accuracy >= 50) { perfText = `🥉 完成了 ${q.correctCount} 題，繼續努力！`;   perfMedal = '🥉'; }
+            else                     { perfText = `⭐ 完成了 ${q.correctCount} 題，多多練習加油！`; perfMedal = '⭐'; }
 
             // 取最後一題物品做購買展示
             const lastQ      = q.questions[q.totalQuestions - 1] || {};
@@ -2586,6 +2727,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 練習加法累積計算</div>
                 </div>
             </div>
+            ${q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b3-res-goals">
+                <h3>🐷 存錢目標清單${ (() => { const catLabels = { toy:'🎮 玩具類', book:'📚 書本類', outdoor:'🌿 戶外類', tech:'💻 科技類' }; const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })() }</h3>
+                <div class="b3-goal-list">
+                    ${q.achievedGoals.map(g => `
+                    <div class="b3-goal-row">
+                        <span class="b3-goal-icon">${g.item.icon || '🎁'}</span>
+                        <span class="b3-goal-name">${g.item.name}</span>
+                        <span class="b3-goal-price">${g.item.price}元</span>
+                        <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
+                    </div>`).join('')}
+                </div>
+            </div>
+            <div class="b3-goal-summary">
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">目標數量</span>
+                    <span class="b3-gs-val">${q.achievedGoals.length} 個</span>
+                </div>
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">合計目標金額</span>
+                    <span class="b3-gs-val">${q.achievedGoals.reduce((s, g) => s + g.item.price, 0)} 元</span>
+                </div>
+                <div class="b3-gs-item">
+                    <span class="b3-gs-label">平均需要週數</span>
+                    <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
+                </div>
+                <div class="b3-gs-item highlight">
+                    <span class="b3-gs-label">平均每週存款</span>
+                    <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.weekly, 0) / q.achievedGoals.length)} 元</span>
+                </div>
+            </div>` : ''}
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>

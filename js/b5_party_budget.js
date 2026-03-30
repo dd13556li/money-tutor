@@ -601,6 +601,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5-ri-icon">${(B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday).icon}</div>
                     <div class="b5-ri-label">本關預算</div>
                     <div class="b5-ri-budget">${budget} 元</div>
+                    ${(() => {
+                        const g = this.state.game;
+                        const mustTotal = (g.items || []).filter(i => i.must).reduce((s, i) => s + i.price, 0);
+                        const optBudget = budget - mustTotal;
+                        return mustTotal > 0 ? `
+                        <div class="b5-ri-alloc">
+                            <span class="b5-ri-must">必買 ${mustTotal} 元</span>
+                            <span class="b5-ri-sep">＋</span>
+                            <span class="b5-ri-opt">選購 ${Math.max(0, optBudget)} 元</span>
+                        </div>` : '';
+                    })()}
                     <div class="b5-ri-hint">點任意處開始</div>
                 </div>`;
             document.body.appendChild(card);
@@ -626,13 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const pct      = Math.round((g.currentRound / g.totalRounds) * 100);
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
 
+            const isHardPriceHide = this.state.settings.difficulty === 'hard';
             const itemsHTML = g.items.map(item => `
-                <div class="b5-item-card ${item.must ? 'locked' : ''}" data-id="${item.id}">
+                <div class="b5-item-card ${item.must ? 'locked' : ''}${isHardPriceHide && !item.must ? ' b5-price-hidden' : ''}" data-id="${item.id}">
                     <span class="b5-check-mark">✅</span>
                     ${item.must ? '<span class="b5-must-badge">🔒 必買</span>' : ''}
                     <span class="b5-item-icon">${item.icon}</span>
                     <span class="b5-item-name">${item.name}</span>
-                    <span class="b5-item-price">${item.price} 元</span>
+                    <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide && !item.must ? '??? 元' : item.price + ' 元'}</span>
                 </div>`).join('');
 
             return `
@@ -663,10 +675,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="b5-total-bar ok" id="b5-total-bar">
                     <span>已選：<span class="b5-total-amount" id="b5-total-amount">0</span> 元</span>
+                    <span class="b5-sel-count" id="b5-sel-count">0 件</span>
                     <span class="b5-remaining" id="b5-remaining">還剩 ${g.budget} 元</span>
                 </div>
-                <div class="b5-budget-meter">
+                <div class="b5-budget-meter" style="position:relative">
                     <div class="b5-budget-meter-fill ok" id="b5-budget-meter-fill" style="width:0%"></div>
+                    <div class="b5-must-marker" id="b5-must-marker" title="必買"></div>
                     <span class="b5-meter-label" id="b5-meter-label">0%</span>
                 </div>
 
@@ -690,6 +704,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (g.submitted) return;
                     const id = card.dataset.id;
                     const item = g.items.find(i => i.id === id);
+                    // 困難模式：首次點擊先揭示價格（Round 35）
+                    if (card.classList.contains('b5-price-hidden')) {
+                        card.classList.remove('b5-price-hidden');
+                        const priceEl = card.querySelector('.b5-item-price');
+                        if (priceEl) priceEl.textContent = priceEl.dataset.price + ' 元';
+                        if (item) Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                        this.audio.play('click');
+                        return; // 第一次只揭示，不選
+                    }
                     if (g.selectedIds.has(id)) {
                         g.selectedIds.delete(id);
                         card.classList.remove('selected');
@@ -769,11 +792,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (totalEl) totalEl.textContent = total;
             if (remEl)   remEl.textContent = rem >= 0 ? `還剩 ${rem} 元` : `超出 ${-rem} 元`;
+            // 即時選擇計數（Round 39）
+            const selCountEl = document.getElementById('b5-sel-count');
+            if (selCountEl) {
+                const mustCount = g.items.filter(i => i.must).length;
+                const optCount  = g.selectedIds ? [...g.selectedIds].filter(id => {
+                    const item = g.items.find(i => i.id === id);
+                    return item && !item.must;
+                }).length : 0;
+                selCountEl.textContent = mustCount > 0
+                    ? `必買${mustCount}件${optCount > 0 ? `+選購${optCount}件` : ''}`
+                    : `已選 ${g.selectedIds ? g.selectedIds.size : 0} 件`;
+            }
 
             if (bar) {
+                const wasOver = bar.classList.contains('over');
                 bar.className = 'b5-total-bar';
-                if (total > g.budget)         bar.classList.add('over');
-                else if (total > g.budget * 0.9) bar.classList.add('near');
+                if (total > g.budget) {
+                    bar.classList.add('over');
+                    if (!wasOver) {
+                        bar.classList.add('b5-shake');
+                        Game.TimerManager.setTimeout(() => bar.classList.remove('b5-shake'), 600, 'ui');
+                    }
+                } else if (total > g.budget * 0.9) bar.classList.add('near');
                 else                          bar.classList.add('ok');
             }
 
@@ -788,11 +829,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (label) label.textContent = `${pct}%`;
             }
 
+            // 必買/選購分隔視覺（Round 36）
+            const mustTotal  = g.items.filter(i => i.must).reduce((s, i) => s + i.price, 0);
+            const mustPct    = g.budget > 0 ? Math.min(100, Math.round(mustTotal / g.budget * 100)) : 0;
+            const mustMarker = document.getElementById('b5-must-marker');
+            if (mustMarker) {
+                mustMarker.style.left = mustPct + '%';
+                mustMarker.title = `必買 ${mustTotal} 元（${mustPct}%）`;
+            }
+
             const canConfirm = total > 0 && total <= g.budget;
             if (btn) {
                 btn.disabled = !canConfirm;
                 btn.classList.toggle('ready', canConfirm);
             }
+
+            // 可負擔商品高亮（Round 38）：未選的選購商品中，標示仍買得起的
+            const remBudget = g.budget - total;
+            document.querySelectorAll('.b5-item-card:not(.locked)').forEach(card => {
+                const item = g.items.find(i => i.id === card.dataset.id);
+                if (!item || item.must) return;
+                const isSelected = g.selectedIds.has(item.id);
+                card.classList.toggle('b5-affordable', !isSelected && item.price <= remBudget);
+            });
         },
 
         _showCenterFeedback(icon, text = '') {
@@ -825,11 +884,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resultArea) {
                 const rem = g.budget - total;
                 if (isCorrect) {
+                    const remPct = g.budget > 0 ? Math.round((rem / g.budget) * 100) : 0;
+                    const isPerfectBudget = rem === 0;
+                    const savingsBadge = rem > 0
+                        ? `<div class="b5-savings-badge">💰 節省了 ${rem} 元（節省 ${remPct}%）！</div>`
+                        : '';
+                    const usePct = g.budget > 0 ? Math.round((total / g.budget) * 100) : 0;
+                    const effInfo = isPerfectBudget ? { icon: '💯', label: '完美！剛好用完預算！', cls: 'perfect-exact' }
+                        : usePct >= 95 ? { icon: '💎', label: '完美預算！', cls: 'perfect' }
+                        : usePct >= 80 ? { icon: '⭐', label: '善用預算！', cls: 'good' }
+                        : usePct >= 60 ? { icon: '👍', label: '不錯預算！', cls: 'ok' }
+                        : { icon: '💡', label: '節省模式', cls: 'save' };
+                    const effBadge = `<div class="b5-eff-badge ${effInfo.cls}">${effInfo.icon} ${effInfo.label} <span class="b5-eff-pct">${usePct}%</span></div>`;
                     resultArea.innerHTML = `
-                        <div class="b5-result-banner success">
-                            🎉 太棒了！派對辦起來！
-                            <div class="b5-result-sub">共花了 ${total} 元，還剩 ${rem} 元</div>
-                        </div>`;
+                        <div class="b5-result-banner success${isPerfectBudget ? ' perfect-budget' : ''}">
+                            ${isPerfectBudget ? '🎯 完美配額！' : '🎉 太棒了！派對辦起來！'}
+                            <div class="b5-result-sub">共花了 ${total} 元${isPerfectBudget ? '，剛好用完！' : `，還剩 ${rem} 元`}</div>
+                        </div>
+                        ${effBadge}
+                        ${savingsBadge}`;
                 } else if (!mustOk) {
                     resultArea.innerHTML = `
                         <div class="b5-result-banner fail">
@@ -891,16 +964,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
                 }
                 // 記錄各關預算使用（B6 receipts pattern）
-                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
+                const mustSpent = g.items.filter(i => i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
+                const optSpent  = g.items.filter(i => !i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
+                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total, mustSpent, optSpent });
                 // 記錄本關選購物品（A4 交易摘要模式）
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
                         g.successfulRoundItems.push(`${i.icon} ${i.name}`);
                 });
                 this.audio.play('correct');
-                this._showCenterFeedback('✅', '太棒了！');
                 const rem = g.budget - total;
-                Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
+                if (rem === 0) {
+                    this._showCenterFeedback('💯', '完美配額！');
+                    Game.Speech.speak(`完美！剛好花了${toTWD(total)}，用完全部預算！`);
+                } else {
+                    this._showCenterFeedback('✅', '太棒了！');
+                    Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
+                }
             } else {
                 g.streak = 0;
                 this.audio.play('error');
@@ -1010,15 +1090,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = g.totalRounds > 0
                 ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
 
-            let badge;
-            if (accuracy >= 90)      { badge = '優異 🏆'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; }
-            else                     { badge = '練習 📚'; }
+            let badge, badgeColor, medalIcon;
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; medalIcon = '🥇'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; medalIcon = '🥇'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; medalIcon = '🥈'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; medalIcon = '🥉'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; medalIcon = '⭐'; }
 
-            // 各關預算使用統計
-            const roundStatsCardHTML = g.roundStats && g.roundStats.length > 0 ? `
-            <div class="b-review-card">
+            // 各關預算使用統計（F5 量比較 pattern）
+            const roundStatsCardHTML = g.roundStats && g.roundStats.length > 0 ? (() => {
+                const totalBudget = g.roundStats.reduce((s, r) => s + r.budget, 0);
+                const totalSpent  = g.roundStats.reduce((s, r) => s + r.spent,  0);
+                const totalSaved  = totalBudget - totalSpent;
+                const avgPct = Math.round(totalSpent / totalBudget * 100);
+                return `
+            <div class="b5-res-budget-stats">
+
                 <h3>📊 各關預算使用</h3>
                 <div class="b5-budget-bars">
                     ${g.roundStats.map(r => {
@@ -1033,7 +1120,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                     }).join('')}
                 </div>
-            </div>` : '';
+                <div class="b5-res-total-row">
+                    <span>總預算：<strong>${totalBudget}元</strong></span>
+                    <span>總花費：<strong>${totalSpent}元</strong></span>
+                    <span class="${totalSaved >= 0 ? 'saved' : 'over'}">節省：<strong>${totalSaved >= 0 ? '+'+totalSaved : totalSaved}元</strong></span>
+                    <span>平均使用率：<strong>${avgPct}%</strong></span>
+                </div>
+            </div>`;
+            })() : '';
 
             // 派對物品回顧
             const themeForResult = this.state.settings.partyTheme === 'random'
@@ -1128,6 +1222,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 控制花費不超出預算</div>
                 </div>
             </div>
+
+            ${roundStatsCardHTML}
+
+            ${/* 預算效率星評（Round 31 pattern）*/ (() => {
+                if (!g.roundStats || g.roundStats.length === 0) return '';
+                const avgPct2 = Math.round(g.roundStats.reduce((s,r) => s + r.spent/r.budget*100, 0) / g.roundStats.length);
+                const stars = avgPct2 >= 90 ? 3 : avgPct2 >= 60 ? 2 : 1;
+                const starHTML = ['⭐','⭐','⭐'].map((s, i) => `<span class="b5-star${i < stars ? ' lit' : ''}">${s}</span>`).join('');
+                const label = stars === 3 ? '預算大師！' : stars === 2 ? '不錯的控制！' : '繼續練習！';
+                return `<div class="b5-star-rating">
+                    <div class="b5-star-row">${starHTML}</div>
+                    <div class="b5-star-label">${label}（平均使用率 ${avgPct2}%）</div>
+                </div>`;
+            })()}
+
+            ${partyCardHTML}
+
+            ${/* 必買vs選購比例條（Round 40）*/ (() => {
+                if (!g.roundStats || g.roundStats.length === 0) return '';
+                const totalMust = g.roundStats.reduce((s, r) => s + (r.mustSpent || 0), 0);
+                const totalOpt  = g.roundStats.reduce((s, r) => s + (r.optSpent  || 0), 0);
+                const total     = totalMust + totalOpt;
+                if (total === 0) return '';
+                const mustPct = Math.round(totalMust / total * 100);
+                const optPct  = 100 - mustPct;
+                return `<div class="b5-res-ratio">
+                    <h3>🛒 必買 vs 選購比例</h3>
+                    <div class="b5-ratio-bar">
+                        <div class="b5-ratio-must" style="width:${mustPct}%">必買 ${mustPct}%</div>
+                        <div class="b5-ratio-opt"  style="width:${optPct}%">選購 ${optPct}%</div>
+                    </div>
+                    <div class="b5-ratio-vals">
+                        <span>必買：${totalMust}元</span>
+                        <span>選購：${totalOpt}元</span>
+                    </div>
+                </div>`;
+            })()}
+
+
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>

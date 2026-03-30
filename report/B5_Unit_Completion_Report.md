@@ -3,8 +3,9 @@
 > **建立日期**：2026-03-24
 > **更新日期**：2026-03-24（第七輪：B5_SCENARIOS easy/normal 8→12 組，共 32 組）
 > **更新日期**：2026-03-25（第九輪：超支時智慧移除建議 `_handleConfirm` 超支分支改版）
-> **更新日期**：2026-03-29（派對主題篩選：`B5_THEMES`（birthday/halloween/picnic）各含 `allItems[]`+`scenarios{}`；`partyTheme: null`；設定頁「🎪 派對主題」3 選項；`renderRound` 改用 `themeData.allItems`；完成畫面標題動態顯示主題）
 > **更新日期**：2026-03-25（第十三輪：關卡轉場卡 `_showRoundTransition`，C6 transitionText pattern）
+> **更新日期**：2026-03-29（派對主題篩選 `B5_THEMES`；預算儀表條；確認鈕脈動；預算效率徽章；輔助點擊 AssistClick）
+> **更新日期**：2026-03-30（Rounds 29–39 豐富化：星評/困難隱藏價格/完美配額/分配說明/可負擔高亮完整記錄）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）
 > **系列**：B 預算規劃
@@ -17,8 +18,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b5_party_budget.html` | — |
-| JS | `js/b5_party_budget.js` | ~781 行，v3.7 |
-| CSS（專用）| `css/b5_party_budget.css` | ~243 行 |
+| JS | `js/b5_party_budget.js` | ~1,403 行，v3.7（2026-03-30）|
+| CSS（專用）| `css/b5_party_budget.css` | ~687 行（2026-03-30）|
 | 作業單 | `worksheet/units/b5-worksheet.js` | 128 行 |
 
 ---
@@ -526,3 +527,126 @@ A6「確認付款脈動」pattern — 在操作就緒後以視覺動態吸引注
 | 超支建議高亮 | 橘色脈動邊框（`b5-hint-glow`）| 建議但不強制 |
 | 轉場卡 | 紫色全屏 + 關卡號 | 區隔各關，提升儀式感 |
 | 完成畫面橫條圖 | ok 綠 / near 橘 / over 紅 | 各關預算控制能力回顧 |
+
+---
+
+## 十五、派對主題篩選（2026-03-29）
+
+### 15.1 主題資料結構（`B5_THEMES`）
+
+| 主題 ID | 中文名稱 | icon | 特色商品 |
+|---------|---------|------|---------|
+| `birthday` | 生日派對 🎂 | 🎂 | 生日蛋糕、氣球、帽子 |
+| `halloween` | 萬聖節派對 🎃 | 🎃 | 南瓜燈、糖果、面具 |
+| `picnic` | 戶外野餐 🧺 | 🧺 | 三明治、飲料、野餐墊 |
+
+- 每個主題各有 `allItems[]` + `scenarios{easy, normal, hard}[]`
+- 設定頁「🎪 派對主題」4 選項（含「隨機 🎲」）
+- `partyTheme: null`，`_checkCanStart` 加守衛
+- `renderRound` 讀取 `scenario._themeKey`，切換主題對應商品池
+
+### 15.2 完成畫面整合
+
+「🎉 本次派對採購物品」標題動態顯示「🎂 生日派對採購」/ 「🎃 萬聖節派對採購」/ 「🧺 戶外野餐採購」。
+
+---
+
+## 十六、輔助點擊模式（AssistClick，2026-03-29）
+
+| 狀態 | 策略 |
+|------|------|
+| 有可負擔未選商品 | 高亮第一個可選（`price ≤ remBudget`）商品卡片 |
+| 所有可負擔商品已選 / 超支 | 高亮確認按鈕（`#b5-confirm-btn`）|
+| 確認按鈕本身可點 | 直接高亮確認 |
+
+---
+
+## 十七、Rounds 26–39 豐富化紀錄
+
+### 17.1 每關開場預算介紹卡（2026-03-27）
+
+`renderRound()` 末尾呼叫 `_showRoundIntroCard(roundNum, budget)`；紫色全屏蓋板 + 白卡顯示關卡 / 🎂 / 預算大字；語音整合（移除舊 400ms speech timer）；1.8s 或點擊後 fade。
+
+### 17.2 關卡轉場語音（2026-03-26）
+
+`_showRoundTransition` 加 `Game.Speech.speak(\`第${roundNum}關\`)`。
+
+### 17.3 超支費用明細展開（Round 29）
+
+`_handleConfirm` 超支分支：渲染所有已選商品費用明細表格（合計 / 預算 / 超出），超出金額顯示百分比「超出 X%」。CSS：`.b5-breakdown`、`.b5-bd-row`、`.b5-bd-over`、`.b5-bd-total`。
+
+### 17.4 節省金額徽章（Round 29）
+
+成功分支：`rem > 0` 時渲染 `.b5-savings-badge`「💰 節省了 X 元（節省 Y%）！」，綠色漸層徽章。
+
+### 17.5 預算效率徽章（Round 29）
+
+`usePct = total / budget * 100` 判定：
+- ≥95% → 💎 完美
+- ≥80% → ⭐ 善用
+- ≥60% → 👍 不錯
+- <60% → 💡 節省
+
+CSS：`.b5-eff-badge.perfect/good/ok/save`。
+
+### 17.6 超支建議高亮（2026-03-26）
+
+超支分支：`suggestion` 存在時 800ms 後加 `b5-hint-glow` 至建議移除的卡片（2.4s 後移除）。
+
+### 17.7 商品點選語音（2026-03-26）
+
+卡片點擊後：選擇 → 「{名稱}，{價格}元」；取消 → 「取消{名稱}」。
+
+### 17.8 超限震動（Round 30）
+
+`_updateTotalBar` 加 `wasOver` 偵測，首次超出加 `b5-shake` class（600ms 後移除），`@keyframes b5Shake`。
+
+### 17.9 即時選擇計數（Round 39）
+
+total-bar 新增 `#b5-sel-count`，`_updateTotalBar` 更新「必買 N 件 + 選購 M 件」，`.b5-sel-count` 藍色膠囊。
+
+### 17.10 預算分配說明（Round 34）
+
+`_showRoundIntroCard` 加 `.b5-ri-alloc`（必買 X 元 + 選購 Y 元），讓學生一開始就了解預算分配結構。
+
+### 17.11 困難模式隱藏價格（Round 35）
+
+hard mode 非必買商品顯示「??? 元」；首次點擊揭示價格（`.b5-price-hidden` CSS）；第二次點擊才選取。教學意義：類比真實購物需查看標籤才知道價格。
+
+### 17.12 完美配額特效（Round 29）
+
+`rem === 0` 時：banner 改「🎯 完美配額！」黃色主題；feedback 改「💯」；語音「完美！剛好花了 X 元，用完全部預算！」；eff-badge 改 `perfect-exact` 粉色 + `b5PerfectPulse` 2 次脈動。
+
+### 17.13 可負擔商品高亮（Round 38）
+
+`_updateTotalBar` 末尾對非必買未選卡片 toggle `.b5-affordable`（`price <= remBudget`），綠色虛線外框提示學生「這個還買得起」。
+
+---
+
+## 十八、完成畫面豐富化
+
+### 18.1 本次派對採購物品（2026-03-27）
+
+`state.game.successfulRoundItems[]`，`_handleConfirm` 答對分支收集 `${icon} ${name}`（去重），渲染粉色標籤泡泡。
+
+### 18.2 各關預算使用（2026-03-27）
+
+`state.game.roundStats[]`，`_handleConfirm` 答對時 `push({roundNum, budget, spent})`，渲染綠框橫條圖（ok = 綠 / near = 橙 / over = 紅）。
+
+### 18.3 各關總計摘要（Round 29）
+
+`roundStatsHTML` 改 IIFE 計算 `totalBudget / totalSpent / totalSaved / avgPct`，渲染 `.b5-res-total-row` 4 欄，`.saved`（綠）/ `.over`（紅）。
+
+### 18.4 預算效率星評（Round 31）
+
+`showResults` 插入星評：
+- `avgPct ≥ 90` → ★★★
+- `avgPct ≥ 60` → ★★
+- 其他 → ★
+
+CSS：`.b5-star-rating`、`.b5-star.lit`。
+
+### 18.5 勳章制（Round 33）
+
+🥇🥇🥈🥉⭐ 分層勳章，與全 B 系列對齊。
+

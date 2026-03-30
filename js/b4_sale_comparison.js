@@ -656,6 +656,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
             this._showItemIntroModal(curr);
+            // 困難模式記憶挑戰倒數（Round 38）
+            if (diff === 'hard' && !curr.isTriple) {
+                Game.TimerManager.setTimeout(() => this._startMemoryCountdown(), 1900, 'ui');
+            }
 
             // 語音引導（含雙店資訊，對齊 A/C/F 讀出題目數字 pattern）
             Game.TimerManager.setTimeout(() => {
@@ -686,6 +690,63 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
             }
+
+            // 10秒無操作提示（A5 hintDelay pattern）
+            if (diff !== 'hard') {
+                this._clearSelectHintTimer();
+                this._selectHintTimer = Game.TimerManager.setTimeout(() => {
+                    if (this.state.phase === 'select') {
+                        const curr = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                        if (!curr || curr.isTriple) return;
+                        // highlight correct side
+                        const correctSide = curr.swapped ? 'left' : 'right';
+                        const card = document.getElementById(`card-${correctSide}`);
+                        if (card) {
+                            card.classList.add('b4-auto-select-hint');
+                            Game.TimerManager.setTimeout(() => card.classList.remove('b4-auto-select-hint'), 3000, 'ui');
+                            Game.Speech.speak('提示：哪個比較便宜？');
+                        }
+                    }
+                }, 10000, 'ui');
+            }
+        },
+
+        // ── 困難記憶倒數（Round 38）─────────────────────────────
+        _startMemoryCountdown() {
+            const existing = document.getElementById('b4-memory-bar');
+            if (existing) existing.remove();
+            let sec = 3;
+            const bar = document.createElement('div');
+            bar.id = 'b4-memory-bar';
+            bar.className = 'b4-memory-bar';
+            bar.innerHTML = `<span>⏱</span><span>記住價格！還有 <strong id="b4-mem-sec">3</strong> 秒</span><div class="b4-mem-track"><div class="b4-mem-fill" id="b4-mem-fill" style="width:100%"></div></div>`;
+            const app = document.getElementById('app');
+            if (app) app.insertAdjacentElement('afterbegin', bar);
+            else return;
+
+            const tick = () => {
+                sec--;
+                const secEl = document.getElementById('b4-mem-sec');
+                const fill  = document.getElementById('b4-mem-fill');
+                if (secEl) secEl.textContent = sec;
+                if (fill)  fill.style.width = `${Math.round((sec / 3) * 100)}%`;
+                if (sec <= 0) {
+                    if (document.body.contains(bar)) bar.remove();
+                    // 模糊所有價格
+                    document.querySelectorAll('.b4-price').forEach(el => el.classList.add('b4-mem-blur'));
+                    const hero = document.querySelector('.b4-item-hero');
+                    if (hero) {
+                        const hint = document.createElement('div');
+                        hint.className = 'b4-mem-challenge';
+                        hint.textContent = '🤔 靠記憶回答！';
+                        hero.appendChild(hint);
+                        Game.TimerManager.setTimeout(() => { if (document.body.contains(hint)) hint.remove(); }, 2200, 'ui');
+                    }
+                } else {
+                    Game.TimerManager.setTimeout(tick, 1000, 'ui');
+                }
+            };
+            Game.TimerManager.setTimeout(tick, 1000, 'ui');
         },
 
         _showItemIntroModal(curr) {
@@ -741,6 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-header-center">${centerTxt}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    ${q.totalSaved > 0 ? `<span class="b4-savings-tally">💰 已省 ${q.totalSaved} 元</span>` : ''}
                     <button class="b-reward-btn" id="reward-btn-g">🎁 獎勵</button>
                     <button class="b-back-btn" id="back-to-settings">返回設定</button>
                 </div>
@@ -801,6 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Select Phase Handler ────────────────────────────────
         handleSelectClick(isCorrect, curr, correctSide, left, right) {
+            this._clearSelectHintTimer();
             const diff = this.state.settings.difficulty;
 
             // 視覺回饋
@@ -812,10 +875,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
                 if (correctCard) {
-                    correctCard.classList.add('selected-correct');
+                    correctCard.classList.add('selected-correct', 'b4-card-glow'); // 卡片光暈（Round 33）
                     const cheapTag = curr.isUnit ? '比較划算！' : '比較便宜！';
                     correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
                         <div class="b4-cheaper-tag">${cheapTag}</div>`;
+                }
+                // 貴的那張顯示「比較貴 +N元」（Round 27）
+                if (wrongCard && !curr.isUnit) {
+                    const delta = Math.abs((left.price || 0) - (right.price || 0));
+                    if (delta > 0) {
+                        wrongCard.classList.add('selected-wrong');
+                        wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴 +${delta}元</div>`;
+                    }
                 }
                 if (diff === 'easy') {
                     // 簡單：直接下一題
@@ -824,9 +895,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                         Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
                     }
-                    const cheapWord = curr.isUnit ? '比較划算' : '比較便宜';
-                    Game.Speech.speak(`答對了！${correctCard?.querySelector('.b4-store-name')?.textContent || ''}${cheapWord}`);
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                    const cheapSide = correctSide === 'left' ? left : right;
+                    const expSide   = correctSide === 'left' ? right : left;
+                    let easyCorrectSpeech;
+                    if (curr.isUnit) {
+                        easyCorrectSpeech = `答對了！${cheapSide.store}每${curr.unit}${curr.perB}元，比${expSide.store}每${curr.unit}${curr.perA}元便宜！`;
+                    } else {
+                        easyCorrectSpeech = `答對了！${cheapSide.store}${cheapSide.price}元，比${expSide.store}${expSide.price}元便宜！`;
+                    }
+                    // 即時數字語音（Round 37：F4 instant feedback pattern）
+                    const priceSpeech = curr.isUnit
+                        ? `${cheapSide.store}每${curr.unit}${cheapSide.price === (curr.optA.store === cheapSide.store ? curr.perA : curr.perB)}元，比較划算！`
+                        : `${cheapSide.store}，${cheapSide.price}元，比較便宜！`;
+                    Game.Speech.speak(priceSpeech);
+                    this._showChampionBadge(cheapSide.store); // 冠軍徽章（Round 31）
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     // 普通/困難：顯示差額問題
                     Game.TimerManager.setTimeout(() => {
@@ -1098,7 +1181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         Game.Speech.speak(`排序正確！從${curr.sortedAsc[0].store}${toTWD(curr.sortedAsc[0].price)}到${curr.sortedAsc[2].store}${toTWD(curr.sortedAsc[2].price)}`);
                         this._showSavingsToast(curr.diff);
-                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
+                        this._showPodiumAnimation(curr);
+                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 2400, 'turnTransition');
                     } else {
                         this.audio.play('error');
                         // 顯示正確排序
@@ -1257,6 +1341,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const maxP = Math.max(curr.optA.price, curr.optB.price);
             const pctA = Math.round(curr.optA.price / maxP * 100);
             const pctB = Math.round(curr.optB.price / maxP * 100);
+            // 加上差距百分比標籤（Round 36）
+            const diffPct = maxP > 0 ? Math.round((maxP - Math.min(curr.optA.price, curr.optB.price)) / maxP * 100) : 0;
             return `
             <div class="b4-price-bars">
                 <div class="b4-pbar-row">
@@ -1273,6 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <span class="b4-pbar-price">${curr.optB.price} 元</span>
                 </div>
+                ${diffPct > 0 ? `<div class="b4-pbar-diff-pct">便宜了 ${diffPct}%</div>` : ''}
             </div>`;
         },
 
@@ -1400,6 +1487,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return [...opts].sort(() => Math.random() - 0.5);
         },
 
+        // ── Diff Correct 算式閃現（Round 28）────────────────────
+        _showDiffCalcFlash(highPrice, lowPrice, diff) {
+            const prev = document.getElementById('b4-calc-flash');
+            if (prev) prev.remove();
+            const flash = document.createElement('div');
+            flash.id = 'b4-calc-flash';
+            flash.className = 'b4-calc-flash';
+            flash.innerHTML = `
+                <span class="b4-cf-num">${highPrice}</span>
+                <span class="b4-cf-op">−</span>
+                <span class="b4-cf-num">${lowPrice}</span>
+                <span class="b4-cf-op">=</span>
+                <span class="b4-cf-ans">${diff} 元</span>`;
+            document.body.appendChild(flash);
+            Game.TimerManager.setTimeout(() => {
+                flash.classList.add('b4-cf-fade');
+                Game.TimerManager.setTimeout(() => { if (flash.parentNode) flash.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
+        },
+
+        // ── Select 階段計時提示（清除函數）──────────────────────
+        _clearSelectHintTimer() {
+            if (this._selectHintTimer) {
+                // TimerManager handles clearing, just reset the ref
+                this._selectHintTimer = null;
+            }
+        },
+
         // ── Diff Formula Hint ───────────────────────────────────
         _showDiffFormulaHint() {
             const item = this.state.currentDiffItem;
@@ -1426,6 +1541,39 @@ document.addEventListener('DOMContentLoaded', () => {
             else section.appendChild(hint);
         },
 
+        // ── 三商店獎台動畫（F4 排序 pattern）────────────────────
+        _showPodiumAnimation(curr) {
+            const prev = document.getElementById('b4-podium-overlay');
+            if (prev) prev.remove();
+            const sorted = curr.sortedAsc; // [cheapest, middle, mostExp]
+            // 獎台視覺：左=2nd，中=1st（最高），右=3rd
+            const cols = [
+                { store: sorted[1].store, price: sorted[1].price, rank: '🥈', height: '70px', label: '第2名', cls: 'silver' },
+                { store: sorted[0].store, price: sorted[0].price, rank: '🥇', height: '96px', label: '最便宜', cls: 'gold' },
+                { store: sorted[2].store, price: sorted[2].price, rank: '🥉', height: '50px', label: '第3名', cls: 'bronze' },
+            ];
+            const overlay = document.createElement('div');
+            overlay.id = 'b4-podium-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:10150;display:flex;align-items:flex-end;justify-content:center;padding-bottom:60px;pointer-events:none;';
+            overlay.innerHTML = `<div class="b4-podium-wrap">
+                ${cols.map((col, i) => `
+                <div class="b4-podium-col ${col.cls}" style="animation-delay:${i*0.12}s">
+                    <div class="b4-podium-rank">${col.rank}</div>
+                    <div class="b4-podium-store">${col.store}</div>
+                    <div class="b4-podium-price">${col.price}元</div>
+                    <div class="b4-podium-block ${col.cls}" style="height:${col.height}">
+                        <span class="b4-podium-lbl">${col.label}</span>
+                    </div>
+                </div>`).join('')}
+            </div>`;
+            document.body.appendChild(overlay);
+            Game.TimerManager.setTimeout(() => {
+                overlay.style.transition = 'opacity 0.4s';
+                overlay.style.opacity = '0';
+                Game.TimerManager.setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 400, 'ui');
+            }, 1600, 'ui');
+        },
+
         // ── 連勝徽章（B3 streak pattern）──────────────────────
         _showStreakBadge(streak) {
             const existing = document.getElementById('b4-streak-badge');
@@ -1446,6 +1594,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Diff Answer Handler ─────────────────────────────────
         // 省錢 toast（A4 _showPricePopup pattern）
+        // ── 學習要點提示（Round 32）──────────────────────────────
+        _showSubtractionTip(highPrice, lowPrice, diff) {
+            const prev = document.getElementById('b4-sub-tip');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b4-sub-tip';
+            tip.className = 'b4-sub-tip';
+            tip.innerHTML = `<span class="b4-st-label">📐 減法算式：</span>`
+                + `<span class="b4-st-hi">${highPrice}</span>`
+                + `<span class="b4-st-op"> − </span>`
+                + `<span class="b4-st-lo">${lowPrice}</span>`
+                + `<span class="b4-st-op"> = </span>`
+                + `<span class="b4-st-diff">${diff} 元</span>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => { tip.classList.add('b4-tip-fade'); Game.TimerManager.setTimeout(() => tip.remove(), 400, 'ui'); }, 1200, 'ui');
+        },
+
+        // ── 冠軍徽章（Round 31）──────────────────────────────────
+        _showChampionBadge(storeName) {
+            const prev = document.getElementById('b4-champion-badge');
+            if (prev) prev.remove();
+            const badge = document.createElement('div');
+            badge.id = 'b4-champion-badge';
+            badge.className = 'b4-champion-badge';
+            badge.innerHTML = `<span class="b4-champ-icon">🥇</span><span class="b4-champ-text">${storeName}最便宜！</span>`;
+            document.body.appendChild(badge);
+            Game.TimerManager.setTimeout(() => badge.remove(), 1600, 'ui');
+        },
+
         _showSavingsToast(amount) {
             const prev = document.getElementById('b4-savings-toast');
             if (prev) prev.remove();
@@ -1481,7 +1658,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ci = this.state.currentDiffItem;
                 if (ci) {
                     this.state.quiz.comparisonHistory.push({
-                        name: ci.name, icon: ci.icon,
+                        name: ci.name, icon: ci.icon, cat: ci.cat || 'other',
                         cheapStore: ci.optB.store, cheapPrice: ci.isUnit ? ci.perB : ci.optB.price,
                         expStore: ci.optA.store,   expPrice:  ci.isUnit ? ci.perA : ci.optA.price,
                         saved: correctDiff,
@@ -1489,11 +1666,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 this._showSavingsToast(correctDiff);
+                // 差額算式閃現（Round 28）
                 const ci2 = this.state.currentDiffItem;
+                if (ci2 && !ci2.isUnit) {
+                    this._showDiffCalcFlash(ci2.optA.price, ci2.optB.price, correctDiff);
+                }
                 const diffSpeech = (ci2 && ci2.isUnit)
                     ? `答對了！每${ci2.unit}便宜了${correctDiff}元`
                     : `答對了！便宜了${toTWD(correctDiff)}`;
                 Game.Speech.speak(diffSpeech);
+                // 學習要點提示（Round 32）
+                if (ci2 && !ci2.isUnit) {
+                    this._showSubtractionTip(ci2.optA.price, ci2.optB.price, correctDiff);
+                }
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1561,20 +1746,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
             let badge, badgeColor;
-            if      (accuracy >= 90) { badge = '優異 🏆'; badgeColor = '#f59e0b'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; badgeColor = '#10b981'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; badgeColor = '#6366f1'; }
-            else                     { badge = '練習 📚'; badgeColor = '#94a3b8'; }
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
             // 省錢排行榜（C1 統計 + A4 交易摘要 pattern）
             const savingsRankHTML = (() => {
                 const hist = q.comparisonHistory;
                 if (!hist || hist.length === 0) return '';
                 const medals = ['🥇', '🥈', '🥉'];
-                const top = [...hist].sort((a, b) => b.saved - a.saved).slice(0, 3);
+                const sorted = [...hist].sort((a, b) => b.saved - a.saved);
+                const top = sorted.slice(0, 3);
+                // 最佳比價摘要（Round 35）
+                const best = sorted[0];
+                const bestLine = best ? `<div class="b4-best-deal">🌟 最划算的一次：<strong>${best.icon} ${best.name}</strong> 在 ${best.cheapStore} 買，省了 <strong>${best.saved}</strong> 元！</div>` : '';
                 return `
                 <div class="b4-res-ranking">
                     <h3>🏅 省錢排行榜</h3>
+                    ${bestLine}
                     <div class="b4-rank-list">
                         ${top.map((h, i) => `
                         <div class="b4-rank-row">
@@ -1656,6 +1847,32 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>` : ''}
 
             ${savingsRankHTML}
+
+            ${(() => {
+                // 類別節省分析（Round 40）
+                const hist = q.comparisonHistory;
+                if (!hist || hist.length < 2) return '';
+                const catNames = { food:'食品飲料', stationery:'文具書籍', daily:'生活用品', clothing:'服飾配件' };
+                const catMap = {};
+                hist.forEach(h => {
+                    const cat = h.cat || 'other';
+                    if (!catMap[cat]) catMap[cat] = { saved: 0, count: 0, name: catNames[cat] || cat };
+                    catMap[cat].saved += h.saved || 0;
+                    catMap[cat].count++;
+                });
+                const entries = Object.entries(catMap).filter(([, v]) => v.saved > 0).sort((a, b) => b[1].saved - a[1].saved);
+                if (entries.length === 0) return '';
+                const maxSaved = entries[0][1].saved;
+                return `<div class="b4-cat-savings">
+                    <h3>🏷️ 類別節省分析</h3>
+                    ${entries.map(([cat, v]) => `
+                    <div class="b4-cat-row">
+                        <span class="b4-cat-name">${catNames[cat] || cat}</span>
+                        <div class="b4-cat-bar-wrap"><div class="b4-cat-bar" style="width:${Math.round(v.saved/maxSaved*100)}%"></div></div>
+                        <span class="b4-cat-val">省 ${v.saved}元</span>
+                    </div>`).join('')}
+                </div>`;
+            })()}
 
             ${q.comparisonHistory && q.comparisonHistory.length > 0 ? `
             <div class="b4-res-compare">

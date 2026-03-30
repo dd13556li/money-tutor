@@ -581,3 +581,257 @@
     border-radius: 8px;
     padding: 8px 16px;
 }
+
+/* ── 三商店獎台動畫 ── */
+.b4-podium-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.b4-podium-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: b4PodiumRise 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    width: 90px;
+}
+.b4-podium-rank { font-size: 28px; line-height: 1.2; }
+.b4-podium-store { font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 2px; color: #1f2937; }
+.b4-podium-col.gold .b4-podium-store { color: #d97706; }
+.b4-podium-price { font-size: 14px; font-weight: 700; color: #1d4ed8; margin-bottom: 4px; }
+.b4-podium-block {
+    width: 86px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.b4-podium-block.gold   { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.b4-podium-block.silver { background: linear-gradient(135deg, #d1d5db, #9ca3af); }
+.b4-podium-block.bronze { background: linear-gradient(135deg, #d97706, #b45309); }
+.b4-podium-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    padding: 4px 2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+@keyframes b4PodiumRise {
+    from { transform: translateY(50px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── B4 貴的標籤 (Round 27) ── */
+.b4-exp-delta {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239,68,68,0.9);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    animation: b4DeltaIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    z-index: 10;
+}
+@keyframes b4DeltaIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ── B4 Diff 算式閃現 (Round 28) ── */
+.b4-calc-flash {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    z-index: 9000;
+    animation: b4CfIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.2);
+}
+.b4-cf-num { font-size: 16px; color: #1f2937; background: #f3f4f6; border-radius: 6px; padding: 4px 8px; }
+.b4-cf-op  { font-size: 18px; font-weight: 900; color: #9ca3af; }
+.b4-cf-ans { font-size: 17px; font-weight: 900; color: #059669; background: #d1fae5; border-radius: 8px; padding: 4px 12px; }
+.b4-cf-fade { transition: opacity 0.4s; opacity: 0; }
+@keyframes b4CfIn {
+    from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}
+
+/* ── Round 31：B4 冠軍徽章 ── */
+.b4-champion-badge {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 3px solid #f59e0b;
+    border-radius: 16px;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 800;
+    pointer-events: none;
+    animation: b4ChampIn 0.4s ease, b4ChampOut 0.4s ease 1.2s forwards;
+}
+.b4-champ-icon { font-size: 32px; }
+.b4-champ-text { font-size: 20px; font-weight: 900; color: #78350f; }
+@keyframes b4ChampIn  { from { transform: translate(-50%,-50%) scale(0.6); opacity:0; } to { transform: translate(-50%,-50%) scale(1); opacity:1; } }
+@keyframes b4ChampOut { from { opacity:1; } to { opacity:0; } }
+
+/* ── Round 32：B4 學習要點提示 ── */
+.b4-sub-tip {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e3a5f;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 600;
+    pointer-events: none;
+    animation: bFadeIn 0.3s ease;
+}
+.b4-sub-tip .b4-tip-fade { transition: opacity 0.4s; opacity: 0; }
+.b4-st-label { font-size: 12px; color: #93c5fd; margin-right: 4px; }
+.b4-st-hi  { color: #fca5a5; font-weight: 700; }
+.b4-st-lo  { color: #86efac; font-weight: 700; }
+.b4-st-op  { color: #d1d5db; }
+.b4-st-diff { color: #fde68a; font-weight: 900; }
+
+/* ── Round 33：B4 卡片光暈 ── */
+@keyframes b4CardGlow {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%  { box-shadow: 0 0 30px 8px rgba(16,185,129,0.55); }
+    100% { box-shadow: 0 0 20px 4px rgba(16,185,129,0.2); }
+}
+.b4-card-glow { animation: b4CardGlow 0.8s ease forwards; }
+
+/* ── Round 35：B4 最佳比價摘要 ── */
+.b4-best-deal {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #78350f;
+}
+
+/* ── Round 36：B4 價差百分比標籤 ── */
+.b4-pbar-diff-pct {
+    text-align: right;
+    font-size: 11px;
+    color: #059669;
+    font-weight: 700;
+    margin-top: 2px;
+    padding-right: 4px;
+}
+
+/* ── Round 38：B4 記憶倒數挑戰 ── */
+.b4-memory-bar {
+    background: linear-gradient(90deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin: 8px 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #78350f;
+    animation: bFadeIn 0.3s ease;
+}
+.b4-mem-track {
+    flex: 1;
+    height: 6px;
+    background: #fde68a;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #f59e0b;
+}
+.b4-mem-fill {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 3px;
+    transition: width 0.9s linear;
+}
+.b4-mem-blur {
+    filter: blur(5px);
+    transition: filter 0.5s ease;
+    user-select: none;
+}
+.b4-mem-challenge {
+    font-size: 13px;
+    font-weight: 700;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px dashed #f59e0b;
+    border-radius: 8px;
+    padding: 4px 10px;
+    margin-top: 4px;
+    text-align: center;
+    animation: bFadeIn 0.4s ease;
+}
+
+/* ── Round 39：B4 累計節省徽章 ── */
+.b4-savings-tally {
+    font-size: 12px;
+    font-weight: 700;
+    color: #065f46;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    animation: bFadeIn 0.4s ease;
+}
+
+/* ── Round 40：B4 類別節省分析 ── */
+.b4-cat-savings {
+    background: #fff;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 0;
+}
+.b4-cat-savings h3 { font-size: 14px; margin: 0 0 8px; color: #92400e; }
+.b4-cat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.b4-cat-name { font-size: 12px; color: #374151; width: 64px; flex-shrink: 0; }
+.b4-cat-bar-wrap { flex: 1; height: 10px; background: #fef3c7; border-radius: 5px; overflow: hidden; }
+.b4-cat-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #f97316); border-radius: 5px; }
+.b4-cat-val { font-size: 12px; font-weight: 700; color: #b45309; white-space: nowrap; }
+
+/* ── 10秒自動提示高亮 ── */
+.b4-auto-select-hint {
+    animation: b4AutoHint 1.5s ease-in-out 2;
+    outline: 3px solid #22c55e !important;
+    outline-offset: 3px;
+}
+@keyframes b4AutoHint {
+    0%, 100% { box-shadow: 0 0 15px rgba(34,197,94,0.5); }
+    50%       { box-shadow: 0 0 35px rgba(34,197,94,1.0); }
+}

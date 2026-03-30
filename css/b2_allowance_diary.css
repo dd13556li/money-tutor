@@ -545,3 +545,212 @@
 }
 .b2-sb-label { font-size: 32px; font-weight: 900; color: white; }
 .b2-sb-msg   { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+/* ── B2 收支趨勢指示 (Round 26) ── */
+.b2-net-trend {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    z-index: 9500;
+    animation: b2NtIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b2-net-trend.up   { background: #d1fae5; border: 2px solid #10b981; color: #065f46; }
+.b2-net-trend.down { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; }
+.b2-nt-arrow { font-size: 20px; font-weight: 900; }
+.b2-nt-fade  { transition: opacity 0.4s; opacity: 0; }
+@keyframes b2NtIn {
+    from { transform: translateX(-50%) translateY(-14px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);     opacity: 1; }
+}
+
+/* ── B2 每週收支統計 (Round 27) ── */
+.b2-week-summary {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin: 6px 0;
+    font-size: 14px;
+    font-weight: 700;
+    animation: b2FadeIn 0.3s ease;
+}
+.b2-ws-item.income  { color: #065f46; }
+.b2-ws-item.expense { color: #991b1b; }
+.b2-ws-sep { color: #9ca3af; }
+
+/* ── Round 30：B2 餘額走勢條 ── */
+.b2-balance-trend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 13px;
+    animation: b2FadeIn 0.4s ease;
+}
+.b2-bt-label { color: #6b7280; min-width: 52px; }
+.b2-bt-bar { flex: 1; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+.b2-bt-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+.b2-bt-fill.good { background: #10b981; }
+.b2-bt-fill.ok   { background: #f59e0b; }
+.b2-bt-fill.low  { background: #ef4444; }
+.b2-bt-pct { min-width: 38px; text-align: right; font-weight: 700; }
+.b2-bt-pct.good { color: #059669; }
+.b2-bt-pct.ok   { color: #d97706; }
+.b2-bt-pct.low  { color: #dc2626; }
+
+/* ── Round 31：B2 即時餘額預覽 ── */
+.b2-input-preview {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    height: 18px;
+    margin: 2px 0;
+    transition: color 0.2s;
+}
+.b2-input-preview.exact { color: #059669; }
+.b2-input-preview.over  { color: #dc2626; }
+.b2-input-preview.under { color: #d97706; }
+
+/* ── Round 32：B2 理財建議卡 ── */
+.b2-fin-tip {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    max-width: 320px;
+    z-index: 600;
+    pointer-events: none;
+    animation: bFadeIn 0.3s ease;
+}
+.b2-ft-icon { font-size: 18px; flex-shrink: 0; }
+.b2-ft-text { line-height: 1.4; }
+
+/* ── Round 33：B2 答題動畫 ── */
+@keyframes b2AnswerGlow {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%  { box-shadow: 0 0 20px 6px rgba(16,185,129,0.5); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+@keyframes b2AnswerShake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+}
+.b2-answer-correct { animation: b2AnswerGlow 0.6s ease; }
+.b2-answer-wrong   { animation: b2AnswerShake 0.5s ease; }
+
+/* ── Round 34：B2 範圍提示 ── */
+.b2-range-hint {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #78350f;
+    animation: b2FadeIn 0.4s ease;
+}
+
+/* ── Round 35：B2 起始/結束對比條 ── */
+.b2-before-after {
+    padding: 8px 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin: 4px 0;
+    animation: b2FadeIn 0.4s ease;
+}
+.b2-ba-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; font-size: 12px; }
+.b2-ba-label { width: 28px; color: #6b7280; flex-shrink: 0; }
+.b2-ba-bar { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+.b2-ba-fill { height: 100%; border-radius: 4px; }
+.b2-ba-fill.start { background: #94a3b8; width: 100%; }
+.b2-ba-fill.end.good { background: #10b981; }
+.b2-ba-fill.end.ok   { background: #f59e0b; }
+.b2-ba-fill.end.low  { background: #ef4444; }
+.b2-ba-val { font-size: 12px; color: #374151; font-weight: 600; white-space: nowrap; }
+
+/* ── Round 37：B2 收支圖例 ── */
+.b2-legend {
+    display: flex;
+    gap: 12px;
+    padding: 3px 8px;
+    margin: 2px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.b2-legend-in  { color: #059669; }
+.b2-legend-out { color: #dc2626; }
+.b2-legend-sep { color: #9ca3af; }
+
+/* ── Round 38：B2 事件累計金額列 ── */
+.b2-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.b2-running-val {
+    margin-left: auto;
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    white-space: nowrap;
+    padding-left: 4px;
+}
+
+/* ── Round 40：B2 收支平衡評語 ── */
+.b2-balance-comment {
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+.b2-bal-great { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+.b2-bal-ok    { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.b2-bal-warn  { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+.b2-bal-bad   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* ── 語音重聽按鈕 ── */
+.b2-replay-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: #f0f9ff;
+    border: 1.5px solid #93c5fd;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #1d4ed8;
+    transition: background 0.15s, transform 0.1s;
+    vertical-align: middle;
+}
+.b2-replay-btn:hover { background: #dbeafe; transform: scale(1.08); }
+.b2-replay-btn:active { transform: scale(0.95); }

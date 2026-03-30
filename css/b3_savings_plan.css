@@ -1572,3 +1572,210 @@
 @keyframes b3BlockPop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
 .b3-week-label { font-size: 13px; color: #6b7280; font-weight: 600; display: block; margin-top: 2px; }
 .b3-week-extra { font-size: 13px; color: #f59e0b; font-weight: 700; padding: 0 4px; }
+
+/* ── B3 倒數提示 (Round 24) ── */
+.b3-countdown-hint {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    z-index: 9000;
+    animation: b3CdIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+}
+.b3-cd-num {
+    font-size: 22px;
+    font-weight: 900;
+    color: #d97706;
+}
+.b3-cd-label {
+    font-size: 15px;
+    color: #92400e;
+}
+.b3-cd-fade {
+    transition: opacity 0.4s;
+    opacity: 0;
+}
+@keyframes b3CdIn {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}
+
+/* ── B3 距完成天數 (Round 26) ── */
+.b3-days-left-line { font-size: 13px; }
+.b3-days-left-num {
+    font-weight: 900;
+    color: #3b82f6;
+    font-size: 15px;
+    transition: color 0.3s;
+}
+.b3-days-left-num.near { color: #10b981; animation: b3DlPulse 1s ease-in-out 2; }
+@keyframes b3DlPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.25); }
+}
+
+/* ── B3 Goal Summary Highlight (Round 28) ── */
+.b3-gs-item.highlight {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 6px;
+}
+.b3-gs-item.highlight .b3-gs-val { color: #92400e; }
+
+/* ── Round 30：B3 進度環 ── */
+.b3-progress-ring-wrap { display: flex; align-items: center; justify-content: center; }
+.b3-progress-ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: conic-gradient(#f59e0b 0deg, #e5e7eb 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.5s ease;
+}
+.b3-progress-ring-inner {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* ── Round 31：B3 最佳存法提示 ── */
+.b3-best-hint {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    animation: bFadeIn 0.4s ease;
+}
+.b3-bh-label { font-weight: 700; color: #92400e; display: block; margin-bottom: 4px; }
+.b3-bh-rows { display: flex; flex-direction: column; gap: 3px; }
+.b3-bh-row { padding: 2px 6px; border-radius: 4px; }
+.b3-bh-row.slow    { color: #6b7280; background: #f3f4f6; }
+.b3-bh-row.correct { color: #065f46; background: #d1fae5; font-weight: 700; }
+.b3-bh-row.fast    { color: #1e3a8a; background: #dbeafe; }
+
+/* ── Round 34：B3 選項配速預覽 ── */
+.b3-choice-pace {
+    display: block;
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 400;
+    margin-top: 3px;
+    line-height: 1.2;
+}
+.b3-choice-btn.correct .b3-choice-pace { color: #065f46; }
+
+/* ── Round 37：B3 完成預測日期 ── */
+.b3-est-date {
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    padding: 2px 4px;
+    margin-top: 2px;
+    border-radius: 4px;
+    transition: color 0.3s;
+}
+.b3-est-date.soon    { color: #d97706; font-weight: 700; }
+.b3-est-date.reached { color: #059669; font-weight: 700; }
+
+/* ── Round 38：B3 存錢粒子 ── */
+@keyframes b3SparkleUp {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(0.5); }
+}
+.b3-sparkle {
+    position: fixed;
+    font-size: 22px;
+    pointer-events: none;
+    z-index: 5000;
+    animation: b3SparkleUp 1.2s ease forwards;
+}
+
+/* ── Round 39：B3 即時剩餘金額標籤 ── */
+.b3-week-rem {
+    font-size: 11px;
+    color: #92400e;
+    font-weight: 600;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: 6px;
+}
+.b3-week-rem.enough {
+    color: #065f46;
+    background: #d1fae5;
+    border-color: #6ee7b7;
+}
+
+/* ── 週存視覺模擬（F4 方塊動畫 + C2 逐一計數 pattern）── */
+.b3-wsim {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #fde68a;
+}
+.b3-wsim-title {
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 6px;
+}
+.b3-wsim-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+@keyframes b3WsimPop {
+    0%   { opacity: 0; transform: scale(0.5) translateY(6px); }
+    60%  { opacity: 1; transform: scale(1.1) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.b3-wsim-block {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1.5px solid #f59e0b;
+    border-radius: 8px;
+    padding: 4px 7px;
+    text-align: center;
+    min-width: 52px;
+    opacity: 0;
+    animation: b3WsimPop 0.35s ease forwards;
+}
+.b3-wsim-week {
+    font-size: 10px;
+    color: #78350f;
+    font-weight: 600;
+}
+.b3-wsim-acc {
+    font-size: 12px;
+    color: #064e3b;
+    font-weight: 700;
+}
+.b3-wsim-more {
+    background: #e0e7ff;
+    border: 1px solid #a5b4fc;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #3730a3;
+    font-weight: 600;
+    align-self: center;
+}

@@ -488,3 +488,200 @@
     0%, 100% { box-shadow: 0 4px 14px rgba(16,185,129,0.4); transform: scale(1); }
     50%       { box-shadow: 0 6px 24px rgba(16,185,129,0.7); transform: scale(1.03); }
 }
+
+/* ── B5 Savings Badge (Round 24) ── */
+.b5-savings-badge {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #065f46;
+    margin-top: 8px;
+    animation: bFadeIn 0.4s ease;
+}
+
+/* ── B5 Efficiency Badge (Round 25) ── */
+.b5-eff-badge {
+    border-radius: 12px;
+    padding: 8px 14px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 8px;
+    animation: bFadeIn 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.b5-eff-badge.perfect { background: linear-gradient(135deg,#fef3c7,#fde68a); border: 2px solid #f59e0b; color: #92400e; }
+.b5-eff-badge.good    { background: linear-gradient(135deg,#dbeafe,#bfdbfe); border: 2px solid #3b82f6; color: #1e3a8a; }
+.b5-eff-badge.ok      { background: linear-gradient(135deg,#d1fae5,#a7f3d0); border: 2px solid #10b981; color: #065f46; }
+.b5-eff-badge.save    { background: linear-gradient(135deg,#f3f4f6,#e5e7eb); border: 2px solid #9ca3af; color: #374151; }
+.b5-eff-pct { font-size: 18px; font-weight: 900; }
+
+/* ── B5 Perfect Budget (Round 26) ── */
+.b5-result-banner.perfect-budget {
+    background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+    border-color: #d97706 !important;
+    color: #78350f !important;
+}
+.b5-eff-badge.perfect-exact {
+    background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+    border: 2px solid #ec4899;
+    color: #831843;
+    animation: b5PerfectPulse 1s ease 0s 2, bFadeIn 0.4s ease;
+}
+@keyframes b5PerfectPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.04); }
+}
+
+/* ── B5 Total Summary Row (Round 29) ── */
+.b5-res-total-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    justify-content: center;
+    padding: 10px 12px;
+    margin-top: 10px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+    border-radius: 0 0 10px 10px;
+    font-size: 13px;
+    color: #374151;
+}
+.b5-res-total-row .saved { color: #059669; font-weight: 700; }
+.b5-res-total-row .over  { color: #dc2626; font-weight: 700; }
+
+/* ── Round 30：B5 超限震動 ── */
+@keyframes b5Shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+}
+.b5-shake { animation: b5Shake 0.5s ease; }
+
+/* ── Round 31：B5 預算效率星評 ── */
+.b5-star-rating {
+    text-align: center;
+    padding: 14px 12px;
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    margin-top: 12px;
+    animation: bFadeIn 0.5s ease;
+}
+.b5-star-row { font-size: 32px; margin-bottom: 6px; }
+.b5-star { opacity: 0.2; filter: grayscale(1); transition: opacity 0.3s, filter 0.3s; }
+.b5-star.lit { opacity: 1; filter: none; }
+.b5-star-label { font-size: 14px; font-weight: 700; color: #92400e; }
+
+/* ── Round 34：B5 預算分配說明 ── */
+.b5-ri-alloc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 4px;
+    font-size: 13px;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 12px;
+}
+.b5-ri-must { color: #fef9c3; font-weight: 700; }
+.b5-ri-sep  { color: rgba(255,255,255,0.7); }
+.b5-ri-opt  { color: #d1fae5; font-weight: 700; }
+
+/* ── Round 35：B5 困難模式隱藏價格 ── */
+.b5-price-hidden .b5-item-price { color: #9ca3af; font-style: italic; }
+.b5-price-hidden { opacity: 0.88; }
+
+/* ── Round 36：B5 必買分隔線 ── */
+.b5-must-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #f59e0b;
+    border-radius: 2px;
+    z-index: 2;
+    transition: left 0.5s ease;
+}
+.b5-must-marker::after {
+    content: '必';
+    position: absolute;
+    top: -16px;
+    left: -6px;
+    font-size: 9px;
+    color: #92400e;
+    font-weight: 700;
+    background: #fef3c7;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+/* ── Round 38：B5 可負擔商品高亮 ── */
+.b5-item-card.b5-affordable {
+    outline: 2px dashed #10b981;
+    outline-offset: 2px;
+    transition: outline 0.3s ease;
+}
+
+/* ── Round 39：B5 即時選擇計數 ── */
+.b5-sel-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+
+/* ── Round 40：B5 必買vs選購比例條 ── */
+.b5-res-ratio {
+    background: #fff;
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 0;
+}
+.b5-res-ratio h3 { font-size: 14px; color: #6d28d9; margin: 0 0 8px; }
+.b5-ratio-bar {
+    display: flex;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 700;
+}
+.b5-ratio-must {
+    background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    transition: width 0.5s ease;
+}
+.b5-ratio-opt {
+    background: linear-gradient(90deg, #a78bfa, #c4b5fd);
+    color: #4c1d95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    transition: width 0.5s ease;
+}
+.b5-ratio-vals {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}

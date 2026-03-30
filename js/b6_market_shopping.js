@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 paidAmount: 0,
                 receipts: [],
                 stallStats: {},   // { stallKey: totalSpent }
+                exactPayments: 0, // 精準付款次數（Round 33）
             },
             isEndingGame: false,
             isProcessing: false,
@@ -521,7 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
             g.phase        = 'shopping';
             g.paidAmount   = 0;
             g.receipts     = [];
-            g.stallStats   = {};
+            g.stallStats     = {};
+            g.exactPayments  = 0;
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B6] 遊戲狀態已重置');
@@ -943,9 +945,31 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.b6-stall-tab').forEach(tab => {
                 Game.EventManager.on(tab, 'click', () => {
                     if (g.activeStall === tab.dataset.stall) return;
+                    // 顯示離開攤位的小計（B6 stall subtotal, Round 25）
+                    const leavingStall = g.activeStall;
+                    const collectedHere = g.mission.items.filter(i => i.stall === leavingStall && g.collectedIds.has(i.id));
+                    if (collectedHere.length > 0) {
+                        const subtotal = collectedHere.reduce((s, item) => {
+                            const found = (_currentStalls[leavingStall]?.items || []).find(p => p.id === item.id);
+                            return s + (found?.price || 0);
+                        }, 0);
+                        this._showStallSubtotal(_currentStalls[leavingStall].name, subtotal);
+                    }
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
-                    Game.Speech.speak(_currentStalls[tab.dataset.stall].name);
+                    // 攤位商品語音引導（Round 39）：說出攤位名 + 需要收集的商品
+                    const newStall = tab.dataset.stall;
+                    const stallInfo = _currentStalls[newStall];
+                    const neededHere = g.mission.items
+                        .filter(mi => mi.stall === newStall && !g.collectedIds.has(mi.id))
+                        .map(mi => {
+                            const d = stallInfo?.items.find(p => p.id === mi.id);
+                            return d ? d.name : mi.id;
+                        });
+                    const stallSpeech = neededHere.length > 0
+                        ? `${stallInfo.name}，要找${neededHere.join('和')}`
+                        : `${stallInfo.name}，這裡已全部收集！`;
+                    Game.Speech.speak(stallSpeech);
                     this._renderShoppingUI();
                 }, {}, 'gameUI');
             });
@@ -993,6 +1017,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('correct');
                     btn.classList.add('collected');
                     btn.disabled = true;
+                    // 收集進度動畫（Round 27）
+                    const collected = g.collectedIds.size;
+                    const needed    = g.mission.items.length;
+                    this._showCollectionProgress(collected, needed);
 
                     // Update list item + 彈出價格動畫（A4 transaction pattern）
                     const listItem = document.querySelector(`.b6-list-item[data-item-id="${itemId}"]`);
@@ -1008,17 +1036,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
+                    // 收據飛出（Round 37）
+                    if (itemData) this._showItemReceiptFlyout(listItem, itemData);
+
                     // Update total and checkout button
                     const total     = this._calcMissionTotal();
                     const basketEl  = document.querySelector('.b6-basket-total');
                     if (basketEl) basketEl.textContent = total;
+
+                    // 浮動購物籃計數（Round 30）
+                    this._updateCartBadge(g.collectedIds.size, g.mission.items.length);
 
                     const allDone   = g.mission.items.every(({ id }) => g.collectedIds.has(id));
                     const checkoutBtn = document.getElementById('b6-checkout-btn');
                     if (checkoutBtn) {
                         const wasDone = !checkoutBtn.disabled;
                         checkoutBtn.disabled = !allDone;
-                        if (allDone && !wasDone) Game.Speech.speak('所有商品收集完成，可以去結帳了！');
+                        if (allDone && !wasDone) {
+                            Game.Speech.speak('所有商品收集完成，可以去結帳了！');
+                            this._showAllCollectedFlash();
+                        }
+                    }
+
+                    // 攤位完成慶祝（Round 36）
+                    const currentStall = g.activeStall;
+                    if (currentStall) {
+                        const stallItems = g.mission.items.filter(i => i.stall === currentStall);
+                        const stallDone  = stallItems.every(i => g.collectedIds.has(i.id));
+                        const stallTab   = document.querySelector(`.b6-stall-tab[data-stall="${currentStall}"]`);
+                        if (stallDone && stallTab && !stallTab.classList.contains('stall-celebrated')) {
+                            stallTab.classList.add('stall-celebrated', 'b6-stall-done-flash');
+                            Game.TimerManager.setTimeout(() => stallTab.classList.remove('b6-stall-done-flash'), 800, 'ui');
+                        }
                     }
                 }, {}, 'gameUI');
             });
@@ -1027,9 +1076,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkoutBtn = document.getElementById('b6-checkout-btn');
             Game.EventManager.on(checkoutBtn, 'click', () => {
                 if (this.state.isProcessing) return;
-                g.phase = 'payment';
-                g.paidAmount = 0;
-                this._renderPaymentUI();
+                this._showCheckoutConfirm(g, () => {
+                    g.phase = 'payment';
+                    g.paidAmount = 0;
+                    this._renderPaymentUI();
+                });
             }, {}, 'gameUI');
             // 語音重播
             const replayBtn = document.getElementById('replay-speech-btn');
@@ -1041,6 +1092,86 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 結帳前確認清單（B1 _showTaskModal pattern）──────────
+        _showCheckoutConfirm(g, callback) {
+            const existing = document.getElementById('b6-checkout-confirm');
+            if (existing) { existing.remove(); callback(); return; }
+            const items = g.mission.items.filter(({ id }) => g.collectedIds.has(id));
+            const resolve = (item) => (_currentStalls[item.stall]?.items || []).find(i => i.id === item.id);
+            const total = items.reduce((sum, item) => sum + (resolve(item)?.price || 0), 0);
+            const itemRows = items.map(item => {
+                const found = resolve(item);
+                return `<div class="b6-cc-row"><span>${found?.icon || ''} ${found?.name || item.id}</span><span>${found?.price || 0} 元</span></div>`;
+            }).join('');
+            const modal = document.createElement('div');
+            modal.id = 'b6-checkout-confirm';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:10200;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;';
+            modal.innerHTML = `
+                <div class="b6-checkout-card">
+                    <div class="b6-cc-title">🛒 結帳清單</div>
+                    <div class="b6-cc-items">
+                        ${itemRows}
+                        <div class="b6-cc-sep"></div>
+                        <div class="b6-cc-row b6-cc-total"><span>合計</span><span>${total} 元</span></div>
+                        <div class="b6-cc-row b6-cc-budget"><span>預算</span><span>${g.mission.budget} 元</span></div>
+                        <div class="b6-cc-row b6-cc-avg"><span>共 ${items.length} 項，平均每項</span><span>${items.length > 0 ? Math.round(total / items.length) : 0} 元</span></div>
+                    </div>
+                    <button class="b6-cc-btn" id="b6-cc-go">✓ 去付款</button>
+                </div>`;
+            document.body.appendChild(modal);
+            Game.Speech.speak(`合計${total}元，預算${g.mission.budget}元，確認去付款！`);
+            const go = () => { if (modal.parentNode) modal.remove(); callback(); };
+            Game.EventManager.on(document.getElementById('b6-cc-go'), 'click', go, {}, 'gameUI');
+            const autoT = Game.TimerManager.setTimeout(go, 5000, 'ui');
+            // 點擊背景也關閉
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) { Game.TimerManager.clearTimeout(autoT); go(); }
+            });
+        },
+
+        // ── 收集進度動畫（Round 27）──────────────────────────────
+        _showCollectionProgress(collected, needed) {
+            const prev = document.getElementById('b6-col-progress');
+            if (prev) prev.remove();
+            const isAll = collected >= needed;
+            const prog = document.createElement('div');
+            prog.id = 'b6-col-progress';
+            prog.className = `b6-col-progress${isAll ? ' all-done' : ''}`;
+            prog.innerHTML = `<span class="b6-cp-plus">+1</span><span class="b6-cp-count">${collected}/${needed}</span>`;
+            document.body.appendChild(prog);
+            Game.TimerManager.setTimeout(() => {
+                prog.classList.add('b6-cp-fade');
+                Game.TimerManager.setTimeout(() => { if (prog.parentNode) prog.remove(); }, 400, 'ui');
+            }, 1200, 'ui');
+        },
+
+        // ── 全部收集完成中央閃光（Round 38）─────────────────────
+        _showAllCollectedFlash() {
+            const existing = document.getElementById('b6-all-done-flash');
+            if (existing) existing.remove();
+            const el = document.createElement('div');
+            el.id = 'b6-all-done-flash';
+            el.className = 'b6-all-done-flash';
+            el.textContent = '🎉 全部收集完成！';
+            document.body.appendChild(el);
+            Game.TimerManager.setTimeout(() => { if (document.body.contains(el)) el.remove(); }, 1500, 'ui');
+        },
+
+        // ── 攤位小計提示（Round 25）──────────────────────────────
+        _showStallSubtotal(stallName, subtotal) {
+            const prev = document.getElementById('b6-stall-subtotal');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b6-stall-subtotal';
+            tip.className = 'b6-stall-subtotal';
+            tip.innerHTML = `<span class="b6-ss-name">${stallName}</span><span class="b6-ss-total">共 ${subtotal} 元</span>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => {
+                tip.classList.add('b6-ss-fade');
+                Game.TimerManager.setTimeout(() => { if (tip.parentNode) tip.remove(); }, 400, 'ui');
+            }, 1800, 'ui');
+        },
+
         _showCenterFeedback(icon, text = '') {
             document.querySelector('.b-center-feedback')?.remove();
             const overlay = document.createElement('div');
@@ -1048,6 +1179,38 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = `<span class="b-cf-icon">${icon}</span>${text ? `<span class="b-cf-text">${text}</span>` : ''}`;
             document.body.appendChild(overlay);
             Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
+        },
+
+        // ── 商品收據飛出（Round 37）──────────────────────────────────
+        _showItemReceiptFlyout(anchor, item) {
+            const flyout = document.createElement('div');
+            flyout.className = 'b6-item-flyout';
+            flyout.innerHTML = `<span class="b6-if-icon">${item.icon || '🛒'}</span><span class="b6-if-name">${item.name}</span><span class="b6-if-price">+${item.price}元</span>`;
+            const rect = anchor ? anchor.getBoundingClientRect() : null;
+            if (rect) {
+                flyout.style.cssText = `position:fixed;top:${rect.top - 36}px;left:${Math.min(rect.left, window.innerWidth - 160)}px;z-index:600;pointer-events:none;`;
+            } else {
+                flyout.style.cssText = `position:fixed;top:120px;right:20px;z-index:600;pointer-events:none;`;
+            }
+            document.body.appendChild(flyout);
+            Game.TimerManager.setTimeout(() => flyout.remove(), 1000, 'ui');
+        },
+
+        // ── 浮動購物籃計數徽章（Round 30）────────────────────────────
+        _updateCartBadge(collected, needed) {
+            let badge = document.getElementById('b6-cart-badge');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.id = 'b6-cart-badge';
+                badge.className = 'b6-cart-badge';
+                document.body.appendChild(badge);
+            }
+            const done = collected >= needed;
+            badge.className = 'b6-cart-badge' + (done ? ' done' : '');
+            badge.textContent = done ? `✓ ${collected}/${needed} 全收集！` : `🛒 ${collected}/${needed}`;
+            badge.style.animation = 'none';
+            void badge.offsetWidth;
+            badge.style.animation = 'b6CartPop 0.3s ease';
         },
 
         // ── 找到商品彈出價格動畫（A4 transaction tag pattern）────────
@@ -1074,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderPaymentUI() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
+            document.getElementById('b6-cart-badge')?.remove();
 
             const g     = this.state.game;
             const total = this._calcMissionTotal();
@@ -1235,6 +1399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _showChangeQuiz(paid, total, change) {
+            this._changeQuizErrors = 0; // 重置計數（Round 34）
             const g = this.state.game;
 
             Game.Speech.speak(`你付了${toTWD(paid)}，買菜共花了${toTWD(total)}元，應該找回多少元？`);
@@ -1270,6 +1435,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-change-icon">🤔</div>
                     <div class="b6-change-text">付了 <strong>${paid}</strong> 元，買菜花了 <strong>${total}</strong> 元</div>
                     <div class="b6-change-question">應該找回多少元？</div>
+                    <button class="b6-calc-toggle" id="b6-calc-toggle">🧮 幫我算一算</button>
+                    <div class="b6-calc-panel" id="b6-calc-panel">
+                        <div class="b6-cp-row">
+                            <span class="b6-cp-label">付了</span>
+                            <span class="b6-cp-num">${paid}</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                        <div class="b6-cp-row b6-cp-sub">
+                            <span class="b6-cp-op">−</span>
+                            <span class="b6-cp-label">花了</span>
+                            <span class="b6-cp-num">${total}</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                        <div class="b6-cp-divider"></div>
+                        <div class="b6-cp-row b6-cp-ans">
+                            <span class="b6-cp-op">=</span>
+                            <span class="b6-cp-label">找零</span>
+                            <span class="b6-cp-num b6-cp-q">？</span>
+                            <span class="b6-cp-unit">元</span>
+                        </div>
+                    </div>
                     <div class="b6-change-opts" id="b6-change-opts">${optionsHTML}</div>
                 </div>
             </div>`;
@@ -1289,10 +1475,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             }, 800, 'turnTransition');
                         });
                     } else {
-                        // 答錯
+                        // 答錯：漸進提示（Round 34）
+                        this._changeQuizErrors = (this._changeQuizErrors || 0) + 1;
                         btn.classList.add('b6-change-opt-wrong');
                         this.audio.play('error');
-                        this._showChangeFormula(paid, total, change);
+                        if (this._changeQuizErrors === 1) {
+                            // 第1次：只顯示算式 (付-商品=?)
+                            this._showChangeRangeHint(paid, total);
+                        } else {
+                            this._showChangeFormula(paid, total, change);
+                        }
                         const retryMode = this.state.settings.retryMode;
                         if (retryMode === 'retry') {
                             btn.disabled = true;
@@ -1311,6 +1503,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             });
+            // 幫我算一算 toggle（C6 計算機模式）
+            const calcToggle = document.getElementById('b6-calc-toggle');
+            const calcPanel  = document.getElementById('b6-calc-panel');
+            if (calcToggle && calcPanel) {
+                Game.EventManager.on(calcToggle, 'click', () => {
+                    const shown = calcPanel.classList.toggle('visible');
+                    calcToggle.textContent = shown ? '🙈 收起計算' : '🧮 幫我算一算';
+                }, {}, 'gameUI');
+            }
+        },
+
+        // ── 找零第1次錯誤：顯示算式架構（Range hint, Round 34）─
+        _showChangeRangeHint(paid, total) {
+            if (document.querySelector('.b6-change-range-hint')) return;
+            const hint = document.createElement('div');
+            hint.className = 'b6-change-range-hint';
+            hint.innerHTML = `💡 提示：付 <strong>${paid}</strong> 元 − 商品 <strong>${total}</strong> 元 = <strong>？</strong> 元`;
+            const opts = document.querySelector('.b6-change-opts');
+            if (opts) opts.insertAdjacentElement('beforebegin', hint);
         },
 
         _showChangeFormula(paid, total, change) {
@@ -1341,7 +1552,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
 
+            // 易/普通模式結果語音（困難模式語音已在 _showChangeQuiz 播出）
+            if (this.state.settings.difficulty !== 'hard') {
+                if (change === 0) {
+                    Game.Speech.speak(`精準付款！剛好${toTWD(paid)}，不需找零，買菜成功！`);
+                } else {
+                    Game.Speech.speak(`付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);
+                }
+            }
+
             g.correctCount++;
+            if (change === 0) g.exactPayments = (g.exactPayments || 0) + 1; // 精準付款計數（Round 33）
             g.streak = (g.streak || 0) + 1;
             if (g.streak === 3 || g.streak === 5) {
                 Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
@@ -1359,10 +1580,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="game-container">
-                <div class="b6-change-section">
-                    <div class="b6-change-icon">🎉</div>
-                    <div class="b6-change-text">付了 ${paid} 元，找回</div>
-                    <div class="b6-change-amount">${change} 元</div>
+                <div class="b6-change-section${change === 0 ? ' exact-payment' : ''}">
+                    <div class="b6-change-icon">${change === 0 ? '💯' : '🎉'}</div>
+                    ${change === 0
+                        ? `<div class="b6-change-text exact-text">精準付款！</div>
+                           <div class="b6-change-amount exact-amt">${paid} 元，不需找零</div>`
+                        : `<div class="b6-change-text">付了 ${paid} 元，找回</div>
+                           <div class="b6-change-amount">${change} 元</div>`}
                     <div style="font-size:14px;color:#065f46;margin-top:4px;">買菜成功！</div>
                 </div>
                 <button class="b5-next-btn" id="b6-next-btn">
@@ -1433,15 +1657,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = g.totalRounds > 0
                 ? Math.round((g.correctCount / g.totalRounds) * 100) : 0;
 
-            let badge;
-            if (accuracy >= 90)      { badge = '優異 🏆'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; }
-            else                     { badge = '練習 📚'; }
+            let badge, badgeColor;
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
+
+            // 付款效率分析（Round 33）
+            const exactCount  = g.exactPayments || 0;
+            const totalRounds = g.totalRounds || 1;
+            const effPct = Math.round(exactCount / totalRounds * 100);
+            const effLabel = effPct === 100 ? '💯 全部精準！' : effPct >= 60 ? '⭐ 表現不錯！' : '💪 繼續練習！';
+            const efficiencyHTML = exactCount > 0 ? `
+            <div class="b6-res-efficiency">
+                <h3>🎯 付款效率</h3>
+                <div class="b6-eff-row">
+                    <div class="b6-eff-ring" style="--eff-pct:${effPct}">
+                        <svg viewBox="0 0 36 36" class="b6-eff-svg">
+                            <circle class="b6-eff-bg" cx="18" cy="18" r="15.9"/>
+                            <circle class="b6-eff-fill" cx="18" cy="18" r="15.9"
+                                stroke-dasharray="${effPct} ${100 - effPct}" stroke-dashoffset="25"/>
+                        </svg>
+                        <span class="b6-eff-pct">${effPct}%</span>
+                    </div>
+                    <div class="b6-eff-info">
+                        <div class="b6-eff-label">${effLabel}</div>
+                        <div class="b6-eff-detail">精準付款 <strong>${exactCount}</strong> 次 / 共 <strong>${totalRounds}</strong> 關</div>
+                    </div>
+                </div>
+            </div>` : '';
 
             // 採購收據
             const receiptCardHTML = g.receipts.length > 0 ? `
             <div class="b-review-card">
+
                 <h3>🧾 採購收據</h3>
                 <table class="b6-receipt-table">
                     <thead>
@@ -1543,6 +1793,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </a>
         </div>
         <div class="b-res-container">
+            ${/* 市場類型 banner（Round 40）*/ (() => {
+                const mkt = this.state.settings.marketType;
+                if (!mkt) return '';
+                const mktLabels = { traditional: { name: '傳統市場', icon: '🏪' }, supermarket: { name: '超級市場', icon: '🏬' }, nightmarket: { name: '夜市', icon: '🌙' }, random: { name: '隨機市場', icon: '🎲' } };
+                const info = mktLabels[mkt] || mktLabels.traditional;
+                return `<div class="b6-mkt-banner">${info.icon} 本次練習：${info.name}</div>`;
+            })()}
             <div class="b-res-grid">
                 <div class="b-res-card b-res-card-1">
                     <div class="b-res-icon">✅</div>
@@ -1572,6 +1829,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b-res-ach-item">✅ 選擇正確付款金額與找零</div>
                 </div>
             </div>
+
+            ${efficiencyHTML}
+
+
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -1719,6 +1980,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Shopping phase: find next uncollected mission item
             const nextItem = g.mission.items.find(({ id }) => !g.collectedIds.has(id));
             if (!nextItem) {
+                // 確認清單彈窗已開啟 → 點「去付款」
+                const ccGo = document.getElementById('b6-cc-go');
+                if (ccGo) {
+                    this._highlight(ccGo);
+                    this._queue = [{ el: ccGo, action: () => ccGo.click() }];
+                    return;
+                }
                 // All collected → checkout
                 const checkoutBtn = document.getElementById('b6-checkout-btn');
                 if (checkoutBtn && !checkoutBtn.disabled) {

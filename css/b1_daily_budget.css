@@ -904,3 +904,184 @@
     0%, 100% { box-shadow: 0 0 12px rgba(16,185,129,0.4); }
     50%       { box-shadow: 0 0 28px rgba(16,185,129,0.75); }
 }
+
+/* ── B1 找零說明動畫 (Round 25) ── */
+.b1-change-tip {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 2px solid #3b82f6;
+    border-radius: 16px;
+    padding: 12px 20px;
+    z-index: 9000;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.25);
+    animation: b1CtIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    pointer-events: none;
+    min-width: 240px;
+}
+.b1-ct-title { font-size: 13px; color: #6b7280; font-weight: 600; margin-bottom: 6px; }
+.b1-ct-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.b1-ct-item { font-size: 16px; font-weight: 700; color: #1f2937; background: #f3f4f6; border-radius: 8px; padding: 4px 10px; }
+.b1-ct-op { font-size: 18px; font-weight: 800; color: #9ca3af; }
+.b1-ct-ans { font-size: 17px; font-weight: 900; color: #059669; background: #d1fae5; border-radius: 8px; padding: 4px 12px; }
+.b1-ct-fade { transition: opacity 0.4s; opacity: 0; }
+@keyframes b1CtIn {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}
+
+/* ── B1 Wallet Progress Bar (Round 29) ── */
+.b1-wallet-progress-wrap { padding: 4px 12px 0; }
+.b1-wallet-progress {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.b1-wallet-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.35s ease, background 0.3s;
+}
+.b1-wallet-progress-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b1-wallet-progress-fill.full { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* ── Round 32：B1 面額計數摘要 ── */
+.b1-denom-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    animation: bFadeIn 0.3s ease;
+}
+.b1-ds-item {
+    padding: 2px 8px;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #14532d;
+    font-weight: 600;
+}
+
+/* ── Round 37：B1 建議面額卡 ── */
+.b1-hint-combo-card {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e3a5f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 600;
+    pointer-events: none;
+    animation: bFadeIn 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.b1-hcc-icon { font-size: 18px; }
+
+
+/* ── Round 38：B1 費用佔比條 ── */
+.b1-item-pct-bar-wrap {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    margin-top: 3px;
+    overflow: hidden;
+}
+.b1-item-pct-bar {
+    height: 4px;
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+}
+
+/* ── Round 39：B1 場景類別色標 ── */
+.b1-schedule-card.b1-cat-school    { border-top: 4px solid #3b82f6; }
+.b1-schedule-card.b1-cat-food      { border-top: 4px solid #f97316; }
+.b1-schedule-card.b1-cat-outdoor   { border-top: 4px solid #22c55e; }
+.b1-schedule-card.b1-cat-entertainment { border-top: 4px solid #a855f7; }
+.b1-schedule-card.b1-cat-shopping  { border-top: 4px solid #ec4899; }
+
+/* ── Round 40：B1 最貴/最便宜標記 ── */
+.b1-sch-tag {
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+.b1-sch-tag.most-exp  { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+.b1-sch-tag.cheapest  { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+/* ── 提示硬幣動畫（C2 逐一計數 pattern）── */
+@keyframes b1HintCoinIn {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.7); }
+    60%  { transform: translateY(-4px) scale(1.1); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.b1-hint-anim {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px dashed #fde68a;
+    margin-top: 6px;
+}
+.b1-hint-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    animation: b1HintCoinIn 0.4s ease forwards;
+}
+.b1-hc-denom {
+    font-size: 10px;
+    color: #78350f;
+    font-weight: 600;
+}
+.b1-hc-total {
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #065f46;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #bbf7d0;
+}
+
+/* ── 硬幣放入浮動標籤 ── */
+.b1-coin-popup {
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: b1CoinPopup 0.85s ease-out forwards;
+    white-space: nowrap;
+}
+@keyframes b1CoinPopup {
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-55px); }
+}

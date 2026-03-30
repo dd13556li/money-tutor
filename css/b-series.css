@@ -709,3 +709,40 @@
     .b-coin-btn      { min-width: 54px; padding: 8px 4px 4px; }
     .b-coin-img.md   { width: 48px; height: 48px; }
 }
+
+/* ── Round 30：B1 今日路線條 ── */
+.b1-route-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: #fef3c7;
+    border-radius: 20px;
+    font-size: 15px;
+    color: #78350f;
+    animation: bFadeIn 0.5s ease 0.3s both;
+}
+.b1-rs-home { font-size: 18px; }
+.b1-rs-dest { font-size: 22px; }
+.b1-rs-arrow { color: #d97706; font-weight: 700; }
+.b1-rs-label { font-size: 13px; color: #92400e; font-weight: 600; }
+
+/* ── Round 35：B1 行程項目入場動畫 ── */
+.b1-item-enter {
+    animation: b1ItemSlideIn 0.4s ease both;
+}
+@keyframes b1ItemSlideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Round 36：B1 達標彈跳 ── */
+@keyframes b1TotalPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+.b1-total-pop { animation: b1TotalPop 0.5s ease; }

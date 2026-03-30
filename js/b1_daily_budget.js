@@ -606,14 +606,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderScheduleCard(q, showTotal) {
             const isHard   = this.state.settings.difficulty === 'hard';
-            const itemsHtml = q.items.map(it => `
-                <div class="b1-schedule-item">
+            const itemsHtml = q.items.map((it, idx) => {
+                const pctBar = !isHard && q.total > 0
+                    ? `<div class="b1-item-pct-bar-wrap"><div class="b1-item-pct-bar" style="width:${Math.round(it.cost / q.total * 100)}%"></div></div>`
+                    : '';
+                return `
+                <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}</span>
                     ${isHard
                         ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`
                         : `<span class="b1-item-cost">${it.cost} 元</span>`
                     }
-                </div>`).join('');
+                    ${pctBar}
+                </div>`;
+            }).join('');
 
             const totalTag = showTotal
                 ? `<div class="b1-total-right">
@@ -625,8 +631,12 @@ document.addEventListener('DOMContentLoaded', () => {
                        <span class="b1-total-tag b1-total-tag-hidden">??? 元</span>
                    </div>`;
 
+            // 場景類別色標（Round 39）
+            const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
+            const catClass = catColorMap[q.cat] || '';
+
             return `
-            <div class="b1-schedule-card">
+            <div class="b1-schedule-card ${catClass}">
                 <div class="b1-schedule-header">
                     <span class="b1-schedule-icon">${q.icon}</span>
                     <div class="b1-schedule-text">
@@ -639,6 +649,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${totalTag}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
+                <div class="b1-route-strip">
+                    <span class="b1-rs-home">🏠</span>
+                    <span class="b1-rs-arrow">→</span>
+                    <span class="b1-rs-dest">${q.icon}</span>
+                    <span class="b1-rs-label">${q.label}</span>
+                    <span class="b1-rs-arrow">→</span>
+                    <span class="b1-rs-home">🏠</span>
+                </div>
             </div>`;
         },
 
@@ -661,9 +679,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b1-wallet-goal-tag">需要 ${requiredTotal} 元</span>
                     </div>
                 </div>
+                <div class="b1-wallet-progress-wrap">
+                    <div class="b1-wallet-progress" id="b1-wallet-progress"><div class="b1-wallet-progress-fill" id="b1-wallet-progress-fill"></div></div>
+                </div>
                 <div class="b1-wallet-coins b1-drop-zone" id="wallet-coins">
                     <span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>
                 </div>
+                <div class="b1-denom-summary" id="b1-denom-summary" style="display:none"></div>
             </div>`;
         },
 
@@ -734,6 +756,17 @@ document.addEventListener('DOMContentLoaded', () => {
             this._updateWalletDisplay();
             // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
             Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+            // 硬幣浮動標籤（A4 price popup pattern）
+            const coinArea = document.querySelector('.b1-coin-tray') || document.getElementById('wallet-coins') || document.getElementById('wallet-area');
+            if (coinArea) {
+                const rect = coinArea.getBoundingClientRect();
+                const popup = document.createElement('div');
+                popup.className = 'b1-coin-popup';
+                popup.textContent = `+${denom}元`;
+                popup.style.cssText = `position:fixed;left:${rect.left + rect.width/2}px;top:${rect.top + 10}px;`;
+                document.body.appendChild(popup);
+                Game.TimerManager.setTimeout(() => { if (popup.parentNode) popup.remove(); }, 900, 'ui');
+            }
         },
 
         removeCoin(uid) {
@@ -752,11 +785,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const required   = this.state.quiz.questions[this.state.quiz.currentQuestion]?.total ?? 0;
             const enough     = total >= required;
 
-            // 更新合計顯示
+            // 更新合計顯示 + 達標彈跳動畫（Round 36）
             const totalEl = document.getElementById('wallet-total');
             if (totalEl) {
                 totalEl.textContent = `${total} 元`;
+                const wasEnough = totalEl.classList.contains('enough');
                 totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+                if (enough && !wasEnough && total > 0) {
+                    totalEl.classList.add('b1-total-pop');
+                    Game.TimerManager.setTimeout(() => totalEl.classList.remove('b1-total-pop'), 500, 'ui');
+                }
+            }
+            // 更新進度條（Round 29）
+            const fillEl = document.getElementById('b1-wallet-progress-fill');
+            if (fillEl && required > 0) {
+                const pct = Math.min(100, Math.round((total / required) * 100));
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b1-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
             }
 
             // 更新錢包幣列
@@ -803,6 +848,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 行程卡綠光（剛好符合時）
                 const card = document.querySelector('.b1-schedule-card');
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
+            }
+
+            // 面額計數摘要（Round 32）
+            const denomSummaryEl = document.getElementById('b1-denom-summary');
+            if (denomSummaryEl && this.state.wallet.length > 0) {
+                const counts = {};
+                this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
+                denomSummaryEl.innerHTML = Object.entries(counts)
+                    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                    .map(([d, n]) => `<span class="b1-ds-item">${d}元×${n}</span>`).join('');
+                denomSummaryEl.style.display = '';
+            } else if (denomSummaryEl) {
+                denomSummaryEl.style.display = 'none';
             }
 
             // 簡單模式：動態淡化超出剩餘所需的錢幣
@@ -889,6 +947,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1400, 'ui');
         },
 
+        // ── 找零說明動畫（B6 _showChangeFormula pattern）────────
+        _showChangeTip(paid, required, change) {
+            const prev = document.getElementById('b1-change-tip');
+            if (prev) prev.remove();
+            const tip = document.createElement('div');
+            tip.id = 'b1-change-tip';
+            tip.className = 'b1-change-tip';
+            tip.innerHTML = `
+                <div class="b1-ct-title">💱 找零計算</div>
+                <div class="b1-ct-row">
+                    <span class="b1-ct-item">${paid}元</span>
+                    <span class="b1-ct-op">−</span>
+                    <span class="b1-ct-item">${required}元</span>
+                    <span class="b1-ct-op">=</span>
+                    <span class="b1-ct-ans">找回 ${change} 元</span>
+                </div>`;
+            document.body.appendChild(tip);
+            Game.TimerManager.setTimeout(() => {
+                tip.classList.add('b1-ct-fade');
+                Game.TimerManager.setTimeout(() => { if (tip.parentNode) tip.remove(); }, 400, 'ui');
+            }, 2200, 'ui');
+        },
+
         // ── Confirm ────────────────────────────────────────────
         handleConfirm(requiredTotal) {
             if (this.state.isProcessing) return;
@@ -914,6 +995,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
                 // 最少張數提示（C4/C6 最佳付款 pattern）
                 this._showMinCoinsHint(walletTotal, requiredTotal);
+                // 找零說明動畫（Round 25）
+                if (diff > 0) {
+                    Game.TimerManager.setTimeout(() => this._showChangeTip(walletTotal, requiredTotal, diff), 300, 'ui');
+                }
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -923,7 +1008,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(`需要${toTWD(requiredTotal)}，繼續下一題`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 } else {
-                    Game.Speech.speak(`還不夠喔！需要${toTWD(requiredTotal)}，你只有${toTWD(walletTotal)}`);
+                    const shortage = requiredTotal - walletTotal;
+                    Game.Speech.speak(`還差${toTWD(shortage)}，再多加一些！`);
                     this.state.isProcessing = false;
                     const walletArea = document.getElementById('wallet-area');
                     if (walletArea) {
@@ -1110,10 +1196,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 .sort((a, b) => b[0] - a[0])
                 .map(([d, c]) => `${c > 1 ? c + '個' : ''}${toTWD(parseInt(d))}`);
             Game.Speech.speak(`提示：放${parts.join('加')}，共${toTWD(curr.total)}`);
+            // 顯示建議面額浮動卡（Round 37）
+            const prevCard = document.getElementById('b1-hint-combo-card');
+            if (prevCard) prevCard.remove();
+            const card = document.createElement('div');
+            card.id = 'b1-hint-combo-card';
+            card.className = 'b1-hint-combo-card';
+            card.innerHTML = `<span class="b1-hcc-icon">💡</span><span>建議：${parts.join(' + ')}</span>`;
+            document.body.appendChild(card);
+            Game.TimerManager.setTimeout(() => card.remove(), 5000, 'ui');
 
             Game.TimerManager.setTimeout(() => {
                 document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-coin-hint'));
             }, 5000, 'ui');
+
+            this._animateHintCoins(optimal);
+        },
+
+        // ── 提示硬幣逐枚動畫（C2 逐一計數 pattern）──
+        _animateHintCoins(coins) {
+            const card = document.getElementById('b1-hint-combo-card');
+            if (!card) return;
+            // 在卡片下方加動畫區
+            const existing = document.getElementById('b1-hint-anim');
+            if (existing) existing.remove();
+            const wrap = document.createElement('div');
+            wrap.id = 'b1-hint-anim';
+            wrap.className = 'b1-hint-anim';
+            card.appendChild(wrap);
+            let cumulative = 0;
+            let i = 0;
+            const step = () => {
+                if (i >= coins.length) return;
+                const denom = coins[i];
+                cumulative += denom;
+                const el = document.createElement('div');
+                el.className = 'b1-hint-coin';
+                el.style.animationDelay = `${i * 200}ms`;
+                // 嘗試從錢幣盤找對應圖片
+                const src = `../images/money/${denom}_yuan_front.png`;
+                el.innerHTML = `<img src="${src}" onerror="this.parentNode.innerHTML='<span>${denom}</span>'" width="36" height="36"><span class="b1-hc-denom">${denom}元</span>`;
+                wrap.appendChild(el);
+                // 累計金額更新
+                let total = wrap.querySelector('.b1-hc-total');
+                if (!total) {
+                    total = document.createElement('div');
+                    total.className = 'b1-hc-total';
+                    wrap.appendChild(total);
+                }
+                total.textContent = `合計：${cumulative} 元`;
+                i++;
+                if (i < coins.length) {
+                    Game.TimerManager.setTimeout(step, 280, 'ui');
+                }
+            };
+            Game.TimerManager.setTimeout(step, 100, 'ui');
         },
 
         // ── Next Question / Results ────────────────────────────
@@ -1144,26 +1281,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = q.totalQuestions > 0
                 ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
 
-            let badge;
-            if      (accuracy >= 90) { badge = '優異 🏆'; }
-            else if (accuracy >= 70) { badge = '良好 👍'; }
-            else if (accuracy >= 50) { badge = '努力 💪'; }
-            else                     { badge = '練習 📚'; }
+            let badge, badgeColor;
+            if (accuracy === 100)    { badge = '完美 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 90) { badge = '優異 🥇'; badgeColor = '#f59e0b'; }
+            else if (accuracy >= 70) { badge = '良好 🥈'; badgeColor = '#10b981'; }
+            else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
+            else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
-            // 行程費用清單
-            const scheduleCardHTML = q.solvedSchedules && q.solvedSchedules.length > 0 ? `
-            <div class="b-review-card">
-                <h3>📋 完成的行程</h3>
-                <div class="b1-schedule-rows">
-                    ${q.solvedSchedules.map(s => `
-                    <div class="b1-schedule-row">
-                        <span class="b1-sch-icon">${s.icon}</span>
-                        <span class="b1-sch-label">${s.label}</span>
-                        <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
-                        <span class="b1-sch-total">${s.total}元</span>
-                    </div>`).join('')}
-                </div>
-            </div>` : '';
+            // 行程費用清單（最貴/最便宜標記 Round 40）
+            const scheduleCardHTML = (() => {
+                if (!q.solvedSchedules || q.solvedSchedules.length === 0) return '';
+                const maxTotal = Math.max(...q.solvedSchedules.map(s => s.total));
+                const minTotal = Math.min(...q.solvedSchedules.map(s => s.total));
+                return `
+                <div class="b1-res-schedules">
+                    <h3>📋 完成的行程</h3>
+                    <div class="b1-schedule-rows">
+                        ${q.solvedSchedules.map(s => {
+                            const tag = s.total === maxTotal && q.solvedSchedules.length > 1
+                                ? `<span class="b1-sch-tag most-exp">最貴 💸</span>`
+                                : s.total === minTotal && q.solvedSchedules.length > 1
+                                ? `<span class="b1-sch-tag cheapest">最便宜 💚</span>`
+                                : '';
+                            return `
+                            <div class="b1-schedule-row">
+                                <span class="b1-sch-icon">${s.icon}</span>
+                                <span class="b1-sch-label">${s.label}</span>
+                                <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
+                                <span class="b1-sch-total">${s.total}元</span>
+                                ${tag}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            })();
 
             // 面額使用統計
             const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
