@@ -2445,6 +2445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isEndingGame) return;
             this.state.isEndingGame = true;
 
+            AssistClick.deactivate();
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
@@ -2653,7 +2654,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this._overlay) return;
             this._overlay = document.createElement('div');
             this._overlay.id = 'b3-assist-overlay';
-            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            const tbEl = document.querySelector('.b-header');
+            const tbBottom = tbEl ? Math.round(tbEl.getBoundingClientRect().bottom) : 60;
+            this._overlay.style.cssText = `position:fixed;top:${tbBottom}px;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;`;
             document.body.appendChild(this._overlay);
             this._handler      = (e) => { e.stopPropagation(); this._executeStep(); };
             this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };

@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null, clickMode: null, itemCat: 'all' },
+            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null, clickMode: 'off', itemCat: 'all' },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -349,6 +349,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
+                        <div class="b-setting-group" id="assist-click-group" style="display:none;">
+                            <label class="b-setting-label">🤖 輔助點擊</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn${this.state.settings.clickMode === 'on' ? ' active' : ''}" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn${this.state.settings.clickMode !== 'on' ? ' active' : ''}" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:6px;font-size:12px;color:#6b7280;line-height:1.5;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">📋 題目數量</label>
                             <div class="b-btn-group" id="count-group">
@@ -380,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-cat="clothing">服飾配件</button>
                             </div>
                         </div>
-                        <div class="b-setting-group">
+                        <div class="b-setting-group" id="mode-settings-group">
                             <label class="b-setting-label">🔄 作答模式</label>
                             <div class="b-btn-group">
                                 <button class="b-sel-btn" data-mode="retry">反複作答</button>
@@ -388,16 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div style="margin-top:6px;font-size:12px;color:#6b7280;line-height:1.5;">
                                 反複作答：答錯可以再試 ｜ 單次作答：顯示正確答案後繼續
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
-                            <label class="b-setting-label">🤖 輔助點擊</label>
-                            <div class="b-btn-group" id="assist-group">
-                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
-                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
-                            </div>
-                            <div style="margin-top:6px;font-size:12px;color:#6b7280;line-height:1.5;">
-                                啟用後，只要偵測到點擊便會自動執行下一個步驟
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -450,6 +450,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.settings.difficulty = btn.dataset.diff;
                     const desc = document.getElementById('diff-desc');
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.diff]; desc.classList.add('show'); }
+                    const assistGroup = document.getElementById('assist-click-group');
+                    const modeGroup   = document.getElementById('mode-settings-group');
+                    if (btn.dataset.diff === 'easy') {
+                        if (assistGroup) assistGroup.style.display = '';
+                        if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
+                    } else {
+                        if (assistGroup) assistGroup.style.display = 'none';
+                        this.state.settings.clickMode = 'off';
+                        if (modeGroup) modeGroup.style.display = '';
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -494,6 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('[data-assist]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.clickMode = btn.dataset.assist;
+                    const modeGroup = document.getElementById('mode-settings-group');
+                    if (modeGroup) {
+                        modeGroup.style.display = (this.state.settings.difficulty === 'easy' && btn.dataset.assist === 'on') ? 'none' : '';
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -519,7 +533,8 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.compareStores || !s.clickMode;
+            const retryOk = (s.difficulty === 'easy' && s.clickMode === 'on') || !!s.retryMode;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !retryOk || !s.compareStores;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -1532,6 +1547,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isEndingGame) return;
             this.state.isEndingGame = true;
 
+            AssistClick.deactivate();
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
             Game.EventManager.removeByCategory('diffUI');
@@ -1747,7 +1763,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this._correctSide = correctSide;
             this._overlay = document.createElement('div');
             this._overlay.id = 'b4-assist-overlay';
-            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            const tbEl = document.querySelector('.b-header');
+            const tbBottom = tbEl ? Math.round(tbEl.getBoundingClientRect().bottom) : 60;
+            this._overlay.style.cssText = `position:fixed;top:${tbBottom}px;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;`;
             document.body.appendChild(this._overlay);
             this._handler      = (e) => { e.stopPropagation(); this._executeStep(); };
             this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };

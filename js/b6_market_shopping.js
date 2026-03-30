@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: null, marketType: null },
+            settings: { difficulty: null, rounds: null, clickMode: 'off', marketType: null },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -555,6 +555,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
+                        <div class="b-setting-group" id="assist-click-group" style="display:none;">
+                            <label class="b-setting-label">🤖 輔助點擊：</label>
+                            <div class="b-btn-group" id="assist-group">
+                                <button class="b-sel-btn${this.state.settings.clickMode === 'on' ? ' active' : ''}" data-assist="on">✓ 啟用</button>
+                                <button class="b-sel-btn${this.state.settings.clickMode !== 'on' ? ' active' : ''}" data-assist="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                啟用後，只要偵測到點擊便會自動執行下一個步驟
+                            </div>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">關卡數：</label>
                             <div class="b-btn-group" id="rounds-group">
@@ -592,16 +602,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">🤖 輔助點擊：</label>
-                            <div class="b-btn-group" id="assist-group">
-                                <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
-                                <button class="b-sel-btn" data-assist="off">✗ 停用</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                啟用後，只要偵測到點擊便會自動執行下一個步驟
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 依照購物清單在市場各攤位買菜，然後付款找零
                             </label>
@@ -630,6 +630,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.settings.difficulty = btn.dataset.val;
                     const desc = document.getElementById('diff-desc');
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
+                    const assistGroup = document.getElementById('assist-click-group');
+                    if (assistGroup) {
+                        if (btn.dataset.val === 'easy') {
+                            assistGroup.style.display = '';
+                        } else {
+                            assistGroup.style.display = 'none';
+                            this.state.settings.clickMode = 'off';
+                        }
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -681,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.clickMode || !s.marketType;
+            if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.marketType;
         },
 
         // ── 8. 遊戲開始 ───────────────────────────────────────
@@ -1413,6 +1422,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isEndingGame) return;
             this.state.isEndingGame = true;
 
+            AssistClick.deactivate();
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
@@ -1616,7 +1626,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this._overlay) return;
             this._overlay = document.createElement('div');
             this._overlay.id = 'b6-assist-overlay';
-            this._overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;';
+            const tbEl = document.querySelector('.b-header');
+            const tbBottom = tbEl ? Math.round(tbEl.getBoundingClientRect().bottom) : 60;
+            this._overlay.style.cssText = `position:fixed;top:${tbBottom}px;left:0;right:0;bottom:0;z-index:10100;pointer-events:all;touch-action:none;background:transparent;cursor:pointer;`;
             document.body.appendChild(this._overlay);
             this._handler = (e) => { e.stopPropagation(); this._executeStep(); };
             this._touchHandler = (e) => { e.preventDefault(); e.stopPropagation(); this._executeStep(); };

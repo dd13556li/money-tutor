@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-count="20">20題</button>
                             </div>
                         </div>
-                        <div class="b-setting-group">
+                        <div class="b-setting-group" id="mode-settings-group">
                             <label class="b-setting-label">🔄 作答模式</label>
                             <div class="b-btn-group" id="mode-group">
                                 <button class="b-sel-btn" data-mode="retry">反複作答</button>
@@ -411,13 +411,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     // 輔助點擊：只有簡單模式才顯示
                     const assistGroup = document.getElementById('assist-click-group');
-                    if (assistGroup) {
-                        if (btn.dataset.diff === 'easy') {
-                            assistGroup.style.display = '';
-                        } else {
-                            assistGroup.style.display = 'none';
-                            this.state.settings.clickMode = 'off';
-                        }
+                    const modeGroup   = document.getElementById('mode-settings-group');
+                    if (btn.dataset.diff === 'easy') {
+                        if (assistGroup) assistGroup.style.display = '';
+                        if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
+                    } else {
+                        if (assistGroup) assistGroup.style.display = 'none';
+                        this.state.settings.clickMode = 'off';
+                        if (modeGroup) modeGroup.style.display = '';
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -461,6 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.clickMode = btn.dataset.assist;
+                    const modeGroup = document.getElementById('mode-settings-group');
+                    if (modeGroup) {
+                        modeGroup.style.display = (this.state.settings.difficulty === 'easy' && btn.dataset.assist === 'on') ? 'none' : '';
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -474,7 +479,8 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.retryMode || !s.sceneCategory;
+            const retryOk = (s.difficulty === 'easy' && s.clickMode === 'on') || !!s.retryMode;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !retryOk || !s.sceneCategory;
         },
 
         // ── Start Game ─────────────────────────────────────────
