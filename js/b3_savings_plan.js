@@ -28,14 +28,19 @@ function b3CompressImage(file, maxWidth = 200, quality = 0.7) {
 // ── 商品資料庫（依難度篩選）─────────────────────────────────────
 const B3_ALL_ITEMS = [
     // ── easy (≤400 元) ─────────────────────────────────────────
+    { name: '鉛筆盒',    price: 180,  icon: '🖊️', img: 'c5/icon-c5-pencil-case.png',       cat: 'book'    },
     { name: '漫畫書',    price: 200,  icon: '📚', img: 'c5/icon-c5-comic-book.png',        cat: 'book'    },
+    { name: '日記本',    price: 240,  icon: '📓', img: 'c5/icon-c5-diary.png',             cat: 'book'    },
     { name: '故事書',    price: 260,  icon: '📕', img: 'c5/icon-c5-story-book.png',        cat: 'book'    },
     { name: '玩具車',    price: 300,  icon: '🚗', img: 'c5/icon-c5-toy-car.png',           cat: 'toy'     },
+    { name: '計算機',    price: 340,  icon: '🔢', img: 'c5/icon-c5-calculator.png',        cat: 'tech'    },
     { name: '娃娃',      price: 350,  icon: '🪆', img: 'c5/icon-c5-doll.png',              cat: 'toy'     },
     { name: '遙控車',    price: 380,  icon: '🏎️', img: 'c5/icon-c5-rc-car.png',            cat: 'toy'     },
     { name: '機器人玩具', price: 400,  icon: '🤖', img: 'c5/icon-c5-robot.png',             cat: 'toy'     },
     // ── normal（≤800 元）──────────────────────────────────────
+    { name: '運動上衣',  price: 450,  icon: '👕', img: 'c5/icon-c5-shirt.png',             cat: 'outdoor' },
     { name: '耳機',      price: 480,  icon: '🎧', img: 'c5/icon-c5-headphones.png',        cat: 'tech'    },
+    { name: '運動褲',    price: 520,  icon: '👖', img: 'c5/icon-c5-pants.png',             cat: 'outdoor' },
     { name: '外套',      price: 550,  icon: '🧥', img: 'c5/icon-c5-jacket.png',            cat: 'outdoor' },
     { name: '籃球鞋',    price: 620,  icon: '👟', img: 'c5/icon-c5-basketball-shoes.png',  cat: 'outdoor' },
     { name: '藍芽喇叭',  price: 680,  icon: '🔊', img: 'c5/icon-c5-bluetooth-speaker.png', cat: 'tech'    },
@@ -44,6 +49,7 @@ const B3_ALL_ITEMS = [
     // ── hard（全部）──────────────────────────────────────────
     { name: '腳踏車',    price: 1500, icon: '🚴', img: 'c5/icon-c5-bicycle.png',           cat: 'outdoor' },
     { name: '平板電腦',  price: 3000, icon: '📱', img: 'c5/icon-c5-tablet.png',            cat: 'tech'    },
+    { name: '手機',      price: 4500, icon: '📲', img: 'c5/icon-c5-phone.png',             cat: 'tech'    },
 ];
 
 const B3_ITEMS_BY_DIFF = {

@@ -621,6 +621,14 @@ hard mode 非必買商品顯示「??? 元」；首次點擊揭示價格（`.b5-p
 
 `_updateTotalBar` 末尾對非必買未選卡片 toggle `.b5-affordable`（`price <= remBudget`），綠色虛線外框提示學生「這個還買得起」。
 
+### 17.14 必買門檻標線（Round 36）
+
+`_updateTotalBar` 計算 `mustPct`（必買商品合計 / 預算 × 100）；`#b5-must-marker` 為琥珀色垂直標線，固定在預算儀表條上「必買底線」位置，視覺化告訴學生「至少要花到這裡」。
+
+**搜尋關鍵字**：`mustPct`、`b5-must-marker`
+
+**教學意義**：預算有「底線」與「上線」之別。必買門檻標線讓學生看到「還剩多少選購空間」，與 `b5-budget-meter` 配合形成「使用空間視覺化」。參考 F5 量比較 pattern。
+
 ---
 
 ## 十八、完成畫面豐富化
