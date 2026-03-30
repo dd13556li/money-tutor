@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 startDate: null,      // easy only (null = today)
                 dailyAmount: null,    // easy only (null = auto)
                 priceRange: null,     // easy only (max price of items)
-                clickMode: null,      // hard mode quiz only
+                clickMode: 'off',     // easy mode only
                 itemCat: 'all',       // item category filter (all/toy/book/outdoor/tech)
             },
             quiz: {
@@ -322,6 +322,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn b-diff-hard"   data-val="hard">困難</button>
                     </div>
                     <div class="b-diff-desc" id="diff-desc"></div>
+                </div>
+
+                <div class="b-setting-group" id="assist-click-group" style="display:none;">
+                    <label class="b-setting-label">🤖 輔助點擊</label>
+                    <div class="b-btn-group" id="assist-group">
+                        <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
+                        <button class="b-sel-btn active" data-assist="off">✗ 停用</button>
+                    </div>
+                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                        啟用後，只要偵測到點擊便會自動執行下一個步驟
+                    </div>
                 </div>
 
                 <div class="b-setting-group b3-cal-settings" id="cal-settings-group" style="display:none;">
@@ -476,16 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-cat="tech">💻 科技</button>
                     </div>
                 </div>
-                <div class="b-setting-group b3-hard-settings" style="display:none">
-                    <label class="b-setting-label">🤖 輔助點擊</label>
-                    <div class="b-btn-group" id="assist-group">
-                        <button class="b-sel-btn" data-assist="on">✓ 啟用</button>
-                        <button class="b-sel-btn" data-assist="off">✗ 停用</button>
-                    </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                        啟用後，只要偵測到點擊便會自動執行下一個步驟
-                    </div>
-                </div>
                 <div class="b-setting-group">
                     <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                         ✨ 簡單：月曆存錢，面額已分解好直接放置｜普通：月曆存錢，自行組合面額｜困難：計算每週存款所需週數
@@ -521,6 +522,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.b3-normal-settings').forEach(el => el.style.display = diff === 'normal' ? '' : 'none');
                     document.querySelectorAll('.b3-hard-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
                     document.querySelectorAll('.b3-quiz-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
+                    // 輔助點擊：只有簡單模式才顯示
+                    const assistGroup = document.getElementById('assist-click-group');
+                    if (diff === 'easy') {
+                        if (assistGroup) assistGroup.style.display = '';
+                    } else {
+                        if (assistGroup) assistGroup.style.display = 'none';
+                        this.state.settings.clickMode = 'off';
+                        document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.toggle('active', b.dataset.assist === 'off'));
+                    }
                     if (diff === 'hard') {
                         // Reset calendar settings
                         this.state.settings.startDate = null;
@@ -908,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = !s.priceRange || !s.dailyAmount ||
                                s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
-                btn.disabled = !s.questionCount || !s.retryMode || !s.clickMode;
+                btn.disabled = !s.questionCount || !s.retryMode;
             }
         },
 
@@ -2182,7 +2192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak(speechMap[diff]);
             }, 500, 'speech');
 
-            // 輔助點擊啟動（困難模式 quiz 用）
+            // 輔助點擊啟動（quiz 數字鍵盤用）
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(question), 700, 'ui');
             }
