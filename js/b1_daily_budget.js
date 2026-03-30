@@ -338,11 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🔄 作答模式</label>
                             <div class="b-btn-group" id="mode-group">
-                                <button class="b-sel-btn" data-mode="retry">重試模式</button>
-                                <button class="b-sel-btn" data-mode="proceed">繼續模式</button>
+                                <button class="b-sel-btn" data-mode="retry">反複作答</button>
+                                <button class="b-sel-btn" data-mode="proceed">單次作答</button>
                             </div>
                             <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                重試：答錯可以再試 ｜ 繼續：顯示答案後繼續下一題
+                                反複作答：答錯可以再試 ｜ 單次作答：顯示答案後繼續下一題
                             </div>
                         </div>
                         <div class="b-setting-group">

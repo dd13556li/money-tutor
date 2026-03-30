@@ -423,10 +423,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-setting-group b3-hard-settings" id="mode-settings-group" style="display:none;">
                     <label class="b-setting-label">🔄 作答模式：</label>
                     <div class="b-btn-group" id="mode-group">
-                        <button class="b-sel-btn" data-val="retry">重試模式</button>
-                        <button class="b-sel-btn" data-val="proceed">繼續模式</button>
+                        <button class="b-sel-btn" data-val="retry">反複作答</button>
+                        <button class="b-sel-btn" data-val="proceed">單次作答</button>
                     </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">重試：答錯可以再試 ｜ 繼續：顯示答案後繼續</div>
+                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">反複作答：答錯可以再試 ｜ 單次作答：顯示答案後繼續</div>
                 </div>
 
                 <div class="b-setting-group">
