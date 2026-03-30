@@ -3612,8 +3612,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
-                                <span class="iic-price">${itemPrice} 元</span>
-                                <span class="iic-divider">｜</span>
+                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 <span class="iic-paid">已付: <span id="payment-total">0</span> 元</span>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
@@ -3707,8 +3706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
-                                <span class="iic-price">${itemPrice} 元</span>
-                                <span class="iic-divider">｜</span>
+                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 <div id="payment-info-display" class="iic-paid" style="display:none;">已付: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元</div>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
@@ -3745,6 +3743,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // 指令彈窗
+        // 朗讀題目（🔊 按鈕用）
+        speakQuestion() {
+            const question = this.state.gameState && this.state.gameState.question;
+            if (!question) return;
+            const { item, itemPrice } = question;
+            this.speech.speak(`購買物品，${item.name}共${itemPrice}元，請付錢`, { interrupt: true });
+        },
+
         showInstructionModal(question) {
             const { item, itemPrice } = question;
             const { difficulty } = this.state.settings;
@@ -5756,7 +5762,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="item-info-compact">
                         <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
-                        <span class="iic-price">${itemPrice} 元</span>
+                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6155,7 +6161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="item-info-compact">
                         <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
-                        <span class="iic-price">${itemPrice} 元</span>
+                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6465,7 +6471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="item-info-compact" style="justify-content:center;">
                                     <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                     <span class="iic-name">${item.name}</span>
-                                    <span class="iic-price">${itemPrice} 元</span>
+                                    <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 </div>
                             </div>
 
@@ -8107,12 +8113,24 @@ document.addEventListener('DOMContentLoaded', () => {
         getCommonCSS() {
             return `
                 /* 基礎樣式 - 參照unit6 */
-                body { 
-                    background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%) !important; 
-                    margin: 0; 
-                    padding: 0; 
+                body {
+                    background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%) !important;
+                    margin: 0;
+                    padding: 0;
                     font-family: 'Microsoft JhengHei', sans-serif;
                 }
+                /* 題目朗讀按鈕 */
+                .quiz-speak-btn {
+                    width: 36px; height: 36px; border-radius: 50%;
+                    border: 2px solid #7c3aed; background: white; color: #7c3aed;
+                    font-size: 1.1rem; cursor: pointer;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    box-shadow: 0 2px 8px rgba(124,58,237,0.2);
+                    transition: background 0.2s, color 0.2s; padding: 0;
+                    flex-shrink: 0; vertical-align: middle; margin-left: 8px;
+                }
+                .quiz-speak-btn:hover { background: #7c3aed; color: white; }
+                .quiz-speak-btn:active { transform: scale(0.92); }
                 
                 /* 標題列樣式 - 參照unit6 */
                 .title-bar {

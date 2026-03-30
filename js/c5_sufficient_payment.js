@@ -3648,7 +3648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- 物品信息 -->
                         <div class="item-total-container" style="text-align: center; width: 100%; margin: 15px 0;">
                             <span class="item-info-display" style="font-size: 1.8em; color: #e74c3c; font-weight: bold;">
-                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元
+                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元<button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                             </span>
                         </div>
                         <div class="current-total-display unit5-easy-total-display" style="text-align: center; margin: 10px auto;">
@@ -3719,7 +3719,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- 物品信息與總額的容器 -->
                         <div class="item-total-container" style="text-align: center; width: 100%; margin: 15px 0;">
                             <span class="item-info-display" style="font-size: 1.8em; color: #e74c3c; font-weight: bold;">
-                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元
+                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元<button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                             </span>
                         </div>
                         <div class="current-total-display unit5-normal-total-display" style="display: none; text-align: center; font-size: 1.8em; color: #3498db; margin: 10px 0;">
@@ -3794,7 +3794,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- 物品信息與總額的容器 -->
                         <div class="item-total-container" style="text-align: center; width: 100%; margin: 15px 0;">
                             <span class="item-info-display" style="font-size: 1.8em; color: #e74c3c; font-weight: bold;">
-                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元
+                                <span style="font-size: 2.5em; display: inline-flex; align-items: center; vertical-align: middle;">${this.getItemImg(item, '2.5em')}</span> ${item.name} ${itemPrice}元<button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
                             </span>
                         </div>
                         <div class="current-total-display unit5-hard-total-display" style="display: none; text-align: center; font-size: 1.8em; color: #3498db; margin: 10px 0;">
@@ -3821,11 +3821,22 @@ document.addEventListener('DOMContentLoaded', () => {
             this.setupHardModeEventListeners(question);
         },
 
+        // 朗讀題目（🔊 按鈕用）
+        speakQuestion() {
+            const question = this.state.gameState && this.state.gameState.question;
+            if (!question) return;
+            const { item, itemPrice } = question;
+            const text = this.state.settings.difficulty === 'easy'
+                ? `算一算，你的錢夠不夠買${item.name}`
+                : `想一想，你的錢夠不夠買${item.name}，它要${itemPrice}元`;
+            this.speech.speak(text, { interrupt: true });
+        },
+
         // 指令彈窗
         showInstructionModal(question) {
             const { item, itemPrice } = question;
             const { difficulty } = this.state.settings;
-            
+
             let instructionText = '';
             switch (difficulty) {
                 case 'easy':
@@ -5657,12 +5668,24 @@ document.addEventListener('DOMContentLoaded', () => {
         getCommonCSS() {
             return `
                 /* 基礎樣式 - 參照unit6 */
-                body { 
-                    background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%) !important; 
-                    margin: 0; 
-                    padding: 0; 
+                body {
+                    background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%) !important;
+                    margin: 0;
+                    padding: 0;
                     font-family: 'Microsoft JhengHei', sans-serif;
                 }
+                /* 題目朗讀按鈕 */
+                .quiz-speak-btn {
+                    width: 36px; height: 36px; border-radius: 50%;
+                    border: 2px solid #7c3aed; background: white; color: #7c3aed;
+                    font-size: 1.1rem; cursor: pointer;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    box-shadow: 0 2px 8px rgba(124,58,237,0.2);
+                    transition: background 0.2s, color 0.2s; padding: 0;
+                    flex-shrink: 0; vertical-align: middle; margin-left: 8px;
+                }
+                .quiz-speak-btn:hover { background: #7c3aed; color: white; }
+                .quiz-speak-btn:active { transform: scale(0.92); }
                 
                 /* 標題列樣式 - 參照unit6 */
                 .title-bar {
