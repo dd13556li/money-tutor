@@ -1,7 +1,7 @@
 # 專案檔案關聯表
 
 建立日期：2026-02-24
-最後更新：2026-03-16
+最後更新：2026-03-30
 專案路徑：`money_tutor/`
 
 ---
@@ -331,23 +331,23 @@ css/ai-theme.css
 | 檔案 | 行數 | 對應單元 | 主要物件 |
 |------|------|---------|---------|
 | `a1_vending_machine.js` | 7,588 | A1 自動販賣機 | `VendingMachine` |
-| `a2_barber_shop_kiosk.js` | 8,569 | A2 理髮廳 | `BarberKiosk` |
+| `a2_barber_shop_kiosk.js` | 9,553 | A2 理髮廳 | `BarberKiosk` |
 | `a3_mcdonalds_order.js` | 10,591 | A3 麥當勞 | `McDonald` |
 | `a4_simulated_shopping.js` | 14,761 | A4 超市 | `Game` |
 | `a5_atm_simulator.js` | 16,093 | A5 ATM | `ATM` |
 | `a6_train_ticket.js` | 10,830 | A6 火車票 | `Game` |
-| `b1_daily_budget.js` | 1,036 | B1 今天帶多少錢 | `Game`（2026-03-14 新增）|
-| `b2_allowance_diary.js` | 907 | B2 零用錢日記 | `Game` |
-| `b3_savings_plan.js` | 835 | B3 存錢計畫 | `Game` |
-| `b4_sale_comparison.js` | 863 | B4 特賣比一比 | `Game` |
-| `b5_party_budget.js` | 781 | B5 生日派對預算 | `Game` |
-| `b6_market_shopping.js` | 977 | B6 菜市場買菜 | `Game` |
+| `b1_daily_budget.js` | 1,417 | B1 今天帶多少錢 | `Game`（2026-03-14 新增）|
+| `b2_allowance_diary.js` | 1,500 | B2 零用錢日記 | `Game` |
+| `b3_savings_plan.js` | 2,741 | B3 存錢計畫 | `Game` |
+| `b4_sale_comparison.js` | 1,889 | B4 特賣比一比 | `Game` |
+| `b5_party_budget.js` | 1,277 | B5 生日派對預算 | `Game` |
+| `b6_market_shopping.js` | 1,762 | B6 菜市場買菜 | `Game` |
 | `c1_money_types.js` | 1,786 | C1 認識錢幣 | `Game` |
 | `c2_money_counting.js` | 2,299 | C2 數錢 | `Game` |
-| `c3_money_exchange.js` | 10,099 | C3 換錢 | `Game` |
+| `c3_money_exchange.js` | 10,430 | C3 換錢 | `Game` |
 | `c4_correct_amount.js` | 6,133 | C4 付款 | `Game` |
-| `c5_sufficient_payment.js` | 6,440 | C5 夠不夠 | `Game` |
-| `c6_making_change.js` | 10,073 | C6 找零 | `Game` |
+| `c5_sufficient_payment.js` | 6,767 | C5 夠不夠 | `Game` |
+| `c6_making_change.js` | 10,471 | C6 找零 | `Game` |
 | `f1_object_correspondence.js` | 7,241 | F1 一對一對應 | `Game` |
 | `f2_rote_and_rational_counting.js` | 4,401 | F2 唱數 | `Game` |
 | `f3_number_recognition.js` | 3,944 | F3 數字認讀 | `Game` |
@@ -425,7 +425,7 @@ css/ai-theme.css
 | `dark-mode-simple.css` | 83 | 深色模式（`prefers-color-scheme` 媒體查詢） | 全 24 個單元 HTML |
 | `ai-theme.css` | 2,021 | AI 風格主題（背景、按鈕、卡片；`a:not(.selection-btn):not(.choice-btn)` 選擇器修正 2026-03-05）| 23 單元（除 A1）+ index |
 | `shared-game-base.css` | 2,830 | **B/C/F 系列共用基礎**（原 `unit6.css` 重構分拆，2026-03-07 新增）：難度選擇、計分卡、完成畫面通用版面 | B1~B6, C1~C6, F1~F6（18 個）|
-| `b-series.css` | 665 | **B 系列專屬**（2026-03-14 新增）：`.b-series/.b-header/.b-res-*` 前綴規則；完成畫面動畫（bResCelebrate/bResBounce/bResGlow）；語音重播按鈕（`.b-inline-replay`）；中央回饋動畫（`.b-center-feedback`） | B1~B6（6 個）|
+| `b-series.css` | 656 | **B 系列專屬**（2026-03-14 新增）：`.b-series/.b-header/.b-res-*` 前綴規則；完成畫面動畫（bResCelebrate/bResBounce/bResGlow）；語音重播按鈕（`.b-inline-replay`）；中央回饋動畫（`.b-center-feedback`）；2026-03-20 清除舊完成畫面死碼 `.b-completion` 系列（~85行）| B1~B6（6 個）|
 | `c-series.css` | 559 | **C 系列專屬**（從 unit6.css 分拆，2026-03-07 新增）：`.c-series` 前綴規則，含購物區、金錢拖曳、購物車等 C 系列特有樣式 | C1~C6（6 個）|
 | ~~`unit6.css`~~ | ~~3,377~~ | ~~C/F 系列通用基礎~~（已由 shared-game-base.css + c-series.css 取代）| ✅ **2026-03-09 已刪除** |
 | ~~`dark-theme.css`~~ | ~~已刪除~~ | ~~深色主題完整樣式~~ | ✅ **2026-02-24 已刪除** |
@@ -442,12 +442,12 @@ css/ai-theme.css
 
 | 檔案 | 行數 | 對應單元 |
 |------|------|---------|
-| `b1_daily_budget.css` | 741 | B1（含 `.b1-coin-tray`、`.b1-drop-zone`、`.b1-wallet-goal-tag` 拖曳放置樣式）|
-| `b2_allowance_diary.css` | 276 | B2（含 `.b2-answer-card`、`.b2-answer-prompt`）|
-| `b3_savings_plan.css` | 294 | B3（含 `.b3-answer-card`）|
-| `b4_sale_comparison.css` | 296 | B4（含 `.b4-vs-divider` VS 分隔圖示）|
-| `b5_party_budget.css` | 243 | B5 |
-| `b6_market_shopping.css` | 391 | B6（含 `#b6-wrong-tip`、`.b6-bill-label`、`--bill-color` 面額顏色）|
+| `b1_daily_budget.css` | 906 | B1（含 `.b1-coin-tray`、`.b1-drop-zone`、`.b1-wallet-goal-tag` 拖曳放置樣式；`b-res-denom-stats`/`b1-stat-grid`/`b1-stat-item` 面額統計；`.b1-res-schedules`/`.b1-sch-*` 行程費用清單；`.b1-exact-toast`/`b1ToastUp` 投幣剛好 toast）|
+| `b2_allowance_diary.css` | 547 | B2（含 `.b2-answer-card`、`.b2-answer-prompt`；`.b2-res-diary`/`.b2-hist-table`/`.b2-hist-ev` 記帳回顧；`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income/.expense` 計算過程；`.b2-res-totals`/`.b2-res-max-records`；`.b2-entry-active` 逐項動畫；`.b2-running-total`/`b2RtPop`/`b2-task-intro-*` 開題彈窗）|
+| `b3_savings_plan.css` | 1,574 | B3（含 `.b3-answer-card`；`b3-cal-*` 月曆系統；`b3-drag-coin`/`b3-drop-slot`/`b3-slot-filled`/`b3-slot-check`/`b3-drop-wrong` 拖曳存錢；`b3-pig-*` 撲滿卡片；`b3-pig-exch-btn`/`b3MilestonePop`/`b3MilestoneFade` 里程碑；`b3-streak-badge`/`b3SbPop` 連勝徽章；`b3-goal-modal*` 開題彈窗；`b3-res-goals`/`b3-goal-summary` 完成畫面）|
+| `b4_sale_comparison.css` | 583 | B4（含 `.b4-vs-divider` VS 分隔圖示；`.b4-pbar-*` 視覺比例條；`.b4-diff-hint-formula`/`.b4-hint-*` 差額算式提示；`.b4-res-compare`/`.b4-cmp-table`/`.b4-cmp-*` 比價歷程；`.b4-res-ranking`/`.b4-rank-row`/`.b4-rank-medal` 省錢排行；`b4ToastUp`/省錢 toast；`b4SelectHint`/`.b4-diff-hint-btn` 高亮提示）|
+| `b5_party_budget.css` | 490 | B5（含 `.b5-round-intro`/`b5RiIn`/`.b5-ri-*` 每關開場介紹卡；`.b5-res-budget-stats`/`.b5-budget-bars`/`.b5-bar-fill` 預算橫條圖；`.b5-res-party-review`/`.b5-party-tags`/`.b5-party-tag` 物品回顧；`.b5-hint-btn`/`.b5-hint-glow` 預算提示；`b5RtIn` 轉場卡）|
+| `b6_market_shopping.css` | 717 | B6（含 `#b6-wrong-tip`、`.b6-bill-label`、`--bill-color` 面額顏色；`.b6-change-question`/`.b6-change-opts`/`.b6-change-opt/-correct/-wrong` 找零三選一；`.b6-res-receipt`/`.b6-receipt-table` 採購收據；`.b6-res-stall-stats`/`.b6-stall-fill` 攤位消費分析；`b6RcIn` 關卡完成轉場卡）|
 
 #### A 系列（css/ 目錄，6 個）
 
@@ -597,19 +597,32 @@ css/ai-theme.css
 | 類別 | 檔案 | 說明 |
 |------|------|------|
 | A 系列 | `A1~A6_Unit_Completion_Report.md` | A 系列各單元完成報告 |
-| B 系列 | `B1~B6_Unit_Completion_Report.md` | B 系列各單元完成報告（2026-03-14 新建）|
+| B 系列 | `B1~B6_Unit_Completion_Report.md` | B 系列各單元完成報告（2026-03-14 新建；2026-03-27 補全）|
+| B 系列總覽 | `B_Series_Unit_Completion_Report.md` | B 系列功能總覽報告（2026-03-30 新增）|
 | C 系列 | `C1~C6_Unit_Completion_Report.md` | C 系列各單元完成報告（含 C5，2026-03 新增）|
 | F 系列 | `F1~F6_Unit_Completion_Report.md` | F 系列各單元完成報告 |
 | 輔助系統 | `Reward_Unit_Completion_Report.md` | 獎勵系統完成報告（2026-02-24 新建）|
 | 輔助系統 | `Worksheet_Unit_Completion_Report.md` | 作業單系統完成報告（2026-02-24 新建）|
 
-### 7-2 專項報告（report/ 目錄，3 個）
+### 7-2 專項報告（report/ 目錄）
 
 | 檔案 | 說明 |
 |------|------|
 | `Bug_Audit_Report_20260306.md` | 廢棄程式碼稽核報告（2026-03-06）|
+| `Bug_Audit_Report_20260314.md` | 廢棄程式碼稽核報告（2026-03-14）|
 | `CSS_Improvement_Plan.md` | CSS 改善計畫文件 |
 | `Speech_Pattern_Report.md` | 語音模式分析報告 |
+| `Code_Templates.md` | 常用程式碼模板（TimerManager/EventManager/完成畫面/煙火等）|
+| `Deprecated_Code_Audit.md` | 廢棄程式碼稽核（持續維護）|
+| `Fix_History.md` | 歷史修復記錄彙整（CLAUDE.md 歸檔區）|
+| `ClickMode_Animation_DOM_Patterns.md` | 輔助點擊動畫 DOM 模式分析 |
+| `Debug_Commands_Reference.md` | Debug 指令速查 |
+| `A_Series_Hint_System_Analysis.md` | A 系列提示系統分析 |
+| `B_Series_Development_Spec.md` | B 系列開發規格文件 |
+| `B3_Items_Image_Filenames.md` | B3 物品圖片檔名對照表 |
+| `Expansion_Planning_20260314.md` | B 系列擴充規劃（2026-03-14）|
+| `CLAUDE_md_Token_Cost_Analysis.md` | CLAUDE.md Token 成本分析 |
+| `AI_Video_Production_Plan_20260316_1400.md` | AI 影片製作計畫（2026-03-16）|
 
 ### 7-3 檔案關聯記錄
 

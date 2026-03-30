@@ -4370,7 +4370,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="unified-task-frame">
                         <div class="target-item-display">
                             <div class="item-content">
-                                <div class="item-task-text"><span style="align-self:center;font-size:1.8em;font-weight:bold;">${taskDescription}</span>${this.getProductIconHTML(targetItem, '8rem')}<span style="align-self:center;font-size:1.8em;font-weight:bold;"> 共${targetItem.price}元</span></div>
+                                <div class="item-task-text"><span style="align-self:center;font-size:1.8em;font-weight:bold;">${taskDescription}</span>${this.getProductIconHTML(targetItem, '8rem')}<span style="align-self:center;font-size:1.8em;font-weight:bold;"> 共${targetItem.price}元</span><button class="a4-task-speak-btn" onclick="Game.speakShoppingTask()" title="朗讀任務">🔊</button></div>
                             </div>
                         </div>
                     </div>
@@ -4708,6 +4708,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         
+        // 朗讀指定任務（任務框右側🔊按鈕用）
+        speakShoppingTask() {
+            const targetItem = this.state.gameState.selectedItem || this.state.gameState.currentTransaction.targetItem;
+            if (!targetItem) return;
+            const productInfo = this.parseProductDisplay(targetItem, 1);
+            const speechText = `請購買${productInfo.speechText}，共${this.convertToTraditionalCurrency(targetItem.price)}`;
+            this.speech.speak(speechText, { interrupt: true });
+        },
+
         // 顯示任務指示彈窗（支援主題切換）
         showTaskModal(targetItem) {
             // 模態狀態已經在showShoppingScene中設置，這裡確認一下
