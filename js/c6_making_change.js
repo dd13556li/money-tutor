@@ -3612,7 +3612,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
-                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
+                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 <span class="iic-paid">已付: <span id="payment-total">0</span> 元</span>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
@@ -3706,7 +3706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                 <span class="iic-name">${item.name}</span>
-                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
+                                <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 <div id="payment-info-display" class="iic-paid" style="display:none;">已付: <span id="payment-total">${difficulty === 'hard' ? '???' : '0'}</span> 元</div>
                             </div>
                             <div id="payment-drop-zone" class="drop-zone">
@@ -5762,7 +5762,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="item-info-compact">
                         <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
-                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
+                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6161,7 +6161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="item-info-compact">
                         <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                         <span class="iic-name">${item.name}</span>
-                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
+                        <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
                     </div>
                     <div class="calculation-display">
                         <span class="calc-text">${walletAmount}元 - ${itemPrice}元 = ${changeAmount}元</span>
@@ -6471,7 +6471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="item-info-compact" style="justify-content:center;">
                                     <span class="iic-img">${this.getItemImg(item, '180px')}</span>
                                     <span class="iic-name">${item.name}</span>
-                                    <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="Game.speakQuestion()" title="朗讀題目">🔊</button>
+                                    <span class="iic-price">${itemPrice} 元</span><button class="quiz-speak-btn" onclick="event.stopPropagation();Game.speakQuestion()" title="朗讀題目">🔊</button>
                                 </div>
                             </div>
 
