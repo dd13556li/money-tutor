@@ -1126,6 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isEndingGame) return;
             this.state.isEndingGame = true;
 
+            AssistClick.deactivate();
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
