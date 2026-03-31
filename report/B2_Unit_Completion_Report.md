@@ -6,6 +6,7 @@
 > **更新日期**：2026-03-29（日記主題篩選：`B2_THEMES`（school/holiday/family）；設定頁「📓 日記主題」3 選項；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：收支徽章/趨勢條/理財建議/漸進提示/前後對比/週收支統計完整記錄）
 > **更新日期**：2026-03-31（Round 41：簡單模式事件卡片視覺強化，綠/紅卡片區分收支）
+> **更新日期**：2026-04-01（Rounds 43–44：困難模式聽力記憶模糊 `b2-memory-mode`；類別圖示動畫導引 `_showThemeGuide`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
 > **系列**：B 預算規劃
@@ -18,8 +19,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b2_allowance_diary.html` | — |
-| JS | `js/b2_allowance_diary.js` | ~1,669 行，v3.8（2026-03-30）|
-| CSS（專用）| `css/b2_allowance_diary.css` | ~737 行（2026-03-30）|
+| JS | `js/b2_allowance_diary.js` | 1,752 行，v4.0（2026-04-01）|
+| CSS（專用）| `css/b2_allowance_diary.css` | 826 行（2026-04-01）|
 | 作業單 | `worksheet/units/b2-worksheet.js` | 203 行 |
 
 ---
@@ -760,3 +761,37 @@ if (revealBtn) {
 
 ### 搜尋關鍵字
 `b2-memory-mode`、`b2-reveal-btn`、`b2-revealed`
+
+---
+
+## 二十、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b2_allowance_diary.js` | 1,752 行 |
+| `css/b2_allowance_diary.css` | 826 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 41 | **簡單模式事件卡片視覺化** | `.b2-diary` 加 `data-diff="${diff}"`；`.b2-event-row` 加 `${e.type}` class；CSS `[data-diff="easy"]`：income→綠漸層+左5px綠框，expense→紅漸層+左5px紅框；icon 28px/name 17px bold/amount 1.45rem | F1/C1 視覺差異化 |
+| 43 | **困難模式聽力記憶模糊** | `b2-memory-mode` class 加至 `.b2-diary`；`b2-event-icon`/`.b2-event-name` blur 6px；`#b2-reveal-btn` 切換 `b2-revealed`（toggle 解除模糊）；按鈕切換顯示「👁️ 查看」/「🙈 隱藏」 | C1 困難模式音色識別 |
+| 44 | **類別圖示動畫導引** | `_showThemeGuide()`：依 `diaryTheme`（school/holiday/family）顯示圖示+短語；`b2TgSlideIn` 從上滑入，2s 後 `b2-tg-fade` 淡出；`renderQuestion` 任務彈窗後 2400ms 觸發；隨機/未設定模式不顯示 | B3 月曆任務彈窗 pattern |
+
+### 技術要點
+
+- **CSS cascade 安全**：`[data-diff="easy"]` specificity 為 0-1-1（屬性+類別），高於原本 0-0-1（只有類別），不需 `!important`
+- **聽力記憶模糊**：只模糊 icon 與名稱，金額與收支徽章保持可見；`b2-revealed` toggle 確保反覆揭示/隱藏均正常
+- **主題動畫導引**：2400ms 觸發 = 任務彈窗（2200ms）關閉後，不干擾彈窗語音；隨機/未設定主題跳過，避免不相關提示
+- 連勝徽章（B 系列統一）：`quiz.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `data-diff`、`b2-event-row income`、`b2-event-row expense`
+- `b2-memory-mode`、`b2-reveal-btn`、`b2-revealed`
+- `_showThemeGuide`、`b2-theme-guide`、`b2TgSlideIn`

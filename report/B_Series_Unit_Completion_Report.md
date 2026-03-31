@@ -8905,3 +8905,72 @@ entries 動畫時間軸：
 ---
 
 *本節由 Claude Sonnet 4.6 協助撰寫，日期：2026-03-30（第二波）*
+
+---
+
+## 貳拾、2026-04-01 Rounds 40–44 豐富化（最終完整版）
+
+> **更新日期**：2026-04-01（Rounds 40–44，B 系列 v4.0）
+
+### 20.1 各單元檔案規模（Round 44）
+
+| 單元 | JS 行數 | CSS 行數 | 版本 |
+|------|--------|---------|------|
+| B1 今天帶多少錢 | 1,654 行 | 1,112 行 | v4.0 |
+| B2 零用錢日記  | 1,752 行 | 826 行  | v4.0 |
+| B3 存錢計畫    | 2,966 行 | 1,811 行 | v4.0 |
+| B4 特賣比一比  | 2,169 行 | 890 行  | v4.0 |
+| B5 生日派對預算| 1,468 行 | 723 行  | v4.0 |
+| B6 菜市場買菜  | 2,092 行 | 1,063 行 | v4.0 |
+| **合計** | **12,101 行** | **6,424 行** | — |
+
+### 20.2 Round 41 — 視覺強化（2026-03-31）
+
+| 單元 | 功能 | 關鍵類別 |
+|------|------|---------|
+| B2 | 簡單模式事件卡片視覺化：income 綠漸層/expense 紅漸層，左5px色框，icon 28px | `data-diff`、`b2-event-row income/expense` |
+| B3 | 選項擴充4個 + 結構化干擾項（忘進位/過度進位/低估/高估） | `_generateChoices`、`b3-choices-4` |
+| B4 | 動態價格浮動：normal ±10%/hard ±20%，取整到5元，安全守衛 | `價格動態變化`、`finalItem` |
+| B5 | 必買/選購分組佈局：琥珀+翠綠雙色分組，`#b5-opt-budget` 即時餘額 | `b5-section-group`、`b5-opt-budget` |
+| B1 | 費用逐項語音播報（C2 pattern）：2400ms 後遞迴 950ms/項 | `_speakItemsOneByOne` |
+
+### 20.3 Round 42 — 動畫互動（2026-03-30，合入 41 週期）
+
+| 單元 | 功能 | 關鍵類別 |
+|------|------|---------|
+| B1 | 硬幣逐一動畫：`_animateHintCoins` 每280ms 依序顯示硬幣+累計金額 | `b1-hint-anim`、`b1HintCoinIn` |
+| B1 | 放幣浮動標籤：`addCoin` 末尾 `+N元` 膠囊 0.85s 上飄 | `b1-coin-popup`、`b1CoinPopup` |
+
+### 20.4 Round 43 — 困難模式感知強化（2026-03-31）
+
+| 單元 | 功能 | 關鍵類別 |
+|------|------|---------|
+| B2 | 困難模式聽力記憶模糊：`b2-memory-mode` blur 6px；`b2-reveal-btn` toggle 解除 | `b2-memory-mode`、`b2-reveal-btn` |
+| B3 | 困難模式週存金額隱藏：`b3-weekly-hidden`；揭示按鈕一次性 `disabled` | `b3-weekly-hidden`、`b3-reveal-weekly-btn` |
+| B4 | 三商店獎台語音播報：overlay 建立後 350ms 播「第一名，X，Y元，最便宜！」 | `語音播報排名`、`cheapest.store` |
+| B5 | 困難模式翻牌動畫：`b5-flip-reveal` scaleX 0.33s，150ms 中點更新文字 | `b5-flip-reveal`、`b5FlipReveal` |
+| B6 | 付款提示面額色塊：`--bc` 動態顏色，7種面額各有識別色 | `b6-hint-badge`、`b6-hint-badges` |
+
+### 20.5 Round 44 — 最終收尾（2026-04-01）
+
+| 單元 | 功能 | 關鍵類別 |
+|------|------|---------|
+| B1 | 行程卡倒數計時器：easy=30s/normal=20s/hard=15s；≤5s `b1-rt-urgent` 紅色脈動 | `_startRouteTimer`、`b1-rt-urgent` |
+| B2 | 類別圖示動畫導引：`_showThemeGuide()`；主題圖示從上滑入，2s 後淡出 | `_showThemeGuide`、`b2-theme-guide` |
+| B3 | 里程碑語音更新：25/50/75/100% 各有具體激勵語句；達標語音含商品名 | `celebSpeeches`、`達標了` |
+| B4 | 比價思路步驟卡：easy 答對後顯示「1️⃣A店 → 2️⃣B店 → 結論」藍色卡片 | `_showThinkingSteps`、`b4-thinking-card` |
+| B6 | 付款找零計算過程：三行逐行 400ms 間隔進場；2.8s 後淡出 | `_animateChangeCalc`、`b6-change-calc-anim` |
+
+### 20.6 B 系列設計理念演進（Rounds 24→44 回顧）
+
+| 階段 | Rounds | 重心 |
+|------|--------|------|
+| 基礎建構 | 24–26 | 完成畫面、題庫擴充、難度分層 |
+| 互動深化 | 27–30 | 輔助點擊、關卡轉場、統計卡片 |
+| 感知強化 | 31–35 | 動畫反饋、進度環、里程碑 |
+| 記憶訓練 | 36–40 | 模糊遮蔽、記憶倒數、聽力挑戰 |
+| 思維引導 | 41–44 | 步驟卡、逐項語音、視覺顏色編碼 |
+
+---
+
+*本節由 Claude Sonnet 4.6 協助撰寫，日期：2026-04-01（Rounds 40–44 最終版）*

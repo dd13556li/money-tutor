@@ -6,6 +6,7 @@
 > **更新日期**：2026-03-29（三商店排序模式 `B4_TRIPLE_ITEMS`；單位比價模式 `B4_UNIT_ITEMS`；商品類別篩選；開題商品介紹彈窗；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：冠軍徽章/省錢%/差額百分比/記憶倒數/獎台動畫/貴差標籤完整記錄）
 > **更新日期**：2026-03-31（Round 41：普通/困難模式動態價格浮動 ±10%/±20%，C5 PriceStrategy pattern）
+> **更新日期**：2026-04-01（Rounds 43–44：三商店獎台語音播報 `語音播報排名`；比價思路步驟卡 `_showThinkingSteps`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B4 — 特賣比一比（Sale Comparison）
 > **系列**：B 預算規劃
@@ -18,8 +19,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b4_sale_comparison.html` | — |
-| JS | `js/b4_sale_comparison.js` | ~2,078 行，v3.7（2026-03-30）|
-| CSS（專用）| `css/b4_sale_comparison.css` | ~826 行（2026-03-30）|
+| JS | `js/b4_sale_comparison.js` | 2,169 行，v4.0（2026-04-01）|
+| CSS（專用）| `css/b4_sale_comparison.css` | 890 行（2026-04-01）|
 | 作業單 | `worksheet/units/b4-worksheet.js` | 110 行 |
 
 ---
@@ -894,3 +895,37 @@ Game.TimerManager.setTimeout(() => {
 
 ### 搜尋關鍵字
 `語音播報排名`、`cheapest.store`、`_showPodiumAnimation`
+
+---
+
+## 二十四、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b4_sale_comparison.js` | 2,169 行 |
+| `css/b4_sale_comparison.css` | 890 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 41 | **動態價格浮動** | `_generateQuestions` 兩商店分支：normal ±10%、hard ±20%，取整到5元；安全守衛：浮動後 `priceA ≤ priceB` 不套用；三商店/單位比價跳過 | A4 amountLevels / C5 PriceStrategy |
+| 43 | **三商店獎台語音播報** | `_showPodiumAnimation` overlay 建立後 350ms 播報「第一名，X店，Y元，最便宜！」；`TimerManager.setTimeout(..., 'speech')` | A4 交易摘要語音 |
+| 44 | **比價思路步驟卡** | `_showThinkingSteps(curr)`：兩商店模式 easy 答對後顯示藍色卡片；1️⃣A店X元 / 2️⃣B店Y元 / 結論；`b4TcIn`+`b4TcStepIn` stagger 動畫；2s 後 `b4-tc-fade` 淡出；`handleSelectClick` easy 分支呼叫 | B5 round intro card pattern |
+
+### 技術要點
+
+- **動態價格安全守衛**：浮動後若 `priceA ≤ priceB`（機率 <5%）不套用，使用原始固定價，確保題目永遠有正確答案；最低 5 元防止歸零
+- **三商店語音播報**：350ms 延遲 = overlay DOM 建立穩定後，`sorted[0]` 為最便宜店（已依 price 升序排序）
+- **思路步驟卡**：每個步驟（1️⃣2️⃣結論）以 `b4TcStepIn` stagger 進場（0/0.15s/0.3s delay），引導學生「看→比→結論」的思維流程；只在 easy 模式顯示，不干擾 normal/hard 的學習節奏
+- 連勝徽章（B 系列統一）：`quiz.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `價格動態變化`、`pct = difficulty`、`finalItem`
+- `語音播報排名`、`cheapest.store`、`_showPodiumAnimation`
+- `_showThinkingSteps`、`b4-thinking-card`、`b4TcIn`、`b4TcStepIn`

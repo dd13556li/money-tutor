@@ -7,6 +7,7 @@
 > **更新日期**：2026-03-29（派對主題篩選 `B5_THEMES`；預算儀表條；確認鈕脈動；預算效率徽章；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：星評/困難隱藏價格/完美配額/分配說明/可負擔高亮完整記錄）
 > **更新日期**：2026-03-31（Round 42：必買/選購分組佈局 `b5-section-group`；選購剩餘預算即時更新；A4 商品分類 pattern）
+> **更新日期**：2026-04-01（Round 43：困難模式翻牌動畫 `b5-flip-reveal`，C5 差額圖示 pattern）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）
 > **系列**：B 預算規劃
@@ -19,8 +20,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b5_party_budget.html` | — |
-| JS | `js/b5_party_budget.js` | ~1,403 行，v3.7（2026-03-30）|
-| CSS（專用）| `css/b5_party_budget.css` | ~687 行（2026-03-30）|
+| JS | `js/b5_party_budget.js` | 1,468 行，v4.0（2026-04-01）|
+| CSS（專用）| `css/b5_party_budget.css` | 723 行（2026-04-01）|
 | 作業單 | `worksheet/units/b5-worksheet.js` | 128 行 |
 
 ---
@@ -767,3 +768,34 @@ if (card.classList.contains('b5-price-hidden')) {
 
 ### 搜尋關鍵字
 `b5-flip-reveal`、`b5FlipReveal`、`翻牌`
+
+---
+
+## 二十一、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b5_party_budget.js` | 1,468 行 |
+| `css/b5_party_budget.css` | 723 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 42 | **必買/選購分組佈局** | `_renderRoundHTML` 分拆 mustItems/optItems 兩組；`b5-section-hd-must`（琥珀）/`b5-section-hd-opt`（翠綠）；`#b5-opt-budget` 即時顯示可用餘額；`_updateTotalBar` 加 optBudgetEl 更新 | A4 商品分類 / B6 攤位分組 |
+| 43 | **困難模式翻牌動畫** | 首次點擊加 `b5-flip-reveal`（`scaleX` 0.33s 動畫）；150ms 時移除 `b5-price-hidden` 並更新文字；330ms 後移除動畫 class | C5 差額圖示漸進揭示 |
+
+### 技術要點
+
+- **分組佈局**：琥珀色對應「必要支出」心理框架，翠綠色對應「彈性選擇」；`b5-opt-budget` 即時更新讓學生感知剩餘預算；`_bindRoundEvents` / `_showBudgetHint` 均使用 class 選擇器，不受 HTML 結構分組影響
+- **翻牌動畫**：`scaleX` 0→0→1 翻面效果；150ms 中點時更新文字（`???` → 真實價格），視覺上呈現「翻面前後不同」；330ms 後清除動畫 class 回到正常狀態
+- 連勝徽章（B 系列統一）：`game.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `b5-section-group`、`b5-section-hd-must`、`b5-section-hd-opt`、`b5-opt-budget`
+- `b5-flip-reveal`、`b5FlipReveal`、`翻牌`

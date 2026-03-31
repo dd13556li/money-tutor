@@ -7,6 +7,7 @@
 > **更新日期**：2026-03-29（場景類別篩選 `cat` / `sceneCategory`，39 組題庫，5 種場景；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29-39 豐富化：進度條/找零算式/路線條/面額摘要/投幣特效/場景色標完整記錄）
 > **更新日期**：2026-03-31（Round 42：費用項目逐一語音播報 `_speakItemsOneByOne`，C2 逐項朗讀 pattern）
+> **更新日期**：2026-04-01（Rounds 43–44：硬幣逐一動畫 `_animateHintCoins`、放幣浮動標籤 `b1-coin-popup`、行程卡倒數計時器 `_startRouteTimer`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B1 — 今天帶多少錢（Daily Budget）
 > **系列**：B 預算規劃
@@ -19,8 +20,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b1_daily_budget.html` | — |
-| JS | `js/b1_daily_budget.js` | ~1,516 行，v3.8（2026-03-30）|
-| CSS（專用）| `css/b1_daily_budget.css` | ~1,029 行（2026-03-30）|
+| JS | `js/b1_daily_budget.js` | 1,654 行，v4.0（2026-04-01）|
+| CSS（專用）| `css/b1_daily_budget.css` | 1,112 行（2026-04-01）|
 | 作業單 | `worksheet/units/b1-worksheet.js` | 166 行 |
 
 ### CSS 載入順序
@@ -891,3 +892,38 @@ _speakItemsOneByOne(q) {
 ### 搜尋關鍵字
 
 - `_speakItemsOneByOne`、`逐項播報費用`、`C2 逐項朗讀 pattern`
+
+---
+
+## 二十一、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b1_daily_budget.js` | 1,654 行 |
+| `css/b1_daily_budget.css` | 1,112 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 41 | **費用項目逐一語音播報** | `_speakItemsOneByOne`；easy 模式 2400ms 後啟動，遞迴 950ms/項，完成後說「總共N元」 | C2 逐項朗讀 pattern |
+| 42 | **建議硬幣組合卡（DOM 版）** | `_showCoinHint` 改為 DOM 卡片 `#b1-hint-combo-card`；5秒後自動移除 | B1 既有 `_calcOptimalCoins` |
+| 42 | **硬幣逐一動畫** | `_animateHintCoins(coins)`；在 `#b1-hint-anim` 中每 280ms 依序顯示硬幣圖片+面額+累計金額；`b1HintCoinIn` scale/opacity 進場 | A4 交易摘要逐件動畫 |
+| 42 | **放幣浮動標籤** | `addCoin(denom)` 末尾建立 `.b1-coin-popup`（綠色膠囊 `+N元`）；fixed 定位，`b1CoinPopup` 0.85s 上飄淡出；900ms 後移除 | A4/B6 price popup |
+| 44 | **行程卡倒數計時器** | `_startRouteTimer(question)`：easy=30s/normal=20s/hard=15s；遞迴 tick（`'countdown'` category）；≤5s 加 `b1-rt-urgent` 紅色脈動；時間到播 error 音+語音+`_showScheduleBreakdown`；`handleConfirm` 正確時 `clearByCategory('countdown')`；`#b1-route-timer` 插入 header | A5 倒數 + B4 記憶倒數 pattern |
+
+### 技術要點
+
+- `_speakItemsOneByOne`：使用遞迴 TimerManager（`'speech'` category），頁面切換自動中止
+- `_animateHintCoins`：依序建立 `.b1-hint-coin-item` DOM 節點，280ms stagger，含面額圖片+文字+累計金額
+- `_startRouteTimer`：`b1-rt-urgent` 加入時機為剩餘 ≤5s，透過 `b1RtPulse` keyframe 紅色脈動警示；`handleConfirm` 正確後立即 `TimerManager.clearByCategory('countdown')` 防止後期觸發
+- 連勝徽章（B 系列統一）：`quiz.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `_speakItemsOneByOne`、`_animateHintCoins`、`b1-hint-anim`、`b1-coin-popup`、`b1CoinPopup`
+- `_startRouteTimer`、`b1-rt-urgent`、`b1RtPulse`、`'countdown'`

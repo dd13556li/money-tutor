@@ -12,6 +12,7 @@
 > **更新日期**：2026-03-30（商品全面重建：廢棄 images/b3/，改用 C5 現有圖片 14 件；渲染路徑改為通用 `../images/${item.img}`）
 > **更新日期**：2026-03-31（商品資料庫再擴充 14→20 件：新增鉛筆盒/日記本/計算機/運動上衣/運動褲/手機；輔助點擊設定頁修正—改為簡單模式才顯示，對齊 B1 規範）
 > **更新日期**：2026-03-31（Round 42：簡單模式選項擴充4個 + 結構化干擾項 `_generateChoices`；2×2 格局 CSS）
+> **更新日期**：2026-04-01（Rounds 43–44：困難模式週存金額隱藏 `b3-weekly-hidden`；里程碑語音更新 `celebSpeeches`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B3 — 存錢計畫（Savings Plan）
 > **系列**：B 預算規劃
@@ -24,8 +25,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b3_savings_plan.html` | — |
-| JS | `js/b3_savings_plan.js` | ~2,863 行，v4.5（B 系列最大）|
-| CSS（專用）| `css/b3_savings_plan.css` | ~1,729 行（2026-03-30）|
+| JS | `js/b3_savings_plan.js` | 2,966 行，v5.0（B 系列最大，2026-04-01）|
+| CSS（專用）| `css/b3_savings_plan.css` | 1,811 行（2026-04-01）|
 | 作業單 | `worksheet/units/b3-worksheet.js` | 93 行 |
 | 商品圖片 | `images/c5/icon-c5-*.png`（共用） | 14 張（2026-03-30 改用 C5 圖片，廢棄 images/b3/）|
 
@@ -978,3 +979,37 @@ if (revealWeeklyBtn) {
 
 ### 搜尋關鍵字
 `b3-weekly-hidden`、`b3-reveal-weekly-btn`、`data-weekly`
+
+---
+
+## 二十三、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b3_savings_plan.js` | 2,966 行 |
+| `css/b3_savings_plan.css` | 1,811 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 41 | **選項擴充4個 + 結構化干擾項** | `_generateChoices` 擴充至 4 個；加結構化干擾：`correct-1`（忘進位）/`correct+1`（過度進位）/`ceil(correct*0.6)`（低估）；`b3-choices-4` 2×2 grid CSS | C1 選項池自適應 pattern |
+| 43 | **困難模式週存金額隱藏** | `.b3-weekly-hidden` blur + `???元`；`#b3-reveal-weekly-btn` 點擊揭示真實金額並語音（`每週存${weekly}元`）；`data-weekly` 保存值；按鈕點後 disabled | B5 困難模式翻牌 / B2 memory-mode |
+| 44 | **里程碑語音更新** | `_showMilestoneBadge` speeches：25%「已經存了四分之一了，繼續加油！」/ 50%「存了一半了，真棒！」/ 75%「快到了，差一點點！」；`_onCalendarGoalReached` 開頭加 100% 達標語音「達標了！{itemName}可以買了！」 | B 系列里程碑音效 pattern |
+
+### 技術要點
+
+- **4選項干擾設計**：正確答案固定為 `Math.ceil(price / weekly)`；干擾項對應學生最常見的計算錯誤（忘進位、過度進位、低估）；若干擾項與正確答案重複自動跳過
+- **週存金額隱藏**：`data-weekly` 屬性保存真實值，僅一次性揭示（`disabled=true`）；與 B2 `b2-memory-mode` 同一設計語言
+- **里程碑語音**：25/50/75/100% 四個觸發點，各有具體激勵語句；100% 直接呼叫於 `_onCalendarGoalReached` 函數開頭
+- 連勝徽章（B 系列統一）：`quiz.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `_generateChoices`、`b3-choices-4`、`structured`
+- `b3-weekly-hidden`、`b3-reveal-weekly-btn`、`data-weekly`
+- `celebSpeeches`、`達標了`、`_onCalendarGoalReached`

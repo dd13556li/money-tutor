@@ -5,6 +5,7 @@
 > **更新日期**：2026-03-25（第十二輪：攤位分頁需求件數徽章，C5 指示燈 pattern）
 > **更新日期**：2026-03-29（市場類型篩選 `B6_MARKETS`；關卡開場任務彈窗；關卡完成轉場卡；結帳確認清單；輔助點擊 AssistClick）
 > **更新日期**：2026-03-30（Rounds 29–39 豐富化：找零算式/攤位小計/收集進度/購物籃徽章/精準付款/收據飛出/效率環完整記錄）
+> **更新日期**：2026-04-01（Rounds 43–44：付款提示面額色塊 `b6-hint-badge`、`--bc`；付款找零計算過程動畫 `_animateChangeCalc`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B6 — 菜市場買菜（Market Shopping）
 > **系列**：B 預算規劃
@@ -17,8 +18,8 @@
 | 檔案 | 路徑 | 行數/版本 |
 |------|------|---------|
 | HTML | `html/b6_market_shopping.html` | — |
-| JS | `js/b6_market_shopping.js` | ~1,997 行，v3.8（2026-03-30）|
-| CSS（專用）| `css/b6_market_shopping.css` | ~967 行（2026-03-30）|
+| JS | `js/b6_market_shopping.js` | 2,092 行，v4.0（2026-04-01）|
+| CSS（專用）| `css/b6_market_shopping.css` | 1,063 行（2026-04-01）|
 | 作業單 | `worksheet/units/b6-worksheet.js` | 131 行 |
 
 ---
@@ -900,3 +901,46 @@ toast.innerHTML = `<strong>💡 建議付法</strong>
 
 ### 搜尋關鍵字
 `b6-hint-badge`、`b6-hint-badges`、`--bc`、`_showPaymentHint`
+
+---
+
+## 十七、Rounds 40–44 豐富化總覽（2026-03-31 ~ 2026-04-01）
+
+> **更新日期**：2026-04-01（Rounds 40–44 完整記錄）
+
+### 檔案規模更新
+
+| 檔案 | 行數（Round 44，2026-04-01）|
+|------|--------------------------|
+| `js/b6_market_shopping.js` | 2,092 行 |
+| `css/b6_market_shopping.css` | 1,063 行 |
+
+### Round 40–44 功能彙整
+
+| Round | 功能 | 關鍵類別/函數 | 教學模式參照 |
+|-------|------|--------------|------------|
+| 43 | **付款提示面額色塊** | `_showPaymentHint` toast 改為 `.b6-hint-badge`（`--bc` 對應面額顏色）+ `.b6-hint-badges` flex 排列；每個面額以對應顏色（來自 `B6_BILLS[].color`）的圓角標籤顯示 | C4/C6 最佳付款面額高亮 + B1 `_showCoinHint` |
+| 44 | **付款找零計算過程顯示** | `_animateChangeCalc(paid, total, change)`：`_showChangeResult` 渲染後 400ms 觸發（change>0）；三行 `.b6-cc-line` 逐行 `b6CcLineIn`（400ms 間隔）；付/商品/找零三色；2.8s 後 `b6-cca-fade` 淡出 | B6 既有找零公式 / A4 交易摘要 |
+
+### 面額色塊顏色對照
+
+| 面額 | 顏色 |
+|------|------|
+| 1000元 | #7c3aed（紫）|
+| 500元  | #b45309（棕）|
+| 100元  | #1d4ed8（藍）|
+| 50元   | #0369a1（深藍）|
+| 10元   | #047857（綠）|
+| 5元    | #b91c1c（紅）|
+| 1元    | #374151（灰）|
+
+### 技術要點
+
+- **面額色塊**：使用 CSS 自訂屬性 `--bc` 動態注入顏色，單一 `.b6-hint-badge` CSS 規則服務所有面額，避免 7 個 modifier class
+- **計算過程動畫**：三行逐行進場（0ms / 400ms / 800ms），製造「閱讀節奏」；2.8s 後淡出不佔空間；僅在 change>0 時觸發（精準付款無需顯示）
+- 連勝徽章（B 系列統一）：`game.streak`；達 3/5 觸發 `_showStreakBadge(streak)`
+
+### 搜尋關鍵字
+
+- `b6-hint-badge`、`b6-hint-badges`、`--bc`、`_showPaymentHint`
+- `_animateChangeCalc`、`b6-change-calc-anim`、`b6CcLineIn`
