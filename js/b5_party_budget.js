@@ -724,11 +724,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (g.submitted) return;
                     const id = card.dataset.id;
                     const item = g.items.find(i => i.id === id);
-                    // 困難模式：首次點擊先揭示價格（Round 35）
+                    // 困難模式：首次點擊先揭示價格（翻牌動畫 Round 43）
                     if (card.classList.contains('b5-price-hidden')) {
-                        card.classList.remove('b5-price-hidden');
-                        const priceEl = card.querySelector('.b5-item-price');
-                        if (priceEl) priceEl.textContent = priceEl.dataset.price + ' 元';
+                        card.classList.add('b5-flip-reveal');
+                        Game.TimerManager.setTimeout(() => {
+                            card.classList.remove('b5-price-hidden');
+                            const priceEl = card.querySelector('.b5-item-price');
+                            if (priceEl) priceEl.textContent = priceEl.dataset.price + ' 元';
+                        }, 150, 'ui');
+                        Game.TimerManager.setTimeout(() => card.classList.remove('b5-flip-reveal'), 330, 'ui');
                         if (item) Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
                         this.audio.play('click');
                         return; // 第一次只揭示，不選

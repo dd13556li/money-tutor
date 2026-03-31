@@ -846,11 +846,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
 
-                <div class="b2-diary" data-diff="${diff}">
+                <div class="b2-diary${diff === 'hard' ? ' b2-memory-mode' : ''}" data-diff="${diff}">
                     <div class="b2-diary-header">
                         <span class="b2-diary-icon">📒</span>
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
+                        ${diff === 'hard' ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
                     </div>
                     ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
@@ -949,6 +950,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             const evtText = q.events.map(e => `${e.amount > 0 ? '收入' : '支出'}${Math.abs(e.amount)}元`).join('，');
                             Game.Speech.speak(`起始${q.startAmount}元，${evtText}，最後餘額是多少？`);
                         }
+                    }, {}, 'gameUI');
+                }
+                // 困難模式：查看文字切換（聽力記憶模式，Round 43）
+                const revealBtn = document.getElementById('b2-reveal-btn');
+                if (revealBtn) {
+                    Game.EventManager.on(revealBtn, 'click', () => {
+                        const diary = document.querySelector('.b2-diary');
+                        if (!diary) return;
+                        const revealed = diary.classList.toggle('b2-revealed');
+                        revealBtn.textContent = revealed ? '🙈 隱藏' : '👁️ 查看';
                     }, {}, 'gameUI');
                 }
             }

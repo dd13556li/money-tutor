@@ -2249,9 +2249,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="b3-weekly-strip">
                     <span>每週存</span>
-                    <span class="b3-weekly-amount">${question.weekly} 元</span>
+                    <span class="b3-weekly-amount${diff === 'hard' ? ' b3-weekly-hidden' : ''}" id="b3-weekly-val"
+                          data-weekly="${question.weekly}">${diff === 'hard' ? '??? 元' : question.weekly + ' 元'}</span>
                     <span>，需要幾週才夠？</span>
                     <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
+                    ${diff === 'hard' ? `<button class="b3-reveal-weekly-btn" id="b3-reveal-weekly-btn">👁️ 提示</button>` : ''}
                 </div>
 
                 <div class="b3-answer-card" id="b3-answer-area">
@@ -2361,6 +2363,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(replayBtn, 'click', () => {
                     const text = this.state.quiz.lastSpeechText;
                     if (text) Game.Speech.speak(text);
+                }, {}, 'gameUI');
+            }
+            // 困難模式：每週存款揭示按鈕（Round 43）
+            const revealWeeklyBtn = document.getElementById('b3-reveal-weekly-btn');
+            if (revealWeeklyBtn) {
+                Game.EventManager.on(revealWeeklyBtn, 'click', () => {
+                    const el = document.getElementById('b3-weekly-val');
+                    if (!el) return;
+                    const weekly = el.dataset.weekly;
+                    el.classList.remove('b3-weekly-hidden');
+                    el.textContent = weekly + ' 元';
+                    revealWeeklyBtn.textContent = '✅ 已揭示';
+                    revealWeeklyBtn.disabled = true;
+                    Game.Speech.speak(`每週存${weekly}元`);
                 }, {}, 'gameUI');
             }
         },

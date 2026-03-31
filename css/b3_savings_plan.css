@@ -1788,3 +1788,24 @@
     margin: 0 auto;
 }
 .b3-choices-4 .b3-choice-btn { width: 100%; }
+
+/* ── Round 43：困難模式每週存款隱藏 ── */
+.b3-weekly-hidden {
+    filter: blur(5px);
+    user-select: none;
+    transition: filter 0.3s;
+    letter-spacing: 1px;
+}
+.b3-reveal-weekly-btn {
+    margin-left: 8px;
+    padding: 3px 10px;
+    font-size: 0.82rem;
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #92400e;
+    transition: background 0.2s;
+}
+.b3-reveal-weekly-btn:hover:not(:disabled) { background: #fde68a; }
+.b3-reveal-weekly-btn:disabled { opacity: 0.6; cursor: default; background: #f0fdf4; border-color: #86efac; color: #166534; }

@@ -1010,3 +1010,24 @@
 }
 .b6-cp-ans .b6-cp-num { color: #1d4ed8; }
 .b6-cp-q { letter-spacing: 2px; }
+
+/* ── Round 43：付款提示面額色塊 ── */
+.b6-hint-badges {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+.b6-hint-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--bc, #374151);
+    color: #fff;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.b6-hint-plus { color: #374151; font-weight: 700; font-size: 1rem; }
+.b6-hint-eq { color: #065f46; font-weight: 700; font-size: 0.95rem; margin-left: 2px; }

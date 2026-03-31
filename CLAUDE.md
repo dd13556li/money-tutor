@@ -637,6 +637,11 @@ toolbarConfig: {
 | B5 必買/選購分組佈局（2026-03-31）| B5 | `_renderRoundHTML` 分拆 mustItems/optItems 兩組；`b5-section-hd-must`（琥珀）/`b5-section-hd-opt`（翠綠）；`#b5-opt-budget` 即時顯示可用餘額；`_updateTotalBar` 加 optBudgetEl 更新；搜尋 `b5-section-group`、`b5-opt-budget` |
 | B3 選項擴充4個 + 結構化干擾項（2026-03-31）| B3 | `_generateChoices` 擴充 `opts.size < 3` → `4`；加結構化干擾：`correct-1`（忘進位）/ `correct+1`（過度進位）/ `ceil(correct*0.6)`（低估）；`b3-choices-4` 2×2 grid CSS；搜尋 `structured`、`b3-choices-4` |
 | B1 費用逐項語音播報（2026-03-31）| B1 | `renderQuestion` easy 模式加 `_speakItemsOneByOne`（2400ms 後啟動）；遞迴 `next()`，950ms/項，完成後說「總共N元」；搜尋 `_speakItemsOneByOne`、`C2 逐項朗讀 pattern` |
+| B2 困難模式聽力記憶模糊（Round 43）| B2 | `b2-memory-mode` class 加至 `.b2-diary`；`b2-event-icon`/`.b2-event-name` blur 6px；`#b2-reveal-btn` 切換 `b2-revealed`（toggle 解除模糊）；搜尋 `b2-memory-mode`、`b2-reveal-btn`、`b2-revealed` |
+| B3 困難模式週存金額隱藏（Round 43）| B3 | `.b3-weekly-hidden` blur + `???元`；`#b3-reveal-weekly-btn` 點擊揭示真實金額並語音；`data-weekly` 保存值；搜尋 `b3-weekly-hidden`、`b3-reveal-weekly-btn` |
+| B4 三商店獎台語音播報（Round 43）| B4 | `_showPodiumAnimation` overlay 建立後 350ms 播報「第一名，X，Y元，最便宜！」；搜尋 `語音播報排名` |
+| B5 困難模式翻牌動畫（Round 43）| B5 | 首次點擊加 `b5-flip-reveal`（`scaleX` 0→0→1 動畫）；150ms 時移除 `b5-price-hidden` 並更新文字；330ms 後移除動畫 class；搜尋 `b5-flip-reveal`、`b5FlipReveal` |
+| B6 付款提示面額色塊（Round 43）| B6 | `_showPaymentHint` toast 改為 `.b6-hint-badge`（`--bc` 對應面額顏色）+ `.b6-hint-badges` flex 排列；搜尋 `b6-hint-badge`、`b6-hint-badges` |
 
 ---
 

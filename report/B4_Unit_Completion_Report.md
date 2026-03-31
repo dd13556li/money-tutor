@@ -870,3 +870,27 @@ result.push({ ...finalItem, swapped, diff, isTriple: false, isUnit: false });
 
 - `價格動態變化`、`pct = difficulty === 'hard'`、`finalItem`、`priceA = Math.max`
 - 參照：`A4 amountLevels`、`C5 PriceStrategy`、`B4_ITEMS`
+
+---
+
+## 十三、Round 43 三商店獎台語音播報（2026-03-31）
+
+### 功能說明
+`_showPodiumAnimation` 顯示獎台動畫後 350ms，自動語音播報「第一名，X店，Y元，最便宜！」。使用 `TimerManager.setTimeout` 確保記憶體安全，並加入 `'speech'` 類別標記。
+
+### 教學設計
+- **參照模式**：A4 交易摘要語音 + B系列答對語音反饋模式
+- **學習強化**：視覺（獎台動畫）與聽覺（語音播報）雙重確認排名結果；幫助學生鞏固「最便宜」的比較概念
+
+### 關鍵實作
+```javascript
+document.body.appendChild(overlay);
+// 語音播報排名（Round 43）
+const cheapest = sorted[0];
+Game.TimerManager.setTimeout(() => {
+    Game.Speech.speak(`第一名，${cheapest.store}，${cheapest.price}元，最便宜！`);
+}, 350, 'speech');
+```
+
+### 搜尋關鍵字
+`語音播報排名`、`cheapest.store`、`_showPodiumAnimation`

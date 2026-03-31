@@ -1581,6 +1581,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`).join('')}
             </div>`;
             document.body.appendChild(overlay);
+            // 語音播報排名（Round 43）
+            const cheapest = sorted[0];
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak(`第一名，${cheapest.store}，${cheapest.price}元，最便宜！`);
+            }, 350, 'speech');
             Game.TimerManager.setTimeout(() => {
                 overlay.style.transition = 'opacity 0.4s';
                 overlay.style.opacity = '0';

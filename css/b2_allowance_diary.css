@@ -777,3 +777,26 @@
 .b2-diary[data-diff="easy"] .b2-event-amount { font-size: 1.45rem; }
 .b2-diary[data-diff="easy"] .b2-type-badge { font-size: 12px; padding: 3px 9px; }
 .b2-diary[data-diff="easy"] .b2-running-val { font-size: 12px; margin-left: auto; }
+
+/* ── Round 43：困難模式聽力記憶模糊效果 ── */
+.b2-diary.b2-memory-mode .b2-event-icon,
+.b2-diary.b2-memory-mode .b2-event-name {
+    filter: blur(6px);
+    transition: filter 0.3s;
+    user-select: none;
+}
+.b2-diary.b2-memory-mode.b2-revealed .b2-event-icon,
+.b2-diary.b2-memory-mode.b2-revealed .b2-event-name { filter: none; }
+.b2-reveal-btn {
+    margin-left: 8px;
+    padding: 3px 10px;
+    font-size: 0.82rem;
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #92400e;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.b2-reveal-btn:hover { background: #fde68a; }

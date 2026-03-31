@@ -709,3 +709,15 @@
     border-left: 5px solid #10b981;
 }
 .b5-section-sub { font-size: 13px; font-weight: 600; }
+
+/* ── Round 43：困難模式翻牌動畫 ── */
+@keyframes b5FlipReveal {
+    0%   { transform: scaleX(1);  opacity: 1; }
+    40%  { transform: scaleX(0);  opacity: 0.4; }
+    60%  { transform: scaleX(0);  opacity: 0.4; }
+    100% { transform: scaleX(1);  opacity: 1; }
+}
+.b5-flip-reveal {
+    animation: b5FlipReveal 0.33s ease;
+    transform-origin: center;
+}

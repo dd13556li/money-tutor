@@ -1340,12 +1340,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.toggle('b6-bill-hint', !!used[v]);
             });
 
-            // 提示訊息
+            // 提示訊息（面額色塊 Round 43）
             const existing = document.querySelector('.b6-hint-toast');
             if (existing) existing.remove();
             const toast = document.createElement('div');
             toast.className = 'b6-hint-toast';
-            toast.innerHTML = `<strong>💡 建議付法</strong><br>${parts.join(' + ')} = ${total} 元`;
+            const badgesHTML = B6_BILLS
+                .filter(b => used[b.value])
+                .map(b => `<span class="b6-hint-badge" style="--bc:${b.color}">${b.value}元×${used[b.value]}</span>`)
+                .join('<span class="b6-hint-plus">+</span>');
+            toast.innerHTML = `<strong>💡 建議付法</strong><div class="b6-hint-badges">${badgesHTML}<span class="b6-hint-eq">= ${total}元</span></div>`;
             document.querySelector('.b6-payment-section')?.appendChild(toast);
 
             Game.Speech.speak(`建議付${parts.join('，再加')}`);

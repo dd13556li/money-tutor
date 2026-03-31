@@ -939,3 +939,42 @@ const gridClass = question.choices.length >= 4 ? 'b3-choices b3-choices-4' : 'b3
 ### 搜尋關鍵字
 
 - `_generateChoices`、`b3-choices-4`、`structured`、`C1 adaptive pool pattern`
+
+---
+
+## 二十二、Round 43 困難模式每週存款金額隱藏（2026-03-31）
+
+### 功能說明
+困難模式中，週存金額條的金額以 `blur(5px)` 效果隱藏並顯示「??? 元」。真實金額存於 `data-weekly` 屬性。條末加「👁️ 提示」按鈕，點擊後解除模糊、顯示真實金額並語音播報「每週存X元」；按鈕變為「✅ 已揭示」且不可再次點擊。
+
+### 教學設計
+- **參照模式**：B5 困難模式商品價格首次點擊揭示（Round 35）
+- **學習強化**：學生需從開題語音中記憶每週存款金額，再進行除法計算；加強「聽語音→記數字→計算」的完整認知鏈
+- **與 B2 hard blur 一致**：B 系列困難模式統一設計語言——關鍵數字以模糊遮蔽，依賴語音記憶
+
+### 關鍵實作
+```html
+<!-- 週存金額條 -->
+<span class="b3-weekly-amount${diff==='hard'?' b3-weekly-hidden':''}" id="b3-weekly-val"
+      data-weekly="${question.weekly}">
+    ${diff === 'hard' ? '??? 元' : question.weekly + ' 元'}
+</span>
+${diff === 'hard' ? `<button class="b3-reveal-weekly-btn" id="b3-reveal-weekly-btn">👁️ 提示</button>` : ''}
+```
+
+```javascript
+// _bindQuestionEvents：揭示邏輯
+const revealWeeklyBtn = document.getElementById('b3-reveal-weekly-btn');
+if (revealWeeklyBtn) {
+    Game.EventManager.on(revealWeeklyBtn, 'click', () => {
+        el.classList.remove('b3-weekly-hidden');
+        el.textContent = weekly + ' 元';
+        revealWeeklyBtn.textContent = '✅ 已揭示';
+        revealWeeklyBtn.disabled = true;
+        Game.Speech.speak(`每週存${weekly}元`);
+    }, {}, 'gameUI');
+}
+```
+
+### 搜尋關鍵字
+`b3-weekly-hidden`、`b3-reveal-weekly-btn`、`data-weekly`

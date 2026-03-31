@@ -728,3 +728,42 @@ optBudgetEl.style.color = optRem < 0 ? '#dc2626' : '';
 
 - `b5-section-group`、`b5-section-hd-must`、`b5-section-hd-opt`、`b5-opt-budget`
 - 參照：A4 商品分類、B6 攤位分組
+
+---
+
+## 二十、Round 43 困難模式翻牌動畫（2026-03-31）
+
+### 功能說明
+困難模式商品卡片首次點擊揭示價格時，由原先直接移除 `b5-price-hidden` class，改為先加入 `b5-flip-reveal` 動畫 class（`scaleX` 0.33s 動畫）。在動畫中點（150ms）時更新價格文字；330ms 後移除動畫 class。視覺效果為卡片「翻面」，翻面前顯示 `???`，翻面後顯示真實價格。
+
+### 教學設計
+- **參照模式**：C5 差額圖示漸進揭示 + A1/A2 coinFirst 服務亮燈效果
+- **學習強化**：翻牌動畫製造「揭示感」，強化「原本未知→現在揭示」的認知轉換；學生更容易記住剛揭示的價格
+
+### 關鍵實作
+```javascript
+// 困難模式翻牌（Round 43）
+if (card.classList.contains('b5-price-hidden')) {
+    card.classList.add('b5-flip-reveal');
+    Game.TimerManager.setTimeout(() => {
+        card.classList.remove('b5-price-hidden');
+        const priceEl = card.querySelector('.b5-item-price');
+        if (priceEl) priceEl.textContent = priceEl.dataset.price + ' 元';
+    }, 150, 'ui');
+    Game.TimerManager.setTimeout(() => card.classList.remove('b5-flip-reveal'), 330, 'ui');
+    return;
+}
+```
+
+```css
+@keyframes b5FlipReveal {
+    0%   { transform: scaleX(1);  opacity: 1; }
+    40%  { transform: scaleX(0);  opacity: 0.4; }
+    60%  { transform: scaleX(0);  opacity: 0.4; }
+    100% { transform: scaleX(1);  opacity: 1; }
+}
+.b5-flip-reveal { animation: b5FlipReveal 0.33s ease; transform-origin: center; }
+```
+
+### 搜尋關鍵字
+`b5-flip-reveal`、`b5FlipReveal`、`翻牌`
