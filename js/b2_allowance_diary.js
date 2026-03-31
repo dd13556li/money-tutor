@@ -778,6 +778,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 開題起始金額彈窗（B1 _showTaskModal pattern）
             this._showTaskIntroModal(currentQ);
+            // 類別圖示動畫導引（Round 44）
+            Game.TimerManager.setTimeout(() => this._showThemeGuide(), 2400, 'ui');
 
             // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）
             if (diff === 'easy') {
@@ -1179,6 +1181,29 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => {
                 if (document.body.contains(modal)) modal.remove();
             }, 2200, 'ui');
+        },
+
+        // ── 類別圖示動畫導引（Round 44）──────────────────────────
+        _showThemeGuide() {
+            document.getElementById('b2-theme-guide')?.remove();
+            const themeKey = this.state.settings.diaryTheme;
+            const themeData = {
+                school:  { icon: '📚', phrase: '學校週記：留意收入和支出' },
+                holiday: { icon: '🌴', phrase: '假日時光：算算假期花費' },
+                family:  { icon: '👨‍👩‍👧', phrase: '家庭生活：記錄每筆零用錢' },
+            };
+            const td = themeData[themeKey];
+            if (!td) return; // 不顯示於隨機/未設定模式
+            const bar = document.createElement('div');
+            bar.id = 'b2-theme-guide';
+            bar.className = 'b2-theme-guide';
+            bar.innerHTML = `<span class="b2-tg-icon">${td.icon}</span><span class="b2-tg-phrase">${td.phrase}</span>`;
+            const app = document.getElementById('app');
+            if (app) app.insertAdjacentElement('afterbegin', bar);
+            Game.TimerManager.setTimeout(() => {
+                bar.classList.add('b2-tg-fade');
+                Game.TimerManager.setTimeout(() => { if (bar.parentNode) bar.remove(); }, 500, 'ui');
+            }, 2000, 'ui');
         },
 
         // ── 計算過程提示（答錯後顯示逐步算式）─────────────────

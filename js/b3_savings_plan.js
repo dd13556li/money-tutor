@@ -1968,14 +1968,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const existing = document.getElementById('b3-milestone-badge');
             if (existing) existing.remove();
             const labels  = { 25: '存了四分之一！🎉', 50: '存了一半！🌟', 75: '快到了！💪' };
-            const speeches = { 25: '太棒了！已經存了四分之一！', 50: '好棒！已經存了一半了！', 75: '快到了！再加油！' };
+            // 里程碑慶賀語音（Round 44：更具體的鼓勵語句）
+            const celebSpeeches = {
+                25: '已經存了四分之一了，繼續加油！',
+                50: '存了一半了，真棒！',
+                75: '快到了，差一點點！',
+            };
             const badge = document.createElement('div');
             badge.id = 'b3-milestone-badge';
             badge.className = 'b3-milestone-badge';
             badge.innerHTML = `<span class="b3-milestone-pct">${pct}%</span><span>${labels[pct]}</span>`;
             document.body.appendChild(badge);
             this.audio.play('correct');
-            Game.TimerManager.setTimeout(() => Game.Speech.speak(speeches[pct]), 200, 'ui'); // 里程碑語音（Round 35）
+            Game.TimerManager.setTimeout(() => Game.Speech.speak(celebSpeeches[pct]), 200, 'ui');
             Game.TimerManager.setTimeout(() => {
                 if (document.body.contains(badge)) badge.remove();
             }, 2200, 'ui');
@@ -1986,6 +1991,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isEndingGame = true;
 
             const c = this.state.calendar;
+            // 100% 達標慶賀語音（Round 44）
+            const itemName = c.item ? c.item.name : '目標';
+            Game.Speech.speak(`達標了！${itemName}可以買了！`);
             const elapsed = c.startTime ? (Date.now() - c.startTime) : 0;
             const mins = Math.floor(elapsed / 60000);
             const secs = Math.floor((elapsed % 60000) / 1000);

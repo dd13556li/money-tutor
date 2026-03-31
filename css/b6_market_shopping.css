@@ -1012,6 +1012,36 @@
 .b6-cp-q { letter-spacing: 2px; }
 
 /* ── Round 43：付款提示面額色塊 ── */
+/* ── Round 44：付款找零計算過程逐行動畫 ── */
+.b6-change-calc-anim {
+    margin: 12px auto 0;
+    max-width: 320px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid #4ade80;
+    border-radius: 14px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: opacity 0.5s;
+}
+.b6-change-calc-anim.b6-cca-fade { opacity: 0; }
+.b6-cc-line {
+    font-size: 14px;
+    font-weight: 600;
+    color: #065f46;
+    opacity: 0;
+    animation: b6CcLineIn 0.35s ease-out forwards;
+}
+.b6-cc-paid  { color: #1e40af; }
+.b6-cc-total { color: #b45309; }
+.b6-cc-result { color: #166534; font-size: 15px; border-top: 1px dashed #86efac; padding-top: 6px; margin-top: 2px; }
+.b6-cc-result strong { color: #15803d; font-size: 1.1rem; }
+@keyframes b6CcLineIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
 .b6-hint-badges {
     display: flex;
     align-items: center;

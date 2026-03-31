@@ -642,6 +642,11 @@ toolbarConfig: {
 | B4 三商店獎台語音播報（Round 43）| B4 | `_showPodiumAnimation` overlay 建立後 350ms 播報「第一名，X，Y元，最便宜！」；搜尋 `語音播報排名` |
 | B5 困難模式翻牌動畫（Round 43）| B5 | 首次點擊加 `b5-flip-reveal`（`scaleX` 0→0→1 動畫）；150ms 時移除 `b5-price-hidden` 並更新文字；330ms 後移除動畫 class；搜尋 `b5-flip-reveal`、`b5FlipReveal` |
 | B6 付款提示面額色塊（Round 43）| B6 | `_showPaymentHint` toast 改為 `.b6-hint-badge`（`--bc` 對應面額顏色）+ `.b6-hint-badges` flex 排列；搜尋 `b6-hint-badge`、`b6-hint-badges` |
+| B1 行程卡倒數計時器（Round 44）| B1 | `_startRouteTimer(question)`：easy=30s/normal=20s/hard=15s；遞迴 tick，`'countdown'` category；≤5s 加 `b1-rt-urgent`（`b1RtPulse` 脈動紅色）；時間到播 error 音+語音+`_showScheduleBreakdown`；`handleConfirm` 正確時 `clearByCategory('countdown')`；`#b1-route-timer` 插入 header；搜尋 `_startRouteTimer`、`b1-rt-urgent` |
+| B2 類別圖示動畫導引（Round 44）| B2 | `_showThemeGuide()`：依 `diaryTheme`（school/holiday/family）顯示圖示+短語；`b2TgSlideIn` 從上滑入，2s 後 `b2-tg-fade` 淡出；`renderQuestion` 任務彈窗後 2400ms 觸發；隨機/未設定模式不顯示；搜尋 `_showThemeGuide`、`b2-theme-guide` |
+| B3 存錢里程碑語音貢獻（Round 44）| B3 | `_showMilestoneBadge` speeches 更新為：25%「已經存了四分之一了，繼續加油！」/ 50%「存了一半了，真棒！」/ 75%「快到了，差一點點！」；`_onCalendarGoalReached` 開頭加 100% 達標語音「達標了！{itemName}可以買了！」；搜尋 `celebSpeeches`、`達標了` |
+| B4 比價思路步驟卡（Round 44）| B4 | `_showThinkingSteps(curr)`：兩商店模式 easy 答對後顯示藍色卡片；1️⃣A店X元 / 2️⃣B店Y元 / 結論；`b4TcIn`+`b4TcStepIn` 動畫；2s 後 `b4-tc-fade` 淡出；`handleSelectClick` easy 分支呼叫；搜尋 `_showThinkingSteps`、`b4-thinking-card` |
+| B6 付款找零計算過程顯示（Round 44）| B6 | `_animateChangeCalc(paid, total, change)`：`_showChangeResult` 渲染後 400ms 觸發（change>0）；三行 `.b6-cc-line` 逐行 `b6CcLineIn`（400ms 間隔）；付/商品/找零=三色；2.8s 後 `b6-cca-fade` 淡出；搜尋 `_animateChangeCalc`、`b6-change-calc-anim` |
 
 ---
 

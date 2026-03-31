@@ -1544,6 +1544,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (optsEl) optsEl.insertAdjacentElement('afterend', hint);
         },
 
+        // ── 付款找零計算過程逐行動畫（Round 44）──────────────────
+        _animateChangeCalc(paid, total, change) {
+            document.getElementById('b6-change-calc-anim')?.remove();
+            const box = document.createElement('div');
+            box.id = 'b6-change-calc-anim';
+            box.className = 'b6-change-calc-anim';
+            const lines = [
+                { text: `💰 付了 ${paid} 元`, cls: 'b6-cc-paid' },
+                { text: `🛒 商品 ${total} 元`, cls: 'b6-cc-total' },
+                { text: `💵 找零 = ${paid} − ${total} = <strong>${change}</strong> 元`, cls: 'b6-cc-result' },
+            ];
+            lines.forEach((ln, i) => {
+                const el = document.createElement('div');
+                el.className = `b6-cc-line ${ln.cls}`;
+                el.innerHTML = ln.text;
+                el.style.animationDelay = `${i * 400}ms`;
+                box.appendChild(el);
+            });
+            // Insert after change-section or as body overlay
+            const anchor = document.querySelector('.b6-change-section');
+            if (anchor) anchor.insertAdjacentElement('afterend', box);
+            else document.body.appendChild(box);
+            Game.TimerManager.setTimeout(() => {
+                box.classList.add('b6-cca-fade');
+                Game.TimerManager.setTimeout(() => { if (box.parentNode) box.remove(); }, 500, 'ui');
+            }, 2800, 'ui');
+        },
+
         _showChangeResult(paid, change) {
             const g = this.state.game;
 
@@ -1605,6 +1633,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._showRoundCompleteCard(g.currentRound + 1, items, total, paid, change, () => this.nextRound());
                 }
             }, {}, 'gameUI');
+
+            // 付款找零計算過程動畫（Round 44，在結果畫面渲染後顯示）
+            if (change > 0) {
+                Game.TimerManager.setTimeout(() => this._animateChangeCalc(paid, total, change), 400, 'ui');
+            }
         },
 
         // ── 13. 下一關 ────────────────────────────────────────

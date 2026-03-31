@@ -923,6 +923,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         : `${cheapSide.store}，${cheapSide.price}元，比較便宜！`;
                     Game.Speech.speak(priceSpeech);
                     this._showChampionBadge(cheapSide.store); // 冠軍徽章（Round 31）
+                    this._showThinkingSteps(curr); // 比價思路步驟卡（Round 44）
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     // 普通/困難：顯示差額問題
@@ -1631,6 +1632,31 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 冠軍徽章（Round 31）──────────────────────────────────
+        // ── 比價思路步驟卡（Round 44）────────────────────────────
+        _showThinkingSteps(curr) {
+            document.getElementById('b4-thinking-card')?.remove();
+            if (curr.isTriple || curr.isUnit) return; // 僅兩商店模式
+            const a = curr.optA, b = curr.optB;
+            const cheaperStore = a.price <= b.price ? a.store : b.store;
+            const cheaper  = a.price <= b.price ? a.price : b.price;
+            const pricierStore = a.price <= b.price ? b.store : a.store;
+            const pricier  = a.price <= b.price ? b.price : a.price;
+            const op = pricier > cheaper ? '>' : '=';
+            const card = document.createElement('div');
+            card.id = 'b4-thinking-card';
+            card.className = 'b4-thinking-card';
+            card.innerHTML = `
+                <div class="b4-tc-title">🤔 比較思路</div>
+                <div class="b4-tc-step b4-tc-step1">1️⃣ 看 ${a.store}：<strong>${a.price}元</strong></div>
+                <div class="b4-tc-step b4-tc-step2">2️⃣ 看 ${b.store}：<strong>${b.price}元</strong></div>
+                <div class="b4-tc-conclude">${pricier}元 ${op} ${cheaper}元，所以 <strong>${cheaperStore}</strong> 比較便宜 ✅</div>`;
+            document.body.appendChild(card);
+            Game.TimerManager.setTimeout(() => {
+                card.classList.add('b4-tc-fade');
+                Game.TimerManager.setTimeout(() => { if (card.parentNode) card.remove(); }, 400, 'ui');
+            }, 2000, 'ui');
+        },
+
         _showChampionBadge(storeName) {
             const prev = document.getElementById('b4-champion-badge');
             if (prev) prev.remove();

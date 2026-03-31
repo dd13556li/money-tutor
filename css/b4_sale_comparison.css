@@ -825,6 +825,59 @@
 .b4-cat-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #f97316); border-radius: 5px; }
 .b4-cat-val { font-size: 12px; font-weight: 700; color: #b45309; white-space: nowrap; }
 
+/* ── Round 44：比價思路步驟卡 ── */
+.b4-thinking-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 2px solid #3b82f6;
+    border-radius: 16px;
+    padding: 16px 22px;
+    z-index: 9500;
+    min-width: 240px;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(59,130,246,0.25);
+    animation: b4TcIn 0.35s ease-out;
+    transition: opacity 0.4s;
+    pointer-events: none;
+}
+.b4-thinking-card.b4-tc-fade { opacity: 0; }
+.b4-tc-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 8px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+.b4-tc-step {
+    font-size: 14px;
+    color: #1e3a8a;
+    padding: 4px 0;
+    border-bottom: 1px dashed #93c5fd;
+    animation: b4TcStepIn 0.3s ease-out both;
+}
+.b4-tc-step1 { animation-delay: 0.1s; }
+.b4-tc-step2 { animation-delay: 0.5s; }
+.b4-tc-conclude {
+    font-size: 13px;
+    color: #1e40af;
+    margin-top: 8px;
+    font-weight: 600;
+    animation: b4TcStepIn 0.3s ease-out 0.9s both;
+}
+.b4-tc-conclude strong { color: #16a34a; }
+@keyframes b4TcIn {
+    from { opacity: 0; transform: translate(-50%, -56%); }
+    to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes b4TcStepIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
 /* ── 10秒自動提示高亮 ── */
 .b4-auto-select-hint {
     animation: b4AutoHint 1.5s ease-in-out 2;

@@ -1067,6 +1067,31 @@
     border-top: 1px solid #bbf7d0;
 }
 
+/* ── Round 44：行程卡倒數計時器 ── */
+.b1-route-timer {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    background: #f3f4f6;
+    border: 1.5px solid #d1d5db;
+    border-radius: 12px;
+    padding: 2px 9px;
+    min-width: 52px;
+    text-align: center;
+    flex-shrink: 0;
+    transition: color 0.3s, background 0.3s, border-color 0.3s;
+}
+.b1-route-timer.b1-rt-urgent {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #f87171;
+    animation: b1RtPulse 0.8s ease-in-out infinite;
+}
+@keyframes b1RtPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.08); }
+}
+
 /* ── 硬幣放入浮動標籤 ── */
 .b1-coin-popup {
     transform: translateX(-50%);

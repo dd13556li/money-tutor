@@ -561,6 +561,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindQuestionEvents(curr);
             this._showTaskModal(curr, diff);
+            // 行程卡倒數計時器（Round 44）
+            Game.TimerManager.setTimeout(() => this._startRouteTimer(curr), 2200, 'countdown');
 
             // 語音播報
             Game.TimerManager.setTimeout(() => {
@@ -669,6 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b1-schedule-subtitle">需要帶這些錢 👇</div>
                     </div>
                     ${totalTag}
+                    <div class="b1-route-timer" id="b1-route-timer"></div>
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
                 <div class="b1-route-strip">
@@ -992,6 +995,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2200, 'ui');
         },
 
+        // ── 行程卡倒數計時器（Round 44）──────────────────────────
+        _startRouteTimer(question) {
+            const diff = this.state.settings.difficulty;
+            const secs = diff === 'easy' ? 30 : diff === 'normal' ? 20 : 15;
+            let remaining = secs;
+            const el = document.getElementById('b1-route-timer');
+            if (!el) return;
+            const update = () => {
+                if (!el.isConnected) return;
+                el.textContent = `⏱ ${remaining}s`;
+                el.classList.toggle('b1-rt-urgent', remaining <= 5);
+            };
+            update();
+            const tick = () => {
+                if (!el.isConnected) return;
+                remaining--;
+                update();
+                if (remaining <= 0) {
+                    el.textContent = '⏱ 0s';
+                    this.audio.play('error');
+                    Game.Speech.speak('時間到！來看看答案吧！');
+                    Game.TimerManager.setTimeout(() => {
+                        this._showScheduleBreakdown(question);
+                    }, 600, 'countdown');
+                    return;
+                }
+                Game.TimerManager.setTimeout(tick, 1000, 'countdown');
+            };
+            Game.TimerManager.setTimeout(tick, 1000, 'countdown');
+        },
+
         // ── Confirm ────────────────────────────────────────────
         handleConfirm(requiredTotal) {
             if (this.state.isProcessing) return;
@@ -1003,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Debug.log('state', `確認：錢包${walletTotal} 需要${requiredTotal} 正確=${isCorrect}`);
 
             if (isCorrect) {
+                Game.TimerManager.clearByCategory('countdown'); // 停止倒數計時器
                 this.audio.play('correct');
                 this._showFeedback('✅', '答對了！');
                 const diff = walletTotal - requiredTotal;
