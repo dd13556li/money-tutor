@@ -634,9 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const pctBar = !isHard && q.total > 0
                     ? `<div class="b1-item-pct-bar-wrap"><div class="b1-item-pct-bar" style="width:${Math.round(it.cost / q.total * 100)}%"></div></div>`
                     : '';
+                // 場景類別 per-item 徽章（Round 45）
+                const catBadgeMap = { school:'📚', food:'🍔', outdoor:'🌳', entertainment:'🎭', shopping:'🛒' };
+                const catBadge = catBadgeMap[q.cat] ? `<span class="b1-item-cat-badge">${catBadgeMap[q.cat]}</span>` : '';
                 return `
                 <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
-                    <span class="b1-item-name">📌 ${it.name}</span>
+                    <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
                     ${isHard
                         ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`
                         : `<span class="b1-item-cost">${it.cost} 元</span>`

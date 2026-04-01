@@ -756,6 +756,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         hero.appendChild(hint);
                         Game.TimerManager.setTimeout(() => { if (document.body.contains(hint)) hint.remove(); }, 2200, 'ui');
                     }
+                    // 語音重聽按鈕（Round 45）
+                    const curr45 = this.state.quiz.currentQuestion < this.state.quiz.questions.length
+                        ? this.state.quiz.questions[this.state.quiz.currentQuestion] : null;
+                    if (curr45) {
+                        const replayBtn = document.createElement('button');
+                        replayBtn.id = 'b4-mem-replay';
+                        replayBtn.className = 'b4-mem-replay-btn';
+                        replayBtn.textContent = '🔊 重聽價格';
+                        const buildSpeech = c => {
+                            if (c.isTriple) return c.stores.map(s => `${s.store}${s.price}元`).join('，');
+                            return `${c.optA.store}${c.optA.price}元，${c.optB.store}${c.optB.price}元`;
+                        };
+                        Game.EventManager.on(replayBtn, 'click', () => {
+                            Game.Speech.speak(buildSpeech(curr45));
+                            replayBtn.disabled = true;
+                            Game.TimerManager.setTimeout(() => { replayBtn.disabled = false; }, 2000, 'ui');
+                        }, {}, 'gameUI');
+                        const app = document.getElementById('app');
+                        if (app) app.insertAdjacentElement('afterbegin', replayBtn);
+                    }
                 } else {
                     Game.TimerManager.setTimeout(tick, 1000, 'ui');
                 }

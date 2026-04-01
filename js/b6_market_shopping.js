@@ -957,6 +957,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     this.audio.play('click');
                     g.activeStall = tab.dataset.stall;
+                    // 切換至已完成攤位提示（Round 45）
+                    const destStall = tab.dataset.stall;
+                    const destNeeded = g.mission.items.filter(i => i.stall === destStall);
+                    const destDone   = destNeeded.every(i => g.collectedIds.has(i.id));
+                    if (destDone && destNeeded.length > 0) {
+                        const toast45 = document.createElement('div');
+                        toast45.className = 'b6-stall-done-toast';
+                        toast45.textContent = `✅ ${_currentStalls[destStall]?.name || ''} 已收集完畢！`;
+                        document.body.appendChild(toast45);
+                        Game.TimerManager.setTimeout(() => { toast45.classList.add('b6-sdt-fade'); }, 1000, 'ui');
+                        Game.TimerManager.setTimeout(() => { if (document.body.contains(toast45)) toast45.remove(); }, 1600, 'ui');
+                    }
                     // 攤位商品語音引導（Round 39）：說出攤位名 + 需要收集的商品
                     const newStall = tab.dataset.stall;
                     const stallInfo = _currentStalls[newStall];

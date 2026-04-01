@@ -944,3 +944,14 @@ toast.innerHTML = `<strong>💡 建議付法</strong>
 
 - `b6-hint-badge`、`b6-hint-badges`、`--bc`、`_showPaymentHint`
 - `_animateChangeCalc`、`b6-change-calc-anim`、`b6CcLineIn`
+- `b6-stall-done-toast`、`b6-sdt-fade`、`destDone`（Round 45）
+
+---
+
+## 十八、Round 45 新增功能（2026-04-01）
+
+| 功能 | 描述 | 搜尋關鍵字 |
+|------|------|----------|
+| 切換至已完成攤位 toast | 攤位切換時偵測 `destDone`；已完成→底部顯示「✅ X攤位 已收集完畢！」；1s 後淡出，1.6s 後移除 | `b6-stall-done-toast`, `b6-sdt-fade`, `destDone` |
+
+**教學意義**：當學生在已完成的攤位間切換時，即時確認哪些攤位已完成，降低認知負擔（「我有沒有漏買？」），讓採購規劃更有條理。

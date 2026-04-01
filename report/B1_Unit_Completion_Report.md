@@ -927,3 +927,14 @@ _speakItemsOneByOne(q) {
 
 - `_speakItemsOneByOne`、`_animateHintCoins`、`b1-hint-anim`、`b1-coin-popup`、`b1CoinPopup`
 - `_startRouteTimer`、`b1-rt-urgent`、`b1RtPulse`、`'countdown'`
+- `b1-item-cat-badge`、`catBadgeMap`（Round 45）
+
+---
+
+## 二十二、Round 45 新增功能（2026-04-01）
+
+| 功能 | 描述 | 搜尋關鍵字 |
+|------|------|----------|
+| per-item 場景類別徽章 | 每個費用項目右側加 20px 圓形 emoji 徽章（school📚/food🍔/outdoor🌳/entertainment🎭/shopping🛒） | `b1-item-cat-badge`, `catBadgeMap` |
+
+**教學意義**：讓學生一眼看出此行程屬於哪種生活類別，強化場景識別能力。配合場景類別頂部色條（Round 39），形成雙層視覺提示系統。

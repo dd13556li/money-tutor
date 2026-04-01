@@ -1061,3 +1061,11 @@
 }
 .b6-hint-plus { color: #374151; font-weight: 700; font-size: 1rem; }
 .b6-hint-eq { color: #065f46; font-weight: 700; font-size: 0.95rem; margin-left: 2px; }
+/* ── Round 45：切換至已完成攤位 toast ── */
+.b6-stall-done-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: #dcfce7; border: 1.5px solid #86efac; color: #166534;
+    border-radius: 20px; padding: 8px 20px; font-size: 14px; font-weight: 700;
+    z-index: 10050; pointer-events: none; transition: opacity 0.5s;
+}
+.b6-stall-done-toast.b6-sdt-fade { opacity: 0; }

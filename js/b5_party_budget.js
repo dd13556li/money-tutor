@@ -711,6 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="b5-result-area"></div>
 
                 <button class="b5-hint-btn" id="b5-hint-btn">💡 還能選什麼？</button>
+                <button class="b5-read-selected-btn" id="b5-read-selected-btn">🔊 朗讀已選</button>
                 <button class="b5-confirm-btn" id="b5-confirm-btn">✅ 確認購買！</button>
             </div>`;
         },
@@ -760,6 +761,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn = document.getElementById('b5-hint-btn');
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => this._showBudgetHint(), {}, 'gameUI');
+            }
+            // 已選清單語音朗讀按鈕（Round 45）
+            const readBtn = document.getElementById('b5-read-selected-btn');
+            if (readBtn) {
+                Game.EventManager.on(readBtn, 'click', () => {
+                    const selected = g.items.filter(i => i.must || (g.selectedIds && g.selectedIds.has(i.id)));
+                    if (!selected.length) { Game.Speech.speak('還沒有選任何商品'); return; }
+                    const total = selected.reduce((s, i) => s + i.price, 0);
+                    const parts = selected.map(i => `${i.name}${i.price}元`).join('，');
+                    Game.Speech.speak(`已選：${parts}，共${total}元`);
+                }, {}, 'gameUI');
             }
             // 語音重播
             const replayBtn = document.getElementById('replay-speech-btn');

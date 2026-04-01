@@ -799,3 +799,14 @@ if (card.classList.contains('b5-price-hidden')) {
 
 - `b5-section-group`、`b5-section-hd-must`、`b5-section-hd-opt`、`b5-opt-budget`
 - `b5-flip-reveal`、`b5FlipReveal`、`翻牌`
+- `b5-read-selected-btn`、`朗讀已選`（Round 45）
+
+---
+
+## 二十二、Round 45 新增功能（2026-04-01）
+
+| 功能 | 描述 | 搜尋關鍵字 |
+|------|------|----------|
+| 朗讀已選清單按鈕 | `#b5-read-selected-btn`（藍色膠囊，插於 hint-btn 和 confirm-btn 之間）；click 朗讀必買+已選商品名稱/價格+合計 | `b5-read-selected-btn`, `朗讀已選` |
+
+**教學意義**：讓學生在確認購買前可以聽一次自己的選購清單，提供「複習機會」，對應語音學習者（聽覺型學習）。配合 B6 的付款足額語音提醒，形成「確認前先聽一遍」的良好習慣。

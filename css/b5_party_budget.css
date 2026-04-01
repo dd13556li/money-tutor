@@ -721,3 +721,12 @@
     animation: b5FlipReveal 0.33s ease;
     transform-origin: center;
 }
+/* ── Round 45：朗讀已選按鈕 ── */
+.b5-read-selected-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 8px 16px; border-radius: 20px;
+    background: #eff6ff; border: 1.5px solid #93c5fd;
+    color: #1d4ed8; font-size: 13px; font-weight: 600;
+    cursor: pointer; margin: 0 6px; transition: background 0.2s;
+}
+.b5-read-selected-btn:hover { background: #dbeafe; }

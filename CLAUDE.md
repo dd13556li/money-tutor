@@ -647,6 +647,11 @@ toolbarConfig: {
 | B3 存錢里程碑語音貢獻（Round 44）| B3 | `_showMilestoneBadge` speeches 更新為：25%「已經存了四分之一了，繼續加油！」/ 50%「存了一半了，真棒！」/ 75%「快到了，差一點點！」；`_onCalendarGoalReached` 開頭加 100% 達標語音「達標了！{itemName}可以買了！」；搜尋 `celebSpeeches`、`達標了` |
 | B4 比價思路步驟卡（Round 44）| B4 | `_showThinkingSteps(curr)`：兩商店模式 easy 答對後顯示藍色卡片；1️⃣A店X元 / 2️⃣B店Y元 / 結論；`b4TcIn`+`b4TcStepIn` 動畫；2s 後 `b4-tc-fade` 淡出；`handleSelectClick` easy 分支呼叫；搜尋 `_showThinkingSteps`、`b4-thinking-card` |
 | B6 付款找零計算過程顯示（Round 44）| B6 | `_animateChangeCalc(paid, total, change)`：`_showChangeResult` 渲染後 400ms 觸發（change>0）；三行 `.b6-cc-line` 逐行 `b6CcLineIn`（400ms 間隔）；付/商品/找零=三色；2.8s 後 `b6-cca-fade` 淡出；搜尋 `_animateChangeCalc`、`b6-change-calc-anim` |
+| B1 per-item 場景類別徽章（Round 45）| B1 | `_renderScheduleCard` 每個 `.b1-schedule-item` 加 `.b1-item-cat-badge`（20px 圓形半透明 emoji）；`catBadgeMap`：school📚/food🍔/outdoor🌳/entertainment🎭/shopping🛒；搜尋 `b1-item-cat-badge`、`catBadgeMap` |
+| B3 達標煙火慶祝（Round 45）| B3 | `_onCalendarGoalReached` 語音後加三波 confetti burst（angle 60/120/90，300ms 間隔，zIndex:10200）；搜尋 `達標煙火`、`burst` |
+| B4 記憶模式語音重聽按鈕（Round 45）| B4 | `_startMemoryCountdown` 模糊後加 `#b4-mem-replay`（`.b4-mem-replay-btn`，fixed top:76px right:12px）；click 呼叫 `Game.Speech.speak` 所有店家價格；2s disable 防連按；搜尋 `b4-mem-replay`、`b4-mem-replay-btn` |
+| B5 朗讀已選清單按鈕（Round 45）| B5 | `#b5-read-selected-btn`（`.b5-read-selected-btn`，藍色膠囊）；`_bindRoundEvents` 綁定：朗讀必買+已選商品名稱/價格+合計；插於 hint-btn 和 confirm-btn 之間；搜尋 `b5-read-selected-btn`、`朗讀已選` |
+| B6 切換至已完成攤位 toast（Round 45）| B6 | 攤位切換時偵測 `destDone`；已完成→底部顯示 `.b6-stall-done-toast`「✅ X攤位 已收集完畢！」；1s 後 `.b6-sdt-fade` 淡出，1.6s 後移除；搜尋 `b6-stall-done-toast`、`b6-sdt-fade` |
 
 ---
 

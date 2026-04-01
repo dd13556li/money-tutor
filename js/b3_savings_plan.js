@@ -1994,6 +1994,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // 100% 達標慶賀語音（Round 44）
             const itemName = c.item ? c.item.name : '目標';
             Game.Speech.speak(`達標了！${itemName}可以買了！`);
+
+            // 達標煙火慶祝（Round 45）
+            if (typeof confetti === 'function') {
+                const burst = (angle, x) => confetti({ angle, spread: 55, particleCount: 40, origin: { x, y: 0.55 }, zIndex: 10200 });
+                burst(60, 0.25);
+                Game.TimerManager.setTimeout(() => burst(120, 0.75), 300, 'ui');
+                Game.TimerManager.setTimeout(() => burst(90, 0.5), 600, 'ui');
+            }
             const elapsed = c.startTime ? (Date.now() - c.startTime) : 0;
             const mins = Math.floor(elapsed / 60000);
             const secs = Math.floor((elapsed % 60000) / 1000);

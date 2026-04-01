@@ -1013,3 +1013,14 @@ if (revealWeeklyBtn) {
 - `_generateChoices`、`b3-choices-4`、`structured`
 - `b3-weekly-hidden`、`b3-reveal-weekly-btn`、`data-weekly`
 - `celebSpeeches`、`達標了`、`_onCalendarGoalReached`
+- `burst`（Round 45 confetti）
+
+---
+
+## 二十四、Round 45 新增功能（2026-04-01）
+
+| 功能 | 描述 | 搜尋關鍵字 |
+|------|------|----------|
+| 達標煙火慶祝 | `_onCalendarGoalReached` 語音後加三波 confetti burst（angle 60/120/90，每 300ms，zIndex:10200） | `burst`, `confetti`, `達標煙火` |
+
+**教學意義**：達成儲蓄目標是重要的成就感時刻，三波煙火強化「努力有回報」的正向情緒記憶。對照 A 系列完成畫面的煙火設計，B3 月曆模式現在也有同等慶祝強度。

@@ -929,3 +929,14 @@ Game.TimerManager.setTimeout(() => {
 - `價格動態變化`、`pct = difficulty`、`finalItem`
 - `語音播報排名`、`cheapest.store`、`_showPodiumAnimation`
 - `_showThinkingSteps`、`b4-thinking-card`、`b4TcIn`、`b4TcStepIn`
+- `b4-mem-replay`、`b4-mem-replay-btn`（Round 45）
+
+---
+
+## 二十五、Round 45 新增功能（2026-04-01）
+
+| 功能 | 描述 | 搜尋關鍵字 |
+|------|------|----------|
+| 記憶模式語音重聽按鈕 | `_startMemoryCountdown` 模糊後加 `#b4-mem-replay` 按鈕（fixed 右上角）；click 朗讀所有店家價格；2s disable 防連按 | `b4-mem-replay`, `b4-mem-replay-btn` |
+
+**教學意義**：困難模式遮蔽價格後，提供一次語音重聽機會，讓學生可以選擇是否需要「聲音輔助」記憶，兼顧不同學習風格（視覺/聽覺記憶）。對照 B2 困難模式語音重聽鈕（Round 30）的設計。
