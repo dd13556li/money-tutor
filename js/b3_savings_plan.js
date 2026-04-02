@@ -221,11 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 item: null,
                 dailyAmount: 0,
                 accumulated: 0,
-                denomPile: {},   // 實際持有面額 {denom: count}
+                denomPile: {},          // 實際持有面額 {denom: count}
                 clickedDays: 0,
                 startDate: null,
                 startTime: null,
                 drag: null,
+                hardDailyAmounts: [],   // hard mode: 預先產生的每日存款金額陣列
+                hardSavedAmounts: [],   // hard mode: 實際每天存入的金額記錄
             },
             customItems: [], // { name, price, imageData, isCustom:true }（跨局保留）
             isEndingGame: false,
@@ -294,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = this.state.calendar;
             c.item = null; c.dailyAmount = 0; c.accumulated = 0; c.denomPile = {};
             c.clickedDays = 0; c.startDate = null; c.startTime = null; c.drag = null;
+            c.hardDailyAmounts = []; c.hardSavedAmounts = [];
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B3] 遊戲狀態已重置');
@@ -424,23 +427,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b3-normal-settings b3-days-preview" id="b3-n-days-preview" style="display:none;"></div>
 
                 <!-- 困難模式設定 -->
-                <div class="b-setting-group b3-hard-settings" id="count-settings-group" style="display:none;">
-                    <label class="b-setting-label">📋 題數：</label>
-                    <div class="b-btn-group" id="count-group">
-                        <button class="b-sel-btn" data-val="1">1題</button>
-                        <button class="b-sel-btn" data-val="5">5題</button>
-                        <button class="b-sel-btn" data-val="10">10題</button>
-                        <button class="b-sel-btn" data-val="15">15題</button>
-                        <button class="b-sel-btn" data-val="20">20題</button>
+                <div class="b-setting-group b3-hard-settings" id="h-start-date-group" style="display:none;">
+                    <label class="b-setting-label">📅 開始日期：</label>
+                    <div class="b-btn-group">
+                        <input type="date" id="b3-h-start-date" class="b3-date-input" value="${today}">
                     </div>
                 </div>
-                <div class="b-setting-group b3-hard-settings" id="mode-settings-group" style="display:none;">
-                    <label class="b-setting-label">🔄 作答模式：</label>
-                    <div class="b-btn-group" id="mode-group">
-                        <button class="b-sel-btn" data-val="retry">反複作答</button>
-                        <button class="b-sel-btn" data-val="proceed">單次作答</button>
+                <div class="b-setting-group b3-hard-settings" id="h-price-range-group" style="display:none;">
+                    <label class="b-setting-label">🛒 購買物品金額：</label>
+                    <div class="b-btn-group" id="h-price-range-btns">
+                        <button class="b-sel-btn" data-hrange="800">800元以內</button>
+                        <button class="b-sel-btn" data-hrange="2000">2000元以內</button>
+                        <button class="b-sel-btn" data-hrange="5000">全部商品</button>
                     </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">反複作答：答錯可以再試 ｜ 單次作答：顯示答案後繼續</div>
                 </div>
 
                 <div class="b-setting-group">
@@ -495,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="b-setting-group">
                     <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
-                        ✨ 簡單：月曆存錢，面額已分解好直接放置｜普通：月曆存錢，自行組合面額｜困難：計算每週存款所需週數
+                        ✨ 簡單：月曆存錢，面額已分解好直接放置｜普通：月曆存錢，自行組合面額｜困難：月曆存錢，每天金額不同
                     </label>
                 </div>
             </div>
@@ -510,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _diffDescriptions: {
             easy:   '簡單：月曆模擬！點擊每一天存入固定金額，面額已幫你分解好，直接拖曳放置即可',
             normal: '普通：月曆模擬！每天自行組合正確面額存入撲滿，比簡單模式更具挑戰性',
-            hard:   '困難：計算每週存固定金額需要幾週才能達成目標，精確輸入週數',
+            hard:   '困難：月曆模擬！每天存款金額不固定，每次存入不同金額，挑戰自行組合正確面額',
         },
 
         _bindSettingsEvents() {
@@ -527,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.b3-cal-settings').forEach(el => el.style.display = diff === 'easy' ? '' : 'none');
                     document.querySelectorAll('.b3-normal-settings').forEach(el => el.style.display = diff === 'normal' ? '' : 'none');
                     document.querySelectorAll('.b3-hard-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
-                    document.querySelectorAll('.b3-quiz-settings').forEach(el => el.style.display = diff === 'hard' ? '' : 'none');
+                    document.querySelectorAll('.b3-quiz-settings').forEach(el => el.style.display = 'none');
                     // 輔助點擊：只有簡單模式才顯示
                     const assistGroup = document.getElementById('assist-click-group');
                     if (diff === 'easy') {
@@ -537,16 +536,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.state.settings.clickMode = 'off';
                         document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.toggle('active', b.dataset.assist === 'off'));
                     }
-                    if (diff === 'hard') {
-                        // Reset calendar settings
-                        this.state.settings.startDate = null;
-                        this.state.settings.dailyAmount = null;
-                        this.state.settings.priceRange = null;
-                    } else {
-                        // Reset hard-mode settings
-                        this.state.settings.questionCount = null;
-                        this.state.settings.retryMode = null;
-                    }
+                    // 每次切換難度都清除舊的 quiz 設定
+                    this.state.settings.questionCount = null;
+                    this.state.settings.retryMode = null;
                     if (diff === 'easy') {
                         const dateInput = document.getElementById('b3-start-date');
                         if (dateInput) this.state.settings.startDate = dateInput.value;
@@ -562,6 +554,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (customRow) customRow.style.display = 'none';
                         document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                         document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    } else if (diff === 'hard') {
+                        // hard 模式：月曆變動金額，重置設定
+                        this.state.settings.dailyAmount = null;
+                        this.state.settings.priceRange = null;
+                        const dateInput = document.getElementById('b3-h-start-date');
+                        if (dateInput) this.state.settings.startDate = dateInput.value;
+                        document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -687,22 +686,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             }
 
-            // Count buttons (hard mode only)
-            document.querySelectorAll('#count-group .b-sel-btn').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#count-group .b-sel-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.questionCount = parseInt(btn.dataset.val);
-                    this._checkCanStart();
+            // Hard mode: 開始日期
+            const hDateInput = document.getElementById('b3-h-start-date');
+            if (hDateInput) {
+                Game.EventManager.on(hDateInput, 'change', () => {
+                    this.state.settings.startDate = hDateInput.value;
                 }, {}, 'settings');
-            });
+            }
 
-            // Mode buttons (normal/hard)
-            document.querySelectorAll('#mode-group .b-sel-btn').forEach(btn => {
+            // Hard mode: 購買物品金額
+            document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#mode-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    this.state.settings.retryMode = btn.dataset.val;
+                    this.state.settings.priceRange = parseInt(btn.dataset.hrange);
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -924,7 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = !s.priceRange || !s.dailyAmount ||
                                s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
-                btn.disabled = !s.questionCount || !s.retryMode;
+                btn.disabled = !s.priceRange;
             }
         },
 
@@ -955,25 +952,13 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
 
-            if (this.state.settings.difficulty === 'easy' || this.state.settings.difficulty === 'normal') {
-                this._startCalendarSession();
-            } else {
-                const s = this.state.settings;
-                const q = this.state.quiz;
-                q.currentQuestion = 0;
-                q.totalQuestions  = s.questionCount;
-                q.correctCount    = 0;
-                q.streak          = 0;
-                q.startTime       = Date.now();
-                q.questions       = this._generateQuestions(s.questionCount);
-                q.currentInput    = '';
-                this.renderQuestion();
-            }
+            this._startCalendarSession();
         },
 
-        // ── Easy Mode: Calendar Session ───────────────────────────────
+        // ── Calendar Session（easy / normal / hard）─────────────────────
         _startCalendarSession() {
             const s = this.state.settings;
+            const diff = s.difficulty;
             const maxPrice = s.priceRange || 400;
             const builtIn = B3_ALL_ITEMS.filter(i => i.price <= maxPrice);
             const customInRange = this.state.customItems.filter(i => i.price <= maxPrice);
@@ -983,9 +968,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = pool.slice().sort(() => Math.random() - 0.5);
             const item  = items[0];
 
-            // Calculate daily amount (auto or user-set)
+            // Calculate daily amount
             let dailyAmount;
-            if (!s.dailyAmount || s.dailyAmount === 'auto') {
+            let hardDailyAmounts = [];
+            if (diff === 'hard') {
+                // Hard mode：每天金額不固定，預先產生陣列
+                hardDailyAmounts = this._generateHardDailyAmounts(item.price);
+                // dailyAmount 用平均值做顯示估算
+                const avg = hardDailyAmounts.slice(0, 15).reduce((a, b) => a + b, 0) / 15;
+                dailyAmount = Math.round(avg / 5) * 5 || 50;
+            } else if (!s.dailyAmount || s.dailyAmount === 'auto') {
                 // Auto: aim for ~12-18 days, pick a round number
                 const rawPerDay = item.price / 15;
                 const niceAmounts = [10, 15, 20, 25, 30, 40, 50, 75, 100];
@@ -1012,15 +1004,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 startDate,
                 startTime: Date.now(),
                 drag: null,
+                hardDailyAmounts,
+                hardSavedAmounts: [],
             };
 
             this.renderCalendar();
             this._showCalendarTaskPopup();
         },
 
+        // ── Hard Mode：產生每日變動金額陣列 ──────────────────────────
+        _generateHardDailyAmounts(price) {
+            const avgPerDay = price / 15;
+            const allNice = [5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 80, 100, 120, 150, 180, 200, 250, 300, 400, 500];
+            const lo = Math.max(avgPerDay * 0.4, 5);
+            const hi = avgPerDay * 2.5;
+            let pool = allNice.filter(a => a >= lo && a <= hi);
+            if (pool.length < 3) {
+                const base = Math.max(10, Math.round(avgPerDay / 5) * 5);
+                pool = [
+                    Math.max(5, Math.round(base * 0.6 / 5) * 5),
+                    base,
+                    Math.round(base * 1.5 / 5) * 5,
+                ].filter((v, i, arr) => arr.indexOf(v) === i);
+            }
+            const result = [];
+            for (let i = 0; i < 80; i++) {
+                result.push(pool[Math.floor(Math.random() * pool.length)]);
+            }
+            return result;
+        },
+
         _showCalendarTaskPopup() {
             const c = this.state.calendar;
+            const isHard = this.state.settings.difficulty === 'hard';
             const daysNeeded = Math.ceil(c.item.price / c.dailyAmount);
+            const metaHTML = isHard
+                ? `<span>💰 每天存款金額不固定</span><span>⏰ 預計約 <strong>${daysNeeded}</strong> 天存到</span>`
+                : `<span>💰 每天存 <strong>${c.dailyAmount}</strong> 元</span><span>⏰ 預計 <strong>${daysNeeded}</strong> 天存到</span>`;
             const overlay = document.createElement('div');
             overlay.className = 'b3-task-popup-overlay';
             overlay.innerHTML = `
@@ -1029,10 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b3-task-item-icon-wrap">${this._itemIconHTML(c.item, '128px')}</div>
             <div class="b3-task-item-name">${c.item.name}</div>
             <div class="b3-task-item-price">需要 <strong>${c.item.price}</strong> 元</div>
-            <div class="b3-task-meta">
-                <span>💰 每天存 <strong>${c.dailyAmount}</strong> 元</span>
-                <span>⏰ 預計 <strong>${daysNeeded}</strong> 天存到</span>
-            </div>
+            <div class="b3-task-meta">${metaHTML}</div>
             <button class="b3-task-start-btn" id="b3-task-start">開始存錢！🐷</button>
         </div>`;
             document.body.appendChild(overlay);
@@ -1049,15 +1066,18 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isProcessing = false;
 
             const c = this.state.calendar;
+            const diff = this.state.settings.difficulty;
+            const isHard = diff === 'hard';
             const pct = Math.min(100, Math.round((c.accumulated / c.item.price) * 100));
             const daysNeeded = Math.ceil(c.item.price / c.dailyAmount);
             const remaining = Math.max(0, c.item.price - c.accumulated);
+            const modeLabel = diff === 'easy' ? '簡單模式・月曆存錢' : diff === 'normal' ? '普通模式・月曆存錢' : '困難模式・月曆存錢（變動金額）';
 
             const app = document.getElementById('app');
             app.innerHTML = `
 <div class="b-header">
     <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
-    <div class="b-header-center">簡單模式・月曆存錢</div>
+    <div class="b-header-center">${modeLabel}</div>
     <div class="b-header-right">
         <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
         <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
@@ -1082,9 +1102,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b3-cal-stats-center">
                     <div class="b3-cal-stats-line">已存 <span id="b3-cal-accumulated" class="b3-cal-acc-num">${c.accumulated}</span> 元、還需 <span id="b3-cal-remaining" class="b3-cal-rem-num">${remaining}</span> 元</div>
                     <div class="b3-cal-stat-sep">｜</div>
-                    <div class="b3-cal-stats-line">每天存 ${c.dailyAmount} 元</div>
+                    <div class="b3-cal-stats-line">${isHard ? '每天金額不固定' : `每天存 ${c.dailyAmount} 元`}</div>
                     <div class="b3-cal-stat-sep">｜</div>
-                    <div class="b3-cal-stats-line">共 ${daysNeeded} 天</div>
+                    <div class="b3-cal-stats-line">${isHard ? `預計約 ${daysNeeded} 天` : `共 ${daysNeeded} 天`}</div>
                     <div class="b3-cal-stat-sep">｜</div>
                     <div class="b3-cal-stats-line b3-days-left-line">距完成 <span id="b3-days-left" class="b3-days-left-num">${daysNeeded}</span> 天</div>
                     <div class="b3-est-date" id="b3-est-date">計算中…</div>
@@ -1215,11 +1235,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderCalendarHTML() {
             const c = this.state.calendar;
+            const isHard = this.state.settings.difficulty === 'hard';
             const startDate = c.startDate;
             const year  = startDate.getFullYear();
             const month = startDate.getMonth();
             const startDay = startDate.getDate();
             const nextClickDay = startDay + c.clickedDays; // 1-based day number to click next
+            // hard mode：目前月份已存天數在 hardSavedAmounts 中的起始索引
+            const hardBaseIdx = c.hardSavedAmounts.length - c.clickedDays;
 
             // First day of month (0=Sun)
             const firstWeekday = new Date(year, month, 1).getDay();
@@ -1241,7 +1264,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (d < nextClickDay) {
                     // Already saved
                     cls += ' b3-cal-done';
-                    inner += `<span class="b3-cal-saved-amt">+${c.dailyAmount}</span><span class="b3-cal-check">✓</span>`;
+                    const savedAmt = isHard
+                        ? (c.hardSavedAmounts[hardBaseIdx + (d - startDay)] ?? '?')
+                        : c.dailyAmount;
+                    inner += `<span class="b3-cal-saved-amt">+${savedAmt}</span><span class="b3-cal-check">✓</span>`;
                 } else if (d === nextClickDay) {
                     cls += ' b3-cal-active';
                     inner += `<span class="b3-cal-coin">🐷</span>`;
@@ -1286,6 +1312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // 距完成天數 + 完成預測日期（Round 37）
             const daysLeftEl = document.getElementById('b3-days-left');
+            // hard mode：用最近一天的金額做估算
             const daysLeft   = remaining > 0 ? Math.ceil(remaining / (c.dailyAmount || 1)) : 0;
             if (daysLeftEl) {
                 daysLeftEl.textContent = daysLeft;
@@ -1309,8 +1336,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update clicked cell: active → done
             const clickedCell = document.querySelector(`.b3-cal-cell[data-day="${justClickedDay}"]`);
             if (clickedCell) {
+                const isHard = this.state.settings.difficulty === 'hard';
+                const savedAmt = isHard
+                    ? (c.hardSavedAmounts[c.hardSavedAmounts.length - 1] ?? c.dailyAmount)
+                    : c.dailyAmount;
                 clickedCell.className = 'b3-cal-cell b3-cal-done';
-                clickedCell.innerHTML = `<span class="b3-cal-day-num">${justClickedDay}</span><span class="b3-cal-saved-amt">+${c.dailyAmount}</span><span class="b3-cal-check">✓</span>`;
+                clickedCell.innerHTML = `<span class="b3-cal-day-num">${justClickedDay}</span><span class="b3-cal-saved-amt">+${savedAmt}</span><span class="b3-cal-check">✓</span>`;
             }
 
             if (nextDay <= daysInMonth) {
@@ -1416,7 +1447,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const dayNum = c.clickedDays + 1;
             const diff = this.state.settings.difficulty;
             Game.Speech.speak(`${month}月${day}日，第${dayNum}天`, () => {
-                if (diff === 'normal') {
+                if (diff === 'hard') {
+                    this._startHardDragSession(day);
+                } else if (diff === 'normal') {
                     this._startNormalDragSession(day);
                 } else {
                     this._startDragSession(day);
@@ -1602,6 +1635,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._initNormalDragAndDrop();
             this.state.isProcessing = false;
+        },
+
+        // ── Hard Mode：每天變動金額的拖曳工作階段 ───────────────────
+        _startHardDragSession(day) {
+            const c = this.state.calendar;
+            // 補充金額陣列（不夠時再產生）
+            while (c.clickedDays >= c.hardDailyAmounts.length) {
+                c.hardDailyAmounts.push(...this._generateHardDailyAmounts(c.item.price));
+            }
+            // 取得今天的變動金額，覆寫 dailyAmount 供 _startNormalDragSession 使用
+            c.dailyAmount = c.hardDailyAmounts[c.clickedDays];
+            this._startNormalDragSession(day);
         },
 
         _updateNormalDailyCard() {
@@ -1872,14 +1917,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = this.state.calendar;
             if (!c.drag) return;
             const draggedItems = c.drag.items; // 存起來，下面 c.drag = null 後仍可用
+            const savedAmount  = c.dailyAmount; // 本次實際存入金額（hard mode 已在 _startHardDragSession 更新）
             c.drag = null;
+
+            // hard mode：記錄本天實際存入金額
+            if (this.state.settings.difficulty === 'hard') {
+                c.hardSavedAmounts.push(savedAmount);
+            }
 
             this.audio.play('correct');
             const pigBank = document.getElementById('b3-pig-bank');
-            this._spawnCoinParticles(pigBank, c.dailyAmount);
+            this._spawnCoinParticles(pigBank, savedAmount);
 
             const prevAccum = c.accumulated;
-            c.accumulated += c.dailyAmount;
+            c.accumulated += savedAmount;
             c.clickedDays++;
 
             // 里程碑偵測（25 / 50 / 75 %）
@@ -1924,8 +1975,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this._updateCalendarUI(true); // pig already updated
                 const remaining = Math.max(0, c.item.price - c.accumulated);
-                const daysLeft  = Math.ceil(remaining / c.dailyAmount);
-                const speechText = `存入${toTWD(c.dailyAmount)}！還差${toTWD(remaining)}，再存${daysLeft}天就達標了！`;
+                const daysLeft  = Math.ceil(remaining / (c.dailyAmount || 1));
+                const speechText = `存入${toTWD(savedAmount)}！還差${toTWD(remaining)}，再存${daysLeft}天就達標了！`;
                 c.lastSpeech = speechText;
                 Game.Speech.speak(speechText);
                 this._showCountdownHint(remaining, daysLeft);
