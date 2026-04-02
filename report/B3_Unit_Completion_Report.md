@@ -1024,3 +1024,64 @@ if (revealWeeklyBtn) {
 | 達標煙火慶祝 | `_onCalendarGoalReached` 語音後加三波 confetti burst（angle 60/120/90，每 300ms，zIndex:10200） | `burst`, `confetti`, `達標煙火` |
 
 **教學意義**：達成儲蓄目標是重要的成就感時刻，三波煙火強化「努力有回報」的正向情緒記憶。對照 A 系列完成畫面的煙火設計，B3 月曆模式現在也有同等慶祝強度。
+
+---
+
+## 二十五、設定頁三模式統一天數選項（2026-04-02）
+
+### 背景
+
+原本三種難度設定頁的「每天存款金額」呈現方式不一致：
+- 簡單模式：已改為 `📅 存款天數與金額：` 含 6-10天/9-15天/10-20天/自訂金額
+- 普通模式：仍使用舊有 `💰 每天存款金額：` + 預設（浮動動畫）/自訂 兩個按鈕
+- 困難模式：完全沒有每天存款金額選項
+
+### 變更內容
+
+#### HTML 結構重組
+
+1. **移除 `#b3-preset-display` 浮動動畫區塊**（普通模式）：原本點擊「預設」後會啟動 1.2s 隨機數字滾動動畫，最終鎖定一個面額值。此機制複雜且不直觀，以區間選項取代。
+
+2. **普通模式 `#n-daily-group`** 改為與簡單模式相同的四個按鈕：`6-10天 / 9-15天 / 10-20天 / 自訂金額`（`data-ndaily` 屬性）
+
+3. **困難模式新增 `#h-daily-group`**：`6-10天 / 9-15天 / 10-20天`（`data-hdaily` 屬性，不提供自訂金額，因困難模式每天金額本就為變動值）
+
+4. **`🖼️ 自訂物品（選填）` 區塊移位**：從簡單模式 price-range 與 daily-group 之間，移至困難模式 price-range 之後（三模式共用，切換任何難度時皆可見此區塊）
+
+#### 新設定頁 DOM 順序
+
+```
+難度選擇
+├── [簡單] 開始日期 → 購買物品金額
+├── [普通] 開始日期 → 購買物品金額
+├── [困難] 開始日期 → 購買物品金額
+自訂物品（選填）← 三模式共用，移至此
+├── [簡單] 存款天數與金額 → preview
+├── [普通] 存款天數與金額 → preview
+└── [困難] 存款天數與金額
+作業單 / 獎勵系統 / 目標類別
+```
+
+#### JS 邏輯更新
+
+| 函數 | 變更說明 |
+|------|---------|
+| `_bindSettingsEvents()` | 移除普通模式 preset 動畫 `setInterval` + `TimerManager.setTimeout('presetLock')`；改為單步 range-string 賦值（同簡單模式）；新增困難模式 `#h-daily-btn-group` 事件監聽 |
+| `_checkCanStart()` | 困難模式加入 `!s.dailyAmount` 守衛，需選擇天數才能開始 |
+| `_updateNDaysPreview()` | 新增 range string 支援：`'6-10'→target=8`、`'9-15'→target=12`、`'10-20'→target=15`；計算 `niceAmounts` 區間並顯示「每天存款約 X 元，預計 Y 天達成目標」；數字輸入模式維持原邏輯 |
+| `_generateHardDailyAmounts(price, targetDays=15)` | 新增 `targetDays` 參數（預設 15）；`avgPerDay = price / targetDays` 改用傳入值；`_startCalendarSession` 困難模式讀取 `rangeTargets[s.dailyAmount]` 傳入 |
+| diff-change handler | 移除 `presetDisplay` 重置邏輯；困難模式新增 `#h-daily-btn-group` 清除 active |
+
+### 搜尋關鍵字
+
+- `data-ndaily`、`#n-daily-btn-group`（普通模式天數按鈕）
+- `data-hdaily`、`#h-daily-btn-group`、`#h-daily-group`（困難模式天數按鈕）
+- `_updateNDaysPreview`（普通模式 preview，現支援 range string）
+- `_generateHardDailyAmounts.*targetDays`（困難模式天數參數）
+- `b3-add-custom-item-btn`（自訂物品，DOM 位置已移動）
+
+### 技術要點
+
+- **range string 一致性**：三種難度的 `dailyAmount` 現在都可能是 `'6-10'`、`'9-15'`、`'10-20'` 或自訂數字；`_startCalendarSession` 以統一的 `rangeTargets` map 處理三種情況
+- **困難模式無自訂金額**：困難模式每日金額本就由 `_generateHardDailyAmounts` 根據 targetDays 隨機產生，天數選項只影響平均值，不開放固定金額輸入
+- **移除浮動動畫**：原 preset 動畫使用 `setInterval` + `TimerManager.setTimeout`，屬於不必要的互動延遲；新設計讓使用者直接看到選擇結果，更符合教學情境的快速設定需求

@@ -357,38 +357,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-range="300">300元以內</button>
                         <button class="b-sel-btn" data-range="500">500元以內</button>
                         <button class="b-sel-btn" data-range="800">800元以內</button>
+                        <button class="b-sel-btn" data-range="2000">2000元以內</button>
+                        <button class="b-sel-btn" data-range="5000">全部商品</button>
                     </div>
-                </div>
-
-                <div class="b-setting-group">
-                    <label class="b-setting-label">🖼️ 自訂物品（選填）：</label>
-                    <div class="b3-custom-items-list" id="b3-custom-items-list">
-                        ${this._renderCustomItemsPanel()}
-                    </div>
-                    <div class="b-btn-group" style="margin-top:6px;">
-                        <button class="b-sel-btn" id="b3-add-custom-item-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:#fff;border:none;">＋ 新增物品</button>
-                    </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">上傳圖片作為存錢目標，最多 5 個，會加入題目池一起出題</div>
-                    <input type="file" id="b3-custom-image" accept="image/*" style="display:none;">
                 </div>
 
                 <div class="b-setting-group b3-cal-settings" id="cal-daily-group" style="display:none;">
-                    <label class="b-setting-label">💰 每天存款金額：</label>
+                    <label class="b-setting-label">📅 存款天數與金額：</label>
                     <div class="b-btn-group" id="daily-group">
-                        <button class="b-sel-btn" data-daily="auto">自動</button>
-                        <button class="b-sel-btn" data-daily="10">10元</button>
-                        <button class="b-sel-btn" data-daily="20">20元</button>
-                        <button class="b-sel-btn" data-daily="30">30元</button>
-                        <button class="b-sel-btn" data-daily="50">50元</button>
-                        <button class="b-sel-btn" data-daily="custom">自訂</button>
+                        <button class="b-sel-btn" data-daily="6-10">6-10天</button>
+                        <button class="b-sel-btn" data-daily="9-15">9-15天</button>
+                        <button class="b-sel-btn" data-daily="10-20">10-20天</button>
+                        <button class="b-sel-btn" data-daily="custom">自訂金額</button>
                     </div>
-                    <div id="b3-custom-daily-row" style="display:none;margin-top:8px;display:none;align-items:center;gap:6px;">
+                    <div id="b3-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
                         <input type="number" id="b3-custom-daily-input"
                                min="1" max="9999" placeholder="輸入金額"
                                style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
                         <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
                     </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">自動：系統根據目標金額決定每天存多少</div>
                 </div>
                 <div class="b3-cal-settings b3-days-preview" id="b3-days-preview" style="display:none;"></div>
 
@@ -405,27 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-nrange="300">300元以內</button>
                         <button class="b-sel-btn" data-nrange="500">500元以內</button>
                         <button class="b-sel-btn" data-nrange="800">800元以內</button>
+                        <button class="b-sel-btn" data-nrange="2000">2000元以內</button>
+                        <button class="b-sel-btn" data-nrange="5000">全部商品</button>
                     </div>
                 </div>
-                <div class="b-setting-group b3-normal-settings" id="n-daily-group" style="display:none;">
-                    <label class="b-setting-label">💰 每天存款金額：</label>
-                    <div class="b-btn-group" id="n-daily-btn-group">
-                        <button class="b-sel-btn" data-ndaily="preset">預設</button>
-                        <button class="b-sel-btn" data-ndaily="custom">自訂</button>
-                    </div>
-                    <div id="b3-preset-display" style="display:none;margin-top:10px;padding:10px 20px;background:#fef3c7;border:2px solid #d97706;border-radius:12px;text-align:center;">
-                        <span id="b3-preset-number" style="font-size:2rem;font-weight:900;color:#92400e;letter-spacing:2px;">--</span>
-                        <span style="font-size:1rem;color:#92400e;margin-left:4px;">元 / 天</span>
-                    </div>
-                    <div id="b3-n-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
-                        <input type="number" id="b3-n-custom-daily-input"
-                               min="1" max="9999" placeholder="輸入金額"
-                               style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
-                        <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
-                    </div>
-                </div>
-                <div class="b3-normal-settings b3-days-preview" id="b3-n-days-preview" style="display:none;"></div>
-
                 <!-- 困難模式設定 -->
                 <div class="b-setting-group b3-hard-settings" id="h-start-date-group" style="display:none;">
                     <label class="b-setting-label">📅 開始日期：</label>
@@ -436,9 +406,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-setting-group b3-hard-settings" id="h-price-range-group" style="display:none;">
                     <label class="b-setting-label">🛒 購買物品金額：</label>
                     <div class="b-btn-group" id="h-price-range-btns">
+                        <button class="b-sel-btn" data-hrange="300">300元以內</button>
+                        <button class="b-sel-btn" data-hrange="500">500元以內</button>
                         <button class="b-sel-btn" data-hrange="800">800元以內</button>
                         <button class="b-sel-btn" data-hrange="2000">2000元以內</button>
                         <button class="b-sel-btn" data-hrange="5000">全部商品</button>
+                    </div>
+                </div>
+
+                <!-- 自訂物品（所有模式共用，置於所有購買金額選項之後） -->
+                <div class="b-setting-group">
+                    <label class="b-setting-label">🖼️ 自訂物品（選填）：</label>
+                    <div class="b3-custom-items-list" id="b3-custom-items-list">
+                        ${this._renderCustomItemsPanel()}
+                    </div>
+                    <div class="b-btn-group" style="margin-top:6px;">
+                        <button class="b-sel-btn" id="b3-add-custom-item-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:#fff;border:none;">＋ 新增物品</button>
+                    </div>
+                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">上傳圖片作為存錢目標，最多 5 個，會加入題目池一起出題</div>
+                    <input type="file" id="b3-custom-image" accept="image/*" style="display:none;">
+                </div>
+
+                <!-- 普通模式：存款天數與金額 -->
+                <div class="b-setting-group b3-normal-settings" id="n-daily-group" style="display:none;">
+                    <label class="b-setting-label">📅 存款天數與金額：</label>
+                    <div class="b-btn-group" id="n-daily-btn-group">
+                        <button class="b-sel-btn" data-ndaily="6-10">6-10天</button>
+                        <button class="b-sel-btn" data-ndaily="9-15">9-15天</button>
+                        <button class="b-sel-btn" data-ndaily="10-20">10-20天</button>
+                        <button class="b-sel-btn" data-ndaily="custom">自訂金額</button>
+                    </div>
+                    <div id="b3-n-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
+                        <input type="number" id="b3-n-custom-daily-input"
+                               min="1" max="9999" placeholder="輸入金額"
+                               style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
+                        <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
+                    </div>
+                </div>
+                <div class="b3-normal-settings b3-days-preview" id="b3-n-days-preview" style="display:none;"></div>
+
+                <!-- 困難模式：存款天數與金額 -->
+                <div class="b-setting-group b3-hard-settings" id="h-daily-group" style="display:none;">
+                    <label class="b-setting-label">📅 存款天數與金額：</label>
+                    <div class="b-btn-group" id="h-daily-btn-group">
+                        <button class="b-sel-btn" data-hdaily="6-10">6-10天</button>
+                        <button class="b-sel-btn" data-hdaily="9-15">9-15天</button>
+                        <button class="b-sel-btn" data-hdaily="10-20">10-20天</button>
                     </div>
                 </div>
 
@@ -548,8 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Reset normal-specific UI
                         this.state.settings.dailyAmount = null;
                         this.state.settings.priceRange = null;
-                        const presetDisplay = document.getElementById('b3-preset-display');
-                        if (presetDisplay) { presetDisplay.style.display = 'none'; presetDisplay.classList.remove('b3-preset-locked'); }
                         const customRow = document.getElementById('b3-n-custom-daily-row');
                         if (customRow) customRow.style.display = 'none';
                         document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -561,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const dateInput = document.getElementById('b3-h-start-date');
                         if (dateInput) this.state.settings.startDate = dateInput.value;
                         document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -598,7 +610,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (inp) { inp.value = ''; inp.focus(); }
                     } else {
                         if (customRow) customRow.style.display = 'none';
-                        this.state.settings.dailyAmount = v === 'auto' ? 'auto' : parseInt(v);
+                        // v is now a range string like '6-10', '9-15', '10-20'
+                        this.state.settings.dailyAmount = v;
                     }
                     this._updateDaysPreview();
                     this._checkCanStart();
@@ -636,42 +649,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            // Normal: 每天存款金額（預設/自訂）
+            // Normal: 存款天數與金額（6-10/9-15/10-20/自訂金額）
             document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     const v = btn.dataset.ndaily;
-                    const presetDisplay = document.getElementById('b3-preset-display');
                     const customRow = document.getElementById('b3-n-custom-daily-row');
-                    if (v === 'preset') {
-                        if (customRow) customRow.style.display = 'none';
-                        if (presetDisplay) { presetDisplay.style.display = 'block'; presetDisplay.classList.remove('b3-preset-locked'); }
-                        this.state.settings.dailyAmount = 'preset-pending';
-                        this._checkCanStart();
-                        // 浮動金額動畫
-                        const pool = [10, 20, 30, 50, 75, 100];
-                        const numEl = document.getElementById('b3-preset-number');
-                        const animId = setInterval(() => {
-                            if (numEl) numEl.textContent = pool[Math.floor(Math.random() * pool.length)];
-                        }, 80);
-                        Game.TimerManager.setTimeout(() => {
-                            clearInterval(animId);
-                            const chosen = pool[Math.floor(Math.random() * pool.length)];
-                            if (numEl) numEl.textContent = chosen;
-                            if (presetDisplay) presetDisplay.classList.add('b3-preset-locked');
-                            this.state.settings.dailyAmount = chosen;
-                            this._updateNDaysPreview();
-                            this._checkCanStart();
-                        }, 1200, 'presetLock');
-                    } else {
-                        if (presetDisplay) { presetDisplay.style.display = 'none'; presetDisplay.classList.remove('b3-preset-locked'); }
+                    if (v === 'custom') {
                         if (customRow) customRow.style.display = 'flex';
                         this.state.settings.dailyAmount = 'custom';
                         const inp = document.getElementById('b3-n-custom-daily-input');
                         if (inp) { inp.value = ''; inp.focus(); }
-                        this._checkCanStart();
+                    } else {
+                        if (customRow) customRow.style.display = 'none';
+                        this.state.settings.dailyAmount = v;
                     }
+                    this._updateNDaysPreview();
+                    this._checkCanStart();
                 }, {}, 'settings');
             });
 
@@ -700,6 +695,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.priceRange = parseInt(btn.dataset.hrange);
+                    this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            // Hard mode: 存款天數與金額（6-10/9-15/10-20）
+            document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.dailyAmount = btn.dataset.hdaily;
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -861,51 +866,59 @@ document.addEventListener('DOMContentLoaded', () => {
             const range = s.priceRange;
             const daily = s.dailyAmount;
 
-            // Hide if not in easy mode context
-            if (!range && this.state.customItems.length === 0) {
+            if (!range && !daily && this.state.customItems.length === 0) {
                 preview.style.display = 'none';
                 return;
             }
 
-            const effectiveDaily = (!daily || daily === 'custom') ? null : (daily === 'auto' ? null : daily);
-
-            // Build item pool
+            const niceAmounts = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500];
+            const rangeTargets  = { '6-10': 8, '9-15': 12, '10-20': 15 };
+            const rangeLabels   = { '6-10': '6～10', '9-15': '9～15', '10-20': '10～20' };
             const builtInInRange = range ? B3_ALL_ITEMS.filter(i => i.price <= range) : [];
             const customItems = this.state.customItems;
-
-            // Lines to display
             const lines = [];
 
-            if (range && effectiveDaily !== null) {
-                if (builtInInRange.length > 0) {
+            if (daily in rangeTargets) {
+                // 天數範圍模式：計算每天存款金額區間
+                const target = rangeTargets[daily];
+                const label  = rangeLabels[daily];
+                if (range && builtInInRange.length > 0) {
                     const prices = builtInInRange.map(i => i.price);
-                    const minDays = Math.ceil(Math.min(...prices) / effectiveDaily);
-                    const maxDays = Math.ceil(Math.max(...prices) / effectiveDaily);
-                    if (minDays === maxDays) {
-                        lines.push(`📅 內建物品預計需要 <strong>${maxDays}</strong> 天`);
+                    const minPrice = Math.min(...prices);
+                    const maxPrice = Math.max(...prices);
+                    const dailyForMin = niceAmounts.find(a => a >= minPrice / target) || 500;
+                    const dailyForMax = niceAmounts.find(a => a >= maxPrice / target) || 500;
+                    if (dailyForMin === dailyForMax) {
+                        lines.push(`💰 每天存款約 <strong>${dailyForMin} 元</strong>，預計 <strong>${label} 天</strong>達成目標`);
                     } else {
-                        lines.push(`📅 內建物品預計需要 <strong>${minDays}～${maxDays}</strong> 天`);
+                        lines.push(`💰 每天存款約 <strong>${dailyForMin}～${dailyForMax} 元</strong>，預計 <strong>${label} 天</strong>達成目標`);
                     }
+                } else if (!range) {
+                    lines.push(`📅 目標：<strong>${label} 天</strong>達成，存款金額依物品自動計算`);
                 }
-            } else if (range && daily === 'auto') {
-                lines.push(`📅 每天存款金額由系統自動決定`);
+                customItems.forEach(item => {
+                    const d = niceAmounts.find(a => a >= item.price / target) || 500;
+                    const actualDays = Math.ceil(item.price / d);
+                    lines.push(`🎯 ${item.name}（${item.price}元）每天存 ${d} 元，約 <strong>${actualDays} 天</strong>`);
+                });
+            } else if (typeof daily === 'number') {
+                // 自訂金額模式
+                if (range && builtInInRange.length > 0) {
+                    const prices = builtInInRange.map(i => i.price);
+                    const minDays = Math.ceil(Math.min(...prices) / daily);
+                    const maxDays = Math.ceil(Math.max(...prices) / daily);
+                    lines.push(`💰 每天存 <strong>${daily} 元</strong>，預計需要 <strong>${minDays}～${maxDays} 天</strong>`);
+                }
+                customItems.forEach(item => {
+                    lines.push(`🎯 ${item.name}（${item.price}元）需要 <strong>${Math.ceil(item.price / daily)} 天</strong>`);
+                });
+            } else if (!daily && customItems.length > 0) {
+                customItems.forEach(item => {
+                    lines.push(`🎯 ${item.name}（${item.price}元）— 請先選擇存款天數`);
+                });
             }
 
-            if (customItems.length > 0 && effectiveDaily !== null) {
-                customItems.forEach(i => {
-                    const d = Math.ceil(i.price / effectiveDaily);
-                    lines.push(`🎯 ${i.name}（${i.price}元）需要 <strong>${d}</strong> 天`);
-                });
-            } else if (customItems.length > 0 && daily === 'auto') {
-                customItems.forEach(i => {
-                    lines.push(`🎯 ${i.name}（${i.price}元）天數由系統決定`);
-                });
-            }
-
-            if (lines.length === 0) {
-                preview.style.display = 'none';
-                return;
-            }
+            if (lines.length === 0) { preview.style.display = 'none'; return; }
             preview.innerHTML = lines.join('<br>');
             preview.style.display = '';
         },
@@ -916,12 +929,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn) return;
             if (!s.difficulty) { btn.disabled = true; return; }
             if (s.difficulty === 'easy') {
-                btn.disabled = !s.priceRange || (s.dailyAmount === 'custom');
+                btn.disabled = !s.priceRange || !s.dailyAmount || (s.dailyAmount === 'custom');
             } else if (s.difficulty === 'normal') {
                 btn.disabled = !s.priceRange || !s.dailyAmount ||
                                s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
-                btn.disabled = !s.priceRange;
+                btn.disabled = !s.priceRange || !s.dailyAmount;
             }
         },
 
@@ -932,16 +945,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const s = this.state.settings;
             const range = s.priceRange;
             const daily = s.dailyAmount;
-            const effectiveDaily = (daily && typeof daily === 'number') ? daily : null;
-            if (!effectiveDaily || !range) { preview.style.display = 'none'; return; }
+            if (!range || !daily || daily === 'custom') { preview.style.display = 'none'; return; }
+
+            const niceAmounts  = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500];
+            const rangeTargets = { '6-10': 8, '9-15': 12, '10-20': 15 };
+            const rangeLabels  = { '6-10': '6～10', '9-15': '9～15', '10-20': '10～20' };
             const items = B3_ALL_ITEMS.filter(i => i.price <= range);
             if (!items.length) { preview.style.display = 'none'; return; }
             const prices = items.map(i => i.price);
-            const minDays = Math.ceil(Math.min(...prices) / effectiveDaily);
-            const maxDays = Math.ceil(Math.max(...prices) / effectiveDaily);
-            preview.innerHTML = minDays === maxDays
-                ? `📅 預計需要 <strong>${maxDays}</strong> 天`
-                : `📅 預計需要 <strong>${minDays}～${maxDays}</strong> 天`;
+
+            let html = '';
+            if (daily in rangeTargets) {
+                const target = rangeTargets[daily];
+                const label  = rangeLabels[daily];
+                const dailyForMin = niceAmounts.find(a => a >= Math.min(...prices) / target) || 500;
+                const dailyForMax = niceAmounts.find(a => a >= Math.max(...prices) / target) || 500;
+                if (dailyForMin === dailyForMax) {
+                    html = `💰 每天存款約 <strong>${dailyForMin} 元</strong>，預計 <strong>${label} 天</strong>達成目標`;
+                } else {
+                    html = `💰 每天存款約 <strong>${dailyForMin}～${dailyForMax} 元</strong>，預計 <strong>${label} 天</strong>達成目標`;
+                }
+            } else if (typeof daily === 'number') {
+                const minDays = Math.ceil(Math.min(...prices) / daily);
+                const maxDays = Math.ceil(Math.max(...prices) / daily);
+                html = minDays === maxDays
+                    ? `💰 每天存 <strong>${daily} 元</strong>，預計需要 <strong>${minDays} 天</strong>`
+                    : `💰 每天存 <strong>${daily} 元</strong>，預計需要 <strong>${minDays}～${maxDays} 天</strong>`;
+            }
+
+            if (!html) { preview.style.display = 'none'; return; }
+            preview.innerHTML = html;
             preview.style.display = '';
         },
 
@@ -973,17 +1006,26 @@ document.addEventListener('DOMContentLoaded', () => {
             let hardDailyAmounts = [];
             if (diff === 'hard') {
                 // Hard mode：每天金額不固定，預先產生陣列
-                hardDailyAmounts = this._generateHardDailyAmounts(item.price);
+                const rangeTargets = { '6-10': 8, '9-15': 12, '10-20': 15 };
+                const hardTargetDays = rangeTargets[s.dailyAmount] || 15;
+                hardDailyAmounts = this._generateHardDailyAmounts(item.price, hardTargetDays);
                 // dailyAmount 用平均值做顯示估算
-                const avg = hardDailyAmounts.slice(0, 15).reduce((a, b) => a + b, 0) / 15;
+                const avg = hardDailyAmounts.slice(0, hardTargetDays).reduce((a, b) => a + b, 0) / hardTargetDays;
                 dailyAmount = Math.round(avg / 5) * 5 || 50;
-            } else if (!s.dailyAmount || s.dailyAmount === 'auto') {
-                // Auto: aim for ~12-18 days, pick a round number
-                const rawPerDay = item.price / 15;
-                const niceAmounts = [10, 15, 20, 25, 30, 40, 50, 75, 100];
-                dailyAmount = niceAmounts.find(a => a >= rawPerDay) || 100;
             } else {
-                dailyAmount = s.dailyAmount;
+                const niceAmounts = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500];
+                const rangeTargets = { '6-10': 8, '9-15': 12, '10-20': 15 };
+                if (s.dailyAmount in rangeTargets) {
+                    const target = rangeTargets[s.dailyAmount];
+                    const rawPerDay = item.price / target;
+                    dailyAmount = niceAmounts.find(a => a >= rawPerDay) || 500;
+                } else if (!s.dailyAmount || s.dailyAmount === 'auto') {
+                    // fallback（不應出現，保留相容）
+                    const rawPerDay = item.price / 15;
+                    dailyAmount = niceAmounts.find(a => a >= rawPerDay) || 100;
+                } else {
+                    dailyAmount = s.dailyAmount; // 自訂數字
+                }
             }
 
             // Start date
@@ -1013,8 +1055,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── Hard Mode：產生每日變動金額陣列 ──────────────────────────
-        _generateHardDailyAmounts(price) {
-            const avgPerDay = price / 15;
+        _generateHardDailyAmounts(price, targetDays = 15) {
+            const avgPerDay = price / targetDays;
             const allNice = [5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 80, 100, 120, 150, 180, 200, 250, 300, 400, 500];
             const lo = Math.max(avgPerDay * 0.4, 5);
             const hi = avgPerDay * 2.5;

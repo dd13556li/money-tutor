@@ -652,6 +652,8 @@ toolbarConfig: {
 | B4 記憶模式語音重聽按鈕（Round 45）| B4 | `_startMemoryCountdown` 模糊後加 `#b4-mem-replay`（`.b4-mem-replay-btn`，fixed top:76px right:12px）；click 呼叫 `Game.Speech.speak` 所有店家價格；2s disable 防連按；搜尋 `b4-mem-replay`、`b4-mem-replay-btn` |
 | B5 朗讀已選清單按鈕（Round 45）| B5 | `#b5-read-selected-btn`（`.b5-read-selected-btn`，藍色膠囊）；`_bindRoundEvents` 綁定：朗讀必買+已選商品名稱/價格+合計；插於 hint-btn 和 confirm-btn 之間；搜尋 `b5-read-selected-btn`、`朗讀已選` |
 | B6 切換至已完成攤位 toast（Round 45）| B6 | 攤位切換時偵測 `destDone`；已完成→底部顯示 `.b6-stall-done-toast`「✅ X攤位 已收集完畢！」；1s 後 `.b6-sdt-fade` 淡出，1.6s 後移除；搜尋 `b6-stall-done-toast`、`b6-sdt-fade` |
+| B3 設定頁普通/困難模式天數選項（2026-04-02）| B3 | 普通模式：`💰 每天存款金額：` + preset/自訂 改為 `📅 存款天數與金額：` + 6-10天/9-15天/10-20天/自訂金額（`data-ndaily`）；移除 `#b3-preset-display` 浮動金額動畫；困難模式：新增 `📅 存款天數與金額：` 含 6-10天/9-15天/10-20天（`data-hdaily`，無自訂）；`_checkCanStart` 困難模式加 `!s.dailyAmount` 守衛；`_updateNDaysPreview` 改支援 range string；`_generateHardDailyAmounts(price, targetDays=15)` 接受天數參數；搜尋 `data-ndaily`、`data-hdaily`、`h-daily-btn-group` |
+| B3 自訂物品移至所有購買金額選項之後（2026-04-02）| B3 | `🖼️ 自訂物品（選填）` 區塊從簡單模式 price-range 與 daily-group 之間移至困難模式 price-range 之後（三模式共用，普通/困難切換時皆可見）；搜尋 `b3-add-custom-item-btn`（DOM 順序改變） |
 
 ---
 
