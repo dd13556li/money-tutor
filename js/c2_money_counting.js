@@ -543,9 +543,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                             data-type="category" data-value="notes">
                                         紙鈔
                                     </button>
-                                    <button class="selection-btn ${settings.category === 'mixed' ? 'active' : ''}" 
+                                    <button class="selection-btn ${settings.category === 'mixed' ? 'active' : ''}"
                                             data-type="category" data-value="mixed">
                                         混合
+                                    </button>
+                                    <button class="selection-btn ${settings.category === 'random' ? 'active' : ''}"
+                                            data-type="category" data-value="random">
+                                        隨機
                                     </button>
                                 </div>
                             </div>
@@ -899,6 +903,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const itemSelectionGroup = document.getElementById('item-selection-group');
             const itemContainer = document.getElementById('item-selection');
+
+            // 隨機模式：自動隨機選取 2~4 種面額，隱藏手動選擇區
+            if (category === 'random') {
+                const allItems = [...this.gameData.items.coins, ...this.gameData.items.notes];
+                const count = 2 + Math.floor(Math.random() * 3); // 2、3 或 4 種
+                const shuffled = allItems.slice().sort(() => Math.random() - 0.5);
+                this.state.settings.selectedItems = shuffled.slice(0, count).map(i => i.value);
+                itemContainer.innerHTML = '';
+                itemSelectionGroup.style.display = 'none';
+                this.updateStartButton();
+                return;
+            }
 
             // 清空之前的選項
             itemContainer.innerHTML = '';

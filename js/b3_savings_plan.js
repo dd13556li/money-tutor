@@ -1779,15 +1779,14 @@ document.addEventListener('DOMContentLoaded', () => {
         _updateNormalDailyCard() {
             const c = this.state.calendar;
             const drag = c.drag;
-            const isHard = this.state.settings.difficulty === 'hard';
             const subtitle = document.getElementById('b3-daily-subtitle');
             const itemsContainer = document.getElementById('b3-daily-items');
             if (subtitle) subtitle.style.display = 'none';
             if (!itemsContainer) return;
             itemsContainer.innerHTML = `
 <div class="b3-normal-target-wrap">
-    <div class="b3-normal-target-amount">${isHard ? '？' : drag.targetAmount}</div>
-    <div class="b3-normal-target-unit">${isHard ? '' : '元'}</div>
+    <div class="b3-normal-target-amount">${drag.targetAmount}</div>
+    <div class="b3-normal-target-unit">元</div>
 </div>
 <div class="b3-normal-denom-sources">
     ${drag.availDenoms.map(d => {
@@ -1826,13 +1825,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('')
                 : `<div class="b3-nplace-hint">拖曳或點擊面額放入此處</div>`;
 
-            const totalColor = total === target ? '#16a34a' : total > target ? '#dc2626' : '#1e40af';
+            const hideAmount = this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'hard';
+            const totalColor = hideAmount ? '#888' : (total === target ? '#16a34a' : total > target ? '#dc2626' : '#1e40af');
             const confirmDisabled = total <= 0 ? 'disabled' : '';
             return `
 <div class="b3-normal-placed-area" id="b3-normal-placed-area">${placedHTML}</div>
 <div class="b3-normal-total-row">
-    <span>已存：</span><span id="b3-n-total" style="color:${totalColor};font-weight:900;">${isHard ? '？' : total + ' 元'}</span>
-    ${isHard ? '' : `<span> / 目標：${target} 元</span>`}
+    <span>已存：</span><span id="b3-n-total" style="color:${totalColor};font-weight:900;">${hideAmount ? '？' : total + ' 元'}</span>
+    ${hideAmount ? '' : `<span> / 目標：${target} 元</span>`}
 </div>
 <div class="b3-normal-action-row">
     <button class="b3-normal-clear-btn" id="b3-normal-clear-btn">🗑️ 清除</button>
@@ -1972,12 +1972,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('error');
                 Game.Speech.speak(`存入太多了，目標是${toTWD(targetAmount)}，請重新選擇`);
                 this._clearNormalDropZone();
-                if (c.drag.errorCount >= 3) this._showNormalDepositHint();
+                if (c.drag.errorCount >= 3 && this.state.settings.difficulty === 'normal') this._showNormalDepositHint();
             } else {
                 c.drag.errorCount++;
                 this.audio.play('error');
                 Game.Speech.speak(`還差${toTWD(targetAmount - placedTotal)}元，請繼續放入`);
-                if (c.drag.errorCount >= 3) this._showNormalDepositHint();
+                if (c.drag.errorCount >= 3 && this.state.settings.difficulty === 'normal') this._showNormalDepositHint();
             }
         },
 
