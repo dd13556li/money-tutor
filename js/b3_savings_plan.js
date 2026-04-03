@@ -443,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-hdaily="custom">自訂金額</button>
                     </div>
                 </div>
+                <div class="b3-hard-settings b3-days-preview" id="b3-h-days-preview" style="display:none;"></div>
 
                 <div class="b-setting-group">
                     <label class="b-setting-label">📝 作業單：</label>
@@ -564,32 +565,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.state.settings.clickMode = 'off';
                         document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.toggle('active', b.dataset.assist === 'off'));
                     }
-                    // 每次切換難度都清除舊的 quiz 設定
+                    // 切換難度：清除所有模式的選項狀態（含按鈕 active、自訂文字、設定值）
                     this.state.settings.questionCount = null;
                     this.state.settings.retryMode = null;
-                    if (diff === 'easy') {
-                        const dateInput = document.getElementById('b3-start-date');
-                        if (dateInput) this.state.settings.startDate = dateInput.value;
-                    } else if (diff === 'normal') {
-                        const dateInput = document.getElementById('b3-n-start-date');
-                        if (dateInput) this.state.settings.startDate = dateInput.value;
-                        // Reset normal-specific UI
-                        this.state.settings.dailyAmount = null;
-                        this.state.settings.priceRange = null;
-                        document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.ndaily==='custom') b.textContent='自訂金額'; });
-                        document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
-                    } else if (diff === 'hard') {
-                        // hard 模式：月曆變動金額，重置設定
-                        this.state.settings.dailyAmount = null;
-                        this.state.settings.priceRange = null;
-                        const dateInput = document.getElementById('b3-h-start-date');
-                        if (dateInput) this.state.settings.startDate = dateInput.value;
-                        document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.hdaily==='custom') b.textContent='自訂金額'; });
-                    }
-                    // 更新 preview（避免切換模式後出現空白黃框）
+                    this.state.settings.priceRange  = null;
+                    this.state.settings.dailyAmount  = null;
+                    document.querySelectorAll('#price-range-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#daily-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.daily==='custom') b.textContent='自訂金額'; });
+                    document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.ndaily==='custom') b.textContent='自訂金額'; });
+                    document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.hdaily==='custom') b.textContent='自訂金額'; });
+                    // 讀取對應模式的開始日期
+                    const dateIdMap = { easy: 'b3-start-date', normal: 'b3-n-start-date', hard: 'b3-h-start-date' };
+                    const activeDateInput = document.getElementById(dateIdMap[diff]);
+                    if (activeDateInput) this.state.settings.startDate = activeDateInput.value;
+                    // 更新 preview（清除空白黃框）
                     this._updateDaysPreview();
                     this._updateNDaysPreview();
+                    this._updateHDaysPreview();
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -644,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._updateNDaysPreview();
                 } else if (_npSource === 'hard') {
                     document.querySelectorAll('#h-daily-btn-group .b-sel-btn[data-hdaily="custom"]').forEach(b => b.textContent = label);
+                    this._updateHDaysPreview();
                 }
                 hideNumpad();
                 this._checkCanStart();
@@ -735,6 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.priceRange = parseInt(btn.dataset.hrange);
+                    this._updateHDaysPreview();
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -750,6 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showNumpad('hard');
                     } else {
                         this.state.settings.dailyAmount = v;
+                        this._updateHDaysPreview();
                         this._checkCanStart();
                     }
                 }, {}, 'settings');
@@ -1022,6 +1019,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 html = minDays === maxDays
                     ? `💰 每天存 <strong>${daily} 元</strong>，預計需要 <strong>${minDays} 天</strong>`
                     : `💰 每天存 <strong>${daily} 元</strong>，預計需要 <strong>${minDays}～${maxDays} 天</strong>`;
+            }
+
+            if (!html) { preview.style.display = 'none'; return; }
+            preview.innerHTML = html;
+            preview.style.display = '';
+        },
+
+        // 困難模式設定頁天數預覽（寫入 #b3-h-days-preview）
+        _updateHDaysPreview() {
+            const preview = document.getElementById('b3-h-days-preview');
+            if (!preview) return;
+            const s = this.state.settings;
+            const range = s.priceRange;
+            const daily = s.dailyAmount;
+
+            if (!daily || daily === 'custom') { preview.style.display = 'none'; return; }
+            if (!range) {
+                preview.innerHTML = '📋 請先選擇購買物品金額，即可顯示存款預估';
+                preview.style.display = '';
+                return;
+            }
+
+            const rangeLabels = { '6-10': '6～10', '9-15': '9～15', '10-20': '10～20' };
+            const items = B3_ALL_ITEMS.filter(i => i.price <= range);
+            if (!items.length) { preview.style.display = 'none'; return; }
+            const prices = items.map(i => i.price);
+
+            let html = '';
+            if (daily in rangeLabels) {
+                html = `📅 每天存款金額隨機變動，預計約 <strong>${rangeLabels[daily]} 天</strong>完成目標`;
+            } else if (typeof daily === 'number') {
+                const minDays = Math.max(1, Math.round(Math.min(...prices) / daily));
+                const maxDays = Math.max(1, Math.round(Math.max(...prices) / daily));
+                html = minDays === maxDays
+                    ? `📅 每天存款金額隨機變動，平均約 <strong>${daily} 元</strong> / 天，預計約 <strong>${minDays} 天</strong>`
+                    : `📅 每天存款金額隨機變動，平均約 <strong>${daily} 元</strong> / 天，預計約 <strong>${minDays}～${maxDays} 天</strong>`;
             }
 
             if (!html) { preview.style.display = 'none'; return; }
