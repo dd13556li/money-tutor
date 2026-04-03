@@ -1287,7 +1287,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-pay-actions">
                         <button class="b6-clear-btn" id="b6-clear-btn">清除</button>
                         ${this.state.settings.difficulty !== 'hard'
-                            ? '<button class="b6-hint-btn" id="b6-hint-btn">💡 提示</button>'
+                            ? `<span style="display:inline-flex;align-items:center;gap:4px;">
+                                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                                <button class="b6-hint-btn" id="b6-hint-btn">💡 提示</button>
+                               </span>`
                             : ''}
                         <button class="b6-pay-btn" id="b6-pay-btn" disabled>付款</button>
                     </div>
@@ -1504,7 +1507,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         const retryMode = this.state.settings.retryMode;
                         if (retryMode === 'retry') {
                             btn.disabled = true;
-                            Game.Speech.speak('再想想看，找回多少元？');
+                            const b6ChangeDir = selected > change ? '太多了' : '太少了';
+                            Game.Speech.speak(`不對喔，找零算${b6ChangeDir}，請再試一次`);
                         } else {
                             document.querySelectorAll('.b6-change-opt').forEach(b => {
                                 b.disabled = true;
