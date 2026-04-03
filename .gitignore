@@ -19,3 +19,6 @@ pdf/
 
 # 日誌
 *.log
+
+# 內部報告（不上傳 GitHub）
+report/
