@@ -370,12 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-daily="10-20">10-20天</button>
                         <button class="b-sel-btn" data-daily="custom">自訂金額</button>
                     </div>
-                    <div id="b3-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
-                        <input type="number" id="b3-custom-daily-input"
-                               min="1" max="9999" placeholder="輸入金額"
-                               style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
-                        <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
-                    </div>
                 </div>
                 <div class="b3-cal-settings b3-days-preview" id="b3-days-preview" style="display:none;"></div>
 
@@ -436,12 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-ndaily="10-20">10-20天</button>
                         <button class="b-sel-btn" data-ndaily="custom">自訂金額</button>
                     </div>
-                    <div id="b3-n-custom-daily-row" style="display:none;margin-top:8px;align-items:center;gap:6px;">
-                        <input type="number" id="b3-n-custom-daily-input"
-                               min="1" max="9999" placeholder="輸入金額"
-                               style="width:100px;padding:6px 10px;border:2px solid #d97706;border-radius:8px;font-size:15px;text-align:center;outline:none;">
-                        <span style="font-size:13px;color:#6b7280;">元（1～9999）</span>
-                    </div>
                 </div>
                 <div class="b3-normal-settings b3-days-preview" id="b3-n-days-preview" style="display:none;"></div>
 
@@ -452,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-sel-btn" data-hdaily="6-10">6-10天</button>
                         <button class="b-sel-btn" data-hdaily="9-15">9-15天</button>
                         <button class="b-sel-btn" data-hdaily="10-20">10-20天</button>
+                        <button class="b-sel-btn" data-hdaily="custom">自訂金額</button>
                     </div>
                 </div>
 
@@ -516,6 +505,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="start-btn" id="start-btn" disabled>開始練習</button>
             </div>
         </div>
+    </div>
+
+    <!-- 每天存款金額數字鍵盤彈窗 -->
+    <div id="b3-daily-numpad-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10200;align-items:center;justify-content:center;">
+        <div style="background:#fff;border-radius:20px;padding:24px;width:300px;max-width:90vw;border:3px solid #d97706;box-shadow:0 8px 32px rgba(217,119,6,0.3);">
+            <div style="text-align:center;margin-bottom:14px;">
+                <div style="font-size:14px;color:#92400e;font-weight:700;margin-bottom:10px;">💰 自訂每天存款金額</div>
+                <div id="b3-numpad-display" style="font-size:2.4rem;font-weight:900;color:#92400e;background:#fef3c7;border:2px solid #d97706;border-radius:12px;padding:10px 20px;min-height:60px;display:flex;align-items:center;justify-content:center;letter-spacing:2px;">--</div>
+                <div style="font-size:12px;color:#6b7280;margin-top:5px;">1 ～ 9999 元</div>
+            </div>
+            <div id="b3-numpad-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+                <button data-np="1"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">1</button>
+                <button data-np="2"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">2</button>
+                <button data-np="3"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">3</button>
+                <button data-np="4"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">4</button>
+                <button data-np="5"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">5</button>
+                <button data-np="6"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">6</button>
+                <button data-np="7"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">7</button>
+                <button data-np="8"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">8</button>
+                <button data-np="9"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">9</button>
+                <button data-np="clear"   style="padding:14px 0;font-size:1.1rem;font-weight:700;background:#fee2e2;color:#dc2626;border:2px solid #fca5a5;border-radius:10px;cursor:pointer;">清除</button>
+                <button data-np="0"       style="padding:14px 0;font-size:1.3rem;font-weight:700;background:#fef9c3;color:#92400e;border:2px solid #d97706;border-radius:10px;cursor:pointer;">0</button>
+                <button data-np="confirm" style="padding:14px 0;font-size:1.1rem;font-weight:700;background:#d1fae5;color:#065f46;border:2px solid #6ee7b7;border-radius:10px;cursor:pointer;">確認</button>
+            </div>
+            <button id="b3-numpad-cancel" style="width:100%;padding:9px;border:2px solid #d97706;border-radius:10px;background:transparent;color:#92400e;font-size:14px;cursor:pointer;font-weight:600;">取消</button>
+        </div>
     </div>`;
         },
 
@@ -561,9 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Reset normal-specific UI
                         this.state.settings.dailyAmount = null;
                         this.state.settings.priceRange = null;
-                        const customRow = document.getElementById('b3-n-custom-daily-row');
-                        if (customRow) customRow.style.display = 'none';
-                        document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.ndaily==='custom') b.textContent='自訂金額'; });
                         document.querySelectorAll('#n-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
                     } else if (diff === 'hard') {
                         // hard 模式：月曆變動金額，重置設定
@@ -572,8 +585,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         const dateInput = document.getElementById('b3-h-start-date');
                         if (dateInput) this.state.settings.startDate = dateInput.value;
                         document.querySelectorAll('#h-price-range-btns .b-sel-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => { b.classList.remove('active'); if (b.dataset.hdaily==='custom') b.textContent='自訂金額'; });
                     }
+                    // 更新 preview（避免切換模式後出現空白黃框）
+                    this._updateDaysPreview();
+                    this._updateNDaysPreview();
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -595,39 +611,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            // Daily amount buttons
+            // ── 數字鍵盤彈窗（三模式共用）────────────────────────
+            let _npSource = null;
+            let _npValue  = '';
+            const numpadModal   = document.getElementById('b3-daily-numpad-modal');
+            const numpadDisplay = document.getElementById('b3-numpad-display');
+
+            const showNumpad = (source) => {
+                _npSource = source;
+                _npValue  = '';
+                numpadDisplay.textContent = '--';
+                // 更新標題說明（困難模式輸入每日平均金額；簡單/普通模式輸入固定每日金額）
+                const titleEl = numpadModal.querySelector('div[style*="font-weight:700"]');
+                if (titleEl) {
+                    titleEl.textContent = source === 'hard'
+                        ? '📅 自訂每日平均存款金額'
+                        : '💰 自訂每天存款金額';
+                }
+                numpadModal.style.display = 'flex';
+            };
+            const hideNumpad = () => { numpadModal.style.display = 'none'; };
+            const confirmNumpad = () => {
+                const val = parseInt(_npValue, 10);
+                if (!_npValue || val < 1 || val > 9999) return;
+                const label = `自訂 ${val} 元`;
+                this.state.settings.dailyAmount = val;
+                if (_npSource === 'easy') {
+                    document.querySelectorAll('#daily-group .b-sel-btn[data-daily="custom"]').forEach(b => b.textContent = label);
+                    this._updateDaysPreview();
+                } else if (_npSource === 'normal') {
+                    document.querySelectorAll('#n-daily-btn-group .b-sel-btn[data-ndaily="custom"]').forEach(b => b.textContent = label);
+                    this._updateNDaysPreview();
+                } else if (_npSource === 'hard') {
+                    document.querySelectorAll('#h-daily-btn-group .b-sel-btn[data-hdaily="custom"]').forEach(b => b.textContent = label);
+                }
+                hideNumpad();
+                this._checkCanStart();
+            };
+
+            document.querySelectorAll('#b3-numpad-grid [data-np]').forEach(npBtn => {
+                Game.EventManager.on(npBtn, 'click', () => {
+                    const k = npBtn.dataset.np;
+                    if (k === 'clear') {
+                        _npValue = '';
+                        numpadDisplay.textContent = '--';
+                    } else if (k === 'confirm') {
+                        confirmNumpad();
+                    } else {
+                        if (_npValue.length >= 4) return;
+                        _npValue += k;
+                        numpadDisplay.textContent = _npValue;
+                    }
+                }, {}, 'settings');
+            });
+            Game.EventManager.on(document.getElementById('b3-numpad-cancel'), 'click', hideNumpad, {}, 'settings');
+            Game.EventManager.on(numpadModal, 'click', (e) => { if (e.target === numpadModal) hideNumpad(); }, {}, 'settings');
+
+            // ── 簡單模式：存款天數與金額 ──────────────────────────
             document.querySelectorAll('#daily-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#daily-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     const v = btn.dataset.daily;
-                    const customRow = document.getElementById('b3-custom-daily-row');
                     if (v === 'custom') {
-                        if (customRow) customRow.style.display = 'flex';
-                        // 等待使用者輸入，先標記為 'custom' 阻止開始
                         this.state.settings.dailyAmount = 'custom';
-                        const inp = document.getElementById('b3-custom-daily-input');
-                        if (inp) { inp.value = ''; inp.focus(); }
+                        showNumpad('easy');
                     } else {
-                        if (customRow) customRow.style.display = 'none';
-                        // v is now a range string like '6-10', '9-15', '10-20'
                         this.state.settings.dailyAmount = v;
+                        this._updateDaysPreview();
+                        this._checkCanStart();
                     }
-                    this._updateDaysPreview();
-                    this._checkCanStart();
                 }, {}, 'settings');
             });
-
-            // 自訂存款金額輸入
-            const customDailyInput = document.getElementById('b3-custom-daily-input');
-            if (customDailyInput) {
-                Game.EventManager.on(customDailyInput, 'input', () => {
-                    const val = parseInt(customDailyInput.value);
-                    this.state.settings.dailyAmount = (val >= 1 && val <= 9999) ? val : 'custom';
-                    this._updateDaysPreview();
-                    this._checkCanStart();
-                }, {}, 'settings');
-            }
 
             // ── 普通模式設定事件 ──────────────────────────────
             // Normal: 開始日期
@@ -655,31 +710,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#n-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     const v = btn.dataset.ndaily;
-                    const customRow = document.getElementById('b3-n-custom-daily-row');
                     if (v === 'custom') {
-                        if (customRow) customRow.style.display = 'flex';
                         this.state.settings.dailyAmount = 'custom';
-                        const inp = document.getElementById('b3-n-custom-daily-input');
-                        if (inp) { inp.value = ''; inp.focus(); }
+                        showNumpad('normal');
                     } else {
-                        if (customRow) customRow.style.display = 'none';
                         this.state.settings.dailyAmount = v;
+                        this._updateNDaysPreview();
+                        this._checkCanStart();
                     }
-                    this._updateNDaysPreview();
-                    this._checkCanStart();
                 }, {}, 'settings');
             });
-
-            // Normal: 自訂金額輸入
-            const nCustomDailyInput = document.getElementById('b3-n-custom-daily-input');
-            if (nCustomDailyInput) {
-                Game.EventManager.on(nCustomDailyInput, 'input', () => {
-                    const val = parseInt(nCustomDailyInput.value);
-                    this.state.settings.dailyAmount = (val >= 1 && val <= 9999) ? val : 'custom';
-                    this._updateNDaysPreview();
-                    this._checkCanStart();
-                }, {}, 'settings');
-            }
 
             // Hard mode: 開始日期
             const hDateInput = document.getElementById('b3-h-start-date');
@@ -699,13 +739,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            // Hard mode: 存款天數與金額（6-10/9-15/10-20）
+            // Hard mode: 存款天數與金額（6-10/9-15/10-20/自訂金額）
             document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#h-daily-btn-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    this.state.settings.dailyAmount = btn.dataset.hdaily;
-                    this._checkCanStart();
+                    const v = btn.dataset.hdaily;
+                    if (v === 'custom') {
+                        this.state.settings.dailyAmount = 'custom';
+                        showNumpad('hard');
+                    } else {
+                        this.state.settings.dailyAmount = v;
+                        this._checkCanStart();
+                    }
                 }, {}, 'settings');
             });
 
@@ -934,7 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = !s.priceRange || !s.dailyAmount ||
                                s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
-                btn.disabled = !s.priceRange || !s.dailyAmount;
+                btn.disabled = !s.priceRange || !s.dailyAmount || s.dailyAmount === 'custom';
             }
         },
 
@@ -945,7 +991,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const s = this.state.settings;
             const range = s.priceRange;
             const daily = s.dailyAmount;
-            if (!range || !daily || daily === 'custom') { preview.style.display = 'none'; return; }
+            if (!daily || daily === 'custom') { preview.style.display = 'none'; return; }
+            if (!range) {
+                preview.innerHTML = '📋 請先選擇購買物品金額，即可顯示存款預估';
+                preview.style.display = '';
+                return;
+            }
 
             const niceAmounts  = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500];
             const rangeTargets = { '6-10': 8, '9-15': 12, '10-20': 15 };
@@ -1007,7 +1058,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'hard') {
                 // Hard mode：每天金額不固定，預先產生陣列
                 const rangeTargets = { '6-10': 8, '9-15': 12, '10-20': 15 };
-                const hardTargetDays = rangeTargets[s.dailyAmount] || 15;
+                const hardTargetDays = rangeTargets[s.dailyAmount]
+                    || (typeof s.dailyAmount === 'number' ? Math.max(3, Math.round(item.price / s.dailyAmount)) : 15);
                 hardDailyAmounts = this._generateHardDailyAmounts(item.price, hardTargetDays);
                 // dailyAmount 用平均值做顯示估算
                 const avg = hardDailyAmounts.slice(0, hardTargetDays).reduce((a, b) => a + b, 0) / hardTargetDays;
