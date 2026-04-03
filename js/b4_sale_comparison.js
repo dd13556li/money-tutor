@@ -1158,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     this.state.quiz.selectErrorCount++;
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak('這家不是最便宜的，再比較看看');
+                    Game.Speech.speak('不對喔，請再比較看看');
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         curr.stores.forEach((_, i) => {
@@ -1241,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Game.Speech.speak(`正確順序是：${curr.sortedAsc.map(s => s.store).join('、')}`);
                             Game.TimerManager.setTimeout(() => this.nextQuestion(), 2200, 'turnTransition');
                         } else {
-                            Game.Speech.speak('看看正確的排序，再試一次！');
+                            Game.Speech.speak('不對喔，請看看正確的排序，再試一次！');
                             Game.TimerManager.setTimeout(() => {
                                 this.state.isProcessing = false;
                                 this.state.tripleClickOrder = [];
@@ -1328,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Game.Speech.speak(`差額是${toTWD(correctDiff)}`);
                             Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                         } else {
-                            Game.Speech.speak(`差額是${toTWD(correctDiff)}，再試一次`);
+                            Game.Speech.speak(`不對喔，差額是${toTWD(correctDiff)}，請再試一次`);
                             Game.TimerManager.setTimeout(() => {
                                 this.state.isProcessing = false;
                                 section.querySelectorAll('.b4-diff-opt').forEach(b => {
@@ -1446,7 +1446,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${diffQuestion}
                         <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
                     </div>
-                    <button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>
+                    <div style="display:inline-flex;align-items:center;gap:4px;">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                        <button class="b4-diff-hint-btn" id="b4-diff-hint-btn">💡 提示</button>
+                    </div>
                     <div class="b4-input-display" id="numpad-display">
                         <span id="numpad-val">0</span><span class="b4-unit-text"> ${diffUnit}</span>
                     </div>
@@ -1759,7 +1762,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // retry: re-enable buttons after showing correct
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`${diffWrongSpeechBase}，再試一次`);
+                    Game.Speech.speak(`不對喔，${diffWrongSpeechBase}，請再試一次`);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         // Re-enable diff options
