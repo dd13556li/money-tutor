@@ -690,15 +690,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderWalletArea(requiredTotal) {
             const diff = this.state.settings.difficulty;
-            const hintBtn = diff === 'hard'
-                ? `<button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>`
+            // 普通/困難模式均顯示吉祥物 + 提示鈕
+            const hintWrap = (diff === 'normal' || diff === 'hard')
+                ? `<div class="b1-hint-wrap" id="b1-hint-wrap" style="display:flex;align-items:center;gap:4px;">
+                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                    <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
+                   </div>`
                 : '';
             return `
             <div class="b1-wallet-area" id="wallet-area">
                 <div class="b1-wallet-header">
                     <div style="display:flex;align-items:center;gap:8px;">
                         <span class="b1-wallet-title">👛 我的錢包</span>
-                        ${hintBtn}
+                        ${hintWrap}
                     </div>
                     <div class="b1-wallet-total-wrap">
                         <span class="b1-wallet-total-label">已放</span>
@@ -759,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (text) Game.Speech.speak(text);
             }, {}, 'gameUI');
 
-            // 提示按鈕（困難模式）
+            // 提示按鈕（普通/困難模式）
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => {
@@ -1068,8 +1072,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(`需要${toTWD(requiredTotal)}，繼續下一題`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 } else {
-                    const shortage = requiredTotal - walletTotal;
-                    Game.Speech.speak(`還差${toTWD(shortage)}，再多加一些！`);
+                    Game.Speech.speak(`不對喔，你付的錢太少，請再試一次`);
                     this.state.isProcessing = false;
                     const walletArea = document.getElementById('wallet-area');
                     if (walletArea) {
