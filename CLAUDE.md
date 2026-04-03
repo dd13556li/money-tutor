@@ -654,6 +654,9 @@ toolbarConfig: {
 | B6 切換至已完成攤位 toast（Round 45）| B6 | 攤位切換時偵測 `destDone`；已完成→底部顯示 `.b6-stall-done-toast`「✅ X攤位 已收集完畢！」；1s 後 `.b6-sdt-fade` 淡出，1.6s 後移除；搜尋 `b6-stall-done-toast`、`b6-sdt-fade` |
 | B3 設定頁普通/困難模式天數選項（2026-04-02）| B3 | 普通模式：`💰 每天存款金額：` + preset/自訂 改為 `📅 存款天數與金額：` + 6-10天/9-15天/10-20天/自訂金額（`data-ndaily`）；移除 `#b3-preset-display` 浮動金額動畫；困難模式：新增 `📅 存款天數與金額：` 含 6-10天/9-15天/10-20天（`data-hdaily`，無自訂）；`_checkCanStart` 困難模式加 `!s.dailyAmount` 守衛；`_updateNDaysPreview` 改支援 range string；`_generateHardDailyAmounts(price, targetDays=15)` 接受天數參數；搜尋 `data-ndaily`、`data-hdaily`、`h-daily-btn-group` |
 | B3 自訂物品移至所有購買金額選項之後（2026-04-02）| B3 | `🖼️ 自訂物品（選填）` 區塊從簡單模式 price-range 與 daily-group 之間移至困難模式 price-range 之後（三模式共用，普通/困難切換時皆可見）；搜尋 `b3-add-custom-item-btn`（DOM 順序改變） |
+| B3 設定頁四項修正（2026-04-03）| B3 | ①Preview 延遲顯示：`_updateNDaysPreview`/`_updateHDaysPreview` 先檢查 `!daily`（隱藏），再檢查 `!range`（顯示「請先選擇購買物品金額」提示），兩條件分離防止空黃框；②mode switch 後立即呼叫三個 preview 函數（`_updateDaysPreview`+`_updateNDaysPreview`+`_updateHDaysPreview`）消除切換時的空白顯示；③困難模式加入「自訂金額」按鈕（`data-hdaily="custom"`）；④三種難度共用單一 numpad modal（`#b3-daily-numpad-modal`）+ `_npSource` 變數判斷來源；搜尋 `b3-daily-numpad-modal`、`_npSource`、`showNumpad` |
+| B3 設定頁切換模式清空選項（2026-04-03）| B3 | diff-change handler 改為全面清空：六組按鈕（`#price-range-group`/`#daily-group`/`#n-price-range-btns`/`#n-daily-btn-group`/`#h-price-range-btns`/`#h-daily-btn-group`）一律移除 active，`custom` 按鈕文字重置為「自訂金額」；`priceRange`/`dailyAmount` 歸 null；三個 preview 函數全呼叫；搜尋 `universal reset`、`h-daily-btn-group.*remove.*active` |
+| B3 困難模式設定頁 preview 提示（2026-04-03）| B3 | 新增 `_updateHDaysPreview()` 函數 + `#b3-h-days-preview` DOM 節點；選完天數未選金額→「📋 請先選擇購買物品金額」；兩者皆選→「📅 每天存款金額隨機變動，預計約 X～Y 天完成目標」（range）/ 「📅 隨機變動，平均約 N 元/天，預計約 X 天」（custom）；搜尋 `_updateHDaysPreview`、`b3-h-days-preview` |
 
 ---
 

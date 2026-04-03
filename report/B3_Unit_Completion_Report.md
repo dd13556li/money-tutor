@@ -1085,3 +1085,120 @@ if (revealWeeklyBtn) {
 - **range string 一致性**：三種難度的 `dailyAmount` 現在都可能是 `'6-10'`、`'9-15'`、`'10-20'` 或自訂數字；`_startCalendarSession` 以統一的 `rangeTargets` map 處理三種情況
 - **困難模式無自訂金額**：困難模式每日金額本就由 `_generateHardDailyAmounts` 根據 targetDays 隨機產生，天數選項只影響平均值，不開放固定金額輸入
 - **移除浮動動畫**：原 preset 動畫使用 `setInterval` + `TimerManager.setTimeout`，屬於不必要的互動延遲；新設計讓使用者直接看到選擇結果，更符合教學情境的快速設定需求
+
+---
+
+## 二十六、設定頁後續修正四項（2026-04-03）
+
+### 問題描述
+
+承接二十五節改版後，測試發現四個問題：
+
+1. **Preview 空白黃框**：切換到普通或困難模式後、還未選任何選項，preview div 就顯示空白黃框
+2. **切換後 preview 不更新**：從簡單模式切換至普通模式，已選天數但 preview 不顯示提示文字
+3. **困難模式缺少自訂金額**：困難模式天數按鈕只有 6-10/9-15/10-20，無「自訂金額」入口
+4. **切換模式不清空選項**：切換難度後，前一模式選取的 active 狀態與 state 值殘留
+
+---
+
+### 修正一：Preview 條件分離（Issues 1 & 2）
+
+#### 根因
+
+`_updateNDaysPreview()` 原邏輯：
+```javascript
+if (!range || !daily) { preview.style.display = 'none'; return; }
+```
+兩個條件 OR 合併 → 只選天數未選金額時直接隱藏；diff-change handler 切換後也未呼叫 preview 函數 → 殘留舊 `display:''` 造成空框。
+
+#### 修正
+
+`_updateNDaysPreview()` / `_updateHDaysPreview()` 改為分離判斷：
+```javascript
+if (!daily || daily === 'custom') { preview.style.display = 'none'; return; }
+if (!range) {
+    preview.innerHTML = '📋 請先選擇購買物品金額，即可顯示存款預估';
+    preview.style.display = '';
+    return;
+}
+// 兩者皆選 → 顯示完整估算
+```
+
+diff-change handler 末尾補呼叫三個 preview 函數：
+```javascript
+this._updateDaysPreview();
+this._updateNDaysPreview();
+this._updateHDaysPreview();
+```
+
+---
+
+### 修正二：困難模式加入自訂金額 + 共用 Numpad（Issues 3 & 4）
+
+困難模式 `#h-daily-btn-group` 新增 `data-hdaily="custom"` 按鈕；三種難度共用單一 numpad modal：
+
+```html
+<div id="b3-daily-numpad-modal" style="display:none;position:fixed;...z-index:10200;">
+  <div id="b3-numpad-display">--</div>
+  <div id="b3-numpad-grid"><!-- 0-9 + 清除 + 確認 --></div>
+  <button id="b3-numpad-cancel">取消</button>
+</div>
+```
+
+`_bindSettingsEvents()` 使用閉包變數 `_npSource`（`'easy'` / `'normal'` / `'hard'`）追蹤開啟來源，`confirmNumpad()` 依此更新對應 state 與按鈕文字：
+
+```javascript
+let _npSource = null;
+const showNumpad = (source) => { _npSource = source; ... numpadModal.style.display = 'flex'; };
+const confirmNumpad = () => {
+    const val = parseInt(_npValue, 10);
+    this.state.settings.dailyAmount = val;
+    if (_npSource === 'easy') { /* 更新 #daily-group 按鈕 + _updateDaysPreview */ }
+    else if (_npSource === 'normal') { /* 更新 #n-daily-btn-group + _updateNDaysPreview */ }
+    else if (_npSource === 'hard') { /* 更新 #h-daily-btn-group + _updateHDaysPreview */ }
+};
+```
+
+Numpad 標題依來源切換：困難模式顯示「📅 自訂每日平均存款金額」，其他顯示「💰 自訂每天存款金額」。
+
+---
+
+### 修正三：切換模式全面清空（Issue 4）
+
+diff-change handler 移至每次執行時先做**全面清空**，再設新模式的起始日期：
+
+```javascript
+// 清空全部六組按鈕 active
+['#price-range-group', '#daily-group', '#n-price-range-btns',
+ '#n-daily-btn-group', '#h-price-range-btns', '#h-daily-btn-group']
+ .forEach(sel => document.querySelectorAll(sel + ' .b-sel-btn').forEach(b => {
+     b.classList.remove('active');
+     if (b.dataset.daily === 'custom' || b.dataset.ndaily === 'custom' || b.dataset.hdaily === 'custom')
+         b.textContent = '自訂金額';
+ }));
+// 重置 state
+this.state.settings.priceRange = null;
+this.state.settings.dailyAmount = null;
+// 呼叫三個 preview + _checkCanStart
+```
+
+---
+
+### 新增函數
+
+| 函數 | 說明 |
+|------|------|
+| `_updateHDaysPreview()` | 困難模式 `#b3-h-days-preview` 更新；range string → 天數區間估算；custom number → 平均天數估算 |
+
+### 搜尋關鍵字
+
+- `b3-daily-numpad-modal`（共用 numpad modal）
+- `_npSource`、`showNumpad`（來源追蹤）
+- `_updateHDaysPreview`、`b3-h-days-preview`（困難模式 preview）
+- `universal reset`、全面清空邏輯位於 diff-change handler 頂部
+
+### 技術要點
+
+- **條件分離是關鍵**：preview 的「隱藏」與「顯示提示」是兩種不同狀態，合併 OR 判斷會讓「只選天數」時錯誤隱藏；分離後可實現三段式：隱藏 → 部分提示 → 完整估算
+- **單一 numpad 共用**：三模式的自訂輸入行為相同，差異只在最後寫入哪組 state/按鈕，用 `_npSource` 閉包解決，避免三份重複 HTML
+- **全面清空優先**：模式切換時先無條件清空所有群組，再對新模式填入預設值（目前只填 startDate），確保不同難度間的選擇不互相污染
