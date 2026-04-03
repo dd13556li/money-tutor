@@ -1242,7 +1242,13 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div class="b3-pig-col" id="b3-pig-col">
         <div class="b3-daily-card" id="b3-daily-card">
-            <div class="b3-daily-header">今日可存金錢</div>
+            <div class="b3-daily-header-row">
+                <span class="b3-daily-header">今日可存金錢</span>
+                <div class="b3-daily-hint-wrap" id="b3-daily-hint-wrap" style="display:none">
+                    <img src="../images/index/educated_money_bag_character.png" class="b3-daily-hint-mascot" alt="" onerror="this.style.display='none'">
+                    <button class="b3-daily-hint-btn" id="b3-daily-hint-btn">💡 提示</button>
+                </div>
+            </div>
             <div class="b3-daily-subtitle" id="b3-daily-subtitle">點擊日曆上的存錢圖示開始</div>
             <div class="b3-daily-items" id="b3-daily-items"></div>
         </div>
@@ -1742,6 +1748,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 availDenoms,
                 items: [],        // 完成後填入，供 _completeDragSession 使用
                 errorCount: 0,
+                showHint: false,
             };
 
             const pigBank = document.getElementById('b3-pig-bank');
@@ -1783,6 +1790,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemsContainer = document.getElementById('b3-daily-items');
             if (subtitle) subtitle.style.display = 'none';
             if (!itemsContainer) return;
+            // 顯示提示按鈕（普通／困難模式）
+            const hintWrap = document.getElementById('b3-daily-hint-wrap');
+            const hintBtn = document.getElementById('b3-daily-hint-btn');
+            if (hintWrap) hintWrap.style.display = '';
+            if (hintBtn) {
+                hintBtn.textContent = '💡 提示';
+                Game.EventManager.on(hintBtn, 'click', () => this._toggleDepositHint(), {}, 'gameUI');
+            }
             itemsContainer.innerHTML = `
 <div class="b3-normal-target-wrap">
     <div class="b3-normal-target-amount">${drag.targetAmount}</div>
@@ -1808,22 +1823,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = drag.targetAmount;
             const isHard = this.state.settings.difficulty === 'hard';
 
-            // 依面額分組顯示
-            const denomCounts = {};
-            drag.placedItems.forEach(({ denom }) => {
-                denomCounts[denom] = (denomCounts[denom] || 0) + 1;
-            });
-            const placedHTML = Object.keys(denomCounts).length
-                ? Object.entries(denomCounts).map(([denom, count]) => {
-                    const d = parseInt(denom);
-                    const isBill = d >= 100;
-                    const imgSize = isBill ? '56px' : '44px';
-                    return `<div class="b3-nplaced-row">
-                        <img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">
-                        <span class="b3-nplaced-count">×${count}</span>
+            // 提示模式：ghost slots（未填=淡化，已填=正常）；一般模式：每枚各自顯示
+            let placedHTML;
+            if (drag.showHint && drag.hintSlots?.length) {
+                placedHTML = drag.hintSlots.map((slot, idx) => {
+                    const isBill = slot.denom >= 100;
+                    const imgSize = isBill ? '68px' : '44px';
+                    return `<div class="b3-nplaced-item${slot.filled ? '' : ' b3-nplaced-ghost-slot'}" data-hint-idx="${idx}">
+                        <img src="../images/money/${slot.denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${slot.denom}元">
                     </div>`;
-                }).join('')
-                : `<div class="b3-nplace-hint">拖曳或點擊面額放入此處</div>`;
+                }).join('');
+            } else {
+                placedHTML = drag.placedItems.length
+                    ? drag.placedItems.map(({ denom }) => {
+                        const isBill = denom >= 100;
+                        const imgSize = isBill ? '68px' : '44px';
+                        return `<div class="b3-nplaced-item">
+                            <img src="../images/money/${denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元">
+                        </div>`;
+                    }).join('')
+                    : `<div class="b3-nplace-hint">拖曳或點擊面額放入此處</div>`;
+            }
 
             const hideAmount = this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'hard';
             const totalColor = hideAmount ? '#888' : (total === target ? '#16a34a' : total > target ? '#dc2626' : '#1e40af');
@@ -1920,9 +1940,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const c = this.state.calendar;
             if (!c.drag || c.drag.mode !== 'normal') return;
             if (this.state.isProcessing) return;
+
+            // 提示模式：找對應 ghost slot 填入（直接更新 DOM，不重繪整體避免閃爍）
+            if (c.drag.showHint && c.drag.hintSlots?.length) {
+                const slotIdx = c.drag.hintSlots.findIndex(s => s.denom === denom && !s.filled);
+                if (slotIdx === -1) {
+                    this.audio.play('error');
+                    return;
+                }
+                c.drag.hintSlots[slotIdx].filled = true;
+                c.drag.placedItems.push({ denom, uid: Date.now() + '_' + Math.random().toString(36).slice(2, 7) });
+                c.drag.placedTotal += denom;
+                this.audio.play('coin');
+                // 直接移除該槽位的 ghost class，讓 CSS transition 從淡化漸變為正常
+                const slotEl = document.querySelector(`[data-hint-idx="${slotIdx}"]`);
+                if (slotEl) slotEl.classList.remove('b3-nplaced-ghost-slot');
+                // 僅更新確認按鈕啟用狀態
+                const confirmBtn = document.getElementById('b3-normal-confirm-btn');
+                if (confirmBtn) confirmBtn.disabled = c.drag.placedTotal <= 0;
+                return;
+            }
+
+            // 一般模式
             const newTotal = c.drag.placedTotal + denom;
             const target = c.drag.targetAmount;
-            if (newTotal > target) {
+            if (newTotal > target && this.state.settings.difficulty !== 'hard') {
                 this.audio.play('error');
                 Game.Speech.speak(`放太多了！目標是${toTWD(target)}`);
                 return;
@@ -1948,6 +1990,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!c.drag || c.drag.mode !== 'normal') return;
             c.drag.placedItems = [];
             c.drag.placedTotal = 0;
+            if (c.drag.showHint && c.drag.hintSlots) {
+                c.drag.hintSlots.forEach(s => s.filled = false);
+            }
             this._updateNormalDropZone();
         },
 
@@ -1970,15 +2015,108 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (placedTotal > targetAmount) {
                 c.drag.errorCount++;
                 this.audio.play('error');
-                Game.Speech.speak(`存入太多了，目標是${toTWD(targetAmount)}，請重新選擇`);
+                Game.Speech.speak(`不對喔，你存的錢太多，請再試一次`);
                 this._clearNormalDropZone();
                 if (c.drag.errorCount >= 3 && this.state.settings.difficulty === 'normal') this._showNormalDepositHint();
             } else {
                 c.drag.errorCount++;
                 this.audio.play('error');
-                Game.Speech.speak(`還差${toTWD(targetAmount - placedTotal)}元，請繼續放入`);
+                Game.Speech.speak(`不對喔，你存的錢太少，請再試一次`);
                 if (c.drag.errorCount >= 3 && this.state.settings.difficulty === 'normal') this._showNormalDepositHint();
             }
+        },
+
+        _toggleDepositHint() {
+            const c = this.state.calendar;
+            if (!c.drag) return;
+            // 困難模式：彈窗顯示正確組合圖示＋語音
+            if (this.state.settings.difficulty === 'hard') {
+                this._showHardModeHintModal();
+                return;
+            }
+            // 普通模式：ghost slots
+            c.drag.showHint = !c.drag.showHint;
+            const btn = document.getElementById('b3-daily-hint-btn');
+            if (btn) btn.textContent = c.drag.showHint ? '💡 隱藏' : '💡 提示';
+            if (c.drag.showHint) {
+                // 計算正確組合 → hintSlots
+                const ALL_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+                let rem = c.drag.targetAmount;
+                const slots = [];
+                ALL_DENOMS.forEach(d => {
+                    if (rem >= d) {
+                        const cnt = Math.floor(rem / d);
+                        for (let i = 0; i < cnt; i++) slots.push({ denom: d, filled: false });
+                        rem %= d;
+                    }
+                });
+                c.drag.hintSlots = slots;
+                // 語音提示：「可以存入 2 個 10 元、1 個 5 元」
+                const denomCounts = {};
+                slots.forEach(s => denomCounts[s.denom] = (denomCounts[s.denom] || 0) + 1);
+                const parts = Object.entries(denomCounts)
+                    .sort(([a], [b]) => b - a)
+                    .map(([d, cnt]) => `${cnt > 1 ? cnt + '個' : ''}${d}元`);
+                Game.Speech.speak(`可以存入${parts.join('、')}`);
+                if (c.drag.placedItems.length) {
+                    // 已放置金錢先播退回動畫，再清除並顯示 ghost slots
+                    document.querySelectorAll('.b3-nplaced-item').forEach(el => el.classList.add('b3-nplaced-return'));
+                    Game.TimerManager.setTimeout(() => {
+                        c.drag.placedItems = [];
+                        c.drag.placedTotal = 0;
+                        this._updateNormalDropZone();
+                    }, 240, 'ui');
+                } else {
+                    this._updateNormalDropZone();
+                }
+            } else {
+                c.drag.hintSlots = [];
+                this._updateNormalDropZone();
+            }
+        },
+
+        _showHardModeHintModal() {
+            const c = this.state.calendar;
+            if (!c.drag) return;
+            const target = c.drag.targetAmount;
+            // 貪婪分解面額組合
+            const ALL_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = target;
+            const items = [];
+            ALL_DENOMS.forEach(d => {
+                if (rem >= d) {
+                    const cnt = Math.floor(rem / d);
+                    for (let i = 0; i < cnt; i++) items.push(d);
+                    rem %= d;
+                }
+            });
+            // 語音說明
+            const denomCounts = {};
+            items.forEach(d => denomCounts[d] = (denomCounts[d] || 0) + 1);
+            const parts = Object.entries(denomCounts)
+                .sort(([a], [b]) => b - a)
+                .map(([d, cnt]) => `${d}元${cnt > 1 ? cnt + '個' : ''}`);
+            Game.Speech.speak(`今天要存${toTWD(target)}，可以用${parts.join('、')}`);
+            // 彈窗
+            const existing = document.getElementById('b3-hard-hint-modal');
+            if (existing) existing.remove();
+            const modal = document.createElement('div');
+            modal.id = 'b3-hard-hint-modal';
+            modal.className = 'b3-hint-modal-overlay';
+            modal.innerHTML = `<div class="b3-hint-modal">
+                <div class="b3-hint-modal-title">💡 今天要存 ${target} 元</div>
+                <div class="b3-hint-modal-imgs">
+                    ${items.map(d => {
+                        const imgSize = d >= 100 ? '62px' : '48px';
+                        return `<img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
+                    }).join('')}
+                </div>
+                <button class="b3-hint-modal-close">✕ 關閉</button>
+            </div>`;
+            document.body.appendChild(modal);
+            const close = () => modal.remove();
+            modal.querySelector('.b3-hint-modal-close').addEventListener('click', close);
+            modal.addEventListener('click', e => { if (e.target === modal) close(); });
         },
 
         _showNormalDepositHint() {
@@ -2085,6 +2223,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemsContainer = document.getElementById('b3-daily-items');
             if (itemsContainer) itemsContainer.innerHTML = '';
             if (subtitle) subtitle.style.display = '';
+            const hintWrap = document.getElementById('b3-daily-hint-wrap');
+            if (hintWrap) hintWrap.style.display = 'none';
 
             // 立即隱藏「存入金錢區」
             const dropZone = document.getElementById('b3-pig-drop-zone');
