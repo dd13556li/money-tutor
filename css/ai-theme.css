@@ -1392,6 +1392,14 @@ a:not(.selection-btn):not(.choice-btn):hover {
         display: flex;
         justify-content: center;
     }
+
+    /* 設定頁底部兩個按鈕：字體與 padding 隨螢幕縮放 */
+    .start-btn, .btn, .button, .primary-btn,
+    .back-btn {
+        font-size: clamp(0.8rem, 3.8vw, 1rem);
+        padding: 11px 16px;
+        white-space: nowrap;
+    }
 }
 
 /* =====================================================
