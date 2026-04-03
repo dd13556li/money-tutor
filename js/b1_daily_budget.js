@@ -540,6 +540,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isProcessing = false;
             this.state.wallet = [];
             this.state.quiz.errorCount = 0;
+            this.state.quiz.showHint = false;
+            this.state.quiz.hintSlots = [];
 
             const q    = this.state.quiz;
             const curr = q.questions[q.currentQuestion];
@@ -839,13 +841,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // 更新錢包幣列
             const coinsEl = document.getElementById('wallet-coins');
             if (coinsEl) {
-                if (this.state.wallet.length === 0) {
+                const q = this.state.quiz;
+                if (q.showHint && q.hintSlots?.length) {
+                    // Ghost slot 模式（B3 b3-nplaced-ghost-slot pattern）：
+                    // 先依已放置硬幣逐一填充 hintSlots，再渲染（已填=正常顯示，未填=淡化）
+                    const tmpSlots = q.hintSlots.map(s => ({ ...s, filled: false }));
+                    this.state.wallet.forEach(coin => {
+                        const idx = tmpSlots.findIndex(s => s.denom === coin.denom && !s.filled);
+                        if (idx >= 0) tmpSlots[idx].filled = true;
+                    });
+                    coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
+                        const isBanknote = slot.denom >= 100;
+                        const imgW = isBanknote ? '68px' : '44px';
+                        const ghostClass = slot.filled ? '' : ' b1-wallet-ghost-slot';
+                        return `<div class="b1-wallet-coin${ghostClass}" data-hint-idx="${idx}">
+                            <img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                                 style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                                 draggable="false" onerror="this.style.display='none'">
+                        </div>`;
+                    }).join('');
+                } else if (this.state.wallet.length === 0) {
                     coinsEl.innerHTML = '<span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>';
                 } else {
                     coinsEl.innerHTML = this.state.wallet.map(coin => {
                         const imgSrc   = `../images/money/${coin.denom}_yuan_front.png`;
                         const imgClass = coin.isBanknote ? 'banknote-img' : 'coin-img';
-                        const imgW     = coin.isBanknote ? '100px' : '60px';
+                        const imgW     = coin.isBanknote ? '68px' : '44px';
                         return `
                         <div class="b1-wallet-coin" data-uid="${coin.uid}">
                             <img src="${imgSrc}" alt="${coin.denom}元" class="${imgClass}"
@@ -1255,10 +1276,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
+            // 語音格式：「可以用N個X元，M個Y元」（B3 pattern）
             const parts = Object.entries(countMap)
                 .sort((a, b) => b[0] - a[0])
-                .map(([d, c]) => `${c > 1 ? c + '個' : ''}${toTWD(parseInt(d))}`);
-            Game.Speech.speak(`提示：放${parts.join('加')}，共${toTWD(curr.total)}`);
+                .map(([d, c]) => `${c}個${parseInt(d)}元`);
+            Game.Speech.speak(`可以用${parts.join('，')}`);
+
+            // ghost slots：在錢包放置區顯示淡化的正確面額（B3 b3-nplaced-ghost-slot pattern）
+            const q = this.state.quiz;
+            q.showHint = true;
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            // 已放置金錢先標記到 hintSlots
+            const placed = [...this.state.wallet];
+            placed.forEach(coin => {
+                const idx = q.hintSlots.findIndex(s => s.denom === coin.denom && !s.filled);
+                if (idx >= 0) q.hintSlots[idx].filled = true;
+            });
+            this._updateWalletDisplay();
+
             // 顯示建議面額浮動卡（Round 37）
             const prevCard = document.getElementById('b1-hint-combo-card');
             if (prevCard) prevCard.remove();

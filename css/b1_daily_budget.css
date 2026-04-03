@@ -1110,6 +1110,22 @@
     0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
     100% { opacity: 0; transform: translateX(-50%) translateY(-55px); }
 }
+/* ── Ghost slot 提示（B3 b3-nplaced-ghost-slot pattern）── */
+.b1-wallet-coin {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease;
+}
+.b1-wallet-ghost-slot {
+    animation: b1WalletGhostIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    opacity: 0.35;
+}
+@keyframes b1WalletGhostIn {
+    from { opacity: 0;    transform: translateY(-12px) scale(0.7); }
+    to   { opacity: 0.35; transform: translateY(0) scale(1); }
+}
 /* ── Round 45：per-item 場景類別徽章 ── */
 .b1-item-cat-badge {
     display: inline-flex;

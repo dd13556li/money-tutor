@@ -1345,9 +1345,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cnt = Math.floor(rem / b.value);
                 if (cnt > 0) { used[b.value] = cnt; rem -= cnt * b.value; }
             }
-            const parts = B6_BILLS
+            // 語音格式：「可以用N個X元，M個Y元」（B3 pattern）
+            const speechParts = B6_BILLS
                 .filter(b => used[b.value])
-                .map(b => `${b.label} × ${used[b.value]}`);
+                .map(b => `${used[b.value]}個${b.value}元`);
 
             // 高亮面額按鈕
             document.querySelectorAll('.b6-bill-btn').forEach(btn => {
@@ -1367,7 +1368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.innerHTML = `<strong>💡 建議付法</strong><div class="b6-hint-badges">${badgesHTML}<span class="b6-hint-eq">= ${total}元</span></div>`;
             document.querySelector('.b6-payment-section')?.appendChild(toast);
 
-            Game.Speech.speak(`建議付${parts.join('，再加')}`);
+            Game.Speech.speak(`可以用${speechParts.join('，')}`);
 
             Game.TimerManager.setTimeout(() => {
                 toast.remove();
