@@ -436,6 +436,7 @@ toolbarConfig: {
 | B3 普通/困難模式確認後才提示金額錯誤（2026-04-03）| B3 | `_handleNormalDrop`：困難模式移除超額即時拒絕（加 `difficulty !== 'hard'` 守衛）；`_confirmNormalDeposit` 錯誤語音改「不對喔，你存的錢太多/太少，請再試一次」；困難模式放置時不播總額語音（`difficulty !== 'hard'` 守衛）；搜尋 `不對喔.*存的錢太多`、`difficulty.*hard.*Speech` |
 | B3 普通/困難模式提示按鈕（2026-04-03）| B3 | `b3-daily-header-row`（flex space-between）+ `b3-daily-hint-wrap`（吉祥物 28px + 💡提示鈕）；普通模式 `_toggleDepositHint()`：計算 `hintSlots[]`→已放金錢退回動畫（`b3-nplaced-return`）→顯示 ghost slots（`b3-nplaced-ghost-slot`，`b3NDenomInGhost` 結尾 `opacity:0.35`）→播語音「可以存入N個X元」；填入時直接操作 `[data-hint-idx]` DOM 不重繪（避免閃爍）；清除時重置所有 slots；完成後隱藏提示鈕；搜尋 `b3-daily-hint-btn`、`hintSlots`、`data-hint-idx`、`b3NDenomInGhost` |
 | B3 困難模式提示彈窗（2026-04-03）| B3 | `_showHardModeHintModal()`：貪婪分解面額→彈窗顯示圖示（紙鈔 62px/硬幣 48px）＋語音「今天要存X元，可以用N個X元…」；`b3-hint-modal-overlay`/`.b3-hint-modal`；搜尋 `_showHardModeHintModal`、`b3-hint-modal-overlay` |
+| B3 提示語音格式修正（2026-04-03）| B3 | 普通/困難模式提示語音統一改為「N個X元」（永遠顯示數量，含 1 個）；分隔符 `、` → `，`；例：「可以存入2個10元，1個5元」；搜尋 `可以存入.*個.*元` |
 
 ---
 

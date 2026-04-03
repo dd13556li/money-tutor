@@ -2051,13 +2051,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 c.drag.hintSlots = slots;
-                // 語音提示：「可以存入 2 個 10 元、1 個 5 元」
+                // 語音提示：「可以存入 2 個 10 元，1 個 5 元」
                 const denomCounts = {};
                 slots.forEach(s => denomCounts[s.denom] = (denomCounts[s.denom] || 0) + 1);
                 const parts = Object.entries(denomCounts)
                     .sort(([a], [b]) => b - a)
-                    .map(([d, cnt]) => `${cnt > 1 ? cnt + '個' : ''}${d}元`);
-                Game.Speech.speak(`可以存入${parts.join('、')}`);
+                    .map(([d, cnt]) => `${cnt}個${d}元`);
+                Game.Speech.speak(`可以存入${parts.join('，')}`);
                 if (c.drag.placedItems.length) {
                     // 已放置金錢先播退回動畫，再清除並顯示 ghost slots
                     document.querySelectorAll('.b3-nplaced-item').forEach(el => el.classList.add('b3-nplaced-return'));
@@ -2095,8 +2095,8 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach(d => denomCounts[d] = (denomCounts[d] || 0) + 1);
             const parts = Object.entries(denomCounts)
                 .sort(([a], [b]) => b - a)
-                .map(([d, cnt]) => `${d}元${cnt > 1 ? cnt + '個' : ''}`);
-            Game.Speech.speak(`今天要存${toTWD(target)}，可以用${parts.join('、')}`);
+                .map(([d, cnt]) => `${cnt}個${d}元`);
+            Game.Speech.speak(`今天要存${toTWD(target)}，可以用${parts.join('，')}`);
             // 彈窗
             const existing = document.getElementById('b3-hard-hint-modal');
             if (existing) existing.remove();
