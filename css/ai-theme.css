@@ -1398,7 +1398,6 @@ a:not(.selection-btn):not(.choice-btn):hover {
     .back-btn {
         font-size: clamp(0.8rem, 3.8vw, 1rem);
         padding: 11px 16px;
-        white-space: nowrap;
     }
 }
 
