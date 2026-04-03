@@ -854,6 +854,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                         ${diff === 'hard' ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
+                        ${diff !== 'easy' ? `<span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-left:auto;">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display='none'">
+                            <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
+                        </span>` : ''}
                     </div>
                     ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
@@ -940,6 +944,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(replayBtn, 'click', () => {
                     const text = this.state.quiz.lastSpeechText;
                     if (text) Game.Speech.speak(text);
+                }, {}, 'gameUI');
+            }
+            // 提示按鈕（普通/困難模式）：朗讀算式步驟
+            const b2HintBtn = document.getElementById('b2-hint-btn');
+            if (b2HintBtn) {
+                Game.EventManager.on(b2HintBtn, 'click', () => {
+                    this._showCalcBreakdown(question);
+                    const steps = [question.startAmount, ...question.events.map((e, i) => {
+                        let running = question.startAmount;
+                        for (let j = 0; j <= i; j++) running += question.events[j].type === 'income' ? question.events[j].amount : -question.events[j].amount;
+                        return running;
+                    })];
+                    const parts = question.events.map((e, i) => {
+                        const verb = e.type === 'income' ? '收入' : '花了';
+                        return `${verb}${e.amount}元，剩下${steps[i + 1]}元`;
+                    });
+                    Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${question.answer}元`);
                 }, {}, 'gameUI');
             }
             // 困難模式專屬重聽鈕（inline numpad 區域）
@@ -1038,7 +1059,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.quiz.errorCount++;
                     const willShowHint = this.state.quiz.errorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，再想想看`);
+                    const b2EasyErrDir = chosen > question.answer ? '太多了' : '太少了';
+                    Game.Speech.speak(`不對喔，算${b2EasyErrDir}，請再試一次`);
                     if (willShowHint) this._showCalcBreakdown(question);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
@@ -1282,11 +1304,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userVal = parseInt(this.state.quiz.currentInput);
                 const diff33 = !isNaN(userVal) ? userVal - question.answer : 0;
                 const errSpeech = !isNaN(userVal) && diff33 !== 0
-                    ? (diff33 > 0 ? `算太多了，多了${diff33}元` : `還有${-diff33}元沒算到`)
-                    : `不對喔`;
+                    ? (diff33 > 0 ? `不對喔，算太多了，請再試一次` : `不對喔，算太少了，請再試一次`)
+                    : `不對喔，請再試一次`;
                 if (this.state.settings.retryMode === 'retry') {
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(errSpeech + '，參考算式再試一次');
+                    Game.Speech.speak(errSpeech);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this.state.quiz.currentInput = '';
