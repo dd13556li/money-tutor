@@ -710,7 +710,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div id="b5-result-area"></div>
 
-                <button class="b5-hint-btn" id="b5-hint-btn">💡 還能選什麼？</button>
+                <span style="display:inline-flex;align-items:center;gap:4px;">
+                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                    <button class="b5-hint-btn" id="b5-hint-btn">💡 還能選什麼？</button>
+                </span>
                 <button class="b5-read-selected-btn" id="b5-read-selected-btn">🔊 朗讀已選</button>
                 <button class="b5-confirm-btn" id="b5-confirm-btn">✅ 確認購買！</button>
             </div>`;
@@ -1031,10 +1034,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.audio.play('error');
                 if (!mustOk) {
                     this._showCenterFeedback('❌', '必買商品未選！');
-                    Game.Speech.speak('記得要選所有必買的商品喔！');
+                    Game.Speech.speak('不對喔，記得要選所有必買的商品喔！');
                 } else {
                     this._showCenterFeedback('❌', '超出預算！');
-                    Game.Speech.speak(`超出預算了，多了${toTWD(total - g.budget)}，再試一次！`);
+                    Game.Speech.speak(`不對喔，超出預算了，多了${toTWD(total - g.budget)}，請再試一次！`);
                 }
             }
 
