@@ -1779,14 +1779,15 @@ document.addEventListener('DOMContentLoaded', () => {
         _updateNormalDailyCard() {
             const c = this.state.calendar;
             const drag = c.drag;
+            const isHard = this.state.settings.difficulty === 'hard';
             const subtitle = document.getElementById('b3-daily-subtitle');
             const itemsContainer = document.getElementById('b3-daily-items');
             if (subtitle) subtitle.style.display = 'none';
             if (!itemsContainer) return;
             itemsContainer.innerHTML = `
 <div class="b3-normal-target-wrap">
-    <div class="b3-normal-target-amount">${drag.targetAmount}</div>
-    <div class="b3-normal-target-unit">元</div>
+    <div class="b3-normal-target-amount">${isHard ? '？' : drag.targetAmount}</div>
+    <div class="b3-normal-target-unit">${isHard ? '' : '元'}</div>
 </div>
 <div class="b3-normal-denom-sources">
     ${drag.availDenoms.map(d => {
@@ -1806,6 +1807,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!drag || drag.mode !== 'normal') return '';
             const total = drag.placedTotal;
             const target = drag.targetAmount;
+            const isHard = this.state.settings.difficulty === 'hard';
 
             // 依面額分組顯示
             const denomCounts = {};
@@ -1829,8 +1831,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
 <div class="b3-normal-placed-area" id="b3-normal-placed-area">${placedHTML}</div>
 <div class="b3-normal-total-row">
-    <span>已存：</span><span id="b3-n-total" style="color:${totalColor};font-weight:900;">${total} 元</span>
-    <span> / 目標：${target} 元</span>
+    <span>已存：</span><span id="b3-n-total" style="color:${totalColor};font-weight:900;">${isHard ? '？' : total + ' 元'}</span>
+    ${isHard ? '' : `<span> / 目標：${target} 元</span>`}
 </div>
 <div class="b3-normal-action-row">
     <button class="b3-normal-clear-btn" id="b3-normal-clear-btn">🗑️ 清除</button>
@@ -1930,7 +1932,9 @@ document.addEventListener('DOMContentLoaded', () => {
             c.drag.placedItems.push({ denom, uid });
             c.drag.placedTotal = newTotal;
             this._updateNormalDropZone();
-            Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(newTotal)), 80, 'ui');
+            if (this.state.settings.difficulty !== 'hard') {
+                Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(newTotal)), 80, 'ui');
+            }
         },
 
         _updateNormalDropZone() {
