@@ -856,10 +856,11 @@
 }
 
 @media (max-width: 600px) {
-    .b3-cal-layout { flex-direction: column; }
-    .b3-pig-col    { flex: none; width: 100%; }
+    .b3-cal-layout      { flex-direction: column; align-items: center; }
+    .b3-cal-center-col  { width: 100%; }
+    .b3-pig-col         { flex: none; width: 100%; }
     .b3-pig-col .b3-pig-card { flex: none; }
-    .b3-pig-card   { flex: none; width: 100%; }
+    .b3-pig-card        { flex: none; width: 100%; }
 }
 
 /* ── 月曆卡片 ────────────────────────────────────────────────── */
