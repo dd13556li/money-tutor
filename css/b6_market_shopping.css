@@ -1117,3 +1117,29 @@
     font-size: 12px;
     margin-left: auto;
 }
+
+/* ── 困難模式付法彈窗（B3 _showHardModeHintModal pattern）── */
+.b6-hint-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10200;
+}
+.b6-hint-modal {
+    background: #fff; border-radius: 16px; padding: 20px 24px;
+    max-width: 360px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    text-align: center;
+}
+.b6-hm-header { font-size: 16px; font-weight: 700; color: #047857; margin-bottom: 10px; }
+.b6-hm-total-row {
+    font-size: 14px; color: #374151; margin-bottom: 12px;
+}
+.b6-hm-total-row strong { font-size: 20px; color: #1d4ed8; }
+.b6-hm-imgs {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 14px;
+}
+.b6-hm-close-btn {
+    display: block; width: 100%;
+    background: #047857; color: #fff; border: none; border-radius: 8px;
+    padding: 8px; font-size: 14px; cursor: pointer;
+}

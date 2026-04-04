@@ -798,3 +798,50 @@ if (revealBtn) {
 - `data-diff`、`b2-event-row income`、`b2-event-row expense`
 - `b2-memory-mode`、`b2-reveal-btn`、`b2-revealed`
 - `_showThemeGuide`、`b2-theme-guide`、`b2TgSlideIn`
+
+---
+
+## 二十一、B1/B3 設計特色套用：自訂事件功能（2026-04-04）
+
+> **更新日期**：2026-04-04（參照 B1 自訂項目 / B3 天數設定設計）
+
+### 功能說明
+
+在設定頁「日記主題」區塊下方新增「自訂事件」切換列（僅普通/困難模式可見）。開啟後，題目頁面顯示 `b2-custom-events-panel`，可刪除原有收支事件（`_deleted` flag）並新增自訂事件（收入/支出 + 名稱 + 金額）。所有答案驗證改用 `_getEffectiveEvents()` / `_getEffectiveAnswer()` 計算。
+
+### 設計參照
+- **B1 自訂項目**：`item._deleted` flag 非破壞性刪除；`_getEffectiveItems(curr)` / `_getEffectiveTotal(curr)` 合併原有+自訂；所有 Phase2 比對改用 effective 函數
+- **B3 設定頁切換**：`#custom-items-toggle-row` 模式切換顯隱；easy 切換時強制重置 `customItemsEnabled=false`
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `state.settings.customItemsEnabled` | 新增設定值，預設 `false` |
+| `#b2-custom-events-toggle-row` | 設定頁切換 DOM（easy 時隱藏） |
+| `_bindSettingsEvents` | easy→隱藏切換列；`#b2-custom-events-group [data-custom]` 綁定 |
+| `renderQuestion()` | 重置 `q.customEvents = []`；各 event `_deleted = false` |
+| `_getEffectiveEvents(question)` | `base.filter(!_deleted)` + `customEvents.filter(!_deleted)` |
+| `_getEffectiveAnswer(question)` | `startAmount ± effectiveEvents` 重算正確答案 |
+| `_renderCustomEventsPanel()` | 面板 HTML（base 行+刪除鈕、custom 列、新增列） |
+| `_bindCustomEventsPanel(question)` | 刪除/新增事件的 EventManager 綁定 |
+| `_updateCustomAnswerPreview(question)` | 即時更新答案預覽 |
+| `_bindQuestionEvents` | 末尾呼叫 `_bindCustomEventsPanel` |
+| `_updateInputDisplay` | 改用 `_getEffectiveAnswer(q)` |
+| `_handleChoiceAnswer` | 改用 `effectiveAnswer = _getEffectiveAnswer(question)` |
+| `_handleNumpadAnswer` | 改用 `effectiveAnswer = _getEffectiveAnswer(question)` |
+| `_showCalcBreakdown` | 先移除舊面板（`.b2-calc-breakdown?.remove()`）再重繪，使用 `effEvents`/`effAnswer` |
+
+### CSS 新增（b2_allowance_diary.css）
+`.b2-custom-events-panel`、`.b2-cep-header`、`.b2-cep-add-row`、`.b2-cep-input`、`.b2-cep-type-sel`、`.b2-cep-amt-inp`、`.b2-cep-add-btn`、`.b2-cep-del-btn`、`.b2-cep-deleted`、`.b2-cep-custom-row`
+
+### 版本號
+CSS v1.1 → v1.2；JS v3.8 → v3.9
+
+### 技術要點
+- `_deleted` flag 非破壞性刪除：不改動 `question.events[]` 陣列本身，保留原始資料
+- `_showCalcBreakdown` 改為先移除舊元素再重建，確保自訂事件更動後面板能即時反映最新狀態
+- `customEvents` 陣列儲存在 `state.quiz`（每題重置），型別格式：`{ type:'income'|'expense', name, amount }`
+
+### 搜尋關鍵字
+`customItemsEnabled`、`_getEffectiveEvents`、`b2-custom-events-panel`、`b2-cep-add-btn`

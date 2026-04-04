@@ -835,7 +835,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 預算提示按鈕
             const hintBtn = document.getElementById('b5-hint-btn');
             if (hintBtn) {
-                Game.EventManager.on(hintBtn, 'click', () => this._showBudgetHint(), {}, 'gameUI');
+                Game.EventManager.on(hintBtn, 'click', () => {
+                    if (this.state.settings.difficulty === 'hard') this._showHardModeHintModal();
+                    else this._showBudgetHint();
+                }, {}, 'gameUI');
             }
             // 已選清單語音朗讀按鈕（Round 45）
             const readBtn = document.getElementById('b5-read-selected-btn');
@@ -886,6 +889,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nameWithPrice = affordable.map(i => `${i.name}${toTWD(i.price)}`).join('或');
                 Game.Speech.speak(`還剩${toTWD(remaining)}，可以加選${nameWithPrice}`);
             }
+        },
+
+        // ── 困難模式提示彈窗（B3 _showHardModeHintModal pattern）────
+        _showHardModeHintModal() {
+            const g = this.state.game;
+            const budget = g.budget;
+            const mustItems = g.items.filter(i => i.must);
+            const mustTotal = mustItems.reduce((s, i) => s + i.price, 0);
+            const customTotal = (g.customItems || []).filter(i => !i._deleted).reduce((s, i) => s + i.price, 0);
+            const remaining = budget - mustTotal - customTotal;
+            const affordable = g.items.filter(i => !i.must && i.price <= remaining);
+            const mustHTML = mustItems.map(i =>
+                `<div class="b5-hm-row"><span class="b5-hm-icon">${i.icon}</span><span class="b5-hm-name">${i.name}</span><span class="b5-hm-price">${i.price}元</span></div>`
+            ).join('');
+            const optHTML = affordable.map(i =>
+                `<div class="b5-hm-row b5-hm-opt"><span class="b5-hm-icon">${i.icon}</span><span class="b5-hm-name">${i.name}</span><span class="b5-hm-price">${i.price}元</span></div>`
+            ).join('');
+            const existing = document.getElementById('b5-hard-hint-modal');
+            if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'b5-hard-hint-modal';
+            overlay.className = 'b5-hint-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b5-hint-modal">
+                    <div class="b5-hm-header">💡 預算分析</div>
+                    <div class="b5-hm-budget-row"><span class="b5-hm-label">派對預算</span><span class="b5-hm-budget-val">${budget}元</span></div>
+                    <div class="b5-hm-section">
+                        <div class="b5-hm-sec-title">🎂 必買商品</div>
+                        ${mustHTML}
+                        <div class="b5-hm-row b5-hm-total"><span>必買合計</span><span>${mustTotal}元</span></div>
+                    </div>
+                    ${affordable.length > 0 ? `
+                    <div class="b5-hm-section">
+                        <div class="b5-hm-sec-title">✨ 可加選（還剩${remaining}元）</div>
+                        ${optHTML}
+                    </div>` : `<div class="b5-hm-empty">還剩 ${remaining} 元，已無可加選商品</div>`}
+                    <button class="b5-hm-close-btn" id="b5-hm-close">✕ 關閉</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const close = () => overlay.remove();
+            Game.EventManager.on(document.getElementById('b5-hm-close'), 'click', close, {}, 'gameUI');
+            Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) close(); }, {}, 'gameUI');
+            const parts = affordable.map(i => `${i.name}${toTWD(i.price)}`);
+            const speech = affordable.length > 0
+                ? `派對預算${toTWD(budget)}，必買要${toTWD(mustTotal)}，還剩${toTWD(remaining)}，可以選${parts.join('或')}`
+                : `派對預算${toTWD(budget)}，必買要${toTWD(mustTotal)}，還剩${toTWD(remaining)}，沒有可加選的商品了`;
+            Game.Speech.speak(speech);
         },
 
         _getTotal() {
@@ -1122,7 +1172,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 // 3次錯誤後自動觸發提示（B4 autoHint pattern）
                 if (g.roundErrors >= 3) {
-                    Game.TimerManager.setTimeout(() => this._showBudgetHint(), 800, 'ui');
+                    Game.TimerManager.setTimeout(() => {
+                        if (this.state.settings.difficulty === 'hard') this._showHardModeHintModal();
+                        else this._showBudgetHint();
+                    }, 800, 'ui');
                 }
             }
 

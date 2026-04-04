@@ -813,3 +813,76 @@ if (card.classList.contains('b5-price-hidden')) {
 | 朗讀已選清單按鈕 | `#b5-read-selected-btn`（藍色膠囊，插於 hint-btn 和 confirm-btn 之間）；click 朗讀必買+已選商品名稱/價格+合計 | `b5-read-selected-btn`, `朗讀已選` |
 
 **教學意義**：讓學生在確認購買前可以聽一次自己的選購清單，提供「複習機會」，對應語音學習者（聽覺型學習）。配合 B6 的付款足額語音提醒，形成「確認前先聽一遍」的良好習慣。
+
+---
+
+## 二十三、B1/B3 設計特色套用：自訂商品功能（2026-04-04）
+
+> **更新日期**：2026-04-04（參照 B1 自訂項目 / B3 天數設定設計）
+
+### 功能說明
+
+在設定頁「難度」區塊下方新增「自訂商品」切換列（普通/困難可見）。開啟後，每關 `_renderRoundHTML()` 插入 `b5-custom-items-panel`，可新增自訂商品（名稱 + 價格）。`_getTotal()` 改為合計原有選購商品 + 自訂商品總額；確認時驗證不超出預算且必買項目均已選取。
+
+### 設計參照
+- **B1 自訂項目**：`q.customItems[]` 每題重置；`_deleted` flag 非破壞性刪除；`_getEffectiveTotal` pattern
+- **B3 切換列設定**：easy→隱藏並重置；`#b5-custom-items-toggle-row` DOM 結構與 B1/B3 一致
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `state.settings.customItemsEnabled` | 新增設定值，預設 `false` |
+| `#b5-custom-items-toggle-row` | 設定頁切換 DOM（新 b-setting-group，置於 assist-click 前） |
+| `_bindSettingsEvents` | easy→隱藏；`#b5-custom-items-group [data-custom]` 綁定 |
+| `renderRound()` | 重置 `g.customItems = []` |
+| `_getTotal()` | `baseTotal`（選購項）+ `customTotal`（自訂項，filter `!_deleted`） |
+| `_renderCustomItemsPanel()` | 面板 HTML |
+| `_bindCustomItemsPanel()` | 新增/刪除自訂商品的 EventManager 綁定；刪除時 `e.stopPropagation()` 防觸發卡片點擊 |
+| `_renderRoundHTML()` | 插入 `<div id="b5-custom-items-list"></div>` + panel（confirm btn 前） |
+| `_bindRoundEvents()` | 呼叫 `_bindCustomItemsPanel()` |
+
+### CSS 新增（b5_party_budget.css）
+`.b5-custom-items-panel`、`.b5-cip-header`、`.b5-cip-row`、`.b5-cip-name`、`.b5-cip-price`、`.b5-cip-del-btn`、`.b5-cip-deleted`、`.b5-cip-add-row`、`.b5-cip-input`、`.b5-cip-price-inp`、`.b5-cip-add-btn`、`.b5-cip-custom-row`
+
+### 版本號
+CSS 無版號 → `?v=1.1`；JS v3.7 → v3.8
+
+### 技術要點
+- 自訂商品儲存在 `state.game.customItems[]`（每關重置），型別：`{ id, name, price }`；id 用 `Date.now()` 確保唯一
+- 刪除自訂商品卡片內的刪除按鈕需 `e.stopPropagation()` 阻止卡片 click handler 觸發「選取/取消選取」
+- `_getTotal()` 中 `customTotal` 使用 `filter(!_deleted)` 確保軟刪除生效
+
+### 搜尋關鍵字
+`customItemsEnabled`、`b5-custom-items-panel`、`b5-cip-add-btn`、`customTotal`
+
+---
+
+## 二十四、B3 設計特色套用：困難模式提示彈窗（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B3 `_showHardModeHintModal` 設計）
+
+### 功能說明
+
+困難模式下提示按鈕（💡 還能選什麼？）及 3次錯誤自動提示，改為呼叫 `_showHardModeHintModal()`，以彈窗形式顯示預算分析（必買商品+金額＋可加選商品+金額）。普通/簡單模式維持原本 `_showBudgetHint()`（卡片高亮+語音）。
+
+### 設計參照
+- **B3 `_showHardModeHintModal`**：困難模式用彈窗（modal overlay）展示幣種圖示；普通模式用 ghost slot
+- **B6 `_showHardModeHintModal` 同步**：兩個新函數同日實作，命名與 DOM 結構對齊
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_bindRoundEvents` hint btn | `difficulty === 'hard'` → `_showHardModeHintModal()`；否則 `_showBudgetHint()` |
+| `_handleConfirm` auto-hint | `roundErrors >= 3` → 同上路由 |
+| `_showHardModeHintModal()` | 新增：預算/必買/可加選 彈窗 + 語音 |
+
+### CSS 新增（b5_party_budget.css）
+`.b5-hint-modal-overlay`、`.b5-hint-modal`、`.b5-hm-header`、`.b5-hm-budget-row`、`.b5-hm-label`、`.b5-hm-budget-val`、`.b5-hm-section`、`.b5-hm-sec-title`、`.b5-hm-row`、`.b5-hm-icon`、`.b5-hm-name`、`.b5-hm-price`、`.b5-hm-opt`、`.b5-hm-total`、`.b5-hm-empty`、`.b5-hm-close-btn`
+
+### 版本號
+CSS v1.1 → v1.2；JS v3.8 → v3.9
+
+### 搜尋關鍵字
+`_showHardModeHintModal`、`b5-hint-modal-overlay`、`b5-hm-close-btn`、`b5-hm-budget-val`

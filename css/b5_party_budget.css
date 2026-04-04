@@ -778,3 +778,39 @@
     font-size: 12px;
     margin-left: auto;
 }
+
+/* ── 困難模式提示彈窗（B3 _showHardModeHintModal pattern）── */
+.b5-hint-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10200;
+}
+.b5-hint-modal {
+    background: #fff; border-radius: 16px; padding: 20px 24px;
+    max-width: 340px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.2);
+}
+.b5-hm-header { font-size: 16px; font-weight: 700; color: #6e28b4; margin-bottom: 12px; }
+.b5-hm-budget-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #f3e8ff; border-radius: 8px; padding: 6px 12px; margin-bottom: 10px;
+}
+.b5-hm-label { font-size: 13px; color: #374151; }
+.b5-hm-budget-val { font-size: 18px; font-weight: 700; color: #6e28b4; }
+.b5-hm-section { margin-bottom: 10px; }
+.b5-hm-sec-title { font-size: 12px; font-weight: 700; color: #6b7280; margin-bottom: 4px; }
+.b5-hm-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px;
+}
+.b5-hm-icon { font-size: 18px; }
+.b5-hm-name { flex: 1; color: #1f2937; }
+.b5-hm-price { color: #374151; font-weight: 600; }
+.b5-hm-opt .b5-hm-price { color: #059669; }
+.b5-hm-total { border-top: 2px solid #d1d5db; border-bottom: none; font-weight: 700; color: #6e28b4; padding-top: 4px; }
+.b5-hm-total > span:first-child { flex: 1; }
+.b5-hm-empty { font-size: 13px; color: #6b7280; text-align: center; padding: 8px 0; }
+.b5-hm-close-btn {
+    display: block; width: 100%; margin-top: 14px;
+    background: #6e28b4; color: #fff; border: none; border-radius: 8px;
+    padding: 8px; font-size: 14px; cursor: pointer;
+}

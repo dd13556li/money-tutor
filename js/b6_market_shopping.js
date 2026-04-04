@@ -1371,12 +1371,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="b6-pay-actions">
                         <button class="b6-clear-btn" id="b6-clear-btn">清除</button>
-                        ${this.state.settings.difficulty !== 'hard'
-                            ? `<span style="display:inline-flex;align-items:center;gap:4px;">
-                                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
-                                <button class="b6-hint-btn" id="b6-hint-btn">💡 提示</button>
-                               </span>`
-                            : ''}
+                        <span style="display:inline-flex;align-items:center;gap:4px;">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                            <button class="b6-hint-btn" id="b6-hint-btn">💡 ${this.state.settings.difficulty === 'hard' ? '付法分析' : '提示'}</button>
+                        </span>
                         <button class="b6-pay-btn" id="b6-pay-btn" disabled>付款</button>
                     </div>
                 </div>
@@ -1417,7 +1415,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn = document.getElementById('b6-hint-btn');
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => {
-                    this._showPaymentHint(total);
+                    if (this.state.settings.difficulty === 'hard') this._showHardModeHintModal(total);
+                    else this._showPaymentHint(total);
                 }, {}, 'gameUI');
             }
         },
@@ -1459,6 +1458,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 toast.remove();
                 document.querySelectorAll('.b6-bill-btn').forEach(btn => btn.classList.remove('b6-bill-hint'));
             }, 6000, 'ui');
+        },
+
+        // ── 困難模式付法彈窗（B3 _showHardModeHintModal pattern）────
+        _showHardModeHintModal(total) {
+            const ALL_BILLS = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = total;
+            const items = [];
+            ALL_BILLS.forEach(d => {
+                if (rem >= d) {
+                    const cnt = Math.floor(rem / d);
+                    for (let i = 0; i < cnt; i++) items.push(d);
+                    rem %= d;
+                }
+            });
+            const denomCounts = {};
+            items.forEach(d => { denomCounts[d] = (denomCounts[d] || 0) + 1; });
+            const parts = Object.entries(denomCounts)
+                .sort(([a], [b]) => b - a)
+                .map(([d, cnt]) => `${cnt}個${d}元`);
+            const existing = document.getElementById('b6-hard-hint-modal');
+            if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'b6-hard-hint-modal';
+            overlay.className = 'b6-hint-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b6-hint-modal">
+                    <div class="b6-hm-header">💡 付法分析</div>
+                    <div class="b6-hm-total-row">需付 <strong>${total}</strong> 元</div>
+                    <div class="b6-hm-imgs">
+                        ${items.map(d => {
+                            const imgSize = d >= 100 ? '62px' : '48px';
+                            return `<img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
+                        }).join('')}
+                    </div>
+                    <button class="b6-hm-close-btn" id="b6-hm-close">✕ 關閉</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const close = () => overlay.remove();
+            Game.EventManager.on(document.getElementById('b6-hm-close'), 'click', close, {}, 'gameUI');
+            Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) close(); }, {}, 'gameUI');
+            Game.Speech.speak(`需付${toTWD(total)}，可以用${parts.join('，')}`);
         },
 
         _updatePaidDisplay(paid, total) {

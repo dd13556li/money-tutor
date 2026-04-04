@@ -943,3 +943,57 @@ Game.TimerManager.setTimeout(() => {
 | 記憶模式語音重聽按鈕 | `_startMemoryCountdown` 模糊後加 `#b4-mem-replay` 按鈕（fixed 右上角）；click 朗讀所有店家價格；2s disable 防連按 | `b4-mem-replay`, `b4-mem-replay-btn` |
 
 **教學意義**：困難模式遮蔽價格後，提供一次語音重聽機會，讓學生可以選擇是否需要「聲音輔助」記憶，兼顧不同學習風格（視覺/聽覺記憶）。對照 B2 困難模式語音重聽鈕（Round 30）的設計。
+
+---
+
+## 二十六、B1/B3 設計特色套用：自訂價格功能（2026-04-04）
+
+> **更新日期**：2026-04-04（參照 B1 自訂項目 / B3 天數設定設計）
+
+### 功能說明
+
+在設定頁「商品類別」區塊內新增「自訂價格」切換列（僅兩家店模式且普通/困難可見）。開啟後，題目頁面顯示 `b4-custom-price-panel`，可輸入左右兩店的自訂價格後點擊「套用」，系統維持 `optA.price > optB.price` 不變式，必要時自動翻轉 `curr.swapped`，再觸發 `renderQuestion()` 重繪。
+
+### 設計參照
+- **B1 自訂項目**：設定頁切換列模式（`#custom-items-toggle-row`）；easy 時隱藏並重置
+- **B3 設定頁條件顯示**：根據多個設定值（難度 + 商店數）決定切換列顯隱（`_updateCustomPriceToggle()` helper）
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `state.settings.customItemsEnabled` | 新增設定值，預設 `false` |
+| `#b4-custom-price-toggle-row` | 設定頁切換 DOM |
+| `_updateCustomPriceToggle()` | helper：`difficulty !== 'easy' && compareStores === 'two'` 才顯示 |
+| `_bindSettingsEvents` | `[data-diff]` 與 `[data-stores]` handler 均呼叫 `_updateCustomPriceToggle()`；`#b4-custom-price-group [data-custom]` 綁定 |
+| `renderQuestion()` | 條件插入 `b4-custom-price-panel` HTML（非 isTriple、非 isUnit、非 easy） |
+| `_bindSelectEvents` | 綁定 `#b4-cpp-apply-btn`，呼叫 `_applyCustomPrices` 後 `renderQuestion()` |
+| `_applyCustomPrices(curr, leftPrice, rightPrice)` | 維持 optA>optB 不變式；若輸入翻轉則切換 `curr.swapped`；更新 `curr.diff` |
+
+### `_applyCustomPrices` 邏輯
+
+```
+curr.swapped == false → left=optA, right=optB
+  leftPrice >= rightPrice → optA=left, optB=right（正常）
+  leftPrice <  rightPrice → optA=right, optB=left, swapped=true（翻轉）
+
+curr.swapped == true  → left=optB, right=optA
+  leftPrice <= rightPrice → optB=left, optA=right（維持）
+  leftPrice >  rightPrice → optB=right, optA=left, swapped=false（翻轉）
+
+最後：curr.diff = curr.optA.price - curr.optB.price
+```
+
+### CSS 新增（b4_sale_comparison.css）
+`.b4-custom-price-panel`、`.b4-cpp-header`、`.b4-cpp-row`、`.b4-cpp-apply-btn`
+
+### 版本號
+CSS v1.1 → v1.2；JS v3.7 → v3.8
+
+### 技術要點
+- `_applyCustomPrices` 直接修改 `curr.optA/B.price`（`curr` 為 `state.questions[idx]` 引用），`renderQuestion()` 重繪時自然取新值
+- 三商店（`curr.isTriple`）與單位比價（`curr.isUnit`）模式不顯示自訂價格面板，避免邏輯衝突
+- `_updateCustomPriceToggle()` 集中管理顯隱條件，確保難度與商店數量任一改變時都正確重算
+
+### 搜尋關鍵字
+`customItemsEnabled`、`_applyCustomPrices`、`b4-cpp-apply-btn`、`b4-custom-price-panel`

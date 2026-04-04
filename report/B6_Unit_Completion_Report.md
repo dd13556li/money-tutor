@@ -957,3 +957,76 @@ toast.innerHTML = `<strong>💡 建議付法</strong>
 | 切換至已完成攤位 toast | 攤位切換時偵測 `destDone`；已完成→底部顯示「✅ X攤位 已收集完畢！」；1s 後淡出，1.6s 後移除 | `b6-stall-done-toast`, `b6-sdt-fade`, `destDone` |
 
 **教學意義**：當學生在已完成的攤位間切換時，即時確認哪些攤位已完成，降低認知負擔（「我有沒有漏買？」），讓採購規劃更有條理。
+
+---
+
+## 十九、B1/B3 設計特色套用：自訂購物項目功能（2026-04-04）
+
+> **更新日期**：2026-04-04（參照 B1 自訂項目 / B3 天數設定設計）
+
+### 功能說明
+
+在設定頁「難度」區塊下方新增「自訂購物項目」切換列（普通/困難可見）。開啟後，`_renderShoppingUI()` 插入 `b6-custom-items-panel`，可新增自訂購物項目（名稱 + 價格）。`_calcMissionTotal()` 改為 `baseTotal`（任務商品）+ `customTotal`（自訂項目），驗證付款/找零均使用新合計。
+
+### 設計參照
+- **B1 自訂項目**：`g.customItems[]` 每輪重置；`_deleted` flag；合計 = base + custom
+- **B3 設定頁模式**：`#b6-custom-items-toggle-row` 置於新 `b-setting-group`，easy 時隱藏並重置
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `state.settings.customItemsEnabled` | 新增設定值，預設 `false` |
+| `#b6-custom-items-toggle-row` | 設定頁切換 DOM（新 b-setting-group，置於 assist-click 前） |
+| `_bindSettingsEvents` | easy→隱藏並重置；`#b6-custom-items-group [data-custom]` 綁定 |
+| `renderRound()` | 重置 `g.customItems = []` |
+| `_calcMissionTotal()` | `baseTotal`（任務商品）+ `customTotal`（自訂，filter `!_deleted`） |
+| `_renderCustomItemsPanel()` | 面板 HTML |
+| `_bindCustomItemsPanel()` | 新增/刪除的 EventManager 綁定；刪除時手動更新 `.b6-basket-total` DOM |
+| `_renderShoppingUI()` | 插入 `<div id="b6-custom-items-list"></div>` + panel（basket bar 前） |
+| `_bindShoppingEvents()` | 呼叫 `_bindCustomItemsPanel()` |
+
+### CSS 新增（b6_market_shopping.css）
+`.b6-custom-items-panel`、`.b6-cip-header`、`.b6-cip-row`、`.b6-cip-name`、`.b6-cip-price`、`.b6-cip-del-btn`、`.b6-cip-deleted`、`.b6-cip-add-row`、`.b6-cip-input`、`.b6-cip-price-inp`、`.b6-cip-add-btn`、`.b6-cip-custom-row`
+
+### 版本號
+CSS v3.9 → v4.0；JS v3.8 → v3.9
+
+### 技術要點
+- 刪除自訂項目後未呼叫 `_renderShoppingUI()`（避免全畫面重繪），改為直接操作 `document.querySelector('.b6-basket-total')` 更新總額顯示
+- `_calcMissionTotal()` 中 `customTotal` 透過 `filter(!_deleted)` 支援軟刪除，與 B1/B5 模式一致
+- 自訂項目儲存在 `state.game.customItems[]`，型別：`{ id, name, price }`
+
+### 搜尋關鍵字
+`customItemsEnabled`、`b6-custom-items-panel`、`b6-cip-add-btn`、`_calcMissionTotal`
+
+---
+
+## 二十、B3 設計特色套用：困難模式付法彈窗（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B3 `_showHardModeHintModal` 設計）
+
+### 功能說明
+
+困難模式付款頁原本隱藏提示按鈕，改為顯示「💡 付法分析」（附吉祥物圖示），點擊呼叫 `_showHardModeHintModal(total)`。以彈窗形式貪婪分解面額，顯示鈔票/硬幣圖示（紙鈔62px/硬幣48px）並播語音「需付XXX元，可以用N個X元…」。普通模式維持原本 `_showPaymentHint(total)` toast 行為。
+
+### 設計參照
+- **B3 `_showHardModeHintModal`**：彈窗顯示面額圖示；語音說明組合方式
+- **B5 `_showHardModeHintModal` 同步**：兩個新函數同日實作，命名與 overlay 結構對齊
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_renderShoppingUI` hint btn HTML | 移除 `difficulty !== 'hard' ? ... : ''` 條件；統一顯示，困難模式標籤改「付法分析」 |
+| `_bindPaymentEvents` hint binding | `difficulty === 'hard'` → `_showHardModeHintModal(total)`；否則 `_showPaymentHint(total)` |
+| `_showHardModeHintModal(total)` | 新增：面額分解→彈窗圖示顯示＋語音 |
+
+### CSS 新增（b6_market_shopping.css）
+`.b6-hint-modal-overlay`、`.b6-hint-modal`、`.b6-hm-header`、`.b6-hm-total-row`、`.b6-hm-imgs`、`.b6-hm-close-btn`
+
+### 版本號
+CSS v4.0 → v4.1；JS v3.9 → v4.0
+
+### 搜尋關鍵字
+`_showHardModeHintModal`、`b6-hint-modal-overlay`、`b6-hm-close-btn`、`付法分析`
