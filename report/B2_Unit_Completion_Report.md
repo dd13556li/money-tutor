@@ -9,6 +9,7 @@
 > **更新日期**：2026-04-01（Rounds 43–44：困難模式聽力記憶模糊 `b2-memory-mode`；類別圖示動畫導引 `_showThemeGuide`）
 > **更新日期**：2026-04-03（互動豐富化：①新增吉祥物圖示 + 提示按鈕（`b2-hint-btn`）至日記標題列（普通/困難模式），點後播放算式語音並顯示 `_showCalcBreakdown`；②簡單模式錯誤語音統一含方向（「不對喔，算太多了/太少了，請再試一次」）；③困難模式錯誤語音統一（「不對喔，算太多了/太少了，請再試一次」取代原「算太多了，多了N元」）；搜尋關鍵字：`b2-hint-btn`、`b2EasyErrDir`、`不對喔，算太多了`）
 > **更新日期**：2026-04-04（提示按鈕擴展至簡單模式：移除 `${diff !== 'easy' ? ... : ''}` 條件，三種難度均顯示吉祥物＋提示按鈕（`b2-hint-btn`）；點後播放完整計算過程語音「從X元開始，收入/花了N元，剩下M元，最後剩下Y元」；簡單模式 3 次錯誤後已自動顯示 `_showCalcBreakdown`，提示鈕提供主動觸發；搜尋關鍵字：`b2-hint-wrap`（移除 diff 條件）、`b2-hint-btn`）
+> **更新日期**：2026-04-04（吉祥物圖示尺寸修正：`b2-hint-wrap` 內 `educated_money_bag_character.png` inline style 從 `width:24px;height:24px` 統一改為 `width:28px;height:28px`，與 B1/B3~B6 一致；搜尋關鍵字：`b2-hint-wrap`、`width:28px`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B2 — 零用錢日記（Allowance Diary）
 > **系列**：B 預算規劃

@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                         ${diff === 'hard' ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
                         <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-left:auto;">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display='none'">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
                             <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
                         </span>
                     </div>

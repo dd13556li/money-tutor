@@ -414,3 +414,41 @@
 | B4 記憶模式語音重聽按鈕（Round 45）| B4 | `_startMemoryCountdown` 模糊後加 `#b4-mem-replay`（`.b4-mem-replay-btn`，fixed top:76px right:12px）；click 呼叫 `Game.Speech.speak` 所有店家價格；2s disable 防連按；搜尋 `b4-mem-replay`、`b4-mem-replay-btn` |
 | B5 朗讀已選清單按鈕（Round 45）| B5 | `#b5-read-selected-btn`（`.b5-read-selected-btn`，藍色膠囊）；`_bindRoundEvents` 綁定：朗讀必買+已選商品名稱/價格+合計；插於 hint-btn 和 confirm-btn 之間；搜尋 `b5-read-selected-btn`、`朗讀已選` |
 | B6 切換至已完成攤位 toast（Round 45）| B6 | 攤位切換時偵測 `destDone`；已完成→底部顯示 `.b6-stall-done-toast`「✅ X攤位 已收集完畢！」；1s 後 `.b6-sdt-fade` 淡出，1.6s 後移除；搜尋 `b6-stall-done-toast`、`b6-sdt-fade` |
+
+### B 系列 B3 對齊改進（2026-04-03 ~ 2026-04-04）
+
+以 B3 為基準，對 B1、B2、B4、B5、B6 做跨單元統一改進，主要涵蓋四個面向：
+
+#### 1. 錯誤語音格式統一
+
+| 單元 | 改進 | 搜尋關鍵字 |
+|------|------|-----------|
+| B1 | 確認時金額不足→「不對喔，你付的錢太少，請再試一次」 | `不對喔，你付的錢太少` |
+| B2 | easy 錯誤改「不對喔，算太多了/太少了，請再試一次」（`b2EasyErrDir`）；hard 同格式統一 | `b2EasyErrDir`、`不對喔，算太多了` |
+| B4 | 選最便宜「不對喔，請再比較看看」；排序「不對喔，請看看正確的排序」；差額「不對喔，差額是X元，請再試一次」 | `不對喔，請再比較看看`、`不對喔，差額是` |
+| B5 | 超出預算「不對喔，超出預算了，多了X元，請再試一次！」；必買未選「不對喔，記得要選所有必買的商品喔！」 | `不對喔，超出預算了`、`不對喔，記得要選` |
+| B6 | 找零「不對喔，找零算太多了/太少了，請再試一次」（`b6ChangeDir`） | `b6ChangeDir`、`不對喔，找零算` |
+
+#### 2. 提示語音格式統一（N個X元 + 逗號分隔）
+
+| 單元 | 改進 | 搜尋關鍵字 |
+|------|------|-----------|
+| B1 | `_showCoinHint()` 改「可以用N個X元，M個Y元」（B3 pattern） | `可以用`、`parts.join('，')` |
+| B6 | `_showPaymentHint()` 改「可以用N個X元，M個Y元」（`speechParts` 變數） | `speechParts`、`可以用` |
+| B3 | 分隔符 `、` → `，`；數量永遠顯示（含 1 個） | `可以存入.*個.*元` |
+
+#### 3. 提示按鈕 + 吉祥物系統統一
+
+| 單元 | 改進 | 搜尋關鍵字 |
+|------|------|-----------|
+| B1 | `_renderWalletArea` 的 `hintWrap` 擴展至普通/困難（原本只有困難）；吉祥物 28px | `b1-hint-wrap` |
+| B2 | 日記標題列新增 `b2-hint-btn` + 吉祥物；3 次錯誤後自動觸發；吉祥物修正為 28px（原 24px） | `b2-hint-btn`、`b2-hint-wrap`、`width:28px` |
+| B4 | `b4-diff-hint-btn` 外包裹吉祥物；三商店 3 次錯誤自動提示（`tripleAutoHint`）；差額漸進提示（`diffErrorCount`） | `b4-diff-hint-btn`、`tripleAutoHint`、`diffErrorCount` |
+| B5 | `b5-hint-btn` 外包裹吉祥物；3 次錯誤自動觸發（`roundErrors`）；提示語音加商品價格（`nameWithPrice`） | `b5-hint-btn`、`roundErrors`、`nameWithPrice` |
+| B6 | 付款提示按鈕外包裹吉祥物 | `b6-hint-btn`（wrapper） |
+
+#### 4. Ghost Slot 放置引導（B1 對齊 B3）
+
+| 單元 | 改進 | 搜尋關鍵字 |
+|------|------|-----------|
+| B1 | 按提示後錢包顯示淡化 ghost slots（`b1-wallet-ghost-slot`）；`addCoin()` 只允許匹配面額（防隱形幣）；`_updateWalletStatusOnly()` 防閃爍 | `b1-wallet-ghost-slot`、`showHint`、`hintSlots`、`_updateWalletStatusOnly` |

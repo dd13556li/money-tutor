@@ -450,6 +450,7 @@ toolbarConfig: {
 | B2 提示按鈕擴展至簡單模式（2026-04-04）| B2 | `_renderQuestionHTML` 移除 `diff !== 'easy'` 條件，三難度均顯示 `b2-hint-btn` + 吉祥物；點後播完整計算過程語音；搜尋 `b2-hint-wrap`（無 diff 條件） |
 | B4 差額漸進提示（2026-04-04）| B4 | 新增 `quiz.diffErrorCount`（`nextQuestion()` 重置）；第1~2次錯：方向提示「算多了/少了，再想想看」不透露答案；第3次起：顯示算式 + 說出答案；三商店差額段同步套用（`revealTriple`）；困難提示按鈕語音改完整問句「A店X元，B店Y元，兩者差多少元？」；搜尋 `diffErrorCount`、`revealAnswer`、`revealTriple`、`兩者差多少元` |
 | B5 提示語音含商品價格（2026-04-04）| B5 | `_showBudgetHint` 可負擔清單改為 `nameWithPrice`：`${i.name}${toTWD(i.price)}`；搜尋 `nameWithPrice` |
+| B2 吉祥物圖示尺寸修正（2026-04-04）| B2 | `b2-hint-wrap` 內 `educated_money_bag_character.png` 從 `width:24px;height:24px` 改為 `width:28px;height:28px`，與全 B 系列一致；搜尋 `b2-hint-wrap`、`width:28px` |
 
 ---
 
