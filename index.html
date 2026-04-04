@@ -87,6 +87,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
@@ -284,8 +285,20 @@
         /* 響應式設計 */
         @media (max-width: 768px) {
             h1 { font-size: 2.5em; }
-            .tabs { flex-direction: column; border-radius: var(--radius); gap: 5px; }
-            .tab-btn { width: 100%; text-align: center; }
+            .tabs {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: var(--radius);
+                gap: 8px;
+                justify-content: flex-start;
+            }
+            .tab-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+                font-size: 1.1em;
+            }
             .unit-grid { grid-template-columns: 1fr; }
         }
     </style>

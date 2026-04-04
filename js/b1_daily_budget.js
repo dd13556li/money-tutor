@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', sceneCategory: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', sceneCategory: null, timerEnabled: false },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -346,6 +346,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
+                            <label class="b-setting-label">⏱ 計時器</label>
+                            <div class="b-btn-group" id="timer-group">
+                                <button class="b-sel-btn${this.state.settings.timerEnabled ? ' active' : ''}" data-timer="on">✓ 啟用</button>
+                                <button class="b-sel-btn${!this.state.settings.timerEnabled ? ' active' : ''}" data-timer="off">✗ 停用</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                啟用後每題有倒數時間，時間到自動顯示答案
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
                             <label class="b-setting-label">📝 作業單</label>
                             <div class="b-btn-group">
                                 <a href="#" id="settings-worksheet-link" class="b-sel-btn"
@@ -457,6 +467,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
 
+            document.querySelectorAll('#timer-group .b-sel-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#timer-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.timerEnabled = btn.dataset.timer === 'on';
+                }, {}, 'settings');
+            });
+
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
@@ -563,22 +581,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindQuestionEvents(curr);
             this._showTaskModal(curr, diff);
-            // 行程卡倒數計時器（Round 44）
-            Game.TimerManager.setTimeout(() => this._startRouteTimer(curr), 2200, 'countdown');
+            // 行程卡倒數計時器（設定頁啟用才觸發）
+            if (this.state.settings.timerEnabled) {
+                Game.TimerManager.setTimeout(() => this._startRouteTimer(curr), 2200, 'countdown');
+            }
 
-            // 語音播報
+            // 語音由 _showTaskModal 播放（帶 callback 關閉彈窗），此處記錄供重播用
             Game.TimerManager.setTimeout(() => {
                 const names = curr.items.map(it => it.name).join('、');
                 let text;
                 if (diff === 'easy') {
-                    text = `今天要去${curr.label}，需要準備${names}`;
+                    text = `今天要去：${curr.label}，需要準備${names}`;
                 } else if (diff === 'normal') {
-                    text = `今天要去${curr.label}，需要準備${names}，把錢幣放進錢包。`;
+                    text = `今天要去：${curr.label}，需要準備${names}，把錢幣放進錢包。`;
                 } else {
-                    text = `今天要去${curr.label}，需要準備${names}，自己算好總金額！`;
+                    text = `今天要去：${curr.label}，需要準備${names}，自己算好總金額！`;
                 }
                 this.state.quiz.lastSpeechText = text;
-                Game.Speech.speak(text);
             }, 400, 'speech');
             // 簡單模式：彈窗關閉後逐項播報費用（C2 逐項朗讀 pattern，Round 42）
             if (diff === 'easy') {
@@ -944,7 +963,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
                 denomSummaryEl.innerHTML = Object.entries(counts)
                     .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
-                    .map(([d, n]) => `<span class="b1-ds-item">${d}元×${n}</span>`).join('');
+                    .map(([d, n]) => {
+                        const isBill = parseInt(d) >= 100;
+                        const imgSize = isBill ? '36px' : '28px';
+                        return Array.from({ length: n }, () =>
+                            `<span class="b1-ds-item"><img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;vertical-align:middle;" draggable="false" alt="${d}元"></span>`
+                        ).join('');
+                    }).join('');
                 denomSummaryEl.style.display = '';
             } else if (denomSummaryEl) {
                 denomSummaryEl.style.display = 'none';
@@ -1008,7 +1033,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
                 denomSummaryEl.innerHTML = Object.entries(counts)
                     .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
-                    .map(([d, n]) => `<span class="b1-ds-item">${d}元×${n}</span>`).join('');
+                    .map(([d, n]) => {
+                        const isBill = parseInt(d) >= 100;
+                        const imgSize = isBill ? '36px' : '28px';
+                        return Array.from({ length: n }, () =>
+                            `<span class="b1-ds-item"><img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;vertical-align:middle;" draggable="false" alt="${d}元"></span>`
+                        ).join('');
+                    }).join('');
                 denomSummaryEl.style.display = '';
             }
         },
@@ -1317,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const existing = document.getElementById('b1-task-modal');
             if (existing) existing.remove();
             const totalText = (diff !== 'hard')
-                ? `<div class="b1-task-amount">${toTWD(curr.total)}</div>`
+                ? `<div class="b1-task-amount">${curr.total} 元</div>`
                 : `<div class="b1-task-amount-q">？ 元</div>`;
             const modal = document.createElement('div');
             modal.id = 'b1-task-modal';
@@ -1325,15 +1356,26 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.innerHTML = `
                 <div class="b1-task-modal-inner">
                     <div class="b1-task-modal-icon">${curr.icon}</div>
-                    <div class="b1-task-modal-dest">今天要去 ${curr.label}</div>
+                    <div class="b1-task-modal-dest">今天要去：${curr.label}</div>
                     ${totalText}
                     <div class="b1-task-modal-tap">點任意處繼續</div>
                 </div>`;
             document.body.appendChild(modal);
-            modal.addEventListener('click', () => modal.remove());
+            const closeModal = () => { if (document.body.contains(modal)) modal.remove(); };
+            modal.addEventListener('click', closeModal);
+            // 語音播完後自動關閉（400ms 後語音才開始，需等語音結束）
             Game.TimerManager.setTimeout(() => {
-                if (document.body.contains(modal)) modal.remove();
-            }, 2000, 'ui');
+                const names = curr.items.map(it => it.name).join('、');
+                let text;
+                if (diff === 'easy') {
+                    text = `今天要去：${curr.label}，需要準備${names}`;
+                } else if (diff === 'normal') {
+                    text = `今天要去：${curr.label}，需要準備${names}，把錢幣放進錢包。`;
+                } else {
+                    text = `今天要去：${curr.label}，需要準備${names}，自己算好總金額！`;
+                }
+                Game.Speech.speak(text, closeModal);
+            }, 400, 'ui');
         },
 
         // ── Hint ───────────────────────────────────────────────
