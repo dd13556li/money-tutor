@@ -6,64 +6,71 @@
 
 // ── 場景資料庫（含 category 欄位供類別篩選）──────────────────────
 // 類別：school（學校）| food（飲食）| outdoor（戶外）| entertainment（娛樂）| shopping（購物）
+// 每個 item 以 min/max 定義價格區間，由 _generateQuestions 隨機取值（5元倍數）
 const B1_SCENARIOS = {
     easy: [
-        { icon:'🏫', label:'去學校',   cat:'school',        items:[{ name:'午餐費', cost:50  }] },
-        { icon:'🏪', label:'去超商',   cat:'shopping',      items:[{ name:'飲料',   cost:25  }] },
-        { icon:'📚', label:'圖書館',   cat:'school',        items:[{ name:'影印費', cost:10  }] },
-        { icon:'🎭', label:'看表演',   cat:'entertainment', items:[{ name:'門票',   cost:100 }] },
-        { icon:'🏊', label:'游泳課',   cat:'outdoor',       items:[{ name:'入場費', cost:80  }] },
-        { icon:'🎨', label:'美術課',   cat:'school',        items:[{ name:'材料費', cost:30  }] },
-        { icon:'🚌', label:'搭公車',   cat:'school',        items:[{ name:'公車費', cost:15  }] },
-        { icon:'🌿', label:'逛公園',   cat:'outdoor',       items:[{ name:'停車費', cost:20  }] },
-        { icon:'☕', label:'買早餐',   cat:'food',          items:[{ name:'早餐',   cost:35  }] },
-        { icon:'🐟', label:'買魚飼料', cat:'shopping',      items:[{ name:'飼料',   cost:45  }] },
-        { icon:'🎬', label:'看電影',   cat:'entertainment', items:[{ name:'票價',   cost:120 }] },
-        { icon:'🍜', label:'吃點心',   cat:'food',          items:[{ name:'點心',   cost:40  }] },
-        { icon:'🛒', label:'買文具',   cat:'shopping',      items:[{ name:'文具',   cost:55  }] },
-        { icon:'⛺', label:'踏青',     cat:'outdoor',       items:[{ name:'門票',   cost:60  }] },
+        { icon:'🏫', label:'去學校',    cat:'school',        items:[{ name:'午餐費',   min:40,  max:65  }] },
+        { icon:'🏪', label:'去超商',    cat:'shopping',      items:[{ name:'飲料費',   min:20,  max:35  }] },
+        { icon:'📚', label:'圖書館',    cat:'school',        items:[{ name:'影印費',   min:5,   max:20  }] },
+        { icon:'🎭', label:'看表演',    cat:'entertainment', items:[{ name:'表演票',   min:80,  max:150 }] },
+        { icon:'🏊', label:'游泳課',    cat:'outdoor',       items:[{ name:'入場費',   min:60,  max:100 }] },
+        { icon:'🎨', label:'美術課',    cat:'school',        items:[{ name:'材料費',   min:25,  max:50  }] },
+        { icon:'🚌', label:'搭公車',    cat:'school',        items:[{ name:'公車票',   min:15,  max:30  }] },
+        { icon:'🌿', label:'逛公園',    cat:'outdoor',       items:[{ name:'停車費',   min:15,  max:30  }] },
+        { icon:'☕', label:'買早餐',    cat:'food',          items:[{ name:'早餐費',   min:25,  max:55  }] },
+        { icon:'🐟', label:'買魚飼料',  cat:'shopping',      items:[{ name:'飼料費',   min:35,  max:65  }] },
+        { icon:'🎬', label:'看電影',    cat:'entertainment', items:[{ name:'電影票',   min:100, max:160 }] },
+        { icon:'🍜', label:'吃點心',    cat:'food',          items:[{ name:'點心費',   min:30,  max:60  }] },
+        { icon:'🛒', label:'買文具',    cat:'shopping',      items:[{ name:'文具費',   min:40,  max:75  }] },
+        { icon:'⛺', label:'踏青',      cat:'outdoor',       items:[{ name:'門票費',   min:50,  max:80  }] },
+        { icon:'🍦', label:'買冰淇淋',  cat:'food',          items:[{ name:'冰淇淋費', min:20,  max:50  }] },
+        { icon:'🎮', label:'電玩體驗',  cat:'entertainment', items:[{ name:'遊戲費',   min:30,  max:60  }] },
+        { icon:'🌸', label:'賞花展',    cat:'outdoor',       items:[{ name:'門票費',   min:50,  max:100 }] },
+        { icon:'🐾', label:'寵物店',    cat:'shopping',      items:[{ name:'零食費',   min:30,  max:60  }] },
     ],
     normal: [
-        { icon:'🏫', label:'上學日',   cat:'school',        items:[{ name:'午餐費', cost:60  }, { name:'公車費', cost:20  }] },
-        { icon:'🎨', label:'才藝課',   cat:'school',        items:[{ name:'課程費', cost:150 }, { name:'材料費', cost:50  }] },
-        { icon:'🏥', label:'看醫生',   cat:'school',        items:[{ name:'掛號費', cost:150 }, { name:'藥費',   cost:80  }] },
-        { icon:'🎬', label:'看電影',   cat:'entertainment', items:[{ name:'票價',   cost:280 }, { name:'爆米花', cost:90  }] },
-        { icon:'🚂', label:'搭火車',   cat:'outdoor',       items:[{ name:'票價',   cost:250 }, { name:'便當',   cost:75  }] },
-        { icon:'🏊', label:'去游泳',   cat:'outdoor',       items:[{ name:'入場費', cost:80  }, { name:'飲料',   cost:25  }] },
-        { icon:'📖', label:'買書',     cat:'shopping',      items:[{ name:'故事書', cost:180 }, { name:'文具',   cost:45  }] },
-        { icon:'🌄', label:'爬山',     cat:'outdoor',       items:[{ name:'門票',   cost:100 }, { name:'食物',   cost:120 }] },
-        { icon:'🎮', label:'遊樂場',   cat:'entertainment', items:[{ name:'門票',   cost:200 }, { name:'遊戲',   cost:50  }] },
-        { icon:'🍜', label:'吃午飯',   cat:'food',          items:[{ name:'午餐',   cost:85  }, { name:'飲料',   cost:30  }] },
-        { icon:'🏫', label:'補習班',   cat:'school',        items:[{ name:'課程費', cost:200 }, { name:'文具費', cost:30  }] },
-        { icon:'🍰', label:'下午茶',   cat:'food',          items:[{ name:'飲料',   cost:55  }, { name:'點心',   cost:65  }] },
-        { icon:'🛒', label:'買玩具',   cat:'shopping',      items:[{ name:'玩具',   cost:280 }, { name:'電池',   cost:45  }] },
-        { icon:'🎡', label:'遊樂場',   cat:'entertainment', items:[{ name:'入場費', cost:150 }, { name:'零食',   cost:60  }] },
+        { icon:'🏫', label:'上學日',    cat:'school',        items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
+        { icon:'🎨', label:'才藝課',    cat:'school',        items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }] },
+        { icon:'🏥', label:'看醫生',    cat:'school',        items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }] },
+        { icon:'🎬', label:'看電影',    cat:'entertainment', items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }] },
+        { icon:'🚂', label:'搭火車',    cat:'outdoor',       items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }] },
+        { icon:'🏊', label:'去游泳',    cat:'outdoor',       items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }] },
+        { icon:'📖', label:'買書',      cat:'shopping',      items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
+        { icon:'🌄', label:'爬山',      cat:'outdoor',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }] },
+        { icon:'🎮', label:'遊樂場',    cat:'entertainment', items:[{ name:'門票費',  min:150, max:260 }, { name:'零食費',  min:40,  max:80  }] },
+        { icon:'🍜', label:'吃午飯',    cat:'food',          items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🏫', label:'補習班',    cat:'school',        items:[{ name:'課程費',  min:150, max:300 }, { name:'文具費',  min:20,  max:55  }] },
+        { icon:'🍰', label:'下午茶',    cat:'food',          items:[{ name:'飲料費',  min:45,  max:80  }, { name:'點心費',  min:50,  max:95  }] },
+        { icon:'🛒', label:'買玩具',    cat:'shopping',      items:[{ name:'玩具費',  min:200, max:400 }, { name:'電池費',  min:35,  max:65  }] },
+        { icon:'🎡', label:'遊樂場',    cat:'entertainment', items:[{ name:'入場費',  min:120, max:210 }, { name:'零食費',  min:45,  max:85  }] },
+        { icon:'🍣', label:'吃壽司',    cat:'food',          items:[{ name:'壽司費',  min:150, max:300 }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🥐', label:'買麵包',    cat:'food',          items:[{ name:'麵包費',  min:40,  max:75  }, { name:'咖啡費',  min:45,  max:80  }] },
+        { icon:'💇', label:'去剪髮',    cat:'shopping',      items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }] },
+        { icon:'🐠', label:'水族館',    cat:'outdoor',       items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
     ],
     hard: [
-        { icon:'🛒', label:'大採購',   cat:'shopping',      items:[{ name:'衣服', cost:350 }, { name:'鞋子',   cost:490 }, { name:'書',    cost:180 }] },
-        { icon:'🎂', label:'買禮物',   cat:'shopping',      items:[{ name:'禮物', cost:280 }, { name:'蛋糕',   cost:420 }, { name:'卡片',  cost:35  }] },
-        { icon:'🌿', label:'出遊',     cat:'outdoor',       items:[{ name:'公車費', cost:20 }, { name:'冰淇淋', cost:45  }, { name:'門票', cost:100 }, { name:'飲料', cost:30 }] },
-        { icon:'🏕️', label:'露營',    cat:'outdoor',       items:[{ name:'食材', cost:350 }, { name:'裝備費', cost:200 }, { name:'入場費', cost:150 }] },
-        { icon:'🎡', label:'遊樂園',   cat:'entertainment', items:[{ name:'門票', cost:580 }, { name:'餐費',   cost:250 }, { name:'紀念品', cost:180 }] },
-        { icon:'🌍', label:'校外教學', cat:'school',        items:[{ name:'車費', cost:80  }, { name:'午餐',   cost:120 }, { name:'門票', cost:200 }, { name:'零用', cost:100 }] },
-        { icon:'🎓', label:'畢業典禮', cat:'school',        items:[{ name:'服裝', cost:450 }, { name:'花束',   cost:280 }, { name:'聚餐', cost:350 }] },
-        { icon:'🏖️', label:'去海邊',  cat:'outdoor',       items:[{ name:'防曬乳', cost:180 }, { name:'餐費', cost:300 }, { name:'停車費', cost:100 }, { name:'飲料', cost:60 }] },
-        { icon:'🍱', label:'辦桌聚餐', cat:'food',          items:[{ name:'餐費', cost:450 }, { name:'飲料',   cost:120 }, { name:'甜點',  cost:150 }] },
-        { icon:'🏫', label:'暑期課程', cat:'school',        items:[{ name:'課程費', cost:500 }, { name:'教材費', cost:180 }, { name:'午餐費', cost:120 }] },
-        { icon:'🛍️', label:'換季採購', cat:'shopping',      items:[{ name:'外套', cost:680 }, { name:'褲子',   cost:350 }, { name:'包包',  cost:420 }] },
-        // 追加（2026-03-29）
-        { icon:'🍣', label:'吃壽司',   cat:'food',          items:[{ name:'迴轉壽司', cost:180 }, { name:'飲料', cost:30 }] },
-        { icon:'🍦', label:'吃冰淇淋', cat:'food',          items:[{ name:'冰淇淋', cost:55  }, { name:'飲料', cost:25  }] },
-        { icon:'🍕', label:'吃披薩',   cat:'food',          items:[{ name:'披薩', cost:350 }, { name:'飲料', cost:60 }, { name:'甜點', cost:80 }] },
-        { icon:'🥐', label:'買麵包',   cat:'food',          items:[{ name:'麵包', cost:45  }, { name:'咖啡', cost:55  }] },
-        { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', items:[{ name:'包廂費', cost:400 }, { name:'飲料費', cost:120 }, { name:'小食', cost:80 }] },
-        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', cost:150 }, { name:'租鞋費', cost:50 }] },
-        { icon:'🎰', label:'夾娃娃機', cat:'entertainment', items:[{ name:'投幣費', cost:100 }] },
-        { icon:'🧸', label:'逛玩具展', cat:'entertainment', items:[{ name:'門票', cost:200 }, { name:'紀念品', cost:150 }, { name:'餐費', cost:120 }] },
-        { icon:'💇', label:'去剪髮',   cat:'shopping',      items:[{ name:'剪髮費', cost:200 }] },
-        { icon:'📱', label:'買手機殼', cat:'shopping',      items:[{ name:'手機殼', cost:180 }, { name:'保護貼', cost:50 }] },
-        { icon:'🏋️', label:'健身房',  cat:'outdoor',       items:[{ name:'會員費', cost:350 }, { name:'運動飲料', cost:35 }] },
-        { icon:'🎻', label:'音樂課',   cat:'school',        items:[{ name:'課程費', cost:400 }, { name:'樂器耗材', cost:80 }] },
+        { icon:'🛒', label:'大採購',    cat:'shopping',      items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
+        { icon:'🎂', label:'買禮物',    cat:'shopping',      items:[{ name:'禮物費',  min:200, max:400 }, { name:'蛋糕費',  min:350, max:520 }, { name:'卡片費',  min:25,  max:55  }] },
+        { icon:'🌿', label:'出遊',      cat:'outdoor',       items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費', min:80,  max:160 }, { name:'飲料費', min:25,  max:50 }] },
+        { icon:'🏕️', label:'露營',     cat:'outdoor',       items:[{ name:'食材費',  min:280, max:440 }, { name:'裝備費',  min:150, max:300 }, { name:'入場費',  min:120, max:210 }] },
+        { icon:'🎡', label:'遊樂園',    cat:'entertainment', items:[{ name:'門票費',  min:450, max:720 }, { name:'餐費',    min:200, max:340 }, { name:'紀念品費', min:150, max:260 }] },
+        { icon:'🌍', label:'校外教學',  cat:'school',        items:[{ name:'交通費',  min:60,  max:130 }, { name:'午餐費',  min:90,  max:160 }, { name:'門票費',  min:150, max:300 }, { name:'零用錢', min:80,  max:160 }] },
+        { icon:'🎓', label:'畢業典禮',  cat:'school',        items:[{ name:'服裝費',  min:380, max:580 }, { name:'花束費',  min:200, max:400 }, { name:'聚餐費',  min:280, max:450 }] },
+        { icon:'🏖️', label:'去海邊',   cat:'outdoor',       items:[{ name:'防曬乳',  min:150, max:260 }, { name:'餐費',    min:250, max:400 }, { name:'停車費',  min:80,  max:160 }, { name:'飲料費', min:50,  max:90 }] },
+        { icon:'🍱', label:'聚餐',      cat:'food',          items:[{ name:'餐費',    min:380, max:580 }, { name:'飲料費',  min:100, max:180 }, { name:'甜點費',  min:120, max:210 }] },
+        { icon:'🏫', label:'暑期課程',  cat:'school',        items:[{ name:'課程費',  min:400, max:680 }, { name:'教材費',  min:150, max:260 }, { name:'午餐費',  min:80,  max:160 }] },
+        { icon:'🛍️', label:'換季採購',  cat:'shopping',      items:[{ name:'外套費',  min:550, max:850 }, { name:'褲子費',  min:280, max:450 }, { name:'包包費',  min:350, max:580 }] },
+        { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', items:[{ name:'包廂費',  min:320, max:530 }, { name:'飲料費',  min:100, max:190 }, { name:'小食費',  min:60,  max:130 }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:75  }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🧸', label:'逛玩具展',  cat:'entertainment', items:[{ name:'門票費',  min:150, max:300 }, { name:'紀念品費', min:120, max:220 }, { name:'餐費',   min:100, max:180 }] },
+        { icon:'📱', label:'買手機殼',  cat:'shopping',      items:[{ name:'手機殼',  min:150, max:260 }, { name:'保護貼',  min:40,  max:75  }, { name:'充電線',  min:80,  max:160 }] },
+        { icon:'🎻', label:'音樂課',    cat:'school',        items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費', min:80,  max:160 }] },
+        { icon:'🍕', label:'吃披薩',    cat:'food',          items:[{ name:'披薩費',  min:280, max:440 }, { name:'飲料費',  min:50,  max:90  }, { name:'甜點費',  min:60,  max:110 }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費', min:30,  max:60  }] },
+        { icon:'🐠', label:'海生館',    cat:'outdoor',       items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
+        { icon:'🎠', label:'親子遊',    cat:'entertainment', items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
     ]
 };
 
@@ -76,6 +83,9 @@ const DENOM_BY_DIFF = {
 // ── 金額語音轉換（安全版）──────────────────────────────────────
 const toTWD = v => typeof convertToTraditionalCurrency === 'function'
     ? convertToTraditionalCurrency(v) : `${v}元`;
+
+// ── 場景標籤去除重複「去」前綴（避免「今天要去：去游泳」）────────
+const fmtLabel = label => label.replace(/^去/, '');
 
 // ── 主遊戲物件 ─────────────────────────────────────────────────
 let Game;
@@ -200,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', sceneCategory: null, timerEnabled: false },
+            settings: { difficulty: null, questionCount: null, retryMode: 'retry', clickMode: 'off', sceneCategory: null, timerEnabled: false, customItemsEnabled: false },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -314,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🗂️ 場景類別</label>
                             <div class="b-btn-group" id="cat-group" style="flex-wrap:wrap;">
-                                <button class="b-sel-btn" data-cat="all">全部 🎲</button>
+                                <button class="b-sel-btn" data-cat="all">隨機 🎲</button>
                                 <button class="b-sel-btn" data-cat="school">學校 🏫</button>
                                 <button class="b-sel-btn" data-cat="food">飲食 🍜</button>
                                 <button class="b-sel-btn" data-cat="outdoor">戶外 🌿</button>
@@ -323,6 +333,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div style="margin-top:4px;font-size:12px;color:#6b7280;">
                                 選擇特定類別可以專注練習該情境的金額計算
+                            </div>
+                            <div id="custom-items-toggle-row" style="display:none;margin-top:10px;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂項目</label>
+                                <div class="b-btn-group" id="custom-items-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-custom="off">關閉</button>
+                                    <button class="b-sel-btn" data-custom="on">開啟</button>
+                                </div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                    開啟後，可在測驗頁面新增或刪除項目，系統將依自訂項目計算所需金額
+                                </div>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -333,26 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-count="10">10題</button>
                                 <button class="b-sel-btn" data-count="15">15題</button>
                                 <button class="b-sel-btn" data-count="20">20題</button>
-                            </div>
-                        </div>
-                        <div class="b-setting-group" id="mode-settings-group">
-                            <label class="b-setting-label">🔄 作答模式</label>
-                            <div class="b-btn-group" id="mode-group">
-                                <button class="b-sel-btn" data-mode="retry">反複作答</button>
-                                <button class="b-sel-btn" data-mode="proceed">單次作答</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                反複作答：答錯可以再試 ｜ 單次作答：顯示答案後繼續下一題
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
-                            <label class="b-setting-label">⏱ 計時器</label>
-                            <div class="b-btn-group" id="timer-group">
-                                <button class="b-sel-btn${this.state.settings.timerEnabled ? ' active' : ''}" data-timer="on">✓ 啟用</button>
-                                <button class="b-sel-btn${!this.state.settings.timerEnabled ? ' active' : ''}" data-timer="off">✗ 停用</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                啟用後每題有倒數時間，時間到自動顯示答案
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -420,15 +420,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         desc.classList.add('show');
                     }
                     // 輔助點擊：只有簡單模式才顯示
-                    const assistGroup = document.getElementById('assist-click-group');
-                    const modeGroup   = document.getElementById('mode-settings-group');
+                    const assistGroup  = document.getElementById('assist-click-group');
+                    const modeGroup    = document.getElementById('mode-settings-group');
+                    const customRow    = document.getElementById('custom-items-toggle-row');
                     if (btn.dataset.diff === 'easy') {
                         if (assistGroup) assistGroup.style.display = '';
                         if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
+                        // 簡單模式：隱藏自訂項目，重設為關閉
+                        if (customRow) customRow.style.display = 'none';
+                        this.state.settings.customItemsEnabled = false;
+                        document.querySelectorAll('#custom-items-group [data-custom]').forEach(b => {
+                            b.classList.toggle('active', b.dataset.custom === 'off');
+                        });
                     } else {
                         if (assistGroup) assistGroup.style.display = 'none';
                         this.state.settings.clickMode = 'off';
                         if (modeGroup) modeGroup.style.display = '';
+                        // 普通/困難：顯示自訂項目切換列
+                        if (customRow) customRow.style.display = '';
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -444,15 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            // 作答模式
-            document.querySelectorAll('[data-mode]').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.retryMode = btn.dataset.mode;
-                    this._checkCanStart();
-                }, {}, 'settings');
-            });
 
             Game.EventManager.on(document.getElementById('settings-reward-link'), 'click', (e) => {
                 e.preventDefault();
@@ -467,13 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=900,height=700');
             }, {}, 'settings');
 
-            document.querySelectorAll('#timer-group .b-sel-btn').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#timer-group .b-sel-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.timerEnabled = btn.dataset.timer === 'on';
-                }, {}, 'settings');
-            });
 
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -488,6 +481,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
+            // 自訂項目切換
+            document.querySelectorAll('#custom-items-group [data-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#custom-items-group [data-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
+                }, {}, 'settings');
+            });
+
             // 開始
             Game.EventManager.on(document.getElementById('start-btn'), 'click', () => {
                 this.startGame();
@@ -497,8 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
-            const retryOk = (s.difficulty === 'easy' && s.clickMode === 'on') || !!s.retryMode;
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !retryOk || !s.sceneCategory;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.sceneCategory;
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -521,6 +522,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isProcessing  = false;
 
             Game.Debug.log('init', `開始遊戲 diff=${s.difficulty} count=${q.totalQuestions}`);
+            // 立即清空設定頁，讓彈窗出現在乾淨背景上
+            const app = document.getElementById('app');
+            if (app) app.innerHTML = '';
             this.renderQuestion();
         },
 
@@ -532,79 +536,633 @@ document.addEventListener('DOMContentLoaded', () => {
             const filtered = (cat && cat !== 'all')
                 ? allScenarios.filter(s => s.cat === cat)
                 : allScenarios;
-            const basePool = filtered.length > 0 ? filtered : allScenarios; // 防空集合回退
+            const basePool = filtered.length > 0 ? filtered : allScenarios;
             const pool     = [...basePool];
             const result   = [];
 
+            // 隨機取 min~max 範圍內的金額，四捨五入至 5 元倍數
+            const randCost = (min, max) => Math.round((min + Math.random() * (max - min)) / 5) * 5 || 5;
+
             for (let i = 0; i < count; i++) {
-                if (pool.length === 0) {
-                    // 補滿：重新洗牌原始資料
-                    pool.push(...basePool);
-                }
+                if (pool.length === 0) pool.push(...basePool);
                 const idx = Math.floor(Math.random() * pool.length);
                 const scenario = pool.splice(idx, 1)[0];
-                const total = scenario.items.reduce((s, item) => s + item.cost, 0);
-                result.push({ ...scenario, total });
+                // 依 min/max 隨機化各項金額（舊格式 cost 直接保留作相容）
+                const items = scenario.items.map(it =>
+                    it.min != null
+                        ? { name: it.name, cost: randCost(it.min, it.max) }
+                        : { name: it.name, cost: it.cost }
+                );
+                const total = items.reduce((s, it) => s + it.cost, 0);
+                result.push({ icon: scenario.icon, label: scenario.label, cat: scenario.cat, items, total });
             }
             Game.Debug.log('question', `產生題目 ${result.length} 題（類別：${cat}）`);
             return result;
         },
 
+        // ── 自訂項目合併 helpers ────────────────────────────────
+        _getEffectiveItems(curr) {
+            const q = this.state.quiz;
+            const base   = curr.items.filter(it => !it._deleted);
+            const custom = (q.customItems || []).filter(it => !it._deleted);
+            return [...base, ...custom];
+        },
+
+        _getEffectiveTotal(curr) {
+            return this._getEffectiveItems(curr).reduce((s, it) => s + it.cost, 0);
+        },
+
         // ── Render Question ────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
-            Game.EventManager.removeByCategory('gameUI');
+            Game.EventManager.removeAll();
             AssistClick.deactivate();
             this.state.isProcessing = false;
             this.state.wallet = [];
-            this.state.quiz.errorCount = 0;
-            this.state.quiz.showHint = false;
-            this.state.quiz.hintSlots = [];
+            const q = this.state.quiz;
+            q.errorCount = 0;
+            q.showHint   = false;
+            q.hintSlots  = [];
+            q.hardTotalInput = '';
+            q.walletRevealed = false;
+            q.customItems    = [];
+            q.phase = 1;
+            // 先顯示場景彈窗（只含目的地），關閉後再渲染 Phase 1
+            const curr = q.questions[q.currentQuestion];
+            // 重設自訂項目刪除旗標
+            if (curr && curr.items) curr.items.forEach(it => { it._deleted = false; });
+            this._showTaskModal(curr, () => this._renderPhase1());
+        },
+
+        // ── Phase 1：行程確認（看清單 / 計算總額）──────────────────
+        _renderPhase1() {
+            Game.TimerManager.clearByCategory('gameUI');
+            Game.EventManager.removeByCategory('gameUI');
 
             const q    = this.state.quiz;
             const curr = q.questions[q.currentQuestion];
             const diff = this.state.settings.difficulty;
+            const isHard = diff === 'hard';
             const app  = document.getElementById('app');
+            const useCustom = this.state.settings.customItemsEnabled && diff !== 'easy';
 
-            const showTotal = (diff !== 'hard');
+            // showTotal：easy & normal 顯示實際金額，hard 顯示???
+            const showTotal  = diff !== 'hard';
+            // showHintBtn：只有 hard 模式在行程卡顯示提示鈕
+            const showHintBtn = isHard;
 
             app.innerHTML = `
             ${this._renderHeader()}
             <div class="b-game-wrap">
-                ${this._renderScheduleCard(curr, showTotal)}
-                ${this._renderWalletArea(curr.total)}
-                <div style="display:flex;justify-content:center;margin:8px 0;">
-                    <button class="b1-confirm-btn" id="confirm-btn" disabled>✅ 準備好了，出發！</button>
-                </div>
-                ${this._renderCoinTray(diff)}
+                ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
+                ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
+                ${diff === 'easy'
+                    ? this._renderChoiceButtons(curr)
+                    : this._renderTotalInput(isHard, useCustom)
+                }
             </div>`;
 
-            this._bindQuestionEvents(curr);
-            this._showTaskModal(curr, diff);
-            // 行程卡倒數計時器（設定頁啟用才觸發）
+            this._bindPhase1Events(curr, diff);
+
+            // 彈窗關閉後朗讀費用明細
+            Game.TimerManager.setTimeout(() => {
+                const lbl = fmtLabel(curr.label);
+                const effectiveItems = this._getEffectiveItems(curr);
+                const effectiveTotal = this._getEffectiveTotal(curr);
+                const names = effectiveItems.map(it => it.name).join('、');
+                if (diff === 'easy') {
+                    const it = curr.items[0];
+                    Game.Speech.speak(`今天去${lbl}，${it.name}，${toTWD(it.cost)}，請選擇正確的答案。`);
+                } else if (diff === 'normal') {
+                    Game.Speech.speak(`今天去${lbl}，要準備${names}，總共${toTWD(effectiveTotal)}，請輸入正確的答案。`);
+                } else if (isHard) {
+                    Game.Speech.speak(`今天去${lbl}，要準備${names}，請計算總計的金額後，輸入正確的答案。`);
+                }
+            }, 300, 'speech');
+
             if (this.state.settings.timerEnabled) {
                 Game.TimerManager.setTimeout(() => this._startRouteTimer(curr), 2200, 'countdown');
             }
+        },
 
-            // 語音由 _showTaskModal 播放（帶 callback 關閉彈窗），此處記錄供重播用
-            Game.TimerManager.setTimeout(() => {
-                const names = curr.items.map(it => it.name).join('、');
-                let text;
-                if (diff === 'easy') {
-                    text = `今天要去：${curr.label}，需要準備${names}`;
-                } else if (diff === 'normal') {
-                    text = `今天要去：${curr.label}，需要準備${names}，把錢幣放進錢包。`;
-                } else {
-                    text = `今天要去：${curr.label}，需要準備${names}，自己算好總金額！`;
+        // ── Phase 2：準備錢幣（放置金錢）───────────────────────────
+        _renderPhase2(curr, diff) {
+            Game.TimerManager.clearByCategory('gameUI');
+            Game.EventManager.removeByCategory('gameUI');
+            this.state.quiz.phase = 2;
+
+            const isEasy = diff === 'easy';
+            const effectiveTotal = this._getEffectiveTotal(curr);
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            ${this._renderHeader()}
+            <div class="b-game-wrap">
+                ${this._renderPhase2RefCard(curr)}
+                ${this._renderWalletArea(effectiveTotal)}
+                ${!isEasy ? `<div style="display:flex;justify-content:center;margin:8px 0;">
+                    <button class="b1-confirm-btn" id="confirm-btn" ${diff === 'hard' ? '' : 'disabled'}>✅ 準備好了，出發！</button>
+                </div>` : ''}
+                ${this._renderCoinTray(diff)}
+            </div>`;
+
+            this._bindPhase2Events(curr);
+
+            Game.Speech.speak(`請準備${toTWD(effectiveTotal)}`);
+
+            // 簡單模式：自動顯示 ghost slot 提示（靜默，無語音/彈窗）
+            if (isEasy) {
+                Game.TimerManager.setTimeout(() => this._autoSetGhostSlots(curr), 300, 'ui');
+            }
+        },
+
+        // ── 靜默設定 ghost slots（簡單模式自動提示）──────────────
+        _autoSetGhostSlots(curr) {
+            const denoms  = DENOM_BY_DIFF[this.state.settings.difficulty] || DENOM_BY_DIFF.easy;
+            const optimal = this._calcOptimalCoins(this._getEffectiveTotal(curr), denoms);
+            const q = this.state.quiz;
+            q.showHint   = true;
+            q.hintSlots  = optimal.map(d => ({ denom: d, filled: false }));
+            this._updateWalletDisplay();
+        },
+
+        // ── Phase 2 迷你參考卡 ──────────────────────────────────────
+        _renderPhase2RefCard(curr) {
+            const diff = this.state.settings.difficulty;
+            const effectiveItems = this._getEffectiveItems(curr);
+            const effectiveTotal = this._getEffectiveTotal(curr);
+            const itemsSummary = effectiveItems.map(it => `${it.name} ${it.cost}元`).join('・');
+            const showHint = diff === 'normal' || diff === 'hard';
+            const hintWrap = showHint
+                ? `<div class="b1-pr-hint-wrap">
+                       <img src="../images/index/educated_money_bag_character.png" alt=""
+                            style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                       <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
+                   </div>`
+                : '';
+            return `
+            <div class="b1-phase2-ref">
+                <div class="b1-pr-top-row">
+                    <span class="b1-pr-icon">${curr.icon}</span>
+                    <div class="b1-pr-info">
+                        <span class="b1-pr-label">今天要去：${fmtLabel(curr.label)}</span>
+                        <span class="b1-pr-sub">${itemsSummary}</span>
+                    </div>
+                    ${hintWrap}
+                </div>
+                <div class="b1-pr-total-row">
+                    <div class="b1-pr-total">${effectiveTotal} 元</div>
+                </div>
+            </div>`;
+        },
+
+        // ── 普通/困難模式：總計輸入鍵盤 ─────────────────────────────
+        _renderTotalInput(isHard, useCustom) {
+            const calcBtn = isHard
+                ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle">🧮 開啟計算機</button>`
+                : '';
+            const calcPanel = isHard
+                ? `<div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">
+                       ${this._getCalculatorHTML()}
+                   </div>`
+                : '';
+            const customPreview = useCustom
+                ? `<div class="b1-ht-custom-preview" id="b1-ht-preview"></div>`
+                : '';
+            return `
+            <div class="b1-hard-total-area" id="b1-hard-total-area">
+                ${customPreview}
+                <div class="b1-ht-top-row">
+                    <div class="b1-ht-label">🧮 把每項金額加起來，總共需要幾元？</div>
+                    ${calcBtn}
+                </div>
+                <div class="b1-ht-total-row">
+                    <span class="b1-ht-total-label">總計</span>
+                    <div class="b1-ht-display" id="b1-ht-display">___</div>
+                    <span class="b1-ht-total-label">元</span>
+                </div>
+                <div class="b1-ht-numpad" id="b1-ht-numpad">
+                    <button class="b1-ht-digit" data-digit="1">1</button>
+                    <button class="b1-ht-digit" data-digit="2">2</button>
+                    <button class="b1-ht-digit" data-digit="3">3</button>
+                    <button class="b1-ht-digit" data-digit="4">4</button>
+                    <button class="b1-ht-digit" data-digit="5">5</button>
+                    <button class="b1-ht-digit" data-digit="6">6</button>
+                    <button class="b1-ht-digit" data-digit="7">7</button>
+                    <button class="b1-ht-digit" data-digit="8">8</button>
+                    <button class="b1-ht-digit" data-digit="9">9</button>
+                    <button class="b1-ht-digit b1-ht-back" data-digit="back">⌫</button>
+                    <button class="b1-ht-digit" data-digit="0">0</button>
+                    <button class="b1-ht-confirm" id="b1-ht-confirm">✓ 確認</button>
+                </div>
+                <div class="b1-ht-error" id="b1-ht-error" style="display:none"></div>
+                ${calcPanel}
+            </div>`;
+        },
+
+        // ── 自訂項目面板 HTML ──────────────────────────────────────
+        _renderCustomItemsPanel(curr) {
+            const rows = curr.items.map((it, i) => `
+                <div class="b1-cip-row" id="b1-cip-base-${i}">
+                    <span class="b1-cip-name">${it.name}</span>
+                    <span class="b1-cip-cost">${it.cost}元</span>
+                    <button class="b1-cip-del-btn" data-base-idx="${i}" title="刪除">✕</button>
+                </div>`).join('');
+            return `
+            <div class="b1-custom-items-panel" id="b1-custom-panel">
+                <div class="b1-cip-header">🛠️ 自訂行程項目</div>
+                <div id="b1-cip-base-list">${rows}</div>
+                <div id="b1-cip-custom-list"></div>
+                <div class="b1-cip-add-row">
+                    <input type="text" id="b1-cip-name-input" placeholder="項目名稱" maxlength="8"
+                           class="b1-cip-input">
+                    <input type="number" id="b1-cip-cost-input" placeholder="金額" min="1" max="9999"
+                           class="b1-cip-input b1-cip-cost-inp">
+                    <button class="b1-cip-add-btn" id="b1-cip-add-btn">＋ 新增</button>
+                </div>
+            </div>`;
+        },
+
+        // ── 即時更新自訂合計預覽 ──────────────────────────────────
+        _updateCustomTotalPreview(curr) {
+            const total = this._getEffectiveTotal(curr);
+            const prev = document.getElementById('b1-ht-preview');
+            if (prev) prev.textContent = `自訂合計：${total} 元`;
+            // 同步更新 schedule card 的 total strip
+            const strip = document.querySelector('.b1-ts-amount');
+            if (strip) strip.textContent = `${total} 元`;
+        },
+
+        _getCalculatorHTML() {
+            return `
+            <div class="b1-calculator">
+                <div class="b1-calc-display" id="b1-calc-display">0</div>
+                <div class="b1-calc-buttons">
+                    <button class="b1-calc-btn b1-calc-num" data-v="7">7</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="8">8</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="9">9</button>
+                    <button class="b1-calc-btn b1-calc-op" data-v="C">C</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="4">4</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="5">5</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="6">6</button>
+                    <button class="b1-calc-btn b1-calc-op" data-v="+">+</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="1">1</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="2">2</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="3">3</button>
+                    <button class="b1-calc-btn b1-calc-op" data-v="-">-</button>
+                    <button class="b1-calc-btn b1-calc-num" data-v="0">0</button>
+                    <button class="b1-calc-btn b1-calc-op" data-v="⌫">⌫</button>
+                    <button class="b1-calc-btn b1-calc-eq" data-v="=">=</button>
+                    <button class="b1-calc-btn b1-calc-op" data-v="×">×</button>
+                </div>
+            </div>`;
+        },
+
+        _bindCalculator() {
+            const panel   = document.getElementById('b1-calc-panel');
+            const toggle  = document.getElementById('b1-calc-toggle');
+            const display = document.getElementById('b1-calc-display');
+            if (!panel || !toggle || !display) return;
+
+            let calcVal = '0', calcOp = null, calcPrev = null, calcFresh = false;
+            const updateDisp = () => { display.textContent = calcVal; };
+
+            toggle.addEventListener('click', () => {
+                const open = panel.style.display === 'none';
+                panel.style.display = open ? '' : 'none';
+                toggle.textContent = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
+            });
+
+            panel.querySelectorAll('.b1-calc-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = btn.dataset.v;
+                    if (v === 'C') { calcVal = '0'; calcOp = null; calcPrev = null; calcFresh = false; }
+                    else if (v === '⌫') { calcVal = calcVal.length > 1 ? calcVal.slice(0, -1) : '0'; }
+                    else if (['+', '-', '×'].includes(v)) {
+                        calcPrev = parseFloat(calcVal); calcOp = v; calcFresh = true;
+                    } else if (v === '=') {
+                        if (calcOp && calcPrev !== null) {
+                            const cur = parseFloat(calcVal);
+                            const res = calcOp === '+' ? calcPrev + cur : calcOp === '-' ? calcPrev - cur : calcPrev * cur;
+                            calcVal = String(Math.round(res * 1000) / 1000);
+                            calcOp = null; calcPrev = null;
+                        }
+                    } else { // digit
+                        calcVal = (calcFresh || calcVal === '0') ? v : calcVal + v;
+                        calcFresh = false;
+                    }
+                    updateDisp();
+                });
+            });
+        },
+
+        // ── 簡單模式：3個金額選項 ─────────────────────────────────
+        _renderChoiceButtons(curr) {
+            const choices = this._generateChoices(curr.total);
+            return `
+            <div class="b1-choice-area">
+                <div class="b1-choice-label">這次出門，總共需要帶多少錢？</div>
+                <div class="b1-choice-btns">
+                    ${choices.map(amt => `
+                    <button class="b1-choice-btn" data-amount="${amt}">${amt} 元</button>
+                    `).join('')}
+                </div>
+            </div>`;
+        },
+
+        _generateChoices(correct) {
+            const candidates = new Set([correct]);
+            const offsets = [10, 20, 15, 30, 25, 5, 40, 50];
+            let i = 0;
+            while (candidates.size < 3 && i < offsets.length * 2) {
+                const sign = i % 2 === 0 ? 1 : -1;
+                const c = correct + sign * offsets[Math.floor(i / 2)];
+                if (c > 0) candidates.add(c);
+                i++;
+            }
+            return [...candidates].sort(() => Math.random() - 0.5);
+        },
+
+        // 困難模式逐項朗讀（含各項金額）
+        _speakItemsOneByOneHard(curr) {
+            const items = curr.items;
+            let idx = 0;
+            const next = () => {
+                if (idx < items.length) {
+                    const it = items[idx++];
+                    Game.Speech.speak(`${it.name}，${toTWD(it.cost)}`);
+                    Game.TimerManager.setTimeout(next, 1000, 'speech');
                 }
-                this.state.quiz.lastSpeechText = text;
-            }, 400, 'speech');
-            // 簡單模式：彈窗關閉後逐項播報費用（C2 逐項朗讀 pattern，Round 42）
+            };
+            next();
+        },
+
+        // ── Phase 1 事件繫結 ──────────────────────────────────────
+        _bindPhase1Events(curr, diff) {
+            const isHard = diff === 'hard';
+
+            Game.EventManager.on(document.getElementById('back-to-settings'), 'click', () => {
+                this.showSettings();
+            }, {}, 'gameUI');
+
+            Game.EventManager.on(document.getElementById('replay-speech-btn'), 'click', () => {
+                const text = this.state.quiz.lastSpeechText;
+                if (text) Game.Speech.speak(text);
+            }, {}, 'gameUI');
+
+            Game.EventManager.on(document.getElementById('reward-btn-game'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+
+            // 提示鈕（行程卡右側，三難度均有）
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) {
+                Game.EventManager.on(hintBtn, 'click', () => {
+                    if (isHard) {
+                        // 困難模式：重播費用語音（提示項目金額）
+                        this._speakItemsOneByOneHard(curr);
+                    } else {
+                        // 簡單/普通：顯示建議錢幣彈窗
+                        this._showCoinHint();
+                    }
+                }, {}, 'gameUI');
+            }
             if (diff === 'easy') {
-                Game.TimerManager.setTimeout(() => this._speakItemsOneByOne(curr), 2400, 'speech');
+                // 簡單模式：3個選項按鈕
+                document.querySelectorAll('.b1-choice-btn').forEach(btn => {
+                    Game.EventManager.on(btn, 'click', () => {
+                        const chosen = parseInt(btn.dataset.amount);
+                        if (chosen === curr.total) {
+                            this.audio.play('correct');
+                            this._showFeedback('✅', '答對了！');
+                            btn.classList.add('b1-choice-correct');
+                            document.querySelectorAll('.b1-choice-btn').forEach(b => { b.disabled = true; });
+                            Game.Speech.speak(`答對了！總共${toTWD(curr.total)}`, () => {
+                                this._renderPhase2(curr, diff);
+                            });
+                        } else {
+                            this.audio.play('error');
+                            btn.classList.add('b1-choice-wrong');
+                            Game.TimerManager.setTimeout(() => btn.classList.remove('b1-choice-wrong'), 800, 'ui');
+                            Game.Speech.speak('不對喔，再想想看！');
+                        }
+                    }, {}, 'gameUI');
+                });
+            } else {
+                // 普通/困難模式：數字鍵盤驗證總額，正確後自動進入 Phase 2
+                this._bindTotalNumpad(curr, diff);
+                if (diff === 'hard') this._bindCalculator();
+                // 自訂項目面板事件
+                if (this.state.settings.customItemsEnabled) {
+                    this._bindCustomItemsPanel(curr);
+                }
+            }
+        },
+
+        // ── 自訂項目面板事件繫結 ──────────────────────────────────
+        _bindCustomItemsPanel(curr) {
+            // 刪除/還原原有項目
+            document.querySelectorAll('#b1-cip-base-list [data-base-idx]').forEach(delBtn => {
+                Game.EventManager.on(delBtn, 'click', () => {
+                    const idx = parseInt(delBtn.dataset.baseIdx);
+                    curr.items[idx]._deleted = !curr.items[idx]._deleted;
+                    const row = document.getElementById(`b1-cip-base-${idx}`);
+                    if (row) row.classList.toggle('b1-cip-deleted', !!curr.items[idx]._deleted);
+                    this._updateCustomTotalPreview(curr);
+                    this.audio.play('click');
+                }, {}, 'gameUI');
+            });
+
+            // 新增項目
+            const addBtn = document.getElementById('b1-cip-add-btn');
+            if (addBtn) {
+                Game.EventManager.on(addBtn, 'click', () => {
+                    const nameEl = document.getElementById('b1-cip-name-input');
+                    const costEl = document.getElementById('b1-cip-cost-input');
+                    const name = nameEl ? nameEl.value.trim() : '';
+                    const cost = costEl ? parseInt(costEl.value) : 0;
+                    if (!name || !cost || cost < 1) return;
+                    const q = this.state.quiz;
+                    q.customItems.push({ name, cost });
+                    const customIdx = q.customItems.length - 1;
+                    const list = document.getElementById('b1-cip-custom-list');
+                    if (list) {
+                        const row = document.createElement('div');
+                        row.className = 'b1-cip-row b1-cip-custom-row';
+                        row.id = `b1-cip-custom-${customIdx}`;
+                        row.innerHTML = `<span class="b1-cip-name">${name}</span>
+                                         <span class="b1-cip-cost">${cost}元</span>
+                                         <button class="b1-cip-del-btn" data-custom-idx="${customIdx}">✕</button>`;
+                        list.appendChild(row);
+                        const delBtn2 = row.querySelector('[data-custom-idx]');
+                        if (delBtn2) {
+                            Game.EventManager.on(delBtn2, 'click', () => {
+                                // 以記錄的 customIdx 找正確位置並移除
+                                const ci = parseInt(delBtn2.dataset.customIdx);
+                                // 找出對應的 q.customItems 真實位置（可能因刪除而偏移）
+                                // 使用 name+cost 標記，或直接設 _deleted
+                                q.customItems[ci]._deleted = true;
+                                row.remove();
+                                this._updateCustomTotalPreview(curr);
+                                this.audio.play('click');
+                            }, {}, 'gameUI');
+                        }
+                    }
+                    if (nameEl) nameEl.value = '';
+                    if (costEl) costEl.value = '';
+                    this._updateCustomTotalPreview(curr);
+                    this.audio.play('click');
+                }, {}, 'gameUI');
+            }
+        },
+
+        _bindTotalNumpad(curr, diff) {
+            const q = this.state.quiz;
+            const display   = document.getElementById('b1-ht-display');
+            const errorEl   = document.getElementById('b1-ht-error');
+
+            const updateDisplay = () => {
+                if (display) display.textContent = q.hardTotalInput || '___';
+            };
+
+            document.querySelectorAll('.b1-ht-digit').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const d = btn.dataset.digit;
+                    if (d === 'back') {
+                        q.hardTotalInput = (q.hardTotalInput || '').slice(0, -1);
+                    } else {
+                        const next = (q.hardTotalInput || '') + d;
+                        if (parseInt(next, 10) <= 99999) q.hardTotalInput = next;
+                    }
+                    this.audio.play('click');
+                    updateDisplay();
+                }, {}, 'gameUI');
+            });
+
+            const confirmBtn = document.getElementById('b1-ht-confirm');
+            if (confirmBtn) {
+                Game.EventManager.on(confirmBtn, 'click', () => {
+                    const entered = parseInt(q.hardTotalInput, 10);
+                    if (!q.hardTotalInput || isNaN(entered)) return;
+                    const correctTotal = this._getEffectiveTotal(curr);
+                    if (entered === correctTotal) {
+                        // 正確！語音播完後自動進入 Phase 2
+                        this.audio.play('correct');
+                        if (errorEl) errorEl.style.display = 'none';
+                        this._showFeedback('✅', '算對了！');
+                        if (display) { display.textContent = correctTotal; display.classList.add('b1-ht-correct'); }
+                        confirmBtn.disabled = true;
+                        document.querySelectorAll('.b1-ht-digit').forEach(b => { b.disabled = true; });
+                        Game.Speech.speak(`答對了！總共${toTWD(correctTotal)}`, () => {
+                            this._renderPhase2(curr, diff);
+                        });
+                    } else {
+                        // 錯誤
+                        this.audio.play('error');
+                        q.errorCount = (q.errorCount || 0) + 1;
+                        const isOver = entered > correctTotal;
+                        const errMsg = isOver ? `算多了，再算算看！` : `算少了，再算算看！`;
+                        if (errorEl) {
+                            errorEl.textContent = `❌ ${errMsg}`;
+                            errorEl.style.display = '';
+                        }
+                        Game.Speech.speak(`不對喔，${errMsg}`);
+                        q.hardTotalInput = '';
+                        updateDisplay();
+                        // 3次錯誤後自動提示
+                        if (q.errorCount >= 3) {
+                            Game.TimerManager.setTimeout(() => {
+                                const effectiveItems = this._getEffectiveItems(curr);
+                                const parts = effectiveItems.map(it => `${it.name}${toTWD(it.cost)}`).join('，');
+                                Game.Speech.speak(`${parts}，加起來是${toTWD(correctTotal)}`);
+                                if (errorEl) {
+                                    errorEl.textContent = `💡 提示：${effectiveItems.map(it => `${it.cost}`).join(' + ')} = ${correctTotal}`;
+                                    errorEl.style.display = '';
+                                    errorEl.classList.add('b1-ht-hint');
+                                }
+                            }, 600, 'ui');
+                        }
+                    }
+                }, {}, 'gameUI');
             }
 
-            // 輔助點擊啟動
+        },
+
+        // ── Phase 2 事件繫結 ──────────────────────────────────────
+        _bindPhase2Events(curr) {
+            this._setupDragDrop();
+
+            Game.EventManager.on(document.getElementById('confirm-btn'), 'click', () => {
+                this.handleConfirm(this._getEffectiveTotal(curr));
+            }, {}, 'gameUI');
+
+            // 普通/困難：✕ 按鈕移除錢包幣
+            const walletCoinsEl = document.getElementById('wallet-coins');
+            if (walletCoinsEl) {
+                Game.EventManager.on(walletCoinsEl, 'click', (e) => {
+                    const btn = e.target.closest('.b1-wc-remove');
+                    if (!btn) return;
+                    const uid = parseInt(btn.dataset.uid);
+                    if (!isNaN(uid)) this.removeCoin(uid);
+                }, {}, 'gameUI');
+
+                // 普通/困難：從錢包拖回拖曳盤
+                Game.EventManager.on(walletCoinsEl, 'dragstart', (e) => {
+                    const coinEl = e.target.closest('.b1-wc-removable');
+                    if (!coinEl) return;
+                    const uid = parseInt(coinEl.dataset.uid);
+                    if (isNaN(uid)) return;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', 'remove:' + uid);
+                    coinEl.classList.add('b1-dragging');
+                }, {}, 'gameUI');
+                Game.EventManager.on(walletCoinsEl, 'dragend', (e) => {
+                    const coinEl = e.target.closest('.b1-wc-removable');
+                    if (coinEl) coinEl.classList.remove('b1-dragging');
+                }, {}, 'gameUI');
+            }
+
+            // 拖曳盤接收「移回」事件
+            const tray = document.querySelector('.b1-coin-tray');
+            if (tray) {
+                Game.EventManager.on(tray, 'dragover', (e) => {
+                    if (e.dataTransfer.getData && e.dataTransfer.types.includes('text/plain')) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                    }
+                }, {}, 'gameUI');
+                Game.EventManager.on(tray, 'drop', (e) => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    if (data && data.startsWith('remove:')) {
+                        const uid = parseInt(data.slice(7));
+                        if (!isNaN(uid)) this.removeCoin(uid);
+                    }
+                }, {}, 'gameUI');
+            }
+
+            Game.EventManager.on(document.getElementById('back-to-settings'), 'click', () => {
+                this.showSettings();
+            }, {}, 'gameUI');
+
+            // 提示鈕（在迷你參考卡右側，普通/困難模式）
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) {
+                Game.EventManager.on(hintBtn, 'click', () => {
+                    // 困難模式：揭露已放金額
+                    if (this.state.settings.difficulty === 'hard') {
+                        this.state.quiz.walletRevealed = true;
+                        this._updateWalletDisplay();
+                    }
+                    this._showCoinHint();
+                }, {}, 'gameUI');
+            }
+
+            Game.EventManager.on(document.getElementById('reward-btn-game'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
             }
@@ -649,22 +1207,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderScheduleCard(q, showTotal) {
+        _renderScheduleCard(q, showTotal, opts = {}) {
+            const showItemAmounts = opts.showItemAmounts !== false; // default true
+            const showHintBtn     = opts.showHintBtn    !== false; // default true
             const isHard   = this.state.settings.difficulty === 'hard';
             const itemsHtml = q.items.map((it, idx) => {
-                const pctBar = !isHard && q.total > 0
+                const showAmt = showItemAmounts;
+                const pctBar = showAmt && !isHard && q.total > 0
                     ? `<div class="b1-item-pct-bar-wrap"><div class="b1-item-pct-bar" style="width:${Math.round(it.cost / q.total * 100)}%"></div></div>`
                     : '';
-                // 場景類別 per-item 徽章（Round 45）
                 const catBadgeMap = { school:'📚', food:'🍔', outdoor:'🌳', entertainment:'🎭', shopping:'🛒' };
                 const catBadge = catBadgeMap[q.cat] ? `<span class="b1-item-cat-badge">${catBadgeMap[q.cat]}</span>` : '';
                 return `
                 <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
-                    ${isHard
-                        ? `<span class="b1-item-cost b1-cost-hidden">??? 元</span>`
-                        : `<span class="b1-item-cost">${it.cost} 元</span>`
-                    }
+                    <span class="b1-item-cost">${showAmt ? `${it.cost} 元` : '??? 元'}</span>
                     ${pctBar}
                 </div>`;
             }).join('');
@@ -674,12 +1231,16 @@ document.addEventListener('DOMContentLoaded', () => {
                        <div class="b1-total-right-label">共需金額</div>
                        <span class="b1-total-tag">${q.total} 元</span>
                    </div>`
-                : `<div class="b1-total-right">
-                       <div class="b1-total-right-label">共需金額</div>
-                       <span class="b1-total-tag b1-total-tag-hidden">??? 元</span>
-                   </div>`;
+                : '';
 
-            // 場景類別色標（Round 39）
+            const isEasyMode = this.state.settings.difficulty === 'easy';
+            const hintWrap = (showHintBtn && !isEasyMode)
+                ? `<div class="b1-schedule-hint-wrap" id="b1-hint-wrap">
+                       <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                       <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
+                   </div>`
+                : '';
+
             const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
             const catClass = catColorMap[q.cat] || '';
 
@@ -689,41 +1250,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b1-schedule-icon">${q.icon}</span>
                     <div class="b1-schedule-text">
                         <div class="b1-schedule-label-row">
-                            <span class="b1-schedule-label">今天要去：${q.label}</span>
+                            <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
                             <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                         </div>
-                        <div class="b1-schedule-subtitle">需要帶這些錢 👇</div>
+                        ${isEasyMode ? '' : '<div class="b1-schedule-subtitle">需要帶這些錢 👇</div>'}
                     </div>
-                    ${totalTag}
-                    <div class="b1-route-timer" id="b1-route-timer"></div>
+                    ${(isEasyMode || this.state.settings.difficulty === 'normal') ? '' : totalTag}
+                    ${hintWrap}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
-                <div class="b1-route-strip">
-                    <span class="b1-rs-home">🏠</span>
-                    <span class="b1-rs-arrow">→</span>
-                    <span class="b1-rs-dest">${q.icon}</span>
-                    <span class="b1-rs-label">${q.label}</span>
-                    <span class="b1-rs-arrow">→</span>
-                    <span class="b1-rs-home">🏠</span>
+                <div class="b1-total-strip">
+                    <span class="b1-ts-label">總計金額</span>
+                    <span class="b1-ts-amount">${showTotal ? `${q.total} 元` : '??? 元'}</span>
                 </div>
             </div>`;
         },
 
         _renderWalletArea(requiredTotal) {
-            const diff = this.state.settings.difficulty;
-            // 普通/困難模式均顯示吉祥物 + 提示鈕
-            const hintWrap = (diff === 'normal' || diff === 'hard')
-                ? `<div class="b1-hint-wrap" id="b1-hint-wrap" style="display:flex;align-items:center;gap:4px;">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
-                    <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
-                   </div>`
-                : '';
             return `
             <div class="b1-wallet-area" id="wallet-area">
                 <div class="b1-wallet-header">
                     <div style="display:flex;align-items:center;gap:8px;">
                         <span class="b1-wallet-title">👛 我的錢包</span>
-                        ${hintWrap}
                     </div>
                     <div class="b1-wallet-total-wrap">
                         <span class="b1-wallet-total-label">已放</span>
@@ -763,41 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        // ── Bind Game Events ───────────────────────────────────
-        _bindQuestionEvents(question) {
-            // 設置拖曳放置
-            this._setupDragDrop();
-
-            // 確認按鈕
-            Game.EventManager.on(document.getElementById('confirm-btn'), 'click', () => {
-                this.handleConfirm(question.total);
-            }, {}, 'gameUI');
-
-            // 返回設定
-            Game.EventManager.on(document.getElementById('back-to-settings'), 'click', () => {
-                this.showSettings();
-            }, {}, 'gameUI');
-
-            // 語音重播（內嵌於題目中）
-            Game.EventManager.on(document.getElementById('replay-speech-btn'), 'click', () => {
-                const text = this.state.quiz.lastSpeechText;
-                if (text) Game.Speech.speak(text);
-            }, {}, 'gameUI');
-
-            // 提示按鈕（普通/困難模式）
-            const hintBtn = document.getElementById('hint-btn');
-            if (hintBtn) {
-                Game.EventManager.on(hintBtn, 'click', () => {
-                    this._showCoinHint();
-                }, {}, 'gameUI');
-            }
-
-            // 獎勵按鈕
-            Game.EventManager.on(document.getElementById('reward-btn-game'), 'click', () => {
-                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
-                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
-            }, {}, 'gameUI');
-        },
+        // ── _bindQuestionEvents 已被 _bindPhase1Events / _bindPhase2Events 取代 ──
 
         // ── Wallet Operations ──────────────────────────────────
         addCoin(denom) {
@@ -820,8 +1334,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slotEl) slotEl.classList.remove('b1-wallet-ghost-slot');
                 // 更新確認按鈕與進度條（不全量重繪 coinsEl）
                 this._updateWalletStatusOnly();
-                // 放幣語音
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+                // 簡單模式：所有 ghost slot 填滿後自動確認
+                if (this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled)) {
+                    const currQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
+                    const req = currQ ? this._getEffectiveTotal(currQ) : 0;
+                    Game.TimerManager.setTimeout(() => this.handleConfirm(req), 600, 'ui');
+                }
+                // 放幣語音（困難模式靜音）
+                if (this.state.settings.difficulty !== 'hard') {
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+                }
                 // 浮動標籤
                 const coinArea2 = document.getElementById('wallet-coins') || document.getElementById('wallet-area');
                 if (coinArea2) {
@@ -841,8 +1363,10 @@ document.addEventListener('DOMContentLoaded', () => {
             q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
-            // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
-            Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+            // 放幣語音：簡單/普通模式才播放金額（困難模式靜音，避免干擾計算）
+            if (this.state.settings.difficulty !== 'hard') {
+                Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+            }
             // 硬幣浮動標籤（A4 price popup pattern）
             const coinArea = document.querySelector('.b1-coin-tray') || document.getElementById('wallet-coins') || document.getElementById('wallet-area');
             if (coinArea) {
@@ -869,23 +1393,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _updateWalletDisplay() {
             const total      = this._getWalletTotal();
-            const required   = this.state.quiz.questions[this.state.quiz.currentQuestion]?.total ?? 0;
+            const currQ2     = this.state.quiz.questions[this.state.quiz.currentQuestion];
+            const required   = currQ2 ? this._getEffectiveTotal(currQ2) : 0;
             const enough     = total >= required;
+            const isHard     = this.state.settings.difficulty === 'hard';
 
-            // 更新合計顯示 + 達標彈跳動畫（Round 36）
+            // 更新合計顯示（困難模式按提示後才顯示）
             const totalEl = document.getElementById('wallet-total');
             if (totalEl) {
-                totalEl.textContent = `${total} 元`;
-                const wasEnough = totalEl.classList.contains('enough');
-                totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
-                if (enough && !wasEnough && total > 0) {
-                    totalEl.classList.add('b1-total-pop');
-                    Game.TimerManager.setTimeout(() => totalEl.classList.remove('b1-total-pop'), 500, 'ui');
+                const q2 = this.state.quiz;
+                if (isHard && !q2.walletRevealed) {
+                    totalEl.textContent = '??? 元';
+                    totalEl.className = 'b1-wallet-total-val';
+                } else {
+                    totalEl.textContent = `${total} 元`;
+                    const wasEnough = totalEl.classList.contains('enough');
+                    totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+                    if (enough && !wasEnough && total > 0 && !isHard) {
+                        totalEl.classList.add('b1-total-pop');
+                        Game.TimerManager.setTimeout(() => totalEl.classList.remove('b1-total-pop'), 500, 'ui');
+                    }
                 }
             }
-            // 更新進度條（Round 29）
+            // 更新進度條（困難模式隱藏）
             const fillEl = document.getElementById('b1-wallet-progress-fill');
-            if (fillEl && required > 0) {
+            const progressWrap = document.getElementById('b1-wallet-progress');
+            if (progressWrap) progressWrap.style.display = isHard ? 'none' : '';
+            if (fillEl && required > 0 && !isHard) {
                 const pct = Math.min(100, Math.round((total / required) * 100));
                 fillEl.style.width = pct + '%';
                 fillEl.className = 'b1-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
@@ -905,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
                         const isBanknote = slot.denom >= 100;
-                        const imgW = isBanknote ? '68px' : '44px';
+                        const imgW = isBanknote ? '100px' : '60px';
                         const ghostClass = slot.filled ? '' : ' b1-wallet-ghost-slot';
                         return `<div class="b1-wallet-coin${ghostClass}" data-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
@@ -916,24 +1450,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (this.state.wallet.length === 0) {
                     coinsEl.innerHTML = '<span class="b1-wallet-empty">把錢幣拖曳到這裡 👈</span>';
                 } else {
+                    const removable = this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'hard';
                     coinsEl.innerHTML = this.state.wallet.map(coin => {
                         const imgSrc   = `../images/money/${coin.denom}_yuan_front.png`;
                         const imgClass = coin.isBanknote ? 'banknote-img' : 'coin-img';
-                        const imgW     = coin.isBanknote ? '68px' : '44px';
+                        const imgW     = coin.isBanknote ? '100px' : '60px';
+                        const removableAttrs = removable ? `draggable="true" data-denom="${coin.denom}" class="b1-wallet-coin b1-wc-removable"` : `class="b1-wallet-coin"`;
+                        const removeBtn = removable ? `<button class="b1-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>` : '';
                         return `
-                        <div class="b1-wallet-coin" data-uid="${coin.uid}">
+                        <div ${removableAttrs} data-uid="${coin.uid}">
                             <img src="${imgSrc}" alt="${coin.denom}元" class="${imgClass}"
                                  style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
-                                 onerror="this.style.display='none'">
+                                 onerror="this.style.display='none'" draggable="false">
+                            ${removeBtn}
                         </div>`;
                     }).join('');
                 }
             }
 
-            // 確認按鈕狀態（B6 wasSufficient pattern）
+            // 確認按鈕狀態（困難模式隨時可點，不受金額控制）
             const confirmBtn = document.getElementById('confirm-btn');
-            const wasSufficient = confirmBtn && !confirmBtn.disabled;
-            if (confirmBtn) {
+            if (confirmBtn && !isHard) {
+                const wasSufficient = !confirmBtn.disabled;
                 confirmBtn.disabled = !enough;
                 if (enough && !wasSufficient && total > 0) {
                     if (total === required) {
@@ -966,7 +1504,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 只更新確認按鈕、進度條、面額摘要；coinsEl 已由 ghost class 移除處理
         _updateWalletStatusOnly() {
             const total    = this._getWalletTotal();
-            const required = this.state.quiz.questions[this.state.quiz.currentQuestion]?.total ?? 0;
+            const currQ    = this.state.quiz.questions[this.state.quiz.currentQuestion];
+            const required = currQ ? this._getEffectiveTotal(currQ) : 0;
             const enough   = total >= required;
 
             // 合計顯示
@@ -1142,7 +1681,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isProcessing = true;
 
             const walletTotal = this._getWalletTotal();
-            const isCorrect   = walletTotal >= requiredTotal;
+            const diff        = this.state.settings.difficulty;
+            const isCorrect   = diff === 'easy' ? walletTotal >= requiredTotal : walletTotal === requiredTotal;
 
             Game.Debug.log('state', `確認：錢包${walletTotal} 需要${requiredTotal} 正確=${isCorrect}`);
 
@@ -1175,21 +1715,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Speech.speak(`需要${toTWD(requiredTotal)}，繼續下一題`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 } else {
-                    Game.Speech.speak(`不對喔，你付的錢太少，請再試一次`);
+                    if (diff === 'normal' || diff === 'hard') {
+                        // 普通/困難：清空錢包 + 方向提示
+                        const isOver = walletTotal > requiredTotal;
+                        const errSpeech = isOver
+                            ? `拿了太多的錢，請再試一次`
+                            : `拿了太少的錢，請再試一次`;
+                        Game.Speech.speak(errSpeech);
+                        this.state.wallet = [];
+                        this.state.quiz.showHint = false;
+                        this.state.quiz.hintSlots = [];
+                    } else {
+                        Game.Speech.speak(`不對喔，你付的錢太少，請再試一次`);
+                    }
                     this.state.isProcessing = false;
                     const walletArea = document.getElementById('wallet-area');
                     if (walletArea) {
                         walletArea.style.animation = 'b1Shake 0.4s ease';
-                        Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
+                        Game.TimerManager.setTimeout(() => {
+                            walletArea.style.animation = '';
+                            this._updateWalletDisplay();
+                        }, 500, 'ui');
                     }
-                    // 普通模式：3次錯誤後自動顯示提示
+                    // 普通模式：3次錯誤後自動顯示 ghost slot 提示
                     if (this.state.settings.difficulty === 'normal' && this.state.quiz.errorCount >= 3) {
-                        Game.TimerManager.setTimeout(() => this._showCoinHint(), 600, 'ui');
-                        Game.TimerManager.setTimeout(() => this._showScheduleBreakdown(this.state.quiz.questions[this.state.quiz.currentQuestion]), 900, 'ui');
-                    }
-                    // 困難模式答錯：顯示費用明細（B2 breakdown pattern）
-                    if (this.state.settings.difficulty === 'hard') {
-                        Game.TimerManager.setTimeout(() => this._showScheduleBreakdown(this.state.quiz.questions[this.state.quiz.currentQuestion]), 400, 'ui');
+                        Game.TimerManager.setTimeout(() => this._showCoinHint(), 700, 'ui');
                     }
                 }
                 return;
@@ -1308,38 +1858,34 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 開題任務說明彈窗（C4 instruction modal 模式）──────────
-        _showTaskModal(curr, diff) {
+        // 場景彈窗：只顯示目的地圖示＋名稱，不顯示金額；語音念完後自動關閉
+        _showTaskModal(curr, afterClose) {
             const existing = document.getElementById('b1-task-modal');
             if (existing) existing.remove();
-            const totalText = (diff !== 'hard')
-                ? `<div class="b1-task-amount">${curr.total} 元</div>`
-                : `<div class="b1-task-amount-q">？ 元</div>`;
             const modal = document.createElement('div');
             modal.id = 'b1-task-modal';
             modal.className = 'b1-task-modal';
             modal.innerHTML = `
                 <div class="b1-task-modal-inner">
                     <div class="b1-task-modal-icon">${curr.icon}</div>
-                    <div class="b1-task-modal-dest">今天要去：${curr.label}</div>
-                    ${totalText}
+                    <div class="b1-task-modal-dest">今天要去</div>
+                    <div class="b1-task-modal-label">${fmtLabel(curr.label)}</div>
                     <div class="b1-task-modal-tap">點任意處繼續</div>
                 </div>`;
             document.body.appendChild(modal);
-            const closeModal = () => { if (document.body.contains(modal)) modal.remove(); };
+            let closed = false;
+            const closeModal = () => {
+                if (closed) return;
+                closed = true;
+                if (document.body.contains(modal)) modal.remove();
+                afterClose?.();
+            };
             modal.addEventListener('click', closeModal);
-            // 語音播完後自動關閉（400ms 後語音才開始，需等語音結束）
+            // 語音：「今天要去[場景]，準備出發！」，播完後自動關閉
             Game.TimerManager.setTimeout(() => {
-                const names = curr.items.map(it => it.name).join('、');
-                let text;
-                if (diff === 'easy') {
-                    text = `今天要去：${curr.label}，需要準備${names}`;
-                } else if (diff === 'normal') {
-                    text = `今天要去：${curr.label}，需要準備${names}，把錢幣放進錢包。`;
-                } else {
-                    text = `今天要去：${curr.label}，需要準備${names}，自己算好總金額！`;
-                }
-                Game.Speech.speak(text, closeModal);
-            }, 400, 'ui');
+                const lbl = fmtLabel(curr.label);
+                Game.Speech.speak(`今天要去${lbl}，準備出發！`, closeModal);
+            }, 300, 'ui');
         },
 
         // ── Hint ───────────────────────────────────────────────
@@ -1357,7 +1903,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const curr = this.state.quiz.questions[this.state.quiz.currentQuestion];
             if (!curr) return;
             const denoms  = DENOM_BY_DIFF[this.state.settings.difficulty] || DENOM_BY_DIFF.easy;
-            const optimal = this._calcOptimalCoins(curr.total, denoms);
+            const optimal = this._calcOptimalCoins(this._getEffectiveTotal(curr), denoms);
 
             document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-coin-hint'));
 
@@ -1369,17 +1915,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // 語音格式：「可以用N個X元，M個Y元」（B3 pattern）
+            // 語音：「可以用N個X元，M個Y元」
             const parts = Object.entries(countMap)
                 .sort((a, b) => b[0] - a[0])
                 .map(([d, c]) => `${c}個${parseInt(d)}元`);
             Game.Speech.speak(`可以用${parts.join('，')}`);
 
-            // ghost slots：在錢包放置區顯示淡化的正確面額（B3 b3-nplaced-ghost-slot pattern）
+            // Ghost slots（在 Phase 2 wallet 中顯示）
             const q = this.state.quiz;
             q.showHint = true;
             q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
-            // 已放置金錢先標記到 hintSlots
             const placed = [...this.state.wallet];
             placed.forEach(coin => {
                 const idx = q.hintSlots.findIndex(s => s.denom === coin.denom && !s.filled);
@@ -1387,61 +1932,55 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             this._updateWalletDisplay();
 
-            // 顯示建議面額浮動卡（Round 37）
-            const prevCard = document.getElementById('b1-hint-combo-card');
-            if (prevCard) prevCard.remove();
-            const card = document.createElement('div');
-            card.id = 'b1-hint-combo-card';
-            card.className = 'b1-hint-combo-card';
-            card.innerHTML = `<span class="b1-hcc-icon">💡</span><span>建議：${parts.join(' + ')}</span>`;
-            document.body.appendChild(card);
-            Game.TimerManager.setTimeout(() => card.remove(), 5000, 'ui');
+            // 顯示 B3 風格提示彈窗
+            this._showHintModal(optimal, countMap, parts);
 
             Game.TimerManager.setTimeout(() => {
                 document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-coin-hint'));
-            }, 5000, 'ui');
-
-            this._animateHintCoins(optimal);
+            }, 6000, 'ui');
         },
 
-        // ── 提示硬幣逐枚動畫（C2 逐一計數 pattern）──
-        _animateHintCoins(coins) {
-            const card = document.getElementById('b1-hint-combo-card');
-            if (!card) return;
-            // 在卡片下方加動畫區
-            const existing = document.getElementById('b1-hint-anim');
-            if (existing) existing.remove();
-            const wrap = document.createElement('div');
-            wrap.id = 'b1-hint-anim';
-            wrap.className = 'b1-hint-anim';
-            card.appendChild(wrap);
-            let cumulative = 0;
-            let i = 0;
-            const step = () => {
-                if (i >= coins.length) return;
-                const denom = coins[i];
-                cumulative += denom;
-                const el = document.createElement('div');
-                el.className = 'b1-hint-coin';
-                el.style.animationDelay = `${i * 200}ms`;
-                // 嘗試從錢幣盤找對應圖片
-                const src = `../images/money/${denom}_yuan_front.png`;
-                el.innerHTML = `<img src="${src}" onerror="this.parentNode.innerHTML='<span>${denom}</span>'" width="36" height="36"><span class="b1-hc-denom">${denom}元</span>`;
-                wrap.appendChild(el);
-                // 累計金額更新
-                let total = wrap.querySelector('.b1-hc-total');
-                if (!total) {
-                    total = document.createElement('div');
-                    total.className = 'b1-hc-total';
-                    wrap.appendChild(total);
-                }
-                total.textContent = `合計：${cumulative} 元`;
-                i++;
-                if (i < coins.length) {
-                    Game.TimerManager.setTimeout(step, 280, 'ui');
-                }
-            };
-            Game.TimerManager.setTimeout(step, 100, 'ui');
+        // ── B3 風格提示彈窗（金錢圖示 + 語音）──
+        _showHintModal(optimal, countMap, parts) {
+            const prev = document.getElementById('b1-hint-modal-overlay');
+            if (prev) prev.remove();
+
+            const total = optimal.reduce((s, d) => s + d, 0);
+
+            const denomsHtml = Object.entries(countMap)
+                .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                .map(([d, c]) => {
+                    const dn = parseInt(d);
+                    const isBanknote = dn >= 100;
+                    const imgSize = isBanknote ? '80px' : '48px';
+                    const imgsHtml = Array(c).fill(0).map(() =>
+                        `<img src="../images/money/${d}_yuan_front.png"
+                              style="width:${imgSize};height:${imgSize};object-fit:contain;${isBanknote ? 'border-radius:4px;' : 'border-radius:50%;'}"
+                              onerror="this.style.display='none'">`
+                    ).join('');
+                    return `
+                    <div class="b1-hm-group">
+                        <div class="b1-hm-imgs">${imgsHtml}</div>
+                        <div class="b1-hm-count">${d}元 × ${c}</div>
+                    </div>`;
+                }).join('');
+
+            const overlay = document.createElement('div');
+            overlay.id = 'b1-hint-modal-overlay';
+            overlay.className = 'b1-hint-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b1-hint-modal">
+                    <div class="b1-hm-title">💡 建議帶法</div>
+                    <div class="b1-hm-body">${denomsHtml}</div>
+                    <div class="b1-hm-total">合計：${total} 元</div>
+                    <button class="b1-hm-close" id="b1-hm-close">✓ 我知道了</button>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            const close = () => { if (overlay.parentNode) overlay.remove(); };
+            document.getElementById('b1-hm-close')?.addEventListener('click', close);
+            overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+            Game.TimerManager.setTimeout(close, 8000, 'ui');
         },
 
         // ── Next Question / Results ────────────────────────────
@@ -1486,7 +2025,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const minTotal = Math.min(...q.solvedSchedules.map(s => s.total));
                 return `
                 <div class="b1-res-schedules">
-                    <h3>📋 完成的行程</h3>
+                    <h3>🗓️ 預定的行程</h3>
                     <div class="b1-schedule-rows">
                         ${q.solvedSchedules.map(s => {
                             const tag = s.total === maxTotal && q.solvedSchedules.length > 1
@@ -1511,7 +2050,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const denomEntries = Object.entries(q.denomStats).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
             const denomCardHTML = denomEntries.length > 0 ? `
             <div class="b-review-card">
-                <h3>🪙 面額使用統計</h3>
+                <h3>💰 我的錢包的金額</h3>
                 <div class="b1-stat-grid">
                     ${denomEntries.map(([d, c]) => `
                     <div class="b1-stat-item">
@@ -1535,9 +2074,9 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="b-review-wrapper">
     <div class="b-review-screen">
         <div class="b-review-header">
-            <div class="b-review-emoji">📋</div>
-            <h1 class="b-review-title">測驗回顧</h1>
-            <p class="b-review-subtitle">看看這次完成了哪些行程！</p>
+            <div class="b-review-emoji">🗓️</div>
+            <h1 class="b-review-title">今日行程總覽</h1>
+            <p class="b-review-subtitle">看看我的錢包裡準備了多少錢！</p>
         </div>
         ${scheduleCardHTML}
         ${denomCardHTML}
@@ -1551,7 +2090,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('success-sound')?.play();
             }, 100, 'confetti');
             Game.TimerManager.setTimeout(() => {
-                Game.Speech.speak('完成了！來看看測驗回顧吧！');
+                Game.Speech.speak('完成了！來看看今日行程總覽吧！');
             }, 600, 'speech');
 
             Game.EventManager.on(document.getElementById('b1-view-summary-btn'), 'click', () => {
@@ -1720,7 +2259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 計算錢包中已有金額
             const walletTotal = Game.state.wallet.reduce((s, c) => s + c.denom, 0);
-            const remaining   = curr.total - walletTotal;
+            const remaining   = Game._getEffectiveTotal(curr) - walletTotal;
 
             if (remaining <= 0) {
                 // 已足夠 → 高亮確認按鈕

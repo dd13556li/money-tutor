@@ -941,3 +941,44 @@ _speakItemsOneByOne(q) {
 | per-item 場景類別徽章 | 每個費用項目右側加 20px 圓形 emoji 徽章（school📚/food🍔/outdoor🌳/entertainment🎭/shopping🛒） | `b1-item-cat-badge`, `catBadgeMap` |
 
 **教學意義**：讓學生一眼看出此行程屬於哪種生活類別，強化場景識別能力。配合場景類別頂部色條（Round 39），形成雙層視覺提示系統。
+
+---
+
+## 二十三、自訂項目功能（2026-04-04）
+
+### 功能概述
+
+在設定頁「場景類別」選項下方新增「自訂項目」切換按鈕（僅普通/困難模式顯示）。開啟後，進入 Phase 1 時顯示可編輯的行程項目面板；Phase 2 的所需金額根據自訂結果動態計算。
+
+### 變更摘要
+
+| 項目 | 說明 | 搜尋關鍵字 |
+|------|------|----------|
+| 設定頁切換列 | `#custom-items-toggle-row`：難度切換時 easy 自動隱藏 | `custom-items-toggle-row`, `customItemsEnabled` |
+| 狀態欄位 | `state.settings.customItemsEnabled`（bool）；`q.customItems[]`（per-question 自訂項目）| `customItemsEnabled`, `q.customItems` |
+| 自訂面板 HTML | `_renderCustomItemsPanel(curr)`：顯示原有項目（可刪除）+ 新增輸入列 | `_renderCustomItemsPanel`, `b1-cip-add-btn` |
+| 面板事件 | `_bindCustomItemsPanel(curr)`：刪除舊項目（`_deleted` flag）+ 動態新增新項目 | `_bindCustomItemsPanel`, `b1-cip-del-btn` |
+| 合計預覽 | `_updateCustomTotalPreview(curr)`：即時更新 `#b1-ht-preview` 與 `.b1-ts-amount` | `_updateCustomTotalPreview`, `b1-ht-preview` |
+| 有效項目計算 | `_getEffectiveItems(curr)`：過濾 `_deleted`，合併 `curr.items` + `q.customItems` | `_getEffectiveItems`, `_getEffectiveTotal` |
+| Phase2 金額替換 | 所有涉及 `curr.total` 的 Phase2 比對改用 `_getEffectiveTotal(curr)` | `_getEffectiveTotal` |
+
+### 資料流
+
+```
+設定頁 customItemsEnabled=true（普通/困難）
+    ↓ renderQuestion(): q.customItems=[]；item._deleted=false 重設
+    ↓ Phase1: _renderCustomItemsPanel + _bindCustomItemsPanel
+    ↓ 使用者操作: item._deleted / q.customItems 更新
+    ↓ numpad 確認: _getEffectiveTotal(curr) 為正確答案
+    ↓ Phase2: _renderWalletArea(_getEffectiveTotal) / handleConfirm(_getEffectiveTotal)
+```
+
+### 受影響的函數
+
+- `_renderPhase2`、`_renderPhase2RefCard`、`_updateWalletDisplay`、`_updateWalletStatusOnly`
+- `_autoSetGhostSlots`、`_showCoinHint`、`AssistClick.buildQueue`
+- `addCoin`（easy 模式自動確認時）
+
+### CSS 新增
+
+`.b1-custom-items-panel`、`.b1-cip-row`、`.b1-cip-deleted`、`.b1-cip-add-row`、`.b1-cip-input`、`.b1-cip-add-btn`、`.b1-cip-custom-row`、`.b1-ht-custom-preview`（css/b1_daily_budget.css）
