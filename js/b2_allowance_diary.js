@@ -1067,23 +1067,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
-            // 提示按鈕（三難度均顯示）：朗讀算式步驟
+            // 提示按鈕（三難度均顯示）：困難→彈窗，其他→算式卡片（B3/B5/B6 pattern）
             const b2HintBtn = document.getElementById('b2-hint-btn');
             if (b2HintBtn) {
                 Game.EventManager.on(b2HintBtn, 'click', () => {
-                    this._showCalcBreakdown(question);
-                    const effEvents = this._getEffectiveEvents(question);
-                    const effAnswer = this._getEffectiveAnswer(question);
-                    const steps = [question.startAmount, ...effEvents.map((e, i) => {
-                        let running = question.startAmount;
-                        for (let j = 0; j <= i; j++) running += effEvents[j].type === 'income' ? effEvents[j].amount : -effEvents[j].amount;
-                        return running;
-                    })];
-                    const parts = effEvents.map((e, i) => {
-                        const verb = e.type === 'income' ? '收入' : '花了';
-                        return `${verb}${e.amount}元，剩下${steps[i + 1]}元`;
-                    });
-                    Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
+                    if (diff === 'hard') {
+                        this._showHardModeHintModal(question);
+                    } else {
+                        this._showCalcBreakdown(question);
+                        const effEvents = this._getEffectiveEvents(question);
+                        const effAnswer = this._getEffectiveAnswer(question);
+                        const steps = [question.startAmount, ...effEvents.map((e, i) => {
+                            let running = question.startAmount;
+                            for (let j = 0; j <= i; j++) running += effEvents[j].type === 'income' ? effEvents[j].amount : -effEvents[j].amount;
+                            return running;
+                        })];
+                        const parts = effEvents.map((e, i) => {
+                            const verb = e.type === 'income' ? '收入' : '花了';
+                            return `${verb}${e.amount}元，剩下${steps[i + 1]}元`;
+                        });
+                        Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
+                    }
                 }, {}, 'gameUI');
             }
             // 困難模式專屬重聽鈕（inline numpad 區域）
@@ -1430,12 +1434,17 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
-                // 漸進提示（Round 34）：第1次錯→範圍提示，第2次以上→完整算式
+                // 漸進提示（Round 34）：第1次錯→範圍提示，第2次以上→算式；困難→彈窗（B3/B5/B6 pattern）
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
-                if (this.state.quiz.errorCount === 1 && this.state.settings.difficulty !== 'easy') {
+                const isDiffHard = this.state.settings.difficulty === 'hard';
+                if (this.state.quiz.errorCount === 1 && !isDiffHard) {
                     const lo = Math.min(question.startAmount, effectiveAnswer);
                     const hi = Math.max(question.startAmount, effectiveAnswer);
                     this._showRangeHint(lo, hi);
+                } else if (isDiffHard) {
+                    if (this.state.quiz.errorCount >= 2) {
+                        Game.TimerManager.setTimeout(() => this._showHardModeHintModal(question), 800, 'ui');
+                    }
                 } else {
                     this._showCalcBreakdown(question); // 答錯即顯示計算過程
                 }
@@ -1481,6 +1490,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 trend.classList.add('b2-nt-fade');
                 Game.TimerManager.setTimeout(() => { if (trend.parentNode) trend.remove(); }, 400, 'ui');
             }, 1400, 'ui');
+        },
+
+        // ── 困難模式提示彈窗（B3/B5/B6 _showHardModeHintModal pattern）──
+        _showHardModeHintModal(question) {
+            document.getElementById('b2-hard-hint-modal')?.remove();
+            const effEvents = this._getEffectiveEvents(question);
+            const effAnswer = this._getEffectiveAnswer(question);
+            let cur = question.startAmount;
+            const steps = effEvents.map(e => {
+                const prev = cur;
+                cur = e.type === 'income' ? cur + e.amount : cur - e.amount;
+                const op = e.type === 'income' ? '＋' : '－';
+                return `<div class="b2-hm-row">
+                    <span class="b2-hm-op ${e.type}">${op}${e.amount}元</span>
+                    <span class="b2-hm-name">${e.name}</span>
+                    <span class="b2-hm-result">${cur}元</span>
+                </div>`;
+            }).join('');
+
+            const overlay = document.createElement('div');
+            overlay.id = 'b2-hard-hint-modal';
+            overlay.className = 'b2-hm-overlay';
+            overlay.innerHTML = `
+                <div class="b2-hm-modal">
+                    <div class="b2-hm-header">💡 計算步驟</div>
+                    <div class="b2-hm-start-row">
+                        <span class="b2-hm-op neutral">起</span>
+                        <span class="b2-hm-name">開始有</span>
+                        <span class="b2-hm-result">${question.startAmount}元</span>
+                    </div>
+                    ${steps}
+                    <div class="b2-hm-answer-row">
+                        <span class="b2-hm-op neutral">＝</span>
+                        <span class="b2-hm-name">最後餘額</span>
+                        <span class="b2-hm-result b2-hm-answer">${effAnswer}元</span>
+                    </div>
+                    <button class="b2-hm-close-btn" id="b2-hm-close-btn">✕ 關閉</button>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            // 語音：逐步說明計算過程
+            const parts = effEvents.map(e => {
+                const verb = e.type === 'income' ? '加上' : '減去';
+                return `${e.name}${verb}${e.amount}元`;
+            });
+            Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
+
+            const closeHM = () => { document.getElementById('b2-hard-hint-modal')?.remove(); };
+            Game.EventManager.on(document.getElementById('b2-hm-close-btn'), 'click', closeHM, {}, 'gameUI');
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeHM(); });
         },
 
         // ── 範圍提示（Round 34：第1次錯誤時）────────────────────

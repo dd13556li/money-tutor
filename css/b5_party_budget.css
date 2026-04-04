@@ -814,3 +814,22 @@
     background: #6e28b4; color: #fff; border: none; border-radius: 8px;
     padding: 8px; font-size: 14px; cursor: pointer;
 }
+
+/* ── 商品選取浮動標籤（B6 flyout pattern）──────────────────── */
+.b5-item-flyout {
+    display: flex; align-items: center; gap: 5px;
+    background: linear-gradient(135deg, #6e28b4, #a855f7);
+    color: #fff; border-radius: 20px;
+    padding: 4px 10px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 2px 8px rgba(110,40,180,0.4);
+    white-space: nowrap; opacity: 1;
+    animation: b5FlyoutUp 1s ease-out forwards;
+    pointer-events: none;
+}
+.b5-if-icon { font-size: 16px; }
+.b5-if-price { font-size: 12px; opacity: 0.9; }
+@keyframes b5FlyoutUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    70%  { opacity: 1; transform: translateY(-20px); }
+    100% { opacity: 0; transform: translateY(-30px); }
+}

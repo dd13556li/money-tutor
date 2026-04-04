@@ -997,3 +997,41 @@ CSS v1.1 → v1.2；JS v3.7 → v3.8
 
 ### 搜尋關鍵字
 `customItemsEnabled`、`_applyCustomPrices`、`b4-cpp-apply-btn`、`b4-custom-price-panel`
+
+---
+
+## 二十七、B1 設計特色套用：商品介紹彈窗 afterClose 模式（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B1 `afterClose` callback pattern）
+
+### 功能說明
+
+`_showItemIntroModal(curr)` 升級為 `_showItemIntroModal(curr, afterClose)`：
+
+1. **closed guard**：防止多重關閉（語音 callback + timer + 點擊同時觸發）。
+2. **商品名稱語音**：彈窗出現後 300ms 朗讀 `curr.name`，語音結束後自動關閉彈窗並呼叫 `afterClose()`。
+3. **afterClose 銜接問題語音**：`renderQuestion()` 及 `_renderTripleQuestion()` 移除原 400ms 獨立語音 timer，改由 afterClose 觸發問題語音（「A店N元，B店M元，哪個比較便宜？」）。
+4. **記憶倒數時機修正**：困難模式的 `_startMemoryCountdown()` 改為在問題語音完成回調後 300ms 啟動（原本在 renderQuestion 1900ms timer，可能與語音衝突）。
+
+### 設計參照
+- **B1 `_showTaskModal(curr, afterClose)`**：`closed` guard + 語音 callback chain + `afterClose?.()` 呼叫
+- **B2/B5/B6**：同步採用此 pattern，B4 此次補齊
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_showItemIntroModal(curr, afterClose)` | 新增 `afterClose` 參數；`closed` guard；300ms 後朗讀 curr.name；語音結束/點擊/fallback(2200ms) → closeModal → afterClose?.() |
+| `renderQuestion()` | 移除獨立 400ms speech timer；計算 speechText 後傳 afterClose；記憶倒數移至語音回調後 |
+| `_renderTripleQuestion()` | 同上 |
+
+### 版本號
+JS v3.8 → v3.9
+
+### 技術要點
+- 問題語音拆為兩段：`curr.name`（in modal）+ 價格比較文字（in afterClose）
+- `lastSpeechText` 存完整版本（`${curr.name}，${speechText}`）供重播按鈕使用
+- fallback timer 延長 1800ms → 2200ms（留空間給語音 callback 優先觸發）
+
+### 搜尋關鍵字
+`afterClose`、`b4-item-intro-modal`、`_startMemoryCountdown`、`closed guard`

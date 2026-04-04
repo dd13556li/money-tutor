@@ -715,41 +715,40 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindSelectEvents(curr, correctSide, left, right);
-            this._showItemIntroModal(curr);
-            // 困難模式記憶挑戰倒數（Round 38）
-            if (diff === 'hard' && !curr.isTriple) {
-                Game.TimerManager.setTimeout(() => this._startMemoryCountdown(), 1900, 'ui');
-            }
 
-            // 語音引導（含雙店資訊，對齊 A/C/F 讀出題目數字 pattern）
-            Game.TimerManager.setTimeout(() => {
-                const diff = this.state.settings.difficulty;
-                let speechText;
-                if (curr.isUnit) {
-                    const unitInfo = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}`;
-                    const unitSuffix = diff === 'easy'
-                        ? `，哪家每${curr.unit}比較划算？`
-                        : diff === 'normal'
-                        ? `，哪家每${curr.unit}比較划算？選出後再回答每${curr.unit}差多少元。`
-                        : `，哪家每${curr.unit}比較划算？選出後輸入每${curr.unit}差額。`;
-                    speechText = `${curr.name}，${unitInfo}${unitSuffix}`;
-                } else {
-                    const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
-                    const speechMap = {
-                        easy:   `${curr.name}，${priceInfo}，哪個比較便宜？`,
-                        normal: `${curr.name}，${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
-                        hard:   `${curr.name}，${priceInfo}，哪個比較便宜？選出後輸入差額。`,
-                    };
-                    speechText = speechMap[diff] || `${curr.name}，哪個地方比較便宜？`;
+            // 語音引導（afterClose pattern：商品名稱介紹完畢後再播問題語音）
+            let speechText;
+            if (curr.isUnit) {
+                const unitInfo = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}`;
+                const unitSuffix = diff === 'easy'
+                    ? `，哪家每${curr.unit}比較划算？`
+                    : diff === 'normal'
+                    ? `，哪家每${curr.unit}比較划算？選出後再回答每${curr.unit}差多少元。`
+                    : `，哪家每${curr.unit}比較划算？選出後輸入每${curr.unit}差額。`;
+                speechText = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}${unitSuffix}`;
+            } else {
+                const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
+                const speechMap = {
+                    easy:   `${priceInfo}，哪個比較便宜？`,
+                    normal: `${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
+                    hard:   `${priceInfo}，哪個比較便宜？選出後輸入差額。`,
+                };
+                speechText = speechMap[diff] || `哪個地方比較便宜？`;
+            }
+            this.state.quiz.lastSpeechText = `${curr.name}，${speechText}`;
+            this._showItemIntroModal(curr, () => {
+                // 問題語音（modal 介紹商品名稱後銜接）
+                Game.Speech.speak(speechText, () => {
+                    // 困難模式記憶挑戰倒數（modal 關閉 + 語音結束後才遮住）
+                    if (diff === 'hard' && !curr.isTriple) {
+                        Game.TimerManager.setTimeout(() => this._startMemoryCountdown(), 300, 'ui');
+                    }
+                });
+                // 輔助點擊啟動
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 400, 'ui');
                 }
-                this.state.quiz.lastSpeechText = speechText;
-                Game.Speech.speak(speechText);
-            }, 400, 'speech');
-
-            // 輔助點擊啟動
-            if (this.state.settings.clickMode === 'on') {
-                Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 600, 'ui');
-            }
+            });
 
             // 10秒無操作提示（A5 hintDelay pattern）
             if (diff !== 'hard') {
@@ -829,13 +828,12 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(tick, 1000, 'ui');
         },
 
-        _showItemIntroModal(curr) {
+        _showItemIntroModal(curr, afterClose) {
             const existing = document.getElementById('b4-item-intro-modal');
             if (existing) existing.remove();
 
             let storesHTML;
             if (curr.isTriple) {
-                const sortedAsc = [...curr.stores].sort((a, b) => a.price - b.price);
                 storesHTML = curr.stores.map(s => `<span class="b4-intro-store">${s.storeIcon} ${s.store}<br><strong>${s.price}元</strong></span>`).join('');
             } else if (curr.isUnit) {
                 storesHTML = `
@@ -863,9 +861,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             document.body.appendChild(modal);
 
-            const close = () => { if (modal.parentNode) modal.remove(); };
-            const t = Game.TimerManager.setTimeout(close, 1800, 'ui');
-            modal.addEventListener('click', () => { Game.TimerManager.clearTimeout(t); close(); });
+            // afterClose pattern（B1/B2/B5/B6 pattern）
+            let closed = false;
+            const closeModal = () => {
+                if (closed) return;
+                closed = true;
+                if (modal.parentNode) modal.remove();
+                afterClose?.();
+            };
+            // 朗讀商品名稱，語音結束後自動關閉（closed guard 防重複）
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak(curr.name, closeModal);
+            }, 300, 'ui');
+            const t = Game.TimerManager.setTimeout(closeModal, 2200, 'ui'); // fallback
+            modal.addEventListener('click', () => { Game.TimerManager.clearTimeout(t); closeModal(); });
         },
 
         _renderHeader() {
@@ -1127,25 +1136,22 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindTripleEvents(curr, diff);
-            this._showItemIntroModal(curr);
 
-            // 語音
-            Game.TimerManager.setTimeout(() => {
-                const prices = curr.stores.map(s => `${s.store}${toTWD(s.price)}`).join('，');
-                const speechMap = {
-                    easy:   `${curr.name}，${prices}，哪家最便宜？`,
-                    normal: `${curr.name}，${prices}，找出最便宜的，再回答省了多少元。`,
-                    hard:   `${curr.name}，${prices}，請由便宜到貴依序點選。`,
-                };
-                const txt = speechMap[diff] || `${curr.name}，哪家最便宜？`;
-                this.state.quiz.lastSpeechText = txt;
-                Game.Speech.speak(txt);
-            }, 400, 'speech');
-
-            // 輔助點擊啟動
-            if (this.state.settings.clickMode === 'on') {
-                Game.TimerManager.setTimeout(() => AssistClick.activate(curr, null), 600, 'ui');
-            }
+            // 語音引導（afterClose pattern）
+            const prices = curr.stores.map(s => `${s.store}${toTWD(s.price)}`).join('，');
+            const tripleTextMap = {
+                easy:   `${prices}，哪家最便宜？`,
+                normal: `${prices}，找出最便宜的，再回答省了多少元。`,
+                hard:   `${prices}，請由便宜到貴依序點選。`,
+            };
+            const tripleText = tripleTextMap[diff] || `哪家最便宜？`;
+            this.state.quiz.lastSpeechText = `${curr.name}，${tripleText}`;
+            this._showItemIntroModal(curr, () => {
+                Game.Speech.speak(tripleText);
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr, null), 400, 'ui');
+                }
+            });
         },
 
         _bindTripleEvents(curr, diff) {

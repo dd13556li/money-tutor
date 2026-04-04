@@ -920,3 +920,44 @@ JS v3.9 → v4.0
 
 ### 搜尋關鍵字
 `_speakMustItemsOneByOne`、`afterClose`、`必買：`、`一起挑選吧`
+
+---
+
+## 二十六、B6 設計特色套用：商品選取浮動標籤（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B6 `_showItemFlyout` pattern）
+
+### 功能說明
+
+在 B5 商品選取時，顯示浮動標籤（icon + 名稱 + 金額），提供即時視覺確認。取消選取時不顯示（只有「加入」動作才有浮動反饋）。
+
+### 設計參照
+- **B6 `b6-item-flyout`**：購物放入購物籃時顯示飛出標籤（icon + 名稱 + 金額）
+- **A4 price popup / B1 coin popup**：統一的「動作→浮動視覺確認」pattern
+
+### 新增/修改
+
+| 項目 | 說明 |
+|------|------|
+| `_showItemFlyout(item, el)` | 新增方法：建立 `.b5-item-flyout` DOM，定位於 card 上方（或下方，如果 card 接近螢幕頂端）；1000ms 後移除 |
+| 商品點擊 click handler | 選取時（`!g.selectedIds.has(id)`）→ `this._showItemFlyout(item, card)` |
+
+### CSS 新增（b5_party_budget.css → v1.3）
+
+| 類別 | 說明 |
+|------|------|
+| `.b5-item-flyout` | 紫色漸層膠囊（`#6e28b4 → #a855f7`），flex layout，pointer-events:none |
+| `.b5-if-icon` | 16px emoji icon |
+| `.b5-if-price` | 小字（12px），opacity 0.9 |
+| `@keyframes b5FlyoutUp` | 0→70%：translateY(0→-20px)；70→100%：opacity 1→0，Y -30px |
+
+### 版本號
+CSS v1.2 → v1.3；JS v4.0 → v4.1
+
+### 教學設計
+- 視覺 + 語音雙軌確認：選取商品 → 語音（B5 原有）+ 浮動標籤（新增）
+- 浮動標籤持續 1s 後自動消失，不干擾下一個選取動作
+- `pointer-events: none` 確保標籤不攔截後續點擊
+
+### 搜尋關鍵字
+`_showItemFlyout`、`b5-item-flyout`、`b5FlyoutUp`

@@ -855,7 +855,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         g.selectedIds.add(id);
                         card.classList.add('selected');
-                        if (item) Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                        if (item) {
+                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                            this._showItemFlyout(item, card); // B6 flyout pattern
+                        }
                     }
                     this.audio.play('click');
                     this._updateTotalBar();
@@ -982,6 +985,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 .filter(i => !i._deleted)
                 .reduce((sum, i) => sum + i.price, 0);
             return baseTotal + customTotal;
+        },
+
+        // ── 商品選取浮動標籤（B6 flyout pattern）──────────────────
+        _showItemFlyout(item, el) {
+            const flyout = document.createElement('div');
+            flyout.className = 'b5-item-flyout';
+            flyout.innerHTML = `<span class="b5-if-icon">${item.icon}</span><span class="b5-if-name">${item.name}</span><span class="b5-if-price">+${item.price}元</span>`;
+            const rect = el.getBoundingClientRect();
+            flyout.style.cssText = rect.top > 60
+                ? `position:fixed;top:${rect.top - 40}px;left:${Math.min(rect.left, window.innerWidth - 160)}px;z-index:600;pointer-events:none;`
+                : `position:fixed;top:${rect.bottom + 6}px;left:${Math.min(rect.left, window.innerWidth - 160)}px;z-index:600;pointer-events:none;`;
+            document.body.appendChild(flyout);
+            Game.TimerManager.setTimeout(() => { if (flyout.parentNode) flyout.remove(); }, 1000, 'ui');
         },
 
         _updateTotalBar() {

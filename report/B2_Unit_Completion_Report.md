@@ -879,3 +879,50 @@ JS v3.9 → v4.0
 
 ### 搜尋關鍵字
 `afterClose`、`b2-task-intro-modal`、`_animateEasyEntries`、`ev.name`
+
+---
+
+## 二十三、B3/B5/B6 設計特色套用：困難模式提示彈窗（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B3/B5/B6 `_showHardModeHintModal` pattern）
+
+### 功能說明
+
+困難模式下提示按鈕及連續2次錯誤後，改為呼叫 `_showHardModeHintModal(question)`，以彈窗形式顯示完整計算步驟（起始金額 → 每個收支事件 → 最終餘額）並播語音。普通/簡單模式維持原本的 `_showCalcBreakdown(question)`（行內卡片）。
+
+### 設計參照
+- **B3 `_showHardModeHintModal`**：面額圖示 + 語音；困難用 modal，普通用 ghost slot
+- **B5/B6 `_showHardModeHintModal`**：同日實作，B2 與之命名和 overlay 結構對齊
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_showHardModeHintModal(question)` | 新增：計算 effective events/answer → 建立 `.b2-hm-overlay` 彈窗 → 語音「從N元開始，加上/減去…最後剩下N元」；`EventManager.on` 關閉按鈕；點遮罩關閉 |
+| 提示按鈕 handler | `diff === 'hard'` → `_showHardModeHintModal(question)`；其他 → `_showCalcBreakdown(question)` + 語音 |
+| `_handleNumpadAnswer` 錯誤路徑 | `isDiffHard` + `errorCount >= 2` → 800ms 後自動彈出 `_showHardModeHintModal`；普通/簡單仍用 `_showCalcBreakdown` |
+| 漸進提示邏輯修正 | 困難模式不顯示 range hint（第1次錯即進入 hard modal 路徑）；普通/簡單 error 1 → range hint，error 2+ → calc breakdown |
+
+### CSS 新增（b2_allowance_diary.css → v1.3）
+
+| 類別 | 說明 |
+|------|------|
+| `.b2-hm-overlay` | fixed inset:0，z-index:10300，半透明黑色遮罩 |
+| `.b2-hm-modal` | 白色圓角卡片，max-height 80vh，overflow-y auto |
+| `.b2-hm-header` | 標題列（置中，粗體） |
+| `.b2-hm-start-row`/`.b2-hm-row`/`.b2-hm-answer-row` | flex 行（op + name + result） |
+| `.b2-hm-op` | 操作符（income=綠，expense=紅，neutral=灰） |
+| `.b2-hm-answer` | 最終餘額（紫色，16px） |
+| `.b2-hm-close-btn` | 灰色關閉按鈕 |
+
+### 版本號
+CSS v1.2 → v1.3；JS v4.0 → v4.1
+
+### 技術要點
+- 使用 `_getEffectiveEvents(question)` + `_getEffectiveAnswer(question)` → 自訂事件也正確反映
+- 防重複：`document.getElementById('b2-hard-hint-modal')?.remove()` 確保同時只有一個彈窗
+- 語音以「加上/減去」（非「收入/支出」）更貼近數學語境
+- `EventManager.on` 綁定關閉按鈕（category='gameUI'），頁面切換自動清除
+
+### 搜尋關鍵字
+`_showHardModeHintModal`、`b2-hm-overlay`、`b2-hard-hint-modal`、`b2-hm-close-btn`
