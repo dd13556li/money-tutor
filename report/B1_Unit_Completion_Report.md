@@ -10,6 +10,7 @@
 > **更新日期**：2026-04-01（Rounds 43–44：硬幣逐一動畫 `_animateHintCoins`、放幣浮動標籤 `b1-coin-popup`、行程卡倒數計時器 `_startRouteTimer`）
 > **更新日期**：2026-04-03（互動豐富化：①普通模式新增提示按鈕 + 吉祥物圖示（`b1-hint-wrap`，原本只在困難模式）；②錯誤語音統一為「不對喔，你付的錢太少，請再試一次」；搜尋關鍵字：`b1-hint-wrap`、`不對喔，你付的錢太少`）
 > **更新日期**：2026-04-03（第二輪豐富化：①提示語音格式改為「可以用N個X元，M個Y元」（永遠含數量，分隔符「，」）；②放置區新增 ghost slot 引導——提示按鈕按下後錢包區顯示淡化正確面額圖示（`b1-wallet-ghost-slot`、`data-hint-idx`、`state.quiz.showHint`、`state.quiz.hintSlots`）；③金錢圖示統一大小：紙鈔 68px、硬幣 44px（B3 pattern）；搜尋關鍵字：`b1-wallet-ghost-slot`、`showHint`、`hintSlots`、`可以用`）
+> **更新日期**：2026-04-04（Ghost slot 正確性修正：①`addCoin()` 在 `showHint` 模式下，只允許放入對應未填充 ghost slot 的面額（`hintSlots.findIndex`），不匹配的面額播 error 音並拒絕，避免「隱形幣」導致總額計算錯誤；②改用直接 DOM 操作填充 ghost slot（移除 `b1-wallet-ghost-slot` class），CSS `transition:opacity 0.25s` 提供平滑視覺效果（B3 `_handleNormalDrop` pattern）；③新增 `_updateWalletStatusOnly()` 輔助函數——ghost slot 模式下只更新確認按鈕、進度條、面額摘要，不重繪 coinsEl；搜尋關鍵字：`Ghost slot 模式`、`_updateWalletStatusOnly`、`ghost slot.*findIndex`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B1 — 今天帶多少錢（Daily Budget）
 > **系列**：B 預算規劃

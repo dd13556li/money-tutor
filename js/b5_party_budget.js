@@ -577,6 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.items        = scenario.availableIds.map(id => themeData.allItems.find(i => i.id === id)).filter(Boolean);
             g.selectedIds  = new Set(g.items.filter(i => i.must).map(i => i.id));
             g.submitted    = false;
+            g.roundErrors  = 0; // 每關重置錯誤計數（B4 autoHint pattern）
 
             const app = document.getElementById('app');
             app.innerHTML = this._renderRoundHTML();
@@ -1031,6 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 g.streak = 0;
+                g.roundErrors = (g.roundErrors || 0) + 1;
                 this.audio.play('error');
                 if (!mustOk) {
                     this._showCenterFeedback('❌', '必買商品未選！');
@@ -1038,6 +1040,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     this._showCenterFeedback('❌', '超出預算！');
                     Game.Speech.speak(`不對喔，超出預算了，多了${toTWD(total - g.budget)}，請再試一次！`);
+                }
+                // 3次錯誤後自動觸發提示（B4 autoHint pattern）
+                if (g.roundErrors >= 3) {
+                    Game.TimerManager.setTimeout(() => this._showBudgetHint(), 800, 'ui');
                 }
             }
 

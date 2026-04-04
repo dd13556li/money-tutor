@@ -9,6 +9,7 @@
 > **更新日期**：2026-03-31（Round 42：必買/選購分組佈局 `b5-section-group`；選購剩餘預算即時更新；A4 商品分類 pattern）
 > **更新日期**：2026-04-01（Round 43：困難模式翻牌動畫 `b5-flip-reveal`，C5 差額圖示 pattern）
 > **更新日期**：2026-04-03（互動豐富化：①提示按鈕「💡 還能選什麼？」新增吉祥物圖示外包裹（`b5-hint-btn`）；②錯誤語音統一：超出預算「不對喔，超出預算了，多了X元，請再試一次！」；必買未選「不對喔，記得要選所有必買的商品喔！」；搜尋關鍵字：`不對喔，超出預算了`、`不對喔，記得要選`）
+> **更新日期**：2026-04-04（3次錯誤自動提示：①`renderRound()` 新增 `g.roundErrors = 0` 初始化；②`_handleConfirm` 錯誤分支累計 `g.roundErrors`，達 3 次後 800ms delay 自動呼叫 `_showBudgetHint()`（B4 `autoHint` pattern）；搜尋關鍵字：`roundErrors`、`g.roundErrors >= 3`）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：B5 — 生日派對預算（Party Budget）
 > **系列**：B 預算規劃

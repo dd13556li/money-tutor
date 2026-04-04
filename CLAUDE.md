@@ -444,6 +444,8 @@ toolbarConfig: {
 | B3 提示語音格式修正（2026-04-03）| B3 | 普通/困難模式提示語音統一改為「N個X元」（永遠顯示數量，含 1 個）；分隔符 `、` → `，`；例：「可以存入2個10元，1個5元」；搜尋 `可以存入.*個.*元` |
 | B1 提示語音格式 + Ghost Slot（2026-04-03）| B1 | `_showCoinHint()` 語音改為「可以用N個X元，M個Y元」（B3 pattern）；新增 ghost slot 引導：按提示後錢包放置區顯示淡化正確面額圖示（`b1-wallet-ghost-slot`、`b1WalletGhostIn` keyframe 結尾 `opacity:0.35`）；`state.quiz.showHint`/`hintSlots` 狀態；`_updateWalletDisplay()` 依 `showHint` 渲染 ghost 或一般幣；錢包幣圖示統一：紙鈔 68px、硬幣 44px；搜尋 `b1-wallet-ghost-slot`、`showHint`、`hintSlots`、`可以用` |
 | B6 提示語音格式統一（2026-04-03）| B6 | `_showPaymentHint()` 語音改為「可以用N個X元，M個Y元」（取代原「建議付面額×數量，再加…」）；`speechParts` 變數；搜尋 `speechParts`、`可以用` |
+| B1 Ghost slot 正確性修正（2026-04-04）| B1 | `addCoin()` ghost slot 模式：`hintSlots.findIndex(s.denom===denom && !s.filled)`，不匹配→error 音+拒絕（防隱形幣）；匹配→直接移除 `b1-wallet-ghost-slot` class（CSS `transition:opacity` 平滑填充，B3 `_handleNormalDrop` pattern）；新增 `_updateWalletStatusOnly()` 只更新按鈕/進度條/摘要不重繪 coinsEl；搜尋 `Ghost slot 模式`、`_updateWalletStatusOnly` |
+| B5 3次錯誤自動提示（2026-04-04）| B5 | `renderRound()` 加 `g.roundErrors=0`；`_handleConfirm` 錯誤分支 `g.roundErrors++`，達 3 次 → 800ms delay 呼叫 `_showBudgetHint()`（B4 `autoHint` pattern）；搜尋 `roundErrors`、`g.roundErrors >= 3` |
 
 ---
 

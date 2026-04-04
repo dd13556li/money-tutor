@@ -782,10 +782,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Wallet Operations ──────────────────────────────────
         addCoin(denom) {
+            const q = this.state.quiz;
+            // Ghost slot 模式：只允許放入對應 ghost slot 的面額（B3 _handleNormalDrop pattern）
+            if (q.showHint && q.hintSlots?.length) {
+                const slotIdx = q.hintSlots.findIndex(s => s.denom === denom && !s.filled);
+                if (slotIdx === -1) {
+                    this.audio.play('error');
+                    return; // 拒絕不符合 ghost slot 的面額
+                }
+                q.hintSlots[slotIdx].filled = true;
+                this.audio.play('coin');
+                const uid = ++this.state.uidCounter;
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
+                Game.Debug.log('wallet', `加入 ${denom}元（ghost slot ${slotIdx}），合計 ${this._getWalletTotal()}`);
+                // 直接移除 ghost class，CSS transition opacity:0.35→1（B3 pattern）
+                const slotEl = document.querySelector(`[data-hint-idx="${slotIdx}"]`);
+                if (slotEl) slotEl.classList.remove('b1-wallet-ghost-slot');
+                // 更新確認按鈕與進度條（不全量重繪 coinsEl）
+                this._updateWalletStatusOnly();
+                // 放幣語音
+                Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
+                // 浮動標籤
+                const coinArea2 = document.getElementById('wallet-coins') || document.getElementById('wallet-area');
+                if (coinArea2) {
+                    const rect2 = coinArea2.getBoundingClientRect();
+                    const popup2 = document.createElement('div');
+                    popup2.className = 'b1-coin-popup';
+                    popup2.textContent = `+${denom}元`;
+                    popup2.style.cssText = `position:fixed;left:${rect2.left + rect2.width/2}px;top:${rect2.top + 10}px;`;
+                    document.body.appendChild(popup2);
+                    Game.TimerManager.setTimeout(() => { if (popup2.parentNode) popup2.remove(); }, 900, 'ui');
+                }
+                return;
+            }
             this.audio.play('coin');
             const uid = ++this.state.uidCounter;
             this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
-            this.state.quiz.denomStats[denom] = (this.state.quiz.denomStats[denom] || 0) + 1;
+            q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
             // 放幣語音（F4 instant feedback + C1 coin recognition pattern）
@@ -923,6 +957,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     const d = parseInt(el.dataset.denom);
                     el.classList.toggle('b1-coin-faded', total > 0 && remaining > 0 && d > remaining);
                 });
+            }
+        },
+
+        // ── Ghost slot 模式下的狀態更新（不重繪 coinsEl）────────
+        // 只更新確認按鈕、進度條、面額摘要；coinsEl 已由 ghost class 移除處理
+        _updateWalletStatusOnly() {
+            const total    = this._getWalletTotal();
+            const required = this.state.quiz.questions[this.state.quiz.currentQuestion]?.total ?? 0;
+            const enough   = total >= required;
+
+            // 合計顯示
+            const totalEl = document.getElementById('wallet-total');
+            if (totalEl) {
+                totalEl.textContent = `${total} 元`;
+                const wasEnough = totalEl.classList.contains('enough');
+                totalEl.className = 'b1-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+                if (enough && !wasEnough && total > 0) {
+                    totalEl.classList.add('b1-total-pop');
+                    Game.TimerManager.setTimeout(() => totalEl.classList.remove('b1-total-pop'), 500, 'ui');
+                }
+            }
+            // 進度條
+            const fillEl = document.getElementById('b1-wallet-progress-fill');
+            if (fillEl && required > 0) {
+                const pct = Math.min(100, Math.round((total / required) * 100));
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b1-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
+            }
+            // 確認按鈕
+            const confirmBtn = document.getElementById('confirm-btn');
+            const wasSufficient = confirmBtn && !confirmBtn.disabled;
+            if (confirmBtn) {
+                confirmBtn.disabled = !enough;
+                if (enough && !wasSufficient && total > 0) {
+                    if (total === required) {
+                        this._showExactMatchToast();
+                        Game.Speech.speak('剛好！不需要找零，可以出發了！');
+                    } else {
+                        Game.Speech.speak('金額足夠，可以出發了！');
+                    }
+                }
+                const card = document.querySelector('.b1-schedule-card');
+                if (card) card.classList.toggle('exact-match', total === required && total > 0);
+            }
+            // 面額摘要
+            const denomSummaryEl = document.getElementById('b1-denom-summary');
+            if (denomSummaryEl && this.state.wallet.length > 0) {
+                const counts = {};
+                this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
+                denomSummaryEl.innerHTML = Object.entries(counts)
+                    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                    .map(([d, n]) => `<span class="b1-ds-item">${d}元×${n}</span>`).join('');
+                denomSummaryEl.style.display = '';
             }
         },
 
