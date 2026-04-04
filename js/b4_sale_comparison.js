@@ -1157,8 +1157,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     this.state.quiz.selectErrorCount++;
+                    const tripleAutoHint = this.state.quiz.selectErrorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak('不對喔，請再比較看看');
+                    const tripleHintSpeech = tripleAutoHint
+                        ? `不對喔，${curr.stores[curr.cheapestIdx].store}才是最便宜的，請再選看看`
+                        : '不對喔，請再比較看看';
+                    Game.Speech.speak(tripleHintSpeech);
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         curr.stores.forEach((_, i) => {
@@ -1166,6 +1170,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (c) c.classList.remove('selected-wrong', 'reveal-correct', 'selected-correct');
                             c?.querySelectorAll('.b4-result-mark,.b4-cheaper-tag')?.forEach(m => m.remove());
                         });
+                        if (tripleAutoHint) {
+                            // 3次錯誤後高亮最便宜商品（B4 autoHint pattern）
+                            const hintCard = document.getElementById(`tcard-${curr.cheapestIdx}`);
+                            if (hintCard) {
+                                hintCard.classList.add('b4-select-hint');
+                                Game.TimerManager.setTimeout(() => hintCard.classList.remove('b4-select-hint'), 2400, 'ui');
+                            }
+                        }
                     }, 1500, 'turnTransition');
                 }
             }

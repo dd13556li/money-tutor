@@ -446,6 +446,7 @@ toolbarConfig: {
 | B6 提示語音格式統一（2026-04-03）| B6 | `_showPaymentHint()` 語音改為「可以用N個X元，M個Y元」（取代原「建議付面額×數量，再加…」）；`speechParts` 變數；搜尋 `speechParts`、`可以用` |
 | B1 Ghost slot 正確性修正（2026-04-04）| B1 | `addCoin()` ghost slot 模式：`hintSlots.findIndex(s.denom===denom && !s.filled)`，不匹配→error 音+拒絕（防隱形幣）；匹配→直接移除 `b1-wallet-ghost-slot` class（CSS `transition:opacity` 平滑填充，B3 `_handleNormalDrop` pattern）；新增 `_updateWalletStatusOnly()` 只更新按鈕/進度條/摘要不重繪 coinsEl；搜尋 `Ghost slot 模式`、`_updateWalletStatusOnly` |
 | B5 3次錯誤自動提示（2026-04-04）| B5 | `renderRound()` 加 `g.roundErrors=0`；`_handleConfirm` 錯誤分支 `g.roundErrors++`，達 3 次 → 800ms delay 呼叫 `_showBudgetHint()`（B4 `autoHint` pattern）；搜尋 `roundErrors`、`g.roundErrors >= 3` |
+| B4 三商店 3次錯誤自動提示（2026-04-04）| B4 | `_handleTripleSelectClick` 錯誤分支：`selectErrorCount >= 3` → `tripleAutoHint=true`；語音直接說答案「X才是最便宜的，請再選看看」；高亮正確商品（`b4-select-hint` 2.4s）；搜尋 `tripleAutoHint`、`tripleHintSpeech` |
 
 ---
 
