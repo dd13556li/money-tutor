@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctCount: 0,
                 totalSaved: 0,
                 selectErrorCount: 0,
+                diffErrorCount: 0,
                 streak: 0,
                 questions: [],
                 comparisonHistory: [],
@@ -1335,12 +1336,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
                     } else {
                         this.audio.play('error');
-                        this._showDiffFormulaHint();
+                        this.state.quiz.diffErrorCount = (this.state.quiz.diffErrorCount || 0) + 1;
+                        const revealTriple = this.state.quiz.diffErrorCount >= 3;
+                        if (revealTriple) this._showDiffFormulaHint();
                         if (this.state.settings.retryMode === 'proceed') {
                             Game.Speech.speak(`差額是${toTWD(correctDiff)}`);
                             Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                         } else {
-                            Game.Speech.speak(`不對喔，差額是${toTWD(correctDiff)}，請再試一次`);
+                            if (revealTriple) {
+                                Game.Speech.speak(`不對喔，差額是${toTWD(correctDiff)}，請再試一次`);
+                            } else {
+                                Game.Speech.speak(`不對喔，再算算看`);
+                            }
                             Game.TimerManager.setTimeout(() => {
                                 this.state.isProcessing = false;
                                 section.querySelectorAll('.b4-diff-opt').forEach(b => {
@@ -1494,8 +1501,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.EventManager.on(diffHintBtn, 'click', () => {
                         this._showDiffFormulaHint();
                         const hintSpeech = curr.isUnit
-                            ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，差${curr.diff}元`
-                            : `${curr.optA.price}減${curr.optB.price}`;
+                            ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，差多少元？`
+                            : `${curr.optA.store}${curr.optA.price}元，${curr.optB.store}${curr.optB.price}元，兩者差多少元？`;
                         Game.Speech.speak(hintSpeech);
                     }, {}, 'diffUI');
                 }
@@ -1761,9 +1768,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 this.state.quiz.streak = 0;
+                this.state.quiz.diffErrorCount = (this.state.quiz.diffErrorCount || 0) + 1;
                 this.audio.play('error');
-                this._showDiffFormulaHint(); // 答錯即顯示算式提示
                 const ciW = this.state.currentDiffItem;
+                const revealAnswer = this.state.quiz.diffErrorCount >= 3;
+                // 漸進提示：第1~2次不透露答案，第3次起才顯示算式
+                if (revealAnswer) {
+                    this._showDiffFormulaHint(); // 第3次後顯示算式
+                }
                 const diffWrongSpeechBase = (ciW && ciW.isUnit)
                     ? `每${ciW.unit}差${correctDiff}元`
                     : `差額是${toTWD(correctDiff)}`;
@@ -1774,7 +1786,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // retry: re-enable buttons after showing correct
                     this._showCenterFeedback('❌', '再試一次！');
-                    Game.Speech.speak(`不對喔，${diffWrongSpeechBase}，請再試一次`);
+                    if (revealAnswer) {
+                        // 第3次以上：直接說出答案
+                        Game.Speech.speak(`不對喔，${diffWrongSpeechBase}，請再試一次`);
+                    } else {
+                        // 第1~2次：給方向提示，不透露答案
+                        const ciWDir = ciW && !ciW.isUnit && this.state.numpadValue
+                            ? parseInt(this.state.numpadValue) > correctDiff ? '多了' : '少了'
+                            : null;
+                        const dirHint = ciWDir ? `算${ciWDir}，` : '';
+                        Game.Speech.speak(`不對喔，${dirHint}再想想看`);
+                    }
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         // Re-enable diff options
@@ -1799,6 +1821,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextQuestion() {
             const q = this.state.quiz;
             q.selectErrorCount = 0;
+            q.diffErrorCount = 0;
             q.currentQuestion++;
             if (q.currentQuestion >= q.totalQuestions) {
                 this.showResults();
