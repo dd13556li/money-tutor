@@ -22,3 +22,6 @@ pdf/
 
 # 內部報告（不上傳 GitHub）
 report/
+
+# 競賽文件（不上傳 GitHub）
+doc/
