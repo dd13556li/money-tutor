@@ -607,14 +607,20 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = this._renderRoundHTML();
             this._bindRoundEvents();
             this._updateTotalBar();
-            this._showRoundIntroCard(g.currentRound + 1, scenario.budget);
+            this._showRoundIntroCard(g.currentRound + 1, scenario.budget, () => {
+                // afterClose callback（B1 pattern）：關卡介紹語音結束後，easy 模式逐項朗讀必買商品
+                if (this.state.settings.difficulty === 'easy') {
+                    Game.TimerManager.setTimeout(() => this._speakMustItemsOneByOne(), 200, 'speech');
+                }
+            });
 
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
             }
         },
 
-        _showRoundIntroCard(roundNum, budget) {
+        _showRoundIntroCard(roundNum, budget, afterClose) {
+            // B1 _showTaskModal afterClose pattern
             const existing = document.getElementById('b5-round-intro');
             if (existing) existing.remove();
             const card = document.createElement('div');
@@ -647,14 +653,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 hard:   `第${roundNum}關，預算${budget}元，要精算才不會超支！`,
             };
             this.state.game.lastSpeechText = speechMap[diff];
-            Game.Speech.speak(speechMap[diff]);
+            let closed = false;
             const dismiss = () => {
-                if (!document.body.contains(card)) return;
-                card.classList.add('b5-ri-fade');
-                Game.TimerManager.setTimeout(() => { if (card.parentNode) card.remove(); }, 300, 'turnTransition');
+                if (closed) return;
+                closed = true;
+                if (document.body.contains(card)) {
+                    card.classList.add('b5-ri-fade');
+                    Game.TimerManager.setTimeout(() => {
+                        if (card.parentNode) card.remove();
+                        afterClose?.();
+                    }, 300, 'turnTransition');
+                }
             };
+            // 語音結束後關閉卡片（B1 afterClose pattern）
+            Game.Speech.speak(speechMap[diff], dismiss);
             card.addEventListener('click', dismiss, { once: true });
-            Game.TimerManager.setTimeout(dismiss, 1800, 'turnTransition');
+            Game.TimerManager.setTimeout(dismiss, 2200, 'turnTransition');
+        },
+
+        // ── 簡單模式：必買商品逐項朗讀（B1 _speakItemsOneByOne pattern）───
+        _speakMustItemsOneByOne() {
+            const g = this.state.game;
+            const mustItems = g.items.filter(i => i.must);
+            if (!mustItems.length) return;
+            let idx = 0;
+            const speakNext = () => {
+                if (idx >= mustItems.length) {
+                    Game.TimerManager.setTimeout(() => {
+                        Game.Speech.speak(`共${mustItems.length}項必買，一起挑選吧！`);
+                    }, 300, 'speech');
+                    return;
+                }
+                const item = mustItems[idx++];
+                Game.Speech.speak(`必買：${item.name}，${toTWD(item.price)}`, () => {
+                    Game.TimerManager.setTimeout(speakNext, 350, 'speech');
+                });
+            };
+            speakNext();
         },
 
         _renderRoundHTML() {

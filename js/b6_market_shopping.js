@@ -790,15 +790,20 @@ document.addEventListener('DOMContentLoaded', () => {
             g.customItems = []; // 自訂購物項目
 
             this._renderShoppingUI();
-            this._showMissionIntroModal(g.mission, g.currentRound + 1);
+            this._showMissionIntroModal(g.mission, g.currentRound + 1, () => {
+                // afterClose callback（B1 pattern）：easy 模式逐項朗讀採購項目
+                if (this.state.settings.difficulty === 'easy') {
+                    Game.TimerManager.setTimeout(() => this._speakMissionItemsOneByOne(g.mission), 200, 'speech');
+                }
+            });
 
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
             }
         },
 
-        // ── 關卡開場任務說明彈窗（B1 _showTaskModal pattern）──
-        _showMissionIntroModal(mission, roundNum) {
+        // ── 關卡開場任務說明彈窗（B1 _showTaskModal afterClose pattern）──
+        _showMissionIntroModal(mission, roundNum, afterClose) {
             const existing = document.getElementById('b6-mission-intro');
             if (existing) existing.remove();
             const g = this.state.game;
@@ -830,15 +835,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             document.body.appendChild(modal);
             const welcomePrefix = isFirstRound ? `歡迎來到${mkt.name}！` : '';
-            Game.Speech.speak(`${welcomePrefix}第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`);
-
+            let closed = false;
             const dismiss = () => {
-                if (!modal.parentNode) return;
-                modal.classList.add('b6-mi-fade');
-                Game.TimerManager.setTimeout(() => { if (modal.parentNode) modal.remove(); }, 350, 'ui');
+                if (closed) return;
+                closed = true;
+                if (modal.parentNode) {
+                    modal.classList.add('b6-mi-fade');
+                    Game.TimerManager.setTimeout(() => {
+                        if (modal.parentNode) modal.remove();
+                        afterClose?.();
+                    }, 350, 'ui');
+                }
             };
+            // 語音結束後關閉彈窗（B1 afterClose pattern）
+            Game.Speech.speak(`${welcomePrefix}第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`, dismiss);
             modal.addEventListener('click', dismiss, { once: true });
-            Game.TimerManager.setTimeout(dismiss, 2800, 'turnTransition');
+            Game.TimerManager.setTimeout(dismiss, 3200, 'turnTransition');
+        },
+
+        // ── 簡單模式：採購項目逐項朗讀（B1 _speakItemsOneByOne pattern）─
+        _speakMissionItemsOneByOne(mission) {
+            const items = mission.items.map(({ stall, id }) => {
+                const item = _currentStalls[stall]?.items.find(i => i.id === id);
+                return item ? item : null;
+            }).filter(Boolean);
+            if (!items.length) return;
+            let idx = 0;
+            const speakNext = () => {
+                if (idx >= items.length) {
+                    Game.TimerManager.setTimeout(() => {
+                        Game.Speech.speak(`共${items.length}樣商品，準備出發！`);
+                    }, 300, 'speech');
+                    return;
+                }
+                const item = items[idx++];
+                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                    Game.TimerManager.setTimeout(speakNext, 350, 'speech');
+                });
+            };
+            speakNext();
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────

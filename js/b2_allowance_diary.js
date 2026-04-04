@@ -816,32 +816,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
             const diff = this.state.settings.difficulty;
 
-            // 開題起始金額彈窗（B1 _showTaskModal pattern）
-            this._showTaskIntroModal(currentQ);
-            // 類別圖示動畫導引（Round 44）
-            Game.TimerManager.setTimeout(() => this._showThemeGuide(), 2400, 'ui');
-
-            // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）
+            // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）—— 視覺動畫立即開始
             if (diff === 'easy') {
                 this._animateEasyEntries(currentQ);
             }
-            Game.TimerManager.setTimeout(() => {
-                // 主題情境語音（Round 39）
-                const themeKey = this.state.settings.diaryTheme;
-                const themeIntros = {
-                    school:  '學校週記，',
-                    holiday: '假日時光日記，',
-                    family:  '家庭生活日記，',
-                };
-                const themePrefix = (themeKey && themeKey !== 'random' && themeIntros[themeKey]) ? themeIntros[themeKey] : '';
-                const speechMap = {
-                    easy:   `${themePrefix}看看日記，計算最後剩下多少錢？`,
-                    normal: `${themePrefix}看看每筆收入和支出，算出最後的金額。`,
-                    hard:   `${themePrefix}仔細看每筆記錄，輸入最後剩下多少元。`,
-                };
-                this.state.quiz.lastSpeechText = speechMap[diff];
-                Game.Speech.speak(speechMap[diff]);
-            }, 500, 'speech');
+            // 開題起始金額彈窗（B1 _showTaskModal afterClose pattern）
+            // 語音結束後才關閉彈窗，再播主題語音
+            const themeKey = this.state.settings.diaryTheme;
+            const themeIntros = {
+                school:  '學校週記，',
+                holiday: '假日時光日記，',
+                family:  '家庭生活日記，',
+            };
+            const themePrefix = (themeKey && themeKey !== 'random' && themeIntros[themeKey]) ? themeIntros[themeKey] : '';
+            const speechMap = {
+                easy:   `${themePrefix}看看日記，計算最後剩下多少錢？`,
+                normal: `${themePrefix}看看每筆收入和支出，算出最後的金額。`,
+                hard:   `${themePrefix}仔細看每筆記錄，輸入最後剩下多少元。`,
+            };
+            this.state.quiz.lastSpeechText = speechMap[diff];
+            this._showTaskIntroModal(currentQ, () => {
+                Game.TimerManager.setTimeout(() => Game.Speech.speak(speechMap[diff]), 200, 'speech');
+            });
+            // 類別圖示動畫導引（Round 44）
+            Game.TimerManager.setTimeout(() => this._showThemeGuide(), 2400, 'ui');
 
             // 輔助點擊啟動（待動畫完成後）
             if (this.state.settings.clickMode === 'on') {
@@ -1251,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 逐項語音（C1 逐一計數 pattern）
                     const ev = question.events[i];
                     const verb = ev.type === 'income' ? '收入' : '花了';
-                    Game.Speech.speak(`${verb}${ev.amount}元`);
+                    Game.Speech.speak(`${ev.name}，${verb}${ev.amount}元`); // B1 _speakItemsOneByOne pattern：逐項朗讀名稱＋金額
                 }, 500 + i * 800, 'ui');
             });
 
@@ -1316,7 +1314,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 開題起始金額彈窗（B1 _showTaskModal pattern）─────────
-        _showTaskIntroModal(question) {
+        _showTaskIntroModal(question, afterClose) {
+            // B1 _showTaskModal afterClose pattern：語音結束後才關閉彈窗並執行後續語音
             document.getElementById('b2-task-intro-modal')?.remove();
             const modal = document.createElement('div');
             modal.id = 'b2-task-intro-modal';
@@ -1329,11 +1328,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b2-task-intro-tap">點任意處繼續</div>
                 </div>`;
             document.body.appendChild(modal);
-            Game.Speech.speak(`本週零用錢，起始${question.startAmount}元`);
-            modal.addEventListener('click', () => modal.remove());
-            Game.TimerManager.setTimeout(() => {
+            let closed = false;
+            const closeModal = () => {
+                if (closed) return;
+                closed = true;
                 if (document.body.contains(modal)) modal.remove();
-            }, 2200, 'ui');
+                afterClose?.();
+            };
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak(`本週零用錢，起始${question.startAmount}元`, closeModal);
+            }, 300, 'ui');
+            modal.addEventListener('click', closeModal);
+            Game.TimerManager.setTimeout(closeModal, 2600, 'ui');
         },
 
         // ── 類別圖示動畫導引（Round 44）──────────────────────────

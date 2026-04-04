@@ -1030,3 +1030,37 @@ CSS v4.0 → v4.1；JS v3.9 → v4.0
 
 ### 搜尋關鍵字
 `_showHardModeHintModal`、`b6-hint-modal-overlay`、`b6-hm-close-btn`、`付法分析`
+
+---
+
+## 二十一、B1 設計特色套用：afterClose 模式 + 購物逐項語音（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B1 `afterClose` callback pattern + `_speakItemsOneByOne`）
+
+### 功能說明
+
+1. **afterClose callback pattern**：`_showMissionIntroModal(mission, roundNum, afterClose)` 新增 `afterClose` 參數，modal fade 動畫結束後呼叫，確保逐項語音不與任務介紹語音重疊。
+2. **購物逐項語音**：新增 `_speakMissionItemsOneByOne(mission)`，在 easy 模式任務開始後逐一朗讀購物項目「NAME，PRICE」，最後播結語「共N樣商品，準備出發！」。
+
+### 設計參照
+- **B1 `_showTaskModal(curr, afterClose)`**：`closed` guard + fade + `afterClose?.()` callback chain
+- **B1 `_speakItemsOneByOne`**：遞迴函數，每項語音結束後 350ms 再播下一項，全部結束後播結語
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_showMissionIntroModal(mission, roundNum, afterClose)` | 新增 `afterClose` 參數；`closed` guard；fade 後呼叫 `afterClose?.()` |
+| `_speakMissionItemsOneByOne(mission)` | 新增：從 `_currentStalls` 解析各項目名稱+金額，遞迴朗讀 |
+| `renderRound()` | 傳 `afterClose` → easy 模式觸發 `_speakMissionItemsOneByOne(mission)` |
+
+### 版本號
+CSS v4.1（保持）；JS v4.0 → v4.1
+
+### 技術要點
+- `_speakMissionItemsOneByOne` 使用模組層級的 `_currentStalls`（`renderRound` 前已設定），closure 安全
+- 購物項目從 `mission.items[]` 解析：`{ stall, id }` → `_currentStalls[stall]?.items.find(i => i.id === id)`
+- `filter(Boolean)` 防止找不到商品的 null 值
+
+### 搜尋關鍵字
+`_speakMissionItemsOneByOne`、`afterClose`、`準備出發`、`_currentStalls`

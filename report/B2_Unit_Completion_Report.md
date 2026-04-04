@@ -845,3 +845,37 @@ CSS v1.1 → v1.2；JS v3.8 → v3.9
 
 ### 搜尋關鍵字
 `customItemsEnabled`、`_getEffectiveEvents`、`b2-custom-events-panel`、`b2-cep-add-btn`
+
+---
+
+## 二十二、B1 設計特色套用：afterClose 模式 + 逐項語音（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B1 `afterClose` callback pattern + `_speakItemsOneByOne`）
+
+### 功能說明
+
+1. **afterClose callback pattern**：`_showTaskIntroModal(question, afterClose)` 新增 `afterClose` 參數，modal 語音結束（或被點擊關閉）後自動呼叫，確保主題語音不與介紹語音重疊。
+2. **逐項語音含名稱**：`_animateEasyEntries` 逐事件語音改為 `${ev.name}，${verb}${ev.amount}元`（原本只有金額），讓學生在聆聽時能同步理解各事件的名稱。
+
+### 設計參照
+- **B1 `_showTaskModal(curr, afterClose)`**：`closed` guard + 語音 callback chain + `afterClose?.()` 呼叫
+- **B1 `_speakItemsOneByOne`**：逐一朗讀項目名稱＋金額，遞迴 + 350ms 間隔
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_showTaskIntroModal(question, afterClose)` | 新增 `afterClose` 參數；`closed` guard；語音結束後呼叫 `afterClose?.()` |
+| `renderQuestion()` | 傳 `afterClose` callback → modal 關閉後播主題語音 |
+| `_animateEasyEntries` | 逐事件語音加入 `${ev.name}，` 前綴 |
+
+### 版本號
+JS v3.9 → v4.0
+
+### 技術要點
+- `closed` guard 防止重複關閉（點擊 + timer 同時觸發）
+- animation（視覺）不依賴 afterClose，仍即時執行；語音順序由 callback chain 控制
+- `_animateEasyEntries` 屬於視覺動畫函數，語音為副效果，兩者獨立執行
+
+### 搜尋關鍵字
+`afterClose`、`b2-task-intro-modal`、`_animateEasyEntries`、`ev.name`

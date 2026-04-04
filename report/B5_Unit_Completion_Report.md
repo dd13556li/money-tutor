@@ -886,3 +886,37 @@ CSS v1.1 → v1.2；JS v3.8 → v3.9
 
 ### 搜尋關鍵字
 `_showHardModeHintModal`、`b5-hint-modal-overlay`、`b5-hm-close-btn`、`b5-hm-budget-val`
+
+---
+
+## 二十五、B1 設計特色套用：afterClose 模式 + 必買逐項語音（2026-04-05）
+
+> **更新日期**：2026-04-05（參照 B1 `afterClose` callback pattern + `_speakItemsOneByOne`）
+
+### 功能說明
+
+1. **afterClose callback pattern**：`_showRoundIntroCard(roundNum, budget, afterClose)` 新增 `afterClose` 參數，卡片動畫消失後呼叫，確保逐項語音不與關卡介紹語音重疊。
+2. **必買逐項語音**：新增 `_speakMustItemsOneByOne()`，在 easy 模式關卡開始後逐一朗讀必買項目「必買：NAME，PRICE」，最後播結語「共N項必買，一起挑選吧！」。
+
+### 設計參照
+- **B1 `_showTaskModal(curr, afterClose)`**：`closed` guard + fade animation + `afterClose?.()` 呼叫
+- **B1 `_speakItemsOneByOne`**：遞迴函數，每項語音結束後 350ms 再播下一項，全部結束後播結語
+
+### 新增/修改函數
+
+| 函數/區域 | 說明 |
+|----------|------|
+| `_showRoundIntroCard(roundNum, budget, afterClose)` | 新增 `afterClose` 參數；`closed` guard；fade 動畫結束後呼叫 `afterClose?.()` |
+| `_speakMustItemsOneByOne()` | 新增：遞迴朗讀 `g.items.filter(i => i.must)` 各項目 |
+| `renderRound()` | 傳 `afterClose` → easy 模式觸發 `_speakMustItemsOneByOne()` |
+
+### 版本號
+JS v3.9 → v4.0
+
+### 技術要點
+- `closed` guard 同 B1，防止 speech callback 與 timer 重複關閉
+- normal/hard 模式 afterClose 不觸發逐項語音（各模式有各自的語音邏輯）
+- `_speakMustItemsOneByOne` 結語計數使用 `mustItems.length`（實際必買數量，非全部商品）
+
+### 搜尋關鍵字
+`_speakMustItemsOneByOne`、`afterClose`、`必買：`、`一起挑選吧`

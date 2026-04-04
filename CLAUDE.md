@@ -460,6 +460,9 @@ toolbarConfig: {
 | B6 自訂購物項目功能（2026-04-04）| B6 | 設定頁「難度」下新增「自訂購物項目」切換列（普通/困難可見，`#b6-custom-items-toggle-row`）；`state.settings.customItemsEnabled`；`g.customItems[]`；購物頁顯示 `b6-custom-items-panel`（`_renderCustomItemsPanel`）；`_bindCustomItemsPanel`；`_calcMissionTotal()` 新增 `customTotal`；搜尋 `customItemsEnabled`、`b6-custom-items-panel`、`b6-cip-add-btn` |
 | B5 困難模式提示彈窗（2026-04-05）| B5 | `_showHardModeHintModal()`（B3 pattern）：困難模式提示按鈕/3次錯誤自動觸發→彈窗顯示預算/必買合計/可加選商品（含價格）+ 語音；`b5-hint-modal-overlay`/`.b5-hint-modal`；其他模式仍用 `_showBudgetHint()`；搜尋 `_showHardModeHintModal`、`b5-hint-modal-overlay`、`b5-hm-close-btn` |
 | B6 困難模式付法彈窗（2026-04-05）| B6 | `_showHardModeHintModal(total)`（B3 pattern）：困難模式新增提示按鈕（「💡 付法分析」，有吉祥物）；貪婪分解面額→彈窗顯示鈔票/硬幣圖示（紙鈔62px/硬幣48px）＋語音；`b6-hint-modal-overlay`/`.b6-hint-modal`；普通模式仍用 `_showPaymentHint(total)` toast；搜尋 `_showHardModeHintModal`、`b6-hint-modal-overlay`、`b6-hm-close-btn` |
+| B2 afterClose 模式 + 逐項語音（2026-04-05）| B2 | `_showTaskIntroModal(question, afterClose)` 加 B1 `afterClose` callback pattern（`closed` guard + 語音結束後呼叫）；`renderQuestion()` 傳 afterClose → modal 關閉後播主題語音；`_animateEasyEntries` 逐事件語音改為 `${ev.name}，${verb}${ev.amount}元`（含名稱）；搜尋 `afterClose`、`b2-task-intro-modal`、`_animateEasyEntries` |
+| B5 afterClose 模式 + 必買逐項語音（2026-04-05）| B5 | `_showRoundIntroCard(roundNum, budget, afterClose)` 加 B1 pattern；新增 `_speakMustItemsOneByOne()`：逐一朗讀必買項目「必買：NAME，PRICE」+ 結語；`renderRound()` 傳 afterClose → easy 模式關閉後觸發逐項語音；搜尋 `_speakMustItemsOneByOne`、`afterClose`、`必買：` |
+| B6 afterClose 模式 + 購物逐項語音（2026-04-05）| B6 | `_showMissionIntroModal(mission, roundNum, afterClose)` 加 B1 pattern；新增 `_speakMissionItemsOneByOne(mission)`：逐一朗讀購物項目「NAME，PRICE」+ 結語；`renderRound()` 傳 afterClose → easy 模式關閉後觸發逐項語音；搜尋 `_speakMissionItemsOneByOne`、`afterClose`、`準備出發` |
 
 ---
 
