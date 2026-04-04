@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: 'off', marketType: null },
+            settings: { difficulty: null, rounds: null, clickMode: 'off', marketType: null, customItemsEnabled: false },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -557,6 +557,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
+                        <div class="b-setting-group">
+                            <div id="b6-custom-items-toggle-row" style="display:none;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂購物項目</label>
+                                <div class="b-btn-group" id="b6-custom-items-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-custom="off">關閉</button>
+                                    <button class="b-sel-btn" data-custom="on">開啟</button>
+                                </div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在購物頁面新增自訂商品，計入付款總金額</div>
+                            </div>
+                        </div>
                         <div class="b-setting-group" id="assist-click-group" style="display:none;">
                             <label class="b-setting-label">🤖 輔助點擊：</label>
                             <div class="b-btn-group" id="assist-group">
@@ -633,12 +643,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const desc = document.getElementById('diff-desc');
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
                     const assistGroup = document.getElementById('assist-click-group');
+                    const customToggle = document.getElementById('b6-custom-items-toggle-row');
                     if (assistGroup) {
                         if (btn.dataset.val === 'easy') {
                             assistGroup.style.display = '';
+                            if (customToggle) customToggle.style.display = 'none';
+                            this.state.settings.customItemsEnabled = false;
+                            document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
                         } else {
                             assistGroup.style.display = 'none';
                             this.state.settings.clickMode = 'off';
+                            if (customToggle) customToggle.style.display = '';
                         }
                     }
                     this._checkCanStart();
@@ -674,6 +689,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('active');
                     this.state.settings.marketType = btn.dataset.market;
                     this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
                 }, {}, 'settings');
             });
 
@@ -764,6 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.activeStall = Object.keys(_currentStalls)[0];
             g.phase       = 'shopping';
             g.paidAmount  = 0;
+            g.customItems = []; // 自訂購物項目
 
             this._renderShoppingUI();
             this._showMissionIntroModal(g.mission, g.currentRound + 1);
@@ -926,6 +950,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-products-grid">${productsHTML}</div>
                 </div>
 
+                <!-- 自訂購物項目 -->
+                <div id="b6-custom-items-list"></div>
+                ${this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy' ? this._renderCustomItemsPanel() : ''}
+
                 <!-- 購物籃 -->
                 <div class="b6-basket-bar">
                     <span>🛒 小計：<span class="b6-basket-total">${total}</span> 元</span>
@@ -936,6 +964,55 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindShoppingEvents();
+        },
+
+        _renderCustomItemsPanel() {
+            return `
+            <div class="b6-custom-items-panel" id="b6-cip-panel">
+                <div class="b6-cip-header">🛍️ 自訂購物項目</div>
+                <div class="b6-cip-add-row">
+                    <input type="text" id="b6-cip-name-input" placeholder="商品名稱" maxlength="8" class="b6-cip-input">
+                    <input type="number" id="b6-cip-price-input" placeholder="金額" min="1" max="9999" class="b6-cip-input b6-cip-price-inp">
+                    <button class="b6-cip-add-btn" id="b6-cip-add-btn">＋ 新增</button>
+                </div>
+            </div>`;
+        },
+
+        _bindCustomItemsPanel() {
+            const g = this.state.game;
+            const addBtn = document.getElementById('b6-cip-add-btn');
+            if (!addBtn) return;
+            Game.EventManager.on(addBtn, 'click', () => {
+                const nameEl  = document.getElementById('b6-cip-name-input');
+                const priceEl = document.getElementById('b6-cip-price-input');
+                const name  = nameEl?.value.trim();
+                const price = parseInt(priceEl?.value);
+                if (!name || !price || price < 1) return;
+                const newItem = { name, price, icon: '🛍️', _deleted: false };
+                g.customItems.push(newItem);
+                const ci  = g.customItems.length - 1;
+                const list = document.getElementById('b6-custom-items-list');
+                const row = document.createElement('div');
+                row.className = 'b6-list-item b6-cip-custom-row';
+                row.id = `b6-custom-item-${ci}`;
+                row.innerHTML = `<span class="b6-list-icon">${newItem.icon}</span><span class="b6-list-name">${name} <span style="color:#6b7280;font-size:12px;">${price}元</span></span><button class="b6-cip-del-btn" data-custom-idx="${ci}">✕</button>`;
+                list.appendChild(row);
+                const delBtn = row.querySelector('[data-custom-idx]');
+                Game.EventManager.on(delBtn, 'click', (e) => {
+                    e.stopPropagation();
+                    g.customItems[ci]._deleted = true;
+                    row.remove();
+                    // 更新購物籃小計
+                    const basketTotalEl = document.querySelector('.b6-basket-total');
+                    if (basketTotalEl) basketTotalEl.textContent = this._calcMissionTotal();
+                }, {}, 'gameUI');
+                if (nameEl) nameEl.value = '';
+                if (priceEl) priceEl.value = '';
+                // 更新購物籃小計
+                const basketTotalEl = document.querySelector('.b6-basket-total');
+                if (basketTotalEl) basketTotalEl.textContent = this._calcMissionTotal();
+                this.audio.play('click');
+            }, {}, 'gameUI');
         },
 
         _bindShoppingEvents() {
@@ -1102,6 +1179,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
+            // 自訂購物項目面板
+            if (this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy') {
+                this._bindCustomItemsPanel();
+            }
         },
 
         // ── 結帳前確認清單（B1 _showTaskModal pattern）──────────
@@ -1239,10 +1320,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _calcMissionTotal() {
             const g = this.state.game;
-            return g.mission.items.reduce((sum, { stall, id }) => {
+            const baseTotal = g.mission.items.reduce((sum, { stall, id }) => {
                 const item = _currentStalls[stall].items.find(i => i.id === id);
                 return sum + (item ? item.price : 0);
             }, 0);
+            const customTotal = (g.customItems || [])
+                .filter(i => !i._deleted)
+                .reduce((sum, i) => sum + i.price, 0);
+            return baseTotal + customTotal;
         },
 
         // ── 11. 付款畫面 ──────────────────────────────────────

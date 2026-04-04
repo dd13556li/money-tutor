@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', diaryTheme: null },
+            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', diaryTheme: null, customItemsEnabled: false },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -563,6 +563,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-theme="family">👨‍👩‍👧 家庭</button>
                                 <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                             </div>
+                            <div id="b2-custom-events-toggle-row" style="display:none;margin-top:8px;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂事件</label>
+                                <div class="b-btn-group" id="b2-custom-events-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-custom="off">關閉</button>
+                                    <button class="b-sel-btn" data-custom="on">開啟</button>
+                                </div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可新增或刪除收支事件，系統將依自訂事件計算答案</div>
+                            </div>
                         </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">📝 作業單：</label>
@@ -614,13 +622,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
                     const assistGroup = document.getElementById('assist-click-group');
                     const modeGroup   = document.getElementById('mode-settings-group');
+                    const customRow = document.getElementById('b2-custom-events-toggle-row');
                     if (btn.dataset.val === 'easy') {
                         if (assistGroup) assistGroup.style.display = '';
                         if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
+                        if (customRow) customRow.style.display = 'none';
+                        this.state.settings.customItemsEnabled = false;
+                        document.querySelectorAll('#b2-custom-events-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
                     } else {
                         if (assistGroup) assistGroup.style.display = 'none';
                         this.state.settings.clickMode = 'off';
                         if (modeGroup) modeGroup.style.display = '';
+                        if (customRow) customRow.style.display = '';
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -657,6 +670,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('active');
                     this.state.settings.diaryTheme = btn.dataset.theme;
                     this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#b2-custom-events-group [data-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b2-custom-events-group [data-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
                 }, {}, 'settings');
             });
 
@@ -745,6 +766,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return balance;
         },
 
+        _getEffectiveEvents(question) {
+            const base   = question.events.filter(e => !e._deleted);
+            const custom = (this.state.quiz.customEvents || []).filter(e => !e._deleted);
+            return [...base, ...custom];
+        },
+
+        _getEffectiveAnswer(question) {
+            let balance = question.startAmount;
+            this._getEffectiveEvents(question).forEach(e => {
+                balance += e.type === 'income' ? e.amount : -e.amount;
+            });
+            return balance;
+        },
+
         _generateChoices(correct) {
             // Generate distractors far enough apart to be meaningfully different
             const opts = new Set([correct]);
@@ -768,6 +803,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.currentInput = '';
 
             const q   = this.state.quiz;
+            // 重置自訂事件狀態
+            q.customEvents = [];
+            const currQ = q.questions[q.currentQuestion];
+            if (currQ) currQ.events.forEach(e => { e._deleted = false; });
+
             const app = document.getElementById('app');
             app.innerHTML = this._renderQuestionHTML(q.questions[q.currentQuestion]);
             this._bindQuestionEvents(q.questions[q.currentQuestion]);
@@ -815,20 +855,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const diff = this.state.settings.difficulty;
             const q    = this.state.quiz;
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
+            const useCustom = this.state.settings.customItemsEnabled && diff !== 'easy';
 
             // 累計金額欄（Round 38）
             let runningAmt = question.startAmount;
             const eventsHTML = question.events.map((e, idx) => {
                 runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
                 return `
-                <div class="b2-event-row ${e.type}" style="animation-delay:${0.05 * (idx + 1)}s">
+                <div class="b2-event-row ${e.type}" style="animation-delay:${0.05 * (idx + 1)}s" id="b2-base-event-${idx}">
                     <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
                     <span class="b2-event-icon">${e.icon}</span>
                     <span class="b2-event-name">${e.name}</span>
                     <span class="b2-event-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount} 元</span>
                     <span class="b2-running-val">${runningAmt}元</span>
+                    ${useCustom ? `<button class="b2-cep-del-btn" data-base-idx="${idx}" title="刪除">✕</button>` : ''}
                 </div>`;
             }).join('');
+            const customPanelHTML = useCustom ? this._renderCustomEventsPanel() : '';
 
             return `
             <div class="b-header">
@@ -865,6 +908,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-start-amount">${question.startAmount} 元</span>
                     </div>
                     ${eventsHTML}
+                    <div id="b2-cep-custom-list"></div>
+                    ${customPanelHTML}
                     <div class="b2-question-row">
                         <span class="b2-question-label">💰 現在剩下</span>
                         <span class="b2-question-blank">___ 元</span>
@@ -908,6 +953,84 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
+        _renderCustomEventsPanel() {
+            return `
+            <div class="b2-custom-events-panel" id="b2-cep-panel">
+                <div class="b2-cep-header">📋 自訂收支事件</div>
+                <div class="b2-cep-add-row">
+                    <select class="b2-cep-input b2-cep-type-sel" id="b2-cep-type-sel">
+                        <option value="income">📥 收入</option>
+                        <option value="expense">📤 支出</option>
+                    </select>
+                    <input type="text" id="b2-cep-name-input" placeholder="事件名稱" maxlength="8" class="b2-cep-input">
+                    <input type="number" id="b2-cep-amt-input" placeholder="金額" min="1" max="9999" class="b2-cep-input b2-cep-amt-inp">
+                    <button class="b2-cep-add-btn" id="b2-cep-add-btn">＋ 新增</button>
+                </div>
+            </div>`;
+        },
+
+        _bindCustomEventsPanel(question) {
+            // 刪除原有事件
+            document.querySelectorAll('#b2-base-event-0, #b2-base-event-1, #b2-base-event-2, #b2-base-event-3').forEach(row => {
+                const delBtn = row?.querySelector('[data-base-idx]');
+                if (!delBtn) return;
+                Game.EventManager.on(delBtn, 'click', () => {
+                    const idx = parseInt(delBtn.dataset.baseIdx);
+                    question.events[idx]._deleted = !question.events[idx]._deleted;
+                    row.classList.toggle('b2-cep-deleted', !!question.events[idx]._deleted);
+                    this._updateCustomAnswerPreview(question);
+                }, {}, 'gameUI');
+            });
+            // 新增事件
+            const addBtn = document.getElementById('b2-cep-add-btn');
+            if (!addBtn) return;
+            Game.EventManager.on(addBtn, 'click', () => {
+                const typeEl = document.getElementById('b2-cep-type-sel');
+                const nameEl = document.getElementById('b2-cep-name-input');
+                const amtEl  = document.getElementById('b2-cep-amt-input');
+                const type   = typeEl?.value || 'income';
+                const name   = nameEl?.value.trim();
+                const amount = parseInt(amtEl?.value);
+                if (!name || !amount || amount < 1) return;
+                const q = this.state.quiz;
+                const newEvent = { type, name, amount, icon: type === 'income' ? '💰' : '💸', _deleted: false };
+                q.customEvents.push(newEvent);
+                const ci = q.customEvents.length - 1;
+                const list = document.getElementById('b2-cep-custom-list');
+                const row = document.createElement('div');
+                row.className = `b2-event-row ${type} b2-cep-custom-row`;
+                row.id = `b2-custom-event-${ci}`;
+                row.innerHTML = `<span class="b2-type-badge ${type}">${type === 'income' ? '收入 📥' : '支出 📤'}</span><span class="b2-event-icon">${newEvent.icon}</span><span class="b2-event-name">${name}</span><span class="b2-event-amount ${type}">${type === 'income' ? '+' : '-'}${amount} 元</span><button class="b2-cep-del-btn" data-custom-idx="${ci}">✕</button>`;
+                list.appendChild(row);
+                const delBtn2 = row.querySelector('[data-custom-idx]');
+                Game.EventManager.on(delBtn2, 'click', () => {
+                    q.customEvents[ci]._deleted = true;
+                    row.remove();
+                    this._updateCustomAnswerPreview(question);
+                }, {}, 'gameUI');
+                if (nameEl) nameEl.value = '';
+                if (amtEl) amtEl.value = '';
+                this._updateCustomAnswerPreview(question);
+                this.audio.play('click');
+            }, {}, 'gameUI');
+        },
+
+        _updateCustomAnswerPreview(question) {
+            const ans = this._getEffectiveAnswer(question);
+            const prev = document.getElementById('b2-input-preview');
+            const val = parseInt(this.state.quiz.currentInput);
+            if (prev && !isNaN(val)) {
+                const diff2 = val - ans;
+                const cls   = diff2 === 0 ? 'exact' : diff2 > 0 ? 'over' : 'under';
+                const label = diff2 === 0 ? '✓ 剛好！' : diff2 > 0 ? `多了 ${diff2} 元` : `少了 ${-diff2} 元`;
+                prev.className = 'b2-input-preview ' + cls;
+                prev.textContent = label;
+            } else if (prev) {
+                prev.className = 'b2-input-preview';
+                prev.textContent = '';
+            }
+        },
+
         // ── 12. 事件綁定 ──────────────────────────────────────
         _bindQuestionEvents(question) {
             const diff = this.state.settings.difficulty;
@@ -946,21 +1069,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
-            // 提示按鈕（普通/困難模式）：朗讀算式步驟
+            // 提示按鈕（三難度均顯示）：朗讀算式步驟
             const b2HintBtn = document.getElementById('b2-hint-btn');
             if (b2HintBtn) {
                 Game.EventManager.on(b2HintBtn, 'click', () => {
                     this._showCalcBreakdown(question);
-                    const steps = [question.startAmount, ...question.events.map((e, i) => {
+                    const effEvents = this._getEffectiveEvents(question);
+                    const effAnswer = this._getEffectiveAnswer(question);
+                    const steps = [question.startAmount, ...effEvents.map((e, i) => {
                         let running = question.startAmount;
-                        for (let j = 0; j <= i; j++) running += question.events[j].type === 'income' ? question.events[j].amount : -question.events[j].amount;
+                        for (let j = 0; j <= i; j++) running += effEvents[j].type === 'income' ? effEvents[j].amount : -effEvents[j].amount;
                         return running;
                     })];
-                    const parts = question.events.map((e, i) => {
+                    const parts = effEvents.map((e, i) => {
                         const verb = e.type === 'income' ? '收入' : '花了';
                         return `${verb}${e.amount}元，剩下${steps[i + 1]}元`;
                     });
-                    Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${question.answer}元`);
+                    Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
                 }, {}, 'gameUI');
             }
             // 困難模式專屬重聽鈕（inline numpad 區域）
@@ -986,6 +1111,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'gameUI');
                 }
             }
+            // 自訂事件面板
+            if (this.state.settings.customItemsEnabled && diff !== 'easy') {
+                this._bindCustomEventsPanel(question);
+            }
         },
 
         _updateInputDisplay() {
@@ -996,8 +1125,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (previewEl) {
                 const q   = this.state.quiz.questions[this.state.quiz.currentQuestion];
                 const val = parseInt(this.state.quiz.currentInput);
-                if (q && !isNaN(val)) {
-                    const diff  = val - q.answer;
+                const ans = q ? this._getEffectiveAnswer(q) : null;
+                if (q && !isNaN(val) && ans !== null) {
+                    const diff  = val - ans;
                     const cls   = diff === 0 ? 'exact' : diff > 0 ? 'over' : 'under';
                     const label = diff === 0 ? '✓ 剛好！' : diff > 0 ? `多了 ${diff} 元` : `少了 ${-diff} 元`;
                     previewEl.className = 'b2-input-preview ' + cls;
@@ -1023,12 +1153,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isProcessing) return;
             this.state.isProcessing = true;
 
-            const isCorrect = chosen === question.answer;
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+            const isCorrect = chosen === effectiveAnswer;
 
             document.querySelectorAll('.b2-choice-btn').forEach(btn => {
                 btn.disabled = true;
                 const v = parseInt(btn.dataset.val);
-                if (v === question.answer) btn.classList.add('correct');
+                if (v === effectiveAnswer) btn.classList.add('correct');
                 else if (v === chosen && !isCorrect) btn.classList.add('wrong');
             });
 
@@ -1048,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
+                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`);
                 this._showNetTrend(question);
                 this._showFinancialTip(question); // 理財建議（Round 32）
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
@@ -1059,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.quiz.errorCount++;
                     const willShowHint = this.state.quiz.errorCount >= 3;
                     this._showCenterFeedback('❌', '再試一次！');
-                    const b2EasyErrDir = chosen > question.answer ? '太多了' : '太少了';
+                    const b2EasyErrDir = chosen > effectiveAnswer ? '太多了' : '太少了';
                     Game.Speech.speak(`不對喔，算${b2EasyErrDir}，請再試一次`);
                     if (willShowHint) this._showCalcBreakdown(question);
                     Game.TimerManager.setTimeout(() => {
@@ -1071,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1600, 'turnTransition');
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`正確答案是${toTWD(question.answer)}`);
+                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
                 }
             }
@@ -1230,12 +1361,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 計算過程提示（答錯後顯示逐步算式）─────────────────
         _showCalcBreakdown(question) {
-            if (document.querySelector('.b2-calc-breakdown')) return; // 防重複
+            document.querySelector('.b2-calc-breakdown')?.remove(); // 先移除舊的，確保反映最新自訂事件
             const section = document.querySelector('.b2-numpad-section');
             if (!section) return;
+            const effEvents = this._getEffectiveEvents(question);
+            const effAnswer = this._getEffectiveAnswer(question);
             let cur = question.startAmount;
-            const steps = question.events.map(e => {
-                const prev = cur;
+            const steps = effEvents.map(e => {
                 cur = e.type === 'income' ? cur + e.amount : cur - e.amount;
                 const op = e.type === 'income' ? '＋' : '－';
                 return `<div class="b2-bd-row">
@@ -1257,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b2-bd-row b2-bd-result">
                     <span class="b2-bd-op">＝</span>
                     <span class="b2-bd-name">結果</span>
-                    <span class="b2-bd-val">${question.answer} 元</span>
+                    <span class="b2-bd-val">${effAnswer} 元</span>
                 </div>`;
             section.appendChild(box);
         },
@@ -1268,7 +1400,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isNaN(input) || input < 0) return;
             this.state.isProcessing = true;
 
-            const isCorrect = input === question.answer;
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+            const isCorrect = input === effectiveAnswer;
 
             const displayEl = document.getElementById('b2-input-display');
             if (displayEl) displayEl.style.background = isCorrect ? '#064e3b' : '#7f1d1d';
@@ -1277,14 +1410,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
-                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: question.answer });
+                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: this._getEffectiveEvents(question), answer: effectiveAnswer });
                 this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
                 }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！剩下${toTWD(question.answer)}`);
+                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`);
                 this._showNetTrend(question);
                 this._showFinancialTip(question); // 理財建議（Round 32）
                 Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
@@ -1294,15 +1427,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 漸進提示（Round 34）：第1次錯→範圍提示，第2次以上→完整算式
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
                 if (this.state.quiz.errorCount === 1 && this.state.settings.difficulty !== 'easy') {
-                    const lo = Math.min(question.startAmount, question.answer);
-                    const hi = Math.max(question.startAmount, question.answer);
+                    const lo = Math.min(question.startAmount, effectiveAnswer);
+                    const hi = Math.max(question.startAmount, effectiveAnswer);
                     this._showRangeHint(lo, hi);
                 } else {
                     this._showCalcBreakdown(question); // 答錯即顯示計算過程
                 }
                 // 錯誤辨識語音（Round 33）
                 const userVal = parseInt(this.state.quiz.currentInput);
-                const diff33 = !isNaN(userVal) ? userVal - question.answer : 0;
+                const diff33 = !isNaN(userVal) ? userVal - effectiveAnswer : 0;
                 const errSpeech = !isNaN(userVal) && diff33 !== 0
                     ? (diff33 > 0 ? `不對喔，算太多了，請再試一次` : `不對喔，算太少了，請再試一次`)
                     : `不對喔，請再試一次`;
@@ -1319,7 +1452,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1800, 'turnTransition');
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`正確答案是${toTWD(question.answer)}`);
+                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`);
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
                 }
             }

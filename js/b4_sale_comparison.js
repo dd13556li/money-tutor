@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null, clickMode: 'off', itemCat: 'all' },
+            settings: { difficulty: null, questionCount: null, retryMode: null, compareStores: null, clickMode: 'off', itemCat: 'all', customItemsEnabled: false },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -390,6 +390,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-cat="daily">生活用品</button>
                                 <button class="b-sel-btn" data-cat="clothing">服飾配件</button>
                             </div>
+                            <div id="b4-custom-price-toggle-row" style="display:none;margin-top:8px;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂價格</label>
+                                <div class="b-btn-group" id="b4-custom-price-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-custom="off">關閉</button>
+                                    <button class="b-sel-btn" data-custom="on">開啟</button>
+                                </div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在題目頁面修改兩間商店的價格，系統重新計算比較結果（兩家店模式）</div>
+                            </div>
                         </div>
                         <div class="b-setting-group" id="mode-settings-group">
                             <label class="b-setting-label">🔄 作答模式</label>
@@ -444,6 +452,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _bindSettingsEvents() {
             Game.EventManager.removeByCategory('settings');
+            const _updateCustomPriceToggle = () => {
+                const toggle = document.getElementById('b4-custom-price-toggle-row');
+                if (!toggle) return;
+                const s = this.state.settings;
+                const show = s.difficulty !== 'easy' && s.compareStores === 'two';
+                toggle.style.display = show ? '' : 'none';
+                if (!show) {
+                    this.state.settings.customItemsEnabled = false;
+                    document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
+                }
+            };
+
             document.querySelectorAll('[data-diff]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('active'));
@@ -461,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.state.settings.clickMode = 'off';
                         if (modeGroup) modeGroup.style.display = '';
                     }
+                    _updateCustomPriceToggle();
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -479,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('[data-stores]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.compareStores = btn.dataset.stores;
+                    _updateCustomPriceToggle();
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -497,6 +519,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('active');
                     this.state.settings.retryMode = btn.dataset.mode;
                     this._checkCanStart();
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
                 }, {}, 'settings');
             });
 
@@ -666,6 +696,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b4-vs-divider">VS</div>
                     ${this._renderOptionCard('right', right, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
                 </div>
+                ${this.state.settings.customItemsEnabled && !curr.isTriple && !curr.isUnit && diff !== 'easy' ? `
+                <div class="b4-custom-price-panel" id="b4-cpp-panel">
+                    <div class="b4-cpp-header">🛠️ 自訂價格</div>
+                    <div class="b4-cpp-row">
+                        <label class="b4-cpp-label">${left.store}：</label>
+                        <input type="number" id="b4-cpp-left" class="b4-cpp-input" value="${left.price}" min="1" max="99999">
+                        <span>元</span>
+                    </div>
+                    <div class="b4-cpp-row">
+                        <label class="b4-cpp-label">${right.store}：</label>
+                        <input type="number" id="b4-cpp-right" class="b4-cpp-input" value="${right.price}" min="1" max="99999">
+                        <span>元</span>
+                    </div>
+                    <button class="b4-cpp-apply-btn" id="b4-cpp-apply-btn">套用自訂價格</button>
+                </div>` : ''}
                 <div id="diff-section"></div>
             </div>`;
 
@@ -894,6 +939,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
+            // 自訂價格套用
+            const applyBtn = document.getElementById('b4-cpp-apply-btn');
+            if (applyBtn) {
+                Game.EventManager.on(applyBtn, 'click', () => {
+                    const leftPrice  = parseInt(document.getElementById('b4-cpp-left')?.value);
+                    const rightPrice = parseInt(document.getElementById('b4-cpp-right')?.value);
+                    if (!leftPrice || !rightPrice || leftPrice < 1 || rightPrice < 1 || leftPrice === rightPrice) return;
+                    this._applyCustomPrices(curr, leftPrice, rightPrice);
+                    this.renderQuestion();
+                }, {}, 'gameUI');
+            }
+        },
+
+        _applyCustomPrices(curr, leftPrice, rightPrice) {
+            // left = curr.swapped ? curr.optB : curr.optA
+            // right = curr.swapped ? curr.optA : curr.optB
+            if (curr.swapped) {
+                // left=optB, right=optA
+                if (leftPrice <= rightPrice) {
+                    curr.optB.price = leftPrice;
+                    curr.optA.price = rightPrice;
+                } else {
+                    // optB (left) becomes more expensive → flip
+                    curr.optB.price = rightPrice;
+                    curr.optA.price = leftPrice;
+                    curr.swapped = false;
+                }
+            } else {
+                // left=optA, right=optB
+                if (leftPrice >= rightPrice) {
+                    curr.optA.price = leftPrice;
+                    curr.optB.price = rightPrice;
+                } else {
+                    // optA (left) becomes cheaper → flip
+                    curr.optA.price = rightPrice;
+                    curr.optB.price = leftPrice;
+                    curr.swapped = true;
+                }
+            }
+            curr.diff = curr.optA.price - curr.optB.price;
         },
 
         // ── Select Phase Handler ────────────────────────────────

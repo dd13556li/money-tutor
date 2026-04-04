@@ -824,3 +824,63 @@
     flex-shrink: 0;
 }
 .b2-reveal-btn:hover { background: #fde68a; }
+
+/* ── 自訂事件面板 ──────────────────────────────────────────── */
+.b2-custom-events-panel {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 4px 0;
+}
+.b2-cep-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 8px;
+}
+.b2-cep-add-row {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.b2-cep-input {
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    padding: 5px 7px;
+    font-size: 13px;
+}
+.b2-cep-input:focus { outline: 2px solid #34d399; }
+.b2-cep-type-sel { max-width: 90px; background: #fff; }
+.b2-cep-amt-inp { width: 65px; }
+.b2-cep-add-btn {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.b2-cep-del-btn {
+    background: #fee2e2;
+    border: none;
+    border-radius: 6px;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 2px 7px;
+    font-size: 12px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.b2-cep-deleted .b2-event-name,
+.b2-cep-deleted .b2-event-amount,
+.b2-cep-deleted .b2-type-badge {
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+.b2-cep-custom-row {
+    background: #fffbeb;
+}
