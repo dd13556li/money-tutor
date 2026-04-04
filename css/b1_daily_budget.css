@@ -246,14 +246,15 @@
     color: #fff;
 }
 
-/* 錢包中的錢幣排列 */
+/* 錢包中的錢幣排列（單排橫向捲動） */
 .b1-wallet-coins {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     gap: 10px;
     min-height: 64px;
-    align-items: flex-start;
-    align-content: flex-start;
+    align-items: center;
     padding: 4px 0;
 }
 

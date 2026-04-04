@@ -925,16 +925,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${imgSrc}" alt="${coin.denom}元" class="${imgClass}"
                                  style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
                                  onerror="this.style.display='none'">
-                            <button class="b1-remove-btn" data-uid="${coin.uid}" title="移除">×</button>
                         </div>`;
                     }).join('');
-
-                    // 綁定移除按鈕（gameUI category）
-                    coinsEl.querySelectorAll('.b1-remove-btn').forEach(btn => {
-                        Game.EventManager.on(btn, 'click', () => {
-                            this.removeCoin(parseInt(btn.dataset.uid));
-                        }, {}, 'gameUI');
-                    });
                 }
             }
 
@@ -956,24 +948,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
             }
 
-            // 面額計數摘要（Round 32）
+            // 面額計數摘要已隱藏（不顯示）
             const denomSummaryEl = document.getElementById('b1-denom-summary');
-            if (denomSummaryEl && this.state.wallet.length > 0) {
-                const counts = {};
-                this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
-                denomSummaryEl.innerHTML = Object.entries(counts)
-                    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
-                    .map(([d, n]) => {
-                        const isBill = parseInt(d) >= 100;
-                        const imgSize = isBill ? '36px' : '28px';
-                        return Array.from({ length: n }, () =>
-                            `<span class="b1-ds-item"><img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;vertical-align:middle;" draggable="false" alt="${d}元"></span>`
-                        ).join('');
-                    }).join('');
-                denomSummaryEl.style.display = '';
-            } else if (denomSummaryEl) {
-                denomSummaryEl.style.display = 'none';
-            }
+            if (denomSummaryEl) denomSummaryEl.style.display = 'none';
 
             // 簡單模式：動態淡化超出剩餘所需的錢幣
             if (this.state.settings.difficulty === 'easy') {
@@ -1026,22 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.querySelector('.b1-schedule-card');
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
             }
-            // 面額摘要
-            const denomSummaryEl = document.getElementById('b1-denom-summary');
-            if (denomSummaryEl && this.state.wallet.length > 0) {
-                const counts = {};
-                this.state.wallet.forEach(c => { counts[c.denom] = (counts[c.denom] || 0) + 1; });
-                denomSummaryEl.innerHTML = Object.entries(counts)
-                    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
-                    .map(([d, n]) => {
-                        const isBill = parseInt(d) >= 100;
-                        const imgSize = isBill ? '36px' : '28px';
-                        return Array.from({ length: n }, () =>
-                            `<span class="b1-ds-item"><img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;vertical-align:middle;" draggable="false" alt="${d}元"></span>`
-                        ).join('');
-                    }).join('');
-                denomSummaryEl.style.display = '';
-            }
+            // 面額摘要已隱藏（不顯示）
+            const denomSummaryEl2 = document.getElementById('b1-denom-summary');
+            if (denomSummaryEl2) denomSummaryEl2.style.display = 'none';
         },
 
         // ── 連勝徽章（B3 streak pattern）────────────────────────
