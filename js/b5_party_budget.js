@@ -808,8 +808,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (affordable.length === 0) {
                 Game.Speech.speak(`還剩${toTWD(remaining)}，沒有可以加選的商品了`);
             } else {
-                const names = affordable.map(i => i.name).join('或');
-                Game.Speech.speak(`還剩${toTWD(remaining)}，可以加選${names}`);
+                const nameWithPrice = affordable.map(i => `${i.name}${toTWD(i.price)}`).join('或');
+                Game.Speech.speak(`還剩${toTWD(remaining)}，可以加選${nameWithPrice}`);
             }
         },
 
