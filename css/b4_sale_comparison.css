@@ -33,6 +33,50 @@
     font-weight: 500;
 }
 
+/* ── Hero 右側提示鈕 + 吉祥物 ────────────────────────────────── */
+.b4-hero-hint-wrap {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.b4-hero-hint-btn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(245,158,11,0.4);
+    white-space: nowrap;
+}
+.b4-hero-hint-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* ── 卡片金錢圖示列 ───────────────────────────────────────────── */
+.b4-price-coins {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+    min-height: 28px;
+}
+.b4-price-coins-hidden { display: none !important; }
+.b4-coin-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+.b4-coin-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
 /* ── 比較網格 ─────────────────────────────────────────────────── */
 .b4-compare-grid {
     display: grid;
