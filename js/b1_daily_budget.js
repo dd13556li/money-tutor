@@ -614,17 +614,22 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             ${this._renderHeader()}
             <div class="b-game-wrap">
-                <div class="b1-phase1-card-row">
+                <div class="b1-card-outer-wrap">
                     ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
-                    ${isHard ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="計算機">🧮<br>計算機</button>` : ''}
+                    ${isHard ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="開啟計算機">🧮</button>` : ''}
                 </div>
-                ${isHard ? `<div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">${this._getCalculatorHTML()}</div>` : ''}
                 ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
                 ${diff === 'easy'
                     ? this._renderChoiceButtons(curr)
                     : this._renderTotalInput(isHard, useCustom)
                 }
-            </div>`;
+            </div>
+            ${isHard ? `<div class="b1-calc-overlay" id="b1-calc-overlay" style="display:none;">
+                <div class="b1-calc-popup" id="b1-calc-popup">
+                    <button class="b1-calc-close-btn" id="b1-calc-close">✕</button>
+                    ${this._getCalculatorHTML()}
+                </div>
+            </div>` : ''}`;
 
             this._bindPhase1Events(curr, diff);
 
@@ -816,21 +821,26 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _bindCalculator() {
-            const panel   = document.getElementById('b1-calc-panel');
+            const overlay = document.getElementById('b1-calc-overlay');
             const toggle  = document.getElementById('b1-calc-toggle');
+            const closeBtn = document.getElementById('b1-calc-close');
             const display = document.getElementById('b1-calc-display');
-            if (!panel || !toggle || !display) return;
+            if (!overlay || !toggle || !display) return;
 
             let calcVal = '0', calcOp = null, calcPrev = null, calcFresh = false;
             const updateDisp = () => { display.textContent = calcVal; };
 
-            toggle.addEventListener('click', () => {
-                const open = panel.style.display === 'none';
-                panel.style.display = open ? '' : 'none';
-                toggle.textContent = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
-            });
+            const openCalc  = () => { overlay.style.display = 'flex'; };
+            const closeCalc = () => { overlay.style.display = 'none'; };
 
-            panel.querySelectorAll('.b1-calc-btn').forEach(btn => {
+            toggle.addEventListener('click', () => {
+                overlay.style.display === 'none' ? openCalc() : closeCalc();
+            });
+            if (closeBtn) closeBtn.addEventListener('click', closeCalc);
+            // 點透明背景關閉
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCalc(); });
+
+            overlay.querySelectorAll('.b1-calc-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const v = btn.dataset.v;
                     if (v === 'C') { calcVal = '0'; calcOp = null; calcPrev = null; calcFresh = false; }
@@ -844,7 +854,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             calcVal = String(Math.round(res * 1000) / 1000);
                             calcOp = null; calcPrev = null;
                         }
-                    } else { // digit
+                    } else {
                         calcVal = (calcFresh || calcVal === '0') ? v : calcVal + v;
                         calcFresh = false;
                     }
