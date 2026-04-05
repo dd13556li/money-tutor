@@ -2243,6 +2243,21 @@ a.selection-btn {
    響應式設計
    ===================================================== */
 @media (max-width: 768px) {
+    .game-buttons {
+        gap: 8px;
+    }
+
+    .game-buttons .start-btn,
+    .game-buttons .back-to-main-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 8px;
+        font-size: 14px;
+        white-space: normal;
+        word-break: break-word;
+        text-align: center;
+    }
+
     .title-bar {
         flex-direction: column;
         gap: 10px;

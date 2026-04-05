@@ -2481,12 +2481,18 @@ a.selection-btn {
     }
 
     .game-buttons {
-        flex-direction: column;
-        gap: 10px;
+        gap: 8px;
     }
 
-    .start-btn, .back-to-main-btn {
-        width: 100%;
+    .game-buttons .start-btn,
+    .game-buttons .back-to-main-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 8px;
+        font-size: 14px;
+        white-space: normal;
+        word-break: break-word;
+        text-align: center;
     }
 
     /* 🔧 [新增] 中等屏幕的金額網格調整 */
