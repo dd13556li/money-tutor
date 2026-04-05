@@ -100,6 +100,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     padding: 10px 14px;
     background: #fff;
     border: 1.5px solid #fde68a;
@@ -1660,12 +1661,19 @@
     border-radius: 6px;
     color: #dc2626;
     cursor: pointer;
-    padding: 2px 8px;
+    padding: 2px 0;
     font-size: 13px;
     flex-shrink: 0;
+    width: 28px;
+    text-align: center;
     transition: background 0.15s;
 }
 .b1-cip-del-btn:hover { background: #fca5a5; }
+
+/* 自訂模式：總計金額右邊留與 ✕ 按鈕等寬的空間，使個位數對齊 */
+.b1-custom-mode .b1-ts-amount {
+    margin-right: calc(28px + 8px);  /* ✕ 按鈕寬 + gap */
+}
 
 /* 已刪除行程項目：名稱/金額加刪除線 + 淡化 */
 .b1-cip-deleted .b1-item-name,
