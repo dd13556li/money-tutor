@@ -738,6 +738,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
 
+            // 依難度揭露卡片：easy 顯示金幣＋金額；normal/hard 只顯示金幣
+            if (diff === 'easy') {
+                this._revealCardPrices(left, right);
+            } else {
+                this._revealCoinsOnly(left, right);
+            }
+
             // 語音引導（afterClose pattern：商品名稱介紹完畢後再播問題語音）
             let speechText;
             if (curr.isUnit) {
@@ -961,6 +968,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
+        // ── 僅揭露金錢圖示，價格文字保留「? 元」────────────────────
+        _revealCoinsOnly(left, right) {
+            ['left', 'right'].forEach(s => {
+                const card = document.getElementById(`card-${s}`);
+                if (!card) return;
+                const opt = s === 'left' ? left : right;
+                const coinsEl = card.querySelector('.b4-price-coins');
+                if (coinsEl) {
+                    coinsEl.classList.remove('b4-price-coins-hidden');
+                    coinsEl.innerHTML = b4PriceCoins(opt.price);
+                }
+            });
+        },
+
+        _revealTripleCoinsOnly(curr) {
+            curr.stores.forEach((store, i) => {
+                const card = document.getElementById(`tcard-${i}`);
+                if (!card) return;
+                const coinsEl = card.querySelector('.b4-price-coins');
+                if (coinsEl) {
+                    coinsEl.classList.remove('b4-price-coins-hidden');
+                    coinsEl.innerHTML = b4PriceCoins(store.price);
+                }
+            });
+        },
+
         _bindSelectEvents(curr, correctSide, left, right) {
             // 選項卡點擊
             ['left', 'right'].forEach(side => {
@@ -1137,6 +1170,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     this.state.quiz.selectErrorCount++;
+                    // 普通模式第 3 次錯誤：揭露金額數字
+                    if (diff === 'normal' && this.state.quiz.selectErrorCount >= 3) {
+                        this._revealCardPrices(left, right);
+                    }
                     this._showCenterFeedback('❌', '再試一次！');
                     Game.Speech.speak('這邊比較貴喔，再看看另一邊');
                     Game.TimerManager.setTimeout(() => {
@@ -1195,6 +1232,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             this._bindTripleEvents(curr, diff);
+
+            // 依難度揭露卡片：easy 顯示金幣＋金額；normal/hard 只顯示金幣
+            if (diff === 'easy') {
+                this._revealTripleCardPrices(curr);
+            } else {
+                this._revealTripleCoinsOnly(curr);
+            }
 
             // 語音引導（afterClose pattern）
             const prices = curr.stores.map(s => `${s.store}${toTWD(s.price)}`).join('，');
@@ -1329,6 +1373,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
                 } else {
                     this.state.quiz.selectErrorCount++;
+                    // 普通模式第 3 次錯誤：揭露金額數字
+                    if (diff === 'normal' && this.state.quiz.selectErrorCount >= 3) {
+                        this._revealTripleCardPrices(curr);
+                    }
                     this._showCenterFeedback('❌', '再試一次！');
                     Game.Speech.speak('不對喔，請再比較看看');
                     Game.TimerManager.setTimeout(() => {
