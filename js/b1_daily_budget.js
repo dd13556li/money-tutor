@@ -1243,9 +1243,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
             const catClass = catColorMap[q.cat] || '';
 
-            // 自訂項目新增欄（僅 useCustom 時顯示，置於 total strip 下方）
-            const customSection = useCustom ? `
-                <div id="b1-cip-custom-list"></div>
+            // 自訂項目：新增清單在 total strip 上方，輸入列在 total strip 下方
+            const customListAbove  = useCustom ? `<div id="b1-cip-custom-list"></div>` : '';
+            const customAddBelow   = useCustom ? `
                 <div class="b1-cip-add-row b1-cip-add-row-inline">
                     <input type="text" id="b1-cip-name-input" placeholder="項目名稱" maxlength="8" class="b1-cip-input">
                     <input type="number" id="b1-cip-cost-input" placeholder="金額" min="1" max="9999" class="b1-cip-input b1-cip-cost-inp">
@@ -1267,11 +1267,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${hintWrap}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
+                ${customListAbove}
                 <div class="b1-total-strip">
                     <span class="b1-ts-label">總計金額</span>
                     <span class="b1-ts-amount">${showTotal ? `${q.total} 元` : '??? 元'}</span>
                 </div>
-                ${customSection}
+                ${customAddBelow}
             </div>`;
         },
 
