@@ -1708,12 +1708,3 @@
 }
 .b1-cip-add-btn:hover { background: #059669; }
 
-/* 自訂合計預覽（numpad 上方） */
-.b1-ht-custom-preview {
-    text-align: center;
-    font-size: 13px;
-    color: #059669;
-    font-weight: 600;
-    margin-bottom: 6px;
-    min-height: 18px;
-}

@@ -729,12 +729,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 普通/困難模式：總計輸入鍵盤 ─────────────────────────────
         _renderTotalInput(isHard, useCustom) {
-            const customPreview = useCustom
-                ? `<div class="b1-ht-custom-preview" id="b1-ht-preview"></div>`
-                : '';
             return `
             <div class="b1-hard-total-area" id="b1-hard-total-area">
-                ${customPreview}
                 <div class="b1-ht-top-row">
                     <div class="b1-ht-label">把每項金額加起來，總共需要幾元？</div>
                 </div>
@@ -787,8 +783,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 即時更新自訂合計預覽 ──────────────────────────────────
         _updateCustomTotalPreview(curr) {
             const total = this._getEffectiveTotal(curr);
-            const prev = document.getElementById('b1-ht-preview');
-            if (prev) prev.textContent = `自訂合計：${total} 元`;
             // 同步更新 schedule card 的 total strip
             const strip = document.querySelector('.b1-ts-amount');
             if (strip) strip.textContent = `${total} 元`;
