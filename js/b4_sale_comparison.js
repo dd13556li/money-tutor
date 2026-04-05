@@ -112,9 +112,10 @@ function b4PriceCoins(price) {
     }
     return coins.map(d => {
         const isBill = d >= 100;
-        const w = isBill ? '100px' : '60px';
-        const br = isBill ? '4px' : '50%';
-        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:auto;border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">`;
+        const w  = isBill ? '100px' : '60px';
+        const h  = isBill ? 'auto'  : '60px';
+        const br = isBill ? '4px'   : '50%';
+        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:${h};border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">`;
     }).join('');
 }
 
@@ -709,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
                     ${diff !== 'easy' ? `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>` : ''}
                 </div>
@@ -738,12 +739,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
 
-            // 依難度揭露卡片：easy 顯示金幣＋金額；normal/hard 只顯示金幣
+            // 依難度揭露卡片：easy 顯示金幣＋金額；normal 只顯示金幣；hard 全隱藏
             if (diff === 'easy') {
                 this._revealCardPrices(left, right);
-            } else {
+            } else if (diff === 'normal') {
                 this._revealCoinsOnly(left, right);
             }
+            // hard：金額圖示一開始全隱藏，靠提示鈕或記憶作答
 
             // 語音引導（afterClose pattern：商品名稱介紹完畢後再播問題語音）
             let speechText;
@@ -767,12 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.lastSpeechText = `${curr.name}，${speechText}`;
             this._showItemIntroModal(curr, () => {
                 // 問題語音（modal 介紹商品名稱後銜接）
-                Game.Speech.speak(speechText, () => {
-                    // 困難模式記憶挑戰倒數（modal 關閉 + 語音結束後才遮住）
-                    if (diff === 'hard' && !curr.isTriple) {
-                        Game.TimerManager.setTimeout(() => this._startMemoryCountdown(), 300, 'ui');
-                    }
-                });
+                Game.Speech.speak(speechText);
                 // 輔助點擊啟動
                 if (this.state.settings.clickMode === 'on') {
                     Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 400, 'ui');
@@ -1138,18 +1135,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     const priceSpeech = curr.isUnit
                         ? `${cheapSide.store}每${curr.unit}${cheapSide.price === (curr.optA.store === cheapSide.store ? curr.perA : curr.perB)}元，比較划算！`
                         : `${cheapSide.store}，${cheapSide.price}元，比較便宜！`;
-                    Game.Speech.speak(priceSpeech);
                     this._showChampionBadge(cheapSide.store); // 冠軍徽章（Round 31）
                     this._showThinkingSteps(curr); // 比價思路步驟卡（Round 44）
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1800, 'turnTransition');
+                    Game.Speech.speak(priceSpeech, () => {
+                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                    });
                 } else {
-                    // 普通/困難：顯示差額問題
-                    Game.TimerManager.setTimeout(() => {
+                    // 普通/困難：語音播完後進入差額頁
+                    const cheapSideNH = correctSide === 'left' ? left : right;
+                    const nhSpeech = curr.isUnit
+                        ? `答對了！${cheapSideNH.store}每${curr.unit}比較划算`
+                        : `答對了！${cheapSideNH.store}比較便宜`;
+                    Game.Speech.speak(nhSpeech, () => {
                         this.state.isProcessing = false;
                         this.state.phase = 'diff';
-                        this.state.currentDiffItem = curr;   // 保存供提示使用
+                        this.state.currentDiffItem = curr;
                         this._renderDiffSection(curr, diff);
-                    }, 700, 'turnTransition');
+                    });
                 }
             } else {
                 this.state.quiz.streak = 0;
@@ -1221,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     ${isHard ? '<div class="b4-rank-hint">點選順序：1️⃣最便宜 → 2️⃣中間 → 3️⃣最貴</div>' : ''}
                     ${diff !== 'easy' ? `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>` : ''}
                 </div>
@@ -1233,10 +1235,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindTripleEvents(curr, diff);
 
-            // 依難度揭露卡片：easy 顯示金幣＋金額；normal/hard 只顯示金幣
+            // 依難度揭露卡片：easy 顯示金幣＋金額；normal 只顯示金幣；hard 全隱藏
             if (diff === 'easy') {
                 this._revealTripleCardPrices(curr);
-            } else {
+            } else if (diff === 'normal') {
                 this._revealTripleCoinsOnly(curr);
             }
 
@@ -1339,14 +1341,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (diff === 'easy') {
                     this.state.quiz.correctCount++;
-                    Game.Speech.speak(`答對了！${curr.stores[curr.cheapestIdx].store}最便宜`);
                     this.state.quiz.comparisonHistory.push({
                         name: curr.name, icon: curr.icon, isTriple: true,
                         cheapStore: curr.sortedAsc[0].store, cheapPrice: curr.sortedAsc[0].price,
                         expStore: curr.sortedAsc[2].store,   expPrice:  curr.sortedAsc[2].price,
                         saved: curr.diff
                     });
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                    Game.Speech.speak(`答對了！${curr.stores[curr.cheapestIdx].store}最便宜`, () => {
+                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                    });
                 } else {
                     // normal：再問差額（最貴 - 最便宜）
                     Game.TimerManager.setTimeout(() => {
@@ -1437,10 +1440,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             expStore: curr.sortedAsc[2].store,   expPrice:  curr.sortedAsc[2].price,
                             saved: curr.diff
                         });
-                        Game.Speech.speak(`排序正確！從${curr.sortedAsc[0].store}${toTWD(curr.sortedAsc[0].price)}到${curr.sortedAsc[2].store}${toTWD(curr.sortedAsc[2].price)}`);
                         this._showSavingsToast(curr.diff);
                         this._showPodiumAnimation(curr);
-                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 2400, 'turnTransition');
+                        Game.Speech.speak(`排序正確！從${curr.sortedAsc[0].store}${toTWD(curr.sortedAsc[0].price)}到${curr.sortedAsc[2].store}${toTWD(curr.sortedAsc[2].price)}`, () => {
+                            Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                        });
                     } else {
                         this.audio.play('error');
                         // 顯示正確排序
@@ -1514,7 +1518,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             const hintWrap = `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
-                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                 <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
             </div>`;
 
@@ -1570,8 +1574,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             saved: correctDiff
                         });
                         this._showSavingsToast(correctDiff);
-                        Game.Speech.speak(`答對了！最貴比最便宜貴了${toTWD(correctDiff)}`);
-                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 1400, 'turnTransition');
+                        Game.Speech.speak(`答對了！最貴比最便宜貴了${toTWD(correctDiff)}`, () => {
+                            Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                        });
                     } else {
                         this.audio.play('error');
                         this.state.quiz.diffErrorCount = (this.state.quiz.diffErrorCount || 0) + 1;
@@ -1688,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const diffQuestion = curr.isUnit ? `每${curr.unit}差多少元？` : `便宜了多少元？`;
             const diffUnit     = curr.isUnit ? `元/${curr.unit}` : `元`;
             const hintWrap = `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
-                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                 <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
             </div>`;
 
@@ -2068,11 +2073,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const diffSpeech = (ci2 && ci2.isUnit)
                     ? `答對了！每${ci2.unit}便宜了${correctDiff}元`
                     : `答對了！便宜了${toTWD(correctDiff)}`;
-                Game.Speech.speak(diffSpeech);
                 // 學習要點提示（Round 32）
                 if (ci2 && !ci2.isUnit) {
                     this._showSubtractionTip(ci2.optA.price, ci2.optB.price, correctDiff);
                 }
+                Game.Speech.speak(diffSpeech, () => {
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                });
             } else {
                 this.state.quiz.streak = 0;
                 this.state.quiz.diffErrorCount = (this.state.quiz.diffErrorCount || 0) + 1;
