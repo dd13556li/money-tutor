@@ -112,8 +112,8 @@ function b4PriceCoins(price) {
     }
     return coins.map(d => {
         const isBill = d >= 100;
-        const w = isBill ? '36px' : '28px';
-        const br = isBill ? '3px' : '50%';
+        const w = isBill ? '100px' : '60px';
+        const br = isBill ? '4px' : '50%';
         return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:auto;border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">`;
     }).join('');
 }
