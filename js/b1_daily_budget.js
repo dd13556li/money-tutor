@@ -834,6 +834,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (v === 'C') { calcVal = '0'; calcOp = null; calcPrev = null; calcFresh = false; }
                     else if (v === '⌫') { calcVal = calcVal.length > 1 ? calcVal.slice(0, -1) : '0'; }
                     else if (['+', '-', '×'].includes(v)) {
+                        // 連續運算：若已有待計算結果，先算出來再接下一步
+                        if (calcOp && calcPrev !== null && !calcFresh) {
+                            const cur = parseFloat(calcVal);
+                            const res = calcOp === '+' ? calcPrev + cur : calcOp === '-' ? calcPrev - cur : calcPrev * cur;
+                            calcVal = String(Math.round(res * 1000) / 1000);
+                            updateDisp();
+                        }
                         calcPrev = parseFloat(calcVal); calcOp = v; calcFresh = true;
                     } else if (v === '=') {
                         if (calcOp && calcPrev !== null) {
