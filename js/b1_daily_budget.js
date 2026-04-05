@@ -614,7 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             ${this._renderHeader()}
             <div class="b-game-wrap">
-                ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn, showCalcBtn: isHard })}
+                <div class="b1-phase1-card-row">
+                    ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
+                    ${isHard ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="計算機">🧮<br>計算機</button>` : ''}
+                </div>
                 ${isHard ? `<div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">${this._getCalculatorHTML()}</div>` : ''}
                 ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
                 ${diff === 'easy'
@@ -1205,7 +1208,6 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderScheduleCard(q, showTotal, opts = {}) {
             const showItemAmounts = opts.showItemAmounts !== false; // default true
             const showHintBtn     = opts.showHintBtn    !== false; // default true
-            const showCalcBtn     = opts.showCalcBtn    === true;
             const isHard   = this.state.settings.difficulty === 'hard';
             const itemsHtml = q.items.map((it, idx) => {
                 const showAmt = showItemAmounts;
@@ -1237,10 +1239,6 @@ document.addEventListener('DOMContentLoaded', () => {
                    </div>`
                 : '';
 
-            const calcBtnHTML = showCalcBtn
-                ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="計算機">🧮 開啟計算機</button>`
-                : '';
-
             const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
             const catClass = catColorMap[q.cat] || '';
 
@@ -1257,7 +1255,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     ${(isEasyMode || this.state.settings.difficulty === 'normal') ? '' : totalTag}
                     ${hintWrap}
-                    ${calcBtnHTML}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
                 <div class="b1-total-strip">
