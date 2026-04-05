@@ -1651,31 +1651,9 @@
     opacity: 0.75;
 }
 
-/* ── 自訂項目面板 ─────────────────────────────────────────────── */
-.b1-custom-items-panel {
-    background: #f0fdf4;
-    border: 1.5px solid #bbf7d0;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin: 6px 0;
-}
-.b1-cip-header {
-    font-size: 14px;
-    font-weight: 700;
-    color: #166534;
-    margin-bottom: 8px;
-}
-.b1-cip-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    border-bottom: 1px solid #d1fae5;
-    font-size: 14px;
-}
-.b1-cip-row:last-child { border-bottom: none; }
-.b1-cip-name { flex: 1; color: #1f2937; }
-.b1-cip-cost { color: #374151; min-width: 50px; text-align: right; font-weight: 600; }
+/* ── 自訂項目：行程卡內嵌刪除鈕 ─────────────────────────────── */
+
+/* 行程項目刪除鈕（在 b1-schedule-item 最右邊） */
 .b1-cip-del-btn {
     background: #fee2e2;
     border: none;
@@ -1684,18 +1662,28 @@
     cursor: pointer;
     padding: 2px 8px;
     font-size: 13px;
+    flex-shrink: 0;
     transition: background 0.15s;
 }
 .b1-cip-del-btn:hover { background: #fca5a5; }
-.b1-cip-deleted .b1-cip-name,
-.b1-cip-deleted .b1-cip-cost { opacity: 0.4; text-decoration: line-through; }
+
+/* 已刪除行程項目：名稱/金額加刪除線 + 淡化 */
+.b1-cip-deleted .b1-item-name,
+.b1-cip-deleted .b1-item-cost { opacity: 0.4; text-decoration: line-through; }
 .b1-cip-deleted .b1-cip-del-btn { background: #e5e7eb; color: #6b7280; }
-.b1-cip-add-row {
+
+/* 自訂新增的行程項目（背景淡黃，與原有項目同樣使用 b1-schedule-item 樣式） */
+.b1-cip-custom-row { background: #fffbeb !important; }
+
+/* 行程卡內嵌新增列（total strip 下方） */
+.b1-cip-add-row-inline {
     display: flex;
     gap: 6px;
-    margin-top: 10px;
     align-items: center;
     flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #d1d5db;
 }
 .b1-cip-input {
     border: 1.5px solid #d1d5db;
@@ -1719,7 +1707,6 @@
     transition: background 0.15s;
 }
 .b1-cip-add-btn:hover { background: #059669; }
-.b1-cip-custom-row { background: #fffbeb; }
 
 /* 自訂合計預覽（numpad 上方） */
 .b1-ht-custom-preview {

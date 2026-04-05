@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${this._renderHeader()}
             <div class="b-game-wrap">
                 <div class="b1-card-outer-wrap">
-                    ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
+                    ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn, useCustom })}
                     ${isHard ? `
                     <div class="b1-calc-side-col">
                         <button class="b1-calc-toggle-btn" id="b1-calc-toggle">🧮 開啟計算機</button>
@@ -624,7 +624,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>` : ''}
                 </div>
-                ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
                 ${diff === 'easy'
                     ? this._renderChoiceButtons(curr)
                     : this._renderTotalInput(isHard, useCustom)
@@ -964,8 +963,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 自訂項目面板事件繫結 ──────────────────────────────────
         _bindCustomItemsPanel(curr) {
-            // 刪除/還原原有項目
-            document.querySelectorAll('#b1-cip-base-list [data-base-idx]').forEach(delBtn => {
+            // 刪除/還原原有項目（✕ 按鈕現在直接在 b1-schedule-item 裡）
+            document.querySelectorAll('[data-base-idx]').forEach(delBtn => {
                 Game.EventManager.on(delBtn, 'click', () => {
                     const idx = parseInt(delBtn.dataset.baseIdx);
                     curr.items[idx]._deleted = !curr.items[idx]._deleted;
@@ -990,20 +989,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const customIdx = q.customItems.length - 1;
                     const list = document.getElementById('b1-cip-custom-list');
                     if (list) {
+                        // 新增項目樣式與原有行程項目一致（b1-schedule-item）
                         const row = document.createElement('div');
-                        row.className = 'b1-cip-row b1-cip-custom-row';
+                        row.className = 'b1-schedule-item b1-cip-custom-row';
                         row.id = `b1-cip-custom-${customIdx}`;
-                        row.innerHTML = `<span class="b1-cip-name">${name}</span>
-                                         <span class="b1-cip-cost">${cost}元</span>
+                        row.innerHTML = `<span class="b1-item-name">📌 ${name}</span>
+                                         <span class="b1-item-cost">${cost} 元</span>
                                          <button class="b1-cip-del-btn" data-custom-idx="${customIdx}">✕</button>`;
                         list.appendChild(row);
                         const delBtn2 = row.querySelector('[data-custom-idx]');
                         if (delBtn2) {
                             Game.EventManager.on(delBtn2, 'click', () => {
-                                // 以記錄的 customIdx 找正確位置並移除
                                 const ci = parseInt(delBtn2.dataset.customIdx);
-                                // 找出對應的 q.customItems 真實位置（可能因刪除而偏移）
-                                // 使用 name+cost 標記，或直接設 _deleted
                                 q.customItems[ci]._deleted = true;
                                 row.remove();
                                 this._updateCustomTotalPreview(curr);
@@ -1213,19 +1210,24 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderScheduleCard(q, showTotal, opts = {}) {
             const showItemAmounts = opts.showItemAmounts !== false; // default true
             const showHintBtn     = opts.showHintBtn    !== false; // default true
+            const useCustom       = opts.useCustom      === true;
             const isHard   = this.state.settings.difficulty === 'hard';
+            const catBadgeMap = { school:'📚', food:'🍔', outdoor:'🌳', entertainment:'🎭', shopping:'🛒' };
+            const catBadge = catBadgeMap[q.cat] ? `<span class="b1-item-cat-badge">${catBadgeMap[q.cat]}</span>` : '';
             const itemsHtml = q.items.map((it, idx) => {
                 const showAmt = showItemAmounts;
                 const pctBar = showAmt && !isHard && q.total > 0
                     ? `<div class="b1-item-pct-bar-wrap"><div class="b1-item-pct-bar" style="width:${Math.round(it.cost / q.total * 100)}%"></div></div>`
                     : '';
-                const catBadgeMap = { school:'📚', food:'🍔', outdoor:'🌳', entertainment:'🎭', shopping:'🛒' };
-                const catBadge = catBadgeMap[q.cat] ? `<span class="b1-item-cat-badge">${catBadgeMap[q.cat]}</span>` : '';
+                const delBtn = useCustom
+                    ? `<button class="b1-cip-del-btn b1-item-del-btn" data-base-idx="${idx}" title="刪除">✕</button>`
+                    : '';
                 return `
-                <div class="b1-schedule-item b1-item-enter" style="animation-delay:${idx * 140 + 200}ms">
+                <div class="b1-schedule-item b1-item-enter" id="b1-cip-base-${idx}" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
                     <span class="b1-item-cost">${showAmt ? `${it.cost} 元` : '??? 元'}</span>
                     ${pctBar}
+                    ${delBtn}
                 </div>`;
             }).join('');
 
@@ -1247,6 +1249,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
             const catClass = catColorMap[q.cat] || '';
 
+            // 自訂項目新增欄（僅 useCustom 時顯示，置於 total strip 下方）
+            const customSection = useCustom ? `
+                <div id="b1-cip-custom-list"></div>
+                <div class="b1-cip-add-row b1-cip-add-row-inline">
+                    <input type="text" id="b1-cip-name-input" placeholder="項目名稱" maxlength="8" class="b1-cip-input">
+                    <input type="number" id="b1-cip-cost-input" placeholder="金額" min="1" max="9999" class="b1-cip-input b1-cip-cost-inp">
+                    <button class="b1-cip-add-btn" id="b1-cip-add-btn">＋ 新增</button>
+                </div>` : '';
+
             return `
             <div class="b1-schedule-card ${catClass}">
                 <div class="b1-schedule-header">
@@ -1266,6 +1277,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b1-ts-label">總計金額</span>
                     <span class="b1-ts-amount">${showTotal ? `${q.total} 元` : '??? 元'}</span>
                 </div>
+                ${customSection}
             </div>`;
         },
 
