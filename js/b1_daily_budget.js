@@ -828,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggle.textContent = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
             });
 
-            overlay.querySelectorAll('.b1-calc-btn').forEach(btn => {
+            panel.querySelectorAll('.b1-calc-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const v = btn.dataset.v;
                     if (v === 'C') { calcVal = '0'; calcOp = null; calcPrev = null; calcFresh = false; }

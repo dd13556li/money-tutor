@@ -1425,7 +1425,7 @@
     gap: 8px;
     margin-bottom: 8px;
 }
-/* ── 行程卡 + 計算機右側欄並排 ── */
+/* ── 行程卡 + 計算機右側欄並排（桌面）── */
 .b1-card-outer-wrap {
     display: flex;
     align-items: flex-start;
@@ -1443,6 +1443,24 @@
     align-items: stretch;
     flex-shrink: 0;
     width: 140px;
+}
+
+/* ── 手機端：計算機移到行程卡下方 ── */
+@media (max-width: 600px) {
+    .b1-card-outer-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .b1-calc-side-col {
+        width: 100%;
+        order: 2;
+    }
+    .b1-card-outer-wrap .b1-schedule-card {
+        order: 1;
+    }
+    .b1-calculator {
+        max-width: 100%;
+    }
 }
 
 /* ── 🧮 開啟計算機 按鈕 ── */
