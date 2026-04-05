@@ -1705,7 +1705,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const diff = walletTotal - requiredTotal;
                 let msg = `答對了！你準備了${toTWD(walletTotal)}`;
                 if (diff > 0) msg += `，找回${toTWD(diff)}`;
-                Game.Speech.speak(msg);
+                Game.Speech.speak(msg, () => {
+                    // 語音播完後再進入下一題
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                });
                 this.state.quiz.correctCount++;
                 this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
@@ -1718,6 +1721,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (diff > 0) {
                     Game.TimerManager.setTimeout(() => this._showChangeTip(walletTotal, requiredTotal, diff), 300, 'ui');
                 }
+                return; // nextQuestion 已由 speech callback 處理
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
