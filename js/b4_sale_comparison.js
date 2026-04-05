@@ -100,22 +100,21 @@ const B4_UNIT_ITEMS = [
 // ── 輔助函數 ────────────────────────────────────────────────────
 const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertToTraditionalCurrency(v) : `${v}元`;
 
-// ── 金錢圖示渲染（貪婪分解，最多4組面額，小圖示顯示）───────────
+// ── 金錢圖示渲染（貪婪分解，每枚各顯示一張圖）────────────────
 const B4_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
 function b4PriceCoins(price) {
     let rem = price;
-    const groups = [];
+    const coins = [];
     for (const d of B4_DENOMS) {
         const n = Math.floor(rem / d);
-        if (n > 0) { groups.push({ d, n }); rem -= d * n; }
-        if (groups.length >= 4) break;
+        for (let i = 0; i < n; i++) coins.push(d);
+        rem -= d * n;
     }
-    return groups.map(({ d, n }) => {
+    return coins.map(d => {
         const isBill = d >= 100;
         const w = isBill ? '36px' : '28px';
         const br = isBill ? '3px' : '50%';
-        const countTag = n > 1 ? `<span class="b4-coin-count">×${n}</span>` : '';
-        return `<span class="b4-coin-group"><img src="../images/money/${d}_yuan_front.png" style="width:${w};height:auto;border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">${countTag}</span>`;
+        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:auto;border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">`;
     }).join('');
 }
 
