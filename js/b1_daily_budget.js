@@ -1350,12 +1350,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const req = currQ ? this._getEffectiveTotal(currQ) : 0;
                     Game.TimerManager.setTimeout(() => this.handleConfirm(req), 600, 'ui');
                 }
-                // 放幣語音：普通模式播錢包總計，簡單模式播面額，困難模式靜音
-                if (this.state.settings.difficulty === 'normal') {
+                // 放幣語音：簡單/普通模式播錢包總計，困難模式靜音
+                if (this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'easy') {
                     const walletNow = this._getWalletTotal();
                     Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
-                } else if (this.state.settings.difficulty === 'easy') {
-                    Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
                 }
                 // 浮動標籤
                 const coinArea2 = document.getElementById('wallet-coins') || document.getElementById('wallet-area');
@@ -1376,12 +1374,10 @@ document.addEventListener('DOMContentLoaded', () => {
             q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
-            // 放幣語音：普通模式播錢包總計，簡單模式播面額，困難模式靜音
-            if (this.state.settings.difficulty === 'normal') {
+            // 放幣語音：簡單/普通模式播錢包總計，困難模式靜音
+            if (this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'easy') {
                 const walletNow = this._getWalletTotal();
                 Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
-            } else if (this.state.settings.difficulty === 'easy') {
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(`${denom}元`), 80, 'ui');
             }
             // 硬幣浮動標籤（A4 price popup pattern）
             const coinArea = document.querySelector('.b1-coin-tray') || document.getElementById('wallet-coins') || document.getElementById('wallet-area');
