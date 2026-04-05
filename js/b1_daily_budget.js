@@ -624,19 +624,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindPhase1Events(curr, diff);
 
-            // 彈窗關閉後朗讀費用明細
+            // 彈窗關閉後朗讀費用明細（同步存入 lastSpeechText 供重播按鈕使用）
             Game.TimerManager.setTimeout(() => {
                 const lbl = fmtLabel(curr.label);
                 const effectiveItems = this._getEffectiveItems(curr);
                 const effectiveTotal = this._getEffectiveTotal(curr);
                 const names = effectiveItems.map(it => it.name).join('、');
+                let speechText;
                 if (diff === 'easy') {
                     const it = curr.items[0];
-                    Game.Speech.speak(`今天去${lbl}，${it.name}，${toTWD(it.cost)}，請選擇正確的答案。`);
+                    speechText = `今天去${lbl}，${it.name}，${toTWD(it.cost)}，請選擇正確的答案。`;
                 } else if (diff === 'normal') {
-                    Game.Speech.speak(`今天去${lbl}，要準備${names}，總共${toTWD(effectiveTotal)}，請輸入正確的答案。`);
+                    speechText = `今天去${lbl}，要準備${names}，總共${toTWD(effectiveTotal)}，請輸入正確的答案。`;
                 } else if (isHard) {
-                    Game.Speech.speak(`今天去${lbl}，要準備${names}，請計算總計的金額後，輸入正確的答案。`);
+                    speechText = `今天去${lbl}，要準備${names}，請計算總計的金額後，輸入正確的答案。`;
+                }
+                if (speechText) {
+                    this.state.quiz.lastSpeechText = speechText;
+                    Game.Speech.speak(speechText);
                 }
             }, 300, 'speech');
 
