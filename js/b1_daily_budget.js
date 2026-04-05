@@ -1253,7 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>` : '';
 
             return `
-            <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">`
+            <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
                 <div class="b1-schedule-header">
                     <span class="b1-schedule-icon">${q.icon}</span>
                     <div class="b1-schedule-text">
