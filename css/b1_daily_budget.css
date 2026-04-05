@@ -1425,38 +1425,31 @@
     gap: 8px;
     margin-bottom: 8px;
 }
-/* ── 行程卡 + 計算機右側欄並排（桌面）── */
+/* ── 行程卡外層包裝：relative，讓計算機側欄絕對定位貼於右外側 ── */
 .b1-card-outer-wrap {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    position: relative;
 }
 .b1-card-outer-wrap .b1-schedule-card {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
 }
 
-/* ── 計算機右側欄（按鈕 + panel 縱向排列） ── */
+/* ── 計算機右側欄：桌面端絕對定位在行程卡右邊 ── */
 .b1-calc-side-col {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 0;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    flex-shrink: 0;
     width: 140px;
 }
 
-/* ── 手機端：計算機移到行程卡下方 ── */
+/* ── 手機端：計算機側欄回歸文件流，顯示於行程卡下方 ── */
 @media (max-width: 600px) {
-    .b1-card-outer-wrap {
-        flex-direction: column;
-        align-items: stretch;
-    }
     .b1-calc-side-col {
+        position: static;
         width: 100%;
-        order: 2;
-    }
-    .b1-card-outer-wrap .b1-schedule-card {
-        order: 1;
+        margin-top: 8px;
     }
     .b1-calculator {
         max-width: 100%;
