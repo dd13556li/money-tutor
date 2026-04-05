@@ -293,9 +293,18 @@
 .b1-schedule-hint-wrap {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
     margin-left: 4px;
+}
+
+/* 吉祥物圖示（對齊 A1 48px + settingsBounce）*/
+.b1-hint-mascot {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    animation: settingsBounce 2.5s ease-in-out infinite;
 }
 
 .b1-wallet-empty-hint {
@@ -533,22 +542,25 @@
     box-shadow: inset 0 0 12px rgba(59,130,246,0.2);
 }
 
-/* ── 提示按鈕（困難模式）────────────────────────────────────── */
+/* ── 提示按鈕（對齊 A1 hint-button 大小）────────────────────── */
 .b1-hint-btn {
-    font-size: 12px;
-    color: #d97706;
-    background: rgba(251,191,36,0.15);
-    border: 1.5px solid #fbbf24;
-    border-radius: 8px;
-    padding: 4px 10px;
+    font-size: 14px;
+    color: #92400e;
+    background: rgba(254,243,199,0.9);
+    border: 2px solid #fbbf24;
+    border-radius: 50px;
+    padding: 8px 18px;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.15s;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(251,191,36,0.35);
 }
 .b1-hint-btn:hover {
-    background: rgba(251,191,36,0.3);
-    color: #92400e;
+    background: #fef3c7;
+    border-color: #f59e0b;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(251,191,36,0.5);
 }
 
 /* 鈔票按鈕 */
@@ -1259,7 +1271,7 @@
 .b1-pr-hint-wrap {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
 }
 .b1-pr-total-row {

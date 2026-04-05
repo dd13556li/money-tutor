@@ -699,8 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const showHint = diff === 'normal' || diff === 'hard';
             const hintWrap = showHint
                 ? `<div class="b1-pr-hint-wrap">
-                       <img src="../images/index/educated_money_bag_character.png" alt=""
-                            style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                       <img src="../images/index/educated_money_bag_character.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
                        <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
                    </div>`
                 : '';
@@ -1241,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isEasyMode = this.state.settings.difficulty === 'easy';
             const hintWrap = (showHintBtn && !isEasyMode)
                 ? `<div class="b1-schedule-hint-wrap" id="b1-hint-wrap">
-                       <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                       <img src="../images/index/educated_money_bag_character.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
                        <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
                    </div>`
                 : '';
