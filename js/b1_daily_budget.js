@@ -614,7 +614,8 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             ${this._renderHeader()}
             <div class="b-game-wrap">
-                ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
+                ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn, showCalcBtn: isHard })}
+                ${isHard ? `<div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">${this._getCalculatorHTML()}</div>` : ''}
                 ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
                 ${diff === 'easy'
                     ? this._renderChoiceButtons(curr)
@@ -721,14 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 普通/困難模式：總計輸入鍵盤 ─────────────────────────────
         _renderTotalInput(isHard, useCustom) {
-            const calcBtn = isHard
-                ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle">🧮 開啟計算機</button>`
-                : '';
-            const calcPanel = isHard
-                ? `<div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">
-                       ${this._getCalculatorHTML()}
-                   </div>`
-                : '';
             const customPreview = useCustom
                 ? `<div class="b1-ht-custom-preview" id="b1-ht-preview"></div>`
                 : '';
@@ -736,8 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b1-hard-total-area" id="b1-hard-total-area">
                 ${customPreview}
                 <div class="b1-ht-top-row">
-                    <div class="b1-ht-label">🧮 把每項金額加起來，總共需要幾元？</div>
-                    ${calcBtn}
+                    <div class="b1-ht-label">把每項金額加起來，總共需要幾元？</div>
                 </div>
                 <div class="b1-ht-total-row">
                     <span class="b1-ht-total-label">總計</span>
@@ -759,7 +751,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b1-ht-confirm" id="b1-ht-confirm">✓ 確認</button>
                 </div>
                 <div class="b1-ht-error" id="b1-ht-error" style="display:none"></div>
-                ${calcPanel}
             </div>`;
         },
 
@@ -1214,6 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderScheduleCard(q, showTotal, opts = {}) {
             const showItemAmounts = opts.showItemAmounts !== false; // default true
             const showHintBtn     = opts.showHintBtn    !== false; // default true
+            const showCalcBtn     = opts.showCalcBtn    === true;
             const isHard   = this.state.settings.difficulty === 'hard';
             const itemsHtml = q.items.map((it, idx) => {
                 const showAmt = showItemAmounts;
@@ -1245,6 +1237,10 @@ document.addEventListener('DOMContentLoaded', () => {
                    </div>`
                 : '';
 
+            const calcBtnHTML = showCalcBtn
+                ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="計算機">🧮 開啟計算機</button>`
+                : '';
+
             const catColorMap = { school: 'b1-cat-school', food: 'b1-cat-food', outdoor: 'b1-cat-outdoor', entertainment: 'b1-cat-entertainment', shopping: 'b1-cat-shopping' };
             const catClass = catColorMap[q.cat] || '';
 
@@ -1261,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     ${(isEasyMode || this.state.settings.difficulty === 'normal') ? '' : totalTag}
                     ${hintWrap}
+                    ${calcBtnHTML}
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
                 <div class="b1-total-strip">
