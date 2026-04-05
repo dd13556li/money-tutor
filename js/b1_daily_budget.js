@@ -616,20 +616,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-game-wrap">
                 <div class="b1-card-outer-wrap">
                     ${this._renderScheduleCard(curr, showTotal, { showItemAmounts: true, showHintBtn })}
-                    ${isHard ? `<button class="b1-calc-toggle-btn" id="b1-calc-toggle" title="開啟計算機">🧮</button>` : ''}
+                    ${isHard ? `
+                    <div class="b1-calc-side-col">
+                        <button class="b1-calc-toggle-btn" id="b1-calc-toggle">🧮 開啟計算機</button>
+                        <div class="b1-calc-panel" id="b1-calc-panel" style="display:none;">
+                            ${this._getCalculatorHTML()}
+                        </div>
+                    </div>` : ''}
                 </div>
                 ${useCustom ? this._renderCustomItemsPanel(curr) : ''}
                 ${diff === 'easy'
                     ? this._renderChoiceButtons(curr)
                     : this._renderTotalInput(isHard, useCustom)
                 }
-            </div>
-            ${isHard ? `<div class="b1-calc-overlay" id="b1-calc-overlay" style="display:none;">
-                <div class="b1-calc-popup" id="b1-calc-popup">
-                    <button class="b1-calc-close-btn" id="b1-calc-close">✕</button>
-                    ${this._getCalculatorHTML()}
-                </div>
-            </div>` : ''}`;
+            </div>`;
 
             this._bindPhase1Events(curr, diff);
 
@@ -821,24 +821,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _bindCalculator() {
-            const overlay = document.getElementById('b1-calc-overlay');
+            const panel   = document.getElementById('b1-calc-panel');
             const toggle  = document.getElementById('b1-calc-toggle');
-            const closeBtn = document.getElementById('b1-calc-close');
             const display = document.getElementById('b1-calc-display');
-            if (!overlay || !toggle || !display) return;
+            if (!panel || !toggle || !display) return;
 
             let calcVal = '0', calcOp = null, calcPrev = null, calcFresh = false;
             const updateDisp = () => { display.textContent = calcVal; };
 
-            const openCalc  = () => { overlay.style.display = 'flex'; };
-            const closeCalc = () => { overlay.style.display = 'none'; };
-
             toggle.addEventListener('click', () => {
-                overlay.style.display === 'none' ? openCalc() : closeCalc();
+                const open = panel.style.display === 'none';
+                panel.style.display = open ? '' : 'none';
+                toggle.textContent = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
             });
-            if (closeBtn) closeBtn.addEventListener('click', closeCalc);
-            // 點透明背景關閉
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCalc(); });
 
             overlay.querySelectorAll('.b1-calc-btn').forEach(btn => {
                 btn.addEventListener('click', () => {

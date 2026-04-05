@@ -1424,80 +1424,48 @@
     gap: 8px;
     margin-bottom: 8px;
 }
-/* ── 行程卡外層包裝（relative，讓計算機按鈕貼在卡片右外側） ── */
+/* ── 行程卡 + 計算機右側欄並排 ── */
 .b1-card-outer-wrap {
-    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.b1-card-outer-wrap .b1-schedule-card {
+    flex: 1;
+    min-width: 0;
 }
 
-/* ── 🧮 計算機按鈕：貼在行程卡右外側，垂直居中 ── */
-.b1-calc-toggle-btn {
-    position: absolute;
-    right: -48px;
-    top: 50%;
-    transform: translateY(-50%);
+/* ── 計算機右側欄（按鈕 + panel 縱向排列） ── */
+.b1-calc-side-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    align-items: stretch;
+    flex-shrink: 0;
+    width: 140px;
+}
+
+/* ── 🧮 開啟計算機 按鈕 ── */
+.b1-calc-toggle-btn {
+    padding: 8px 10px;
     background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff;
     border: none;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
-    z-index: 10;
-}
-.b1-calc-toggle-btn:hover {
-    transform: translateY(-50%) scale(1.12);
-    box-shadow: 0 4px 14px rgba(79,70,229,0.5);
-}
-
-/* ── 計算機 fixed overlay（A4 pattern） ── */
-.b1-calc-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10100;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-.b1-calc-popup {
-    position: relative;
-    margin-right: 16px;
-    animation: b1CalcSlideIn 0.25s ease-out;
-}
-@keyframes b1CalcSlideIn {
-    from { opacity: 0; transform: translateX(30px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-.b1-calc-close-btn {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 28px;
-    height: 28px;
-    background: #ef4444;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 13px;
     font-weight: bold;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10101;
-    transition: background 0.15s, transform 0.15s;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.35);
+    transition: background 0.15s, box-shadow 0.15s;
 }
-.b1-calc-close-btn:hover { background: #dc2626; transform: rotate(90deg); }
+.b1-calc-toggle-btn:hover {
+    background: linear-gradient(135deg, #4f46e5, #3730a3);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.45);
+}
+
+/* ── 計算機面板（按鈕正下方） ── */
+.b1-calc-panel { margin-top: 8px; }
 .b1-calculator {
     background: #1e293b;
     border-radius: 14px;
