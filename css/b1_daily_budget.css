@@ -1436,12 +1436,12 @@
 /* ── 計算機右側欄：桌面端絕對定位在行程卡右邊 ── */
 .b1-calc-side-col {
     position: absolute;
-    left: calc(100% + 10px);
+    left: calc(100% + 12px);
     top: 0;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    width: 140px;
+    width: 320px;
 }
 
 /* ── 手機端：計算機側欄回歸文件流，顯示於行程卡下方 ── */
@@ -1456,68 +1456,70 @@
     }
 }
 
-/* ── 🧮 開啟計算機 按鈕 ── */
+/* ── 🧮 開啟計算機 按鈕（A4 pill 樣式）── */
 .b1-calc-toggle-btn {
-    padding: 8px 10px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 20px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     white-space: nowrap;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.35);
-    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.35);
+    transition: background 0.2s, box-shadow 0.2s;
 }
 .b1-calc-toggle-btn:hover {
-    background: linear-gradient(135deg, #4f46e5, #3730a3);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.45);
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    box-shadow: 0 4px 14px rgba(102,126,234,0.5);
 }
 
-/* ── 計算機面板（按鈕正下方） ── */
-.b1-calc-panel { margin-top: 8px; }
+/* ── 計算機面板（A4 尺寸）── */
+.b1-calc-panel { margin-top: 10px; }
 .b1-calculator {
-    background: #1e293b;
-    border-radius: 14px;
-    padding: 12px;
-    max-width: 240px;
-    margin: 0 auto;
+    background: #2d3748;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 320px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
 }
 .b1-calc-display {
-    background: #0f172a;
-    color: #f1f5f9;
-    font-size: 1.8rem;
+    background: #1a202c;
+    color: #48bb78;
+    font-size: 2em;
     font-weight: bold;
     text-align: right;
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    min-height: 44px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    min-height: 60px;
     word-break: break-all;
+    font-family: 'Courier New', monospace;
 }
 .b1-calc-buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: 10px;
 }
 .b1-calc-btn {
-    padding: 12px 0;
+    padding: 18px 0;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 10px;
+    font-size: 1.3em;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.1s, opacity 0.1s;
+    transition: opacity 0.15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
-.b1-calc-btn:active { transform: scale(0.93); }
-.b1-calc-num { background: #334155; color: #f1f5f9; }
-.b1-calc-num:hover { background: #475569; }
-.b1-calc-op  { background: #f59e0b; color: #fff; }
-.b1-calc-op:hover { background: #d97706; }
-.b1-calc-eq  { background: #22c55e; color: #fff; }
-.b1-calc-eq:hover { background: #16a34a; }
+.b1-calc-btn:active { opacity: 0.75; }
+.b1-calc-num { background: #4a5568; color: #fff; }
+.b1-calc-num:hover { background: #718096; }
+.b1-calc-op  { background: #f6ad55; color: #fff; }
+.b1-calc-op:hover { background: #ed8936; }
+.b1-calc-eq  { background: #48bb78; color: #fff; }
+.b1-calc-eq:hover { background: #38a169; }
 
 /* ── 簡單模式：3個選項按鈕 ── */
 .b1-choice-area {
