@@ -66,15 +66,20 @@
     min-height: 28px;
 }
 .b4-price-coins-hidden { display: none !important; }
-.b4-coin-group {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
+
+/* ── 差額區 price bar 右側欄 ──────────────────────────────────── */
+.b4-pbar-price-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    min-width: 80px;
 }
-.b4-coin-count {
-    font-size: 11px;
-    font-weight: 700;
-    color: #6b7280;
+.b4-pbar-coins {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 3px;
 }
 
 /* ── 比較網格 ─────────────────────────────────────────────────── */
