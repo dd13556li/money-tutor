@@ -1040,3 +1040,255 @@
     margin-top: 4px;
     width: 100%;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   省錢清單頁面（showSavingsList）
+   ══════════════════════════════════════════════════════════════ */
+.b4-sl-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #064e3b 0%, #065f46 45%, #059669 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 48px;
+}
+
+/* ── Header ── */
+.b4-sl-header {
+    width: 100%;
+    text-align: center;
+    padding: 36px 20px 24px;
+}
+.b4-sl-trophy {
+    font-size: 60px;
+    display: inline-block;
+    animation: slTrophyIn 0.6s cubic-bezier(.3,1.5,.5,1) both;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+}
+@keyframes slTrophyIn {
+    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+.b4-sl-title {
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    margin: 10px 0 20px;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    animation: slFadeUp 0.5s ease 0.2s both;
+}
+.b4-sl-total-box {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.35);
+    border-radius: 22px;
+    padding: 18px 44px 14px;
+    backdrop-filter: blur(10px);
+    animation: slFadeUp 0.5s ease 0.35s both;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.b4-sl-total-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.82);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+.b4-sl-total-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.b4-sl-total-amount {
+    font-size: 58px;
+    font-weight: 900;
+    color: #fef08a;
+    line-height: 1.05;
+    text-shadow: 0 0 24px rgba(254,240,138,0.55);
+}
+.b4-sl-total-unit {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fef08a;
+}
+
+/* ── Body ── */
+.b4-sl-body {
+    width: 100%;
+    max-width: 620px;
+    padding: 0 16px;
+}
+
+/* 最划算摘要 */
+.b4-sl-best-wrap {
+    animation: slFadeUp 0.5s ease 0.5s both;
+    margin-bottom: 18px;
+}
+.b4-sl-best {
+    background: rgba(255,255,255,0.18);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    backdrop-filter: blur(6px);
+}
+.b4-sl-best-label {
+    font-size: 13px;
+    color: #fde68a;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.b4-sl-best-item {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+}
+.b4-sl-best-store {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+}
+.b4-sl-best-saved {
+    font-size: 14px;
+    font-weight: 800;
+    color: #86efac;
+    margin-left: auto;
+}
+
+/* 明細標題 */
+.b4-sl-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 12px 2px;
+    animation: slFadeUp 0.4s ease 0.55s both;
+}
+
+/* 比價卡片列表 */
+.b4-sl-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.b4-sl-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px 14px 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    animation: slCardIn 0.4s ease both;
+}
+@keyframes slCardIn {
+    from { opacity: 0; transform: translateX(-18px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.b4-sl-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+.b4-sl-item-icon {
+    font-size: 30px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.b4-sl-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+.b4-sl-item-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.b4-sl-stores {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px 6px;
+    font-size: 12px;
+}
+.b4-sl-cheap       { color: #065f46; font-weight: 600; }
+.b4-sl-cheap em    { font-style: normal; font-weight: 800; }
+.b4-sl-vs          { color: #9ca3af; font-size: 11px; }
+.b4-sl-exp         { color: #b91c1c; font-weight: 600; }
+.b4-sl-exp em      { font-style: normal; font-weight: 800; }
+
+/* 省了徽章 */
+.b4-sl-saved-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(145deg, #10b981, #059669);
+    border-radius: 14px;
+    padding: 8px 12px 6px;
+    flex-shrink: 0;
+    min-width: 68px;
+    box-shadow: 0 3px 10px rgba(5,150,105,0.4);
+}
+.b4-sl-saved-label { font-size: 10px; color: rgba(255,255,255,0.88); font-weight: 700; letter-spacing: 0.5px; }
+.b4-sl-saved-num   { font-size: 24px; font-weight: 900; color: #fff; line-height: 1.1; }
+.b4-sl-saved-unit  { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; }
+
+/* 空狀態 */
+.b4-sl-empty {
+    text-align: center;
+    color: rgba(255,255,255,0.65);
+    font-size: 16px;
+    padding: 48px 0;
+}
+
+/* 下一步按鈕 */
+.b4-sl-actions {
+    margin-top: 32px;
+    text-align: center;
+    animation: slFadeUp 0.4s ease 0.8s both;
+}
+.b4-sl-next-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 52px;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 18px rgba(245,158,11,0.55);
+    transition: all 0.2s ease;
+}
+.b4-sl-next-btn:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 6px 22px rgba(245,158,11,0.65);
+}
+.b4-sl-next-btn:active { transform: scale(0.98); }
+
+/* ── 共用 keyframe ── */
+@keyframes slFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 響應式 ── */
+@media (max-width: 480px) {
+    .b4-sl-total-amount { font-size: 44px; }
+    .b4-sl-total-box    { padding: 14px 28px 12px; }
+    .b4-sl-item-icon    { font-size: 24px; }
+    .b4-sl-item-name    { font-size: 14px; }
+    .b4-sl-next-btn     { padding: 14px 36px; font-size: 16px; }
+}

@@ -2143,9 +2143,112 @@ document.addEventListener('DOMContentLoaded', () => {
             q.diffErrorCount = 0;
             q.currentQuestion++;
             if (q.currentQuestion >= q.totalQuestions) {
-                this.showResults();
+                this.showSavingsList();
             } else {
                 this.renderQuestion();
+            }
+        },
+
+        // ── 省錢清單（測驗結束後先顯示，再進總結頁）──────────────
+        showSavingsList() {
+            AssistClick.deactivate();
+            Game.TimerManager.clearByCategory('turnTransition');
+            Game.EventManager.removeByCategory('gameUI');
+            Game.EventManager.removeByCategory('diffUI');
+
+            const q    = this.state.quiz;
+            const hist = q.comparisonHistory || [];
+            const isUnit = this.state.settings.compareStores === 'unit';
+
+            const app = document.getElementById('app');
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+            app.style.overflow  = 'auto';
+            app.style.height    = 'auto';
+            app.style.minHeight = '100vh';
+
+            // ── 最划算摘要 ──
+            const sorted = [...hist].sort((a, b) => b.saved - a.saved);
+            const best   = sorted[0];
+            const bestHTML = best ? `
+                <div class="b4-sl-best">
+                    <span class="b4-sl-best-label">🌟 最划算</span>
+                    <span class="b4-sl-best-item">${best.icon} ${best.name}</span>
+                    <span class="b4-sl-best-store">在 ${best.cheapStore} 買</span>
+                    <span class="b4-sl-best-saved">省了 ${best.saved} 元！</span>
+                </div>` : '';
+
+            // ── 每筆比價卡片 ──
+            const cardsHTML = hist.map((h, i) => `
+                <div class="b4-sl-card" style="animation-delay:${i * 110 + 200}ms">
+                    <div class="b4-sl-card-left">
+                        <span class="b4-sl-item-icon">${h.icon}</span>
+                        <div class="b4-sl-item-info">
+                            <span class="b4-sl-item-name">${h.name}</span>
+                            <div class="b4-sl-stores">
+                                <span class="b4-sl-cheap">✅ ${h.cheapStore}
+                                    <em>${h.isUnit ? `每${h.unit} ${h.cheapPrice}元` : `${h.cheapPrice}元`}</em>
+                                </span>
+                                <span class="b4-sl-vs">→</span>
+                                <span class="b4-sl-exp">❌ ${h.expStore}
+                                    <em>${h.isUnit ? `每${h.unit} ${h.expPrice}元` : `${h.expPrice}元`}</em>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b4-sl-saved-badge">
+                        <span class="b4-sl-saved-label">省了</span>
+                        <span class="b4-sl-saved-num">${h.saved}</span>
+                        <span class="b4-sl-saved-unit">${h.isUnit ? `元/${h.unit}` : '元'}</span>
+                    </div>
+                </div>`).join('');
+
+            app.innerHTML = `
+<div class="b4-sl-wrapper">
+    <div class="b4-sl-header">
+        <div class="b4-sl-trophy">💰</div>
+        <h1 class="b4-sl-title">省錢清單</h1>
+        ${q.totalSaved > 0 ? `
+        <div class="b4-sl-total-box">
+            <span class="b4-sl-total-label">${isUnit ? '你找到最划算的單位價格！' : '這次比價你總共省了'}</span>
+            <div class="b4-sl-total-row">
+                <span class="b4-sl-total-amount">${q.totalSaved}</span>
+                <span class="b4-sl-total-unit">${isUnit ? '元/單位' : '元'}</span>
+            </div>
+        </div>` : ''}
+    </div>
+
+    <div class="b4-sl-body">
+        ${best ? `<div class="b4-sl-best-wrap">${bestHTML}</div>` : ''}
+
+        ${hist.length > 0 ? `
+        <div class="b4-sl-section-title">📋 比價明細</div>
+        <div class="b4-sl-cards">${cardsHTML}</div>`
+        : '<div class="b4-sl-empty">這次沒有比價記錄</div>'}
+
+        <div class="b4-sl-actions">
+            <button class="b4-sl-next-btn" id="b4-sl-next-btn">
+                查看完整成績 →
+            </button>
+        </div>
+    </div>
+</div>`;
+
+            Game.EventManager.on(document.getElementById('b4-sl-next-btn'), 'click', () => {
+                this.showResults();
+            }, {}, 'gameUI');
+
+            // 音效 + 煙火
+            Game.TimerManager.setTimeout(() => {
+                document.getElementById('success-sound')?.play();
+                this._fireConfetti();
+            }, 150, 'confetti');
+
+            // 語音
+            if (q.totalSaved > 0) {
+                Game.TimerManager.setTimeout(() => {
+                    Game.Speech.speak(`恭喜！這次比價總共省了${q.totalSaved}元！`);
+                }, 600, 'speech');
             }
         },
 
