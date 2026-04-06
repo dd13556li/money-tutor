@@ -229,6 +229,13 @@ const B2_TEMPLATES = {
     ],
 };
 
+// ── 面額分組（B1 DENOM_BY_DIFF pattern）─────────────────────────
+const B2_DENOM_BY_DIFF = {
+    easy:   [1, 5, 10, 50],
+    normal: [1, 5, 10, 50, 100, 500],
+    hard:   [1, 5, 10, 50, 100, 500, 1000]
+};
+
 // ── 日記主題（B5 partyTheme pattern）──────────────────────────
 const B2_THEMES = {
     school: {
@@ -451,9 +458,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 answeredHistory: [],
                 startTime: null,
                 currentInput: '',
+                showHint: false,
+                hintSlots: [],
+                walletRevealed: false,
+                p2ErrorCount: 0,
             },
             isEndingGame: false,
             isProcessing: false,
+            wallet: [],
+            uidCounter: 0,
         },
 
         // ── 7. Init ───────────────────────────────────────────
@@ -810,6 +823,13 @@ document.addEventListener('DOMContentLoaded', () => {
             AssistClick.deactivate();
             this.state.isProcessing  = false;
             this.state.quiz.currentInput = '';
+            // 重置 Phase 2 錢包狀態
+            this.state.wallet = [];
+            this.state.uidCounter = 0;
+            this.state.quiz.showHint = false;
+            this.state.quiz.hintSlots = [];
+            this.state.quiz.walletRevealed = false;
+            this.state.quiz.p2ErrorCount = 0;
 
             const q   = this.state.quiz;
             // 重置自訂事件狀態
@@ -1499,17 +1519,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // ── 第2頁：正確金錢圖示展示（B1 Phase 2 pattern）────────────
+        // ── 第2頁：簡單模式展示 / 普通・困難模式拖曳錢包（B1 pattern）──
         _renderPhase2(question, effectiveAnswer) {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
-            const q    = this.state.quiz;
             const diff = this.state.settings.difficulty;
+            if (diff === 'normal' || diff === 'hard') {
+                this._renderB2WalletPhase(question, effectiveAnswer);
+                return;
+            }
+
+            // ── 簡單模式：靜態金錢圖示展示 ──
+            const q    = this.state.quiz;
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
             const isLast = (q.currentQuestion + 1) >= q.totalQuestions;
 
-            // 貪婪分解面額
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = effectiveAnswer;
             const groups = [];
@@ -1518,12 +1543,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const count = Math.floor(rem / d);
                 if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
             }
-
-            // 判斷顯示方式：總數 ≤ 10 枚 → 逐枚顯示；否則 → 分組×N
             const totalCoins = groups.reduce((s, g) => s + g.count, 0);
             let coinsHTML = '';
             if (totalCoins <= 10) {
-                // 逐枚顯示，帶入場動畫
                 let animIdx = 0;
                 for (const g of groups) {
                     for (let i = 0; i < g.count; i++) {
@@ -1540,7 +1562,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } else {
-                // 分組顯示：每種面額一張圖＋×N
                 groups.forEach((g, i) => {
                     const isBill = g.denom >= 100;
                     const w = isBill ? '80px' : '56px';
@@ -1557,7 +1578,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
             const centerText = diffLabel + (themeInfo ? ` · ${themeInfo.icon}${themeInfo.name}` : '');
-
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
@@ -1570,9 +1590,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="game-container">
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" style="width:${pct}%"></div>
-                </div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
                 <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
                 <div class="b2-phase2-card">
                     <div class="b2-p2-header">
@@ -1589,11 +1607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             </div>`;
-
-            // 播語音
             Game.Speech.speak(`剩下${toTWD(effectiveAnswer)}`);
-
-            // 按鈕 + 防重複觸發
             let advanced = false;
             const advance = () => {
                 if (advanced) return;
@@ -1602,8 +1616,529 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.nextQuestion();
             };
             Game.EventManager.on(document.getElementById('b2-p2-next-btn'), 'click', advance, {}, 'gameUI');
-            // 5秒後自動前進
             Game.TimerManager.setTimeout(advance, 5000, 'p2auto');
+        },
+
+        // ── Phase 2 錢包拖曳（普通/困難）────────────────────────────
+        _renderB2WalletPhase(question, effectiveAnswer) {
+            const q    = this.state.quiz;
+            const diff = this.state.settings.difficulty;
+            const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
+
+            // 重置錢包
+            this.state.wallet = [];
+            this.state.uidCounter = 0;
+            q.showHint = false;
+            q.hintSlots = [];
+            q.walletRevealed = false;
+            q.p2ErrorCount = 0;
+
+            const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
+            const diffLabel = { normal: '普通模式', hard: '困難模式' }[diff] || '';
+            const centerText = diffLabel + (themeInfo ? ` · ${themeInfo.icon}${themeInfo.name}` : '');
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            <div class="b-header">
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-center">${centerText}</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    <button class="b-reward-btn" id="b2-reward-btn-p2">🎁 獎勵</button>
+                    <button class="b-back-btn" id="b2-back-btn-p2">返回設定</button>
+                </div>
+            </div>
+            <div class="b-game-wrap">
+                ${this._renderB2Phase2RefCard(question, effectiveAnswer)}
+                ${this._renderB2WalletArea(effectiveAnswer)}
+                <div style="display:flex;justify-content:center;margin:8px 0;">
+                    <button class="b2-wallet-confirm-btn" id="b2-wallet-confirm-btn" ${diff === 'hard' ? '' : 'disabled'}>✅ 準備好了！</button>
+                </div>
+                ${this._renderB2CoinTray(diff)}
+            </div>`;
+
+            this._bindB2WalletPhaseEvents(question, effectiveAnswer);
+            Game.Speech.speak(`最後剩下${toTWD(effectiveAnswer)}，請用錢幣組合出來`);
+        },
+
+        _renderB2Phase2RefCard(question, effectiveAnswer) {
+            const diff = this.state.settings.difficulty;
+            const isHard = diff === 'hard';
+            const effectiveEvents = this._getEffectiveEvents(question);
+            const eventsRows = effectiveEvents.map(e =>
+                `<div class="b2-ref-event-row ${e.type}">
+                    <span class="b2-ref-badge ${e.type}">${e.type === 'income' ? '📥' : '📤'}</span>
+                    <span class="b2-ref-event-name">${e.name}</span>
+                    <span class="b2-ref-event-amt ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount}元</span>
+                </div>`
+            ).join('');
+            const hintWrap = `
+                <div class="b2-ref-hint-wrap">
+                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b2-ref-hint-mascot" onerror="this.style.display='none'">
+                    <button class="b2-ref-hint-btn" id="b2-wallet-hint-btn" title="提示">💡 提示</button>
+                </div>`;
+            return `
+            <div class="b2-ref-card">
+                <div class="b2-ref-top-row">
+                    <span class="b2-ref-diary-icon">📒</span>
+                    <div class="b2-ref-info">
+                        <div class="b2-ref-start">💼 開始有 <strong>${question.startAmount} 元</strong></div>
+                        <div class="b2-ref-events">${eventsRows}</div>
+                    </div>
+                    ${hintWrap}
+                </div>
+                <div class="b2-ref-answer-row">
+                    <span class="b2-ref-answer-label">💰 最後剩下</span>
+                    <span class="b2-ref-answer-val" id="b2-ref-answer-val">
+                        ${isHard ? '??? 元' : `${effectiveAnswer} 元`}
+                    </span>
+                </div>
+            </div>`;
+        },
+
+        _renderB2WalletArea(requiredTotal) {
+            return `
+            <div class="b2-wallet-area" id="b2-wallet-area">
+                <div class="b2-wallet-header">
+                    <span class="b2-wallet-title">👛 我的零用錢</span>
+                    <div class="b2-wallet-total-wrap">
+                        <span class="b2-wallet-total-label">已放</span>
+                        <span class="b2-wallet-total-val" id="b2-wallet-total">0 元</span>
+                        <span class="b2-wallet-sep">/</span>
+                        <span class="b2-wallet-goal-tag">需要 ${requiredTotal} 元</span>
+                    </div>
+                </div>
+                <div class="b2-wallet-progress-wrap">
+                    <div class="b2-wallet-progress" id="b2-wallet-progress">
+                        <div class="b2-wallet-progress-fill" id="b2-wallet-progress-fill"></div>
+                    </div>
+                </div>
+                <div class="b2-wallet-coins b2-drop-zone" id="b2-wallet-coins">
+                    <span class="b2-wallet-empty">把錢幣拖曳到這裡 👈</span>
+                </div>
+            </div>`;
+        },
+
+        _renderB2CoinTray(diff) {
+            const denoms = B2_DENOM_BY_DIFF[diff] || B2_DENOM_BY_DIFF.normal;
+            const coinsHtml = denoms.map(d => {
+                const isBanknote = d >= 100;
+                const imgClass = isBanknote ? 'banknote-img' : 'coin-img';
+                return `
+                <div class="b2-coin-draggable" draggable="true" data-denom="${d}" title="${d}元 — 拖曳放入零用錢">
+                    <img src="../images/money/${d}_yuan_front.png" alt="${d}元" class="${imgClass}" draggable="false"
+                         onerror="this.style.display='none'">
+                    <span class="b2-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+            return `
+            <div class="b2-coin-tray">
+                <div class="b2-tray-title">💰 拖曳錢幣放入零用錢（可重複拖曳）</div>
+                <div class="b2-tray-coins" id="b2-coin-tray">${coinsHtml}</div>
+            </div>`;
+        },
+
+        _bindB2WalletPhaseEvents(question, effectiveAnswer) {
+            this._setupB2DragDrop(effectiveAnswer);
+
+            // 從錢包移除
+            const walletCoinsEl = document.getElementById('b2-wallet-coins');
+            if (walletCoinsEl) {
+                Game.EventManager.on(walletCoinsEl, 'click', (e) => {
+                    const btn = e.target.closest('.b2-wc-remove');
+                    if (!btn) return;
+                    const uid = parseInt(btn.dataset.uid);
+                    if (!isNaN(uid)) this._b2RemoveCoin(uid, effectiveAnswer);
+                }, {}, 'gameUI');
+                Game.EventManager.on(walletCoinsEl, 'dragstart', (e) => {
+                    const coinEl = e.target.closest('.b2-wc-removable');
+                    if (!coinEl) return;
+                    const uid = parseInt(coinEl.dataset.uid);
+                    if (isNaN(uid)) return;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', 'remove:' + uid);
+                    coinEl.classList.add('b2-dragging');
+                }, {}, 'gameUI');
+                Game.EventManager.on(walletCoinsEl, 'dragend', (e) => {
+                    const coinEl = e.target.closest('.b2-wc-removable');
+                    if (coinEl) coinEl.classList.remove('b2-dragging');
+                }, {}, 'gameUI');
+            }
+            const tray = document.querySelector('.b2-coin-tray');
+            if (tray) {
+                Game.EventManager.on(tray, 'dragover', (e) => {
+                    if (e.dataTransfer.types.includes('text/plain')) {
+                        e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+                    }
+                }, {}, 'gameUI');
+                Game.EventManager.on(tray, 'drop', (e) => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    if (data && data.startsWith('remove:')) {
+                        const uid = parseInt(data.slice(7));
+                        if (!isNaN(uid)) this._b2RemoveCoin(uid, effectiveAnswer);
+                    }
+                }, {}, 'gameUI');
+            }
+
+            // 確認按鈕
+            Game.EventManager.on(document.getElementById('b2-wallet-confirm-btn'), 'click', () => {
+                this._handleB2WalletConfirm(effectiveAnswer, question);
+            }, {}, 'gameUI');
+
+            // 提示按鈕
+            Game.EventManager.on(document.getElementById('b2-wallet-hint-btn'), 'click', () => {
+                if (this.state.settings.difficulty === 'hard') {
+                    this.state.quiz.walletRevealed = true;
+                    const valEl = document.getElementById('b2-ref-answer-val');
+                    if (valEl) valEl.textContent = `${effectiveAnswer} 元`;
+                    this._updateB2WalletDisplay(effectiveAnswer);
+                }
+                this._showB2CoinHint(effectiveAnswer);
+            }, {}, 'gameUI');
+
+            // 標題列按鈕
+            Game.EventManager.on(document.getElementById('b2-reward-btn-p2'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b2-back-btn-p2'), 'click', () => {
+                this.showSettings();
+            }, {}, 'gameUI');
+        },
+
+        // ── B2 Wallet Operations ───────────────────────────────────
+        _b2AddCoin(denom, requiredTotal) {
+            const q = this.state.quiz;
+            if (q.showHint && q.hintSlots?.length) {
+                const slotIdx = q.hintSlots.findIndex(s => s.denom === denom && !s.filled);
+                if (slotIdx === -1) { this.audio.play('error'); return; }
+                q.hintSlots[slotIdx].filled = true;
+                this.audio.play('coin');
+                const uid = ++this.state.uidCounter;
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                const slotEl = document.querySelector(`[data-b2-hint-idx="${slotIdx}"]`);
+                if (slotEl) slotEl.classList.remove('b2-wallet-ghost-slot');
+                this._updateB2WalletStatusOnly(requiredTotal);
+                if (this.state.settings.difficulty === 'normal') {
+                    const walletNow = this._getB2WalletTotal();
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
+                }
+            } else {
+                this.audio.play('coin');
+                const uid = ++this.state.uidCounter;
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                this._updateB2WalletDisplay(requiredTotal);
+                if (this.state.settings.difficulty === 'normal') {
+                    const walletNow = this._getB2WalletTotal();
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
+                }
+            }
+            // 浮動標籤
+            const wc = document.getElementById('b2-wallet-coins');
+            if (wc) {
+                const rect = wc.getBoundingClientRect();
+                const popup = document.createElement('div');
+                popup.className = 'b2-coin-popup';
+                popup.textContent = `+${denom}元`;
+                popup.style.cssText = `position:fixed;left:${rect.left + rect.width/2}px;top:${rect.top + 10}px;`;
+                document.body.appendChild(popup);
+                Game.TimerManager.setTimeout(() => { if (popup.parentNode) popup.remove(); }, 900, 'ui');
+            }
+        },
+
+        _b2RemoveCoin(uid, requiredTotal) {
+            this.audio.play('click');
+            this.state.wallet = this.state.wallet.filter(c => c.uid !== uid);
+            this._updateB2WalletDisplay(requiredTotal);
+        },
+
+        _getB2WalletTotal() {
+            return this.state.wallet.reduce((s, c) => s + c.denom, 0);
+        },
+
+        _updateB2WalletDisplay(requiredTotal) {
+            const total  = this._getB2WalletTotal();
+            const enough = total >= requiredTotal;
+            const isHard = this.state.settings.difficulty === 'hard';
+            const q = this.state.quiz;
+
+            const totalEl = document.getElementById('b2-wallet-total');
+            if (totalEl) {
+                if (isHard && !q.walletRevealed) {
+                    totalEl.textContent = '??? 元';
+                    totalEl.className = 'b2-wallet-total-val';
+                } else {
+                    totalEl.textContent = `${total} 元`;
+                    const wasEnough = totalEl.classList.contains('enough');
+                    totalEl.className = 'b2-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+                    if (enough && !wasEnough && total > 0 && !isHard) {
+                        totalEl.classList.add('b2-total-pop');
+                        Game.TimerManager.setTimeout(() => totalEl.classList.remove('b2-total-pop'), 500, 'ui');
+                    }
+                }
+            }
+            const fillEl = document.getElementById('b2-wallet-progress-fill');
+            const progressWrap = document.getElementById('b2-wallet-progress');
+            if (progressWrap) progressWrap.style.display = isHard ? 'none' : '';
+            if (fillEl && requiredTotal > 0 && !isHard) {
+                const pct = Math.min(100, Math.round((total / requiredTotal) * 100));
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b2-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
+            }
+
+            // 錢包幣列
+            const coinsEl = document.getElementById('b2-wallet-coins');
+            if (!coinsEl) return;
+            if (q.showHint && q.hintSlots?.length) {
+                const tmpSlots = q.hintSlots.map(s => ({ ...s, filled: false }));
+                this.state.wallet.forEach(coin => {
+                    const idx = tmpSlots.findIndex(s => s.denom === coin.denom && !s.filled);
+                    if (idx >= 0) tmpSlots[idx].filled = true;
+                });
+                coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
+                    const isBanknote = slot.denom >= 100;
+                    const imgW = isBanknote ? '100px' : '60px';
+                    const ghostClass = slot.filled ? '' : ' b2-wallet-ghost-slot';
+                    return `<div class="b2-wallet-coin${ghostClass}" data-b2-hint-idx="${idx}">
+                        <img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                             style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                             draggable="false" onerror="this.style.display:'none'">
+                    </div>`;
+                }).join('');
+            } else if (this.state.wallet.length === 0) {
+                coinsEl.innerHTML = '<span class="b2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
+            } else {
+                coinsEl.innerHTML = this.state.wallet.map(coin => {
+                    const imgW = coin.isBanknote ? '100px' : '60px';
+                    return `
+                    <div class="b2-wallet-coin b2-wc-removable" draggable="true" data-uid="${coin.uid}">
+                        <img src="../images/money/${coin.denom}_yuan_front.png" alt="${coin.denom}元"
+                             style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                             onerror="this.style.display:'none'" draggable="false">
+                        <button class="b2-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>
+                    </div>`;
+                }).join('');
+            }
+
+            // 確認按鈕狀態（普通模式：正好夠才啟用；困難：一直啟用）
+            const confirmBtn = document.getElementById('b2-wallet-confirm-btn');
+            if (confirmBtn && !isHard) {
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('b2-confirm-ready', enough);
+            }
+        },
+
+        _updateB2WalletStatusOnly(requiredTotal) {
+            const total  = this._getB2WalletTotal();
+            const enough = total >= requiredTotal;
+            const isHard = this.state.settings.difficulty === 'hard';
+            const q = this.state.quiz;
+            const totalEl = document.getElementById('b2-wallet-total');
+            if (totalEl && !(isHard && !q.walletRevealed)) {
+                totalEl.textContent = `${total} 元`;
+                totalEl.className = 'b2-wallet-total-val ' + (enough ? 'enough' : (total > 0 ? 'not-enough' : ''));
+            }
+            const fillEl = document.getElementById('b2-wallet-progress-fill');
+            if (fillEl && requiredTotal > 0 && !isHard) {
+                const pct = Math.min(100, Math.round((total / requiredTotal) * 100));
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b2-wallet-progress-fill' + (enough ? ' full' : (pct >= 70 ? ' near' : ''));
+            }
+            const confirmBtn = document.getElementById('b2-wallet-confirm-btn');
+            if (confirmBtn && !isHard) {
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('b2-confirm-ready', enough);
+            }
+        },
+
+        _handleB2WalletConfirm(requiredTotal, question) {
+            const total = this._getB2WalletTotal();
+            const isHard = this.state.settings.difficulty === 'hard';
+            if (total === requiredTotal) {
+                this.audio.play('correct');
+                Game.Speech.speak(`答對了！${toTWD(requiredTotal)}`, () => {
+                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                });
+            } else {
+                this.audio.play('error');
+                this.state.quiz.p2ErrorCount = (this.state.quiz.p2ErrorCount || 0) + 1;
+                const dir = total > requiredTotal ? '太多了' : '還不夠';
+                const speech = `不對喔，${dir}，請再試一試`;
+                // 困難模式：揭露答案後顯示提示
+                if (isHard) {
+                    this.state.quiz.walletRevealed = true;
+                    const valEl = document.getElementById('b2-ref-answer-val');
+                    if (valEl) valEl.textContent = `${requiredTotal} 元`;
+                }
+                if (this.state.quiz.p2ErrorCount >= 3) {
+                    Game.Speech.speak(speech, () => {
+                        Game.TimerManager.setTimeout(() => this._showB2CoinHint(requiredTotal), 500, 'ui');
+                    });
+                } else {
+                    Game.Speech.speak(speech);
+                }
+                this._updateB2WalletDisplay(requiredTotal);
+            }
+        },
+
+        // ── B2 Drag & Drop ─────────────────────────────────────────
+        _setupB2DragDrop(requiredTotal) {
+            const walletCoins = document.getElementById('b2-wallet-coins');
+            if (!walletCoins) return;
+            document.querySelectorAll('.b2-coin-draggable').forEach(dragEl => {
+                Game.EventManager.on(dragEl, 'dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('text/plain', dragEl.dataset.denom);
+                    dragEl.classList.add('b2-dragging');
+                    if (e.dataTransfer.setDragImage) {
+                        try {
+                            const img = dragEl.querySelector('img');
+                            const ghost = document.createElement('img');
+                            ghost.src = img ? img.src : '';
+                            ghost.style.cssText = 'position:fixed;top:-200px;left:-200px;width:56px;height:56px;object-fit:contain;';
+                            document.body.appendChild(ghost);
+                            e.dataTransfer.setDragImage(ghost, 28, 28);
+                            Game.TimerManager.setTimeout(() => ghost.remove(), 100, 'ui');
+                        } catch(ex) {}
+                    }
+                }, {}, 'gameUI');
+                Game.EventManager.on(dragEl, 'dragend', () => {
+                    dragEl.classList.remove('b2-dragging');
+                }, {}, 'gameUI');
+            });
+            Game.EventManager.on(walletCoins, 'dragover', (e) => {
+                e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+                walletCoins.classList.add('b2-drop-active');
+            }, {}, 'gameUI');
+            Game.EventManager.on(walletCoins, 'dragleave', (e) => {
+                if (!walletCoins.contains(e.relatedTarget)) walletCoins.classList.remove('b2-drop-active');
+            }, {}, 'gameUI');
+            Game.EventManager.on(walletCoins, 'drop', (e) => {
+                e.preventDefault();
+                walletCoins.classList.remove('b2-drop-active');
+                const denom = parseInt(e.dataTransfer.getData('text/plain'));
+                if (denom && !isNaN(denom)) this._b2AddCoin(denom, requiredTotal);
+            }, {}, 'gameUI');
+            this._setupB2TouchDrag(requiredTotal);
+        },
+
+        _setupB2TouchDrag(requiredTotal) {
+            let touchDenom = null, ghost = null;
+            const self = this;
+            document.querySelectorAll('.b2-coin-draggable').forEach(dragEl => {
+                Game.EventManager.on(dragEl, 'touchstart', (e) => {
+                    if (e.touches.length > 1) return;
+                    touchDenom = parseInt(dragEl.dataset.denom);
+                    const rect = dragEl.getBoundingClientRect();
+                    ghost = dragEl.cloneNode(true);
+                    ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;opacity:0.85;pointer-events:none;z-index:9999;transform:scale(1.15);transition:none;`;
+                    document.body.appendChild(ghost);
+                }, { passive: true }, 'gameUI');
+                Game.EventManager.on(dragEl, 'touchmove', (e) => {
+                    if (!ghost) return;
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    ghost.style.left = (t.clientX - ghost.offsetWidth / 2) + 'px';
+                    ghost.style.top  = (t.clientY - ghost.offsetHeight / 2) + 'px';
+                    const wc = document.getElementById('b2-wallet-coins');
+                    if (wc) {
+                        const r = wc.getBoundingClientRect();
+                        wc.classList.toggle('b2-drop-active',
+                            t.clientX >= r.left && t.clientX <= r.right &&
+                            t.clientY >= r.top  && t.clientY <= r.bottom);
+                    }
+                }, { passive: false }, 'gameUI');
+                Game.EventManager.on(dragEl, 'touchend', (e) => {
+                    if (!ghost || touchDenom === null) return;
+                    const t = e.changedTouches[0];
+                    const wc = document.getElementById('b2-wallet-coins');
+                    if (wc) {
+                        const r = wc.getBoundingClientRect();
+                        if (t.clientX >= r.left && t.clientX <= r.right &&
+                            t.clientY >= r.top  && t.clientY <= r.bottom) {
+                            self._b2AddCoin(touchDenom, requiredTotal);
+                        }
+                        wc.classList.remove('b2-drop-active');
+                    }
+                    ghost.remove(); ghost = null; touchDenom = null;
+                }, { passive: true }, 'gameUI');
+            });
+        },
+
+        // ── B2 Hint ─────────────────────────────────────────────────
+        _b2CalcOptimalCoins(amount, denoms) {
+            const sorted = [...denoms].sort((a, b) => b - a);
+            const result = [];
+            let rem = amount;
+            for (const d of sorted) { while (rem >= d) { result.push(d); rem -= d; } }
+            return result;
+        },
+
+        _showB2CoinHint(requiredTotal) {
+            const diff    = this.state.settings.difficulty;
+            const denoms  = B2_DENOM_BY_DIFF[diff] || B2_DENOM_BY_DIFF.normal;
+            const optimal = this._b2CalcOptimalCoins(requiredTotal, denoms);
+
+            document.querySelectorAll('.b2-coin-draggable').forEach(el => el.classList.remove('b2-coin-hint'));
+            const countMap = {};
+            optimal.forEach(d => { countMap[d] = (countMap[d] || 0) + 1; });
+            Object.keys(countMap).forEach(d => {
+                document.querySelectorAll(`.b2-coin-draggable[data-denom="${d}"]`).forEach(el => el.classList.add('b2-coin-hint'));
+            });
+            const parts = Object.entries(countMap).sort((a, b) => b[0] - a[0]).map(([d, c]) => `${c}個${parseInt(d)}元`);
+            Game.Speech.speak(`可以用${parts.join('，')}`);
+
+            const q = this.state.quiz;
+            q.showHint  = true;
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            const placed = [...this.state.wallet];
+            placed.forEach(coin => {
+                const idx = q.hintSlots.findIndex(s => s.denom === coin.denom && !s.filled);
+                if (idx >= 0) q.hintSlots[idx].filled = true;
+            });
+            this._updateB2WalletDisplay(requiredTotal);
+            this._showB2HintModal(optimal, countMap, parts, requiredTotal);
+            Game.TimerManager.setTimeout(() => {
+                document.querySelectorAll('.b2-coin-draggable').forEach(el => el.classList.remove('b2-coin-hint'));
+            }, 6000, 'ui');
+        },
+
+        _showB2HintModal(optimal, countMap, parts, total) {
+            const prev = document.getElementById('b2-hint-modal-overlay');
+            if (prev) prev.remove();
+            const denomsHtml = Object.entries(countMap)
+                .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                .map(([d, c]) => {
+                    const dn = parseInt(d);
+                    const isBanknote = dn >= 100;
+                    const imgSize = isBanknote ? '80px' : '48px';
+                    const imgsHtml = Array(c).fill(0).map(() =>
+                        `<img src="../images/money/${d}_yuan_front.png"
+                              style="width:${imgSize};height:${imgSize};object-fit:contain;${isBanknote ? 'border-radius:4px;' : 'border-radius:50%;'}"
+                              onerror="this.style.display='none'">`
+                    ).join('');
+                    return `
+                    <div class="b2-hm-group">
+                        <div class="b2-hm-imgs">${imgsHtml}</div>
+                        <div class="b2-hm-count">${d}元 × ${c}</div>
+                    </div>`;
+                }).join('');
+            const overlay = document.createElement('div');
+            overlay.id = 'b2-hint-modal-overlay';
+            overlay.className = 'b2-hint-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b2-hint-modal">
+                    <div class="b2-hm-title">💡 建議帶法</div>
+                    <div class="b2-hm-body">${denomsHtml}</div>
+                    <div class="b2-hm-total">合計：${total} 元</div>
+                    <button class="b2-hm-close" id="b2-hm-close">✓ 我知道了</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const close = () => { if (overlay.parentNode) overlay.remove(); };
+            document.getElementById('b2-hm-close')?.addEventListener('click', close);
+            overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+            Game.TimerManager.setTimeout(close, 8000, 'ui');
         },
 
         // ── 收支趨勢指示（Round 26）───────────────────────────

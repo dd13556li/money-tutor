@@ -1022,3 +1022,309 @@
     .b2-p2-amount { font-size: 1.9rem; }
     .b2-event-money-icons { max-width: 80px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   B2 Phase 2 — 錢包拖曳介面（普通/困難）
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 日記參考卡 ─────────────────────────────────────────── */
+.b2-ref-card {
+    background: #fff;
+    border: 2px solid #a5f3fc;
+    border-radius: 16px;
+    padding: 14px 16px 10px;
+    margin: 0 auto 10px;
+    max-width: 540px;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.12);
+}
+.b2-ref-top-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+.b2-ref-diary-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+.b2-ref-info { flex: 1; min-width: 0; }
+.b2-ref-start { font-size: 14px; color: #334155; margin-bottom: 6px; }
+.b2-ref-events { display: flex; flex-direction: column; gap: 3px; }
+.b2-ref-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+.b2-ref-event-row.income  { background: #f0fdf4; }
+.b2-ref-event-row.expense { background: #fff1f2; }
+.b2-ref-badge { font-size: 14px; flex-shrink: 0; }
+.b2-ref-event-name { flex: 1; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b2-ref-event-amt.income  { color: #16a34a; font-weight: 700; white-space: nowrap; }
+.b2-ref-event-amt.expense { color: #dc2626; font-weight: 700; white-space: nowrap; }
+.b2-ref-hint-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+.b2-ref-hint-mascot {
+    width: 28px; height: 28px; object-fit: contain;
+}
+.b2-ref-hint-btn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.b2-ref-hint-btn:hover { filter: brightness(1.1); }
+.b2-ref-answer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #bae6fd;
+}
+.b2-ref-answer-label { font-size: 15px; color: #0369a1; font-weight: 600; }
+.b2-ref-answer-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0369a1;
+    background: #e0f2fe;
+    border-radius: 10px;
+    padding: 2px 14px;
+}
+
+/* ── 錢包區 ─────────────────────────────────────────────── */
+.b2-wallet-area {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid #86efac;
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin: 0 auto 10px;
+    max-width: 540px;
+}
+.b2-wallet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.b2-wallet-title { font-size: 16px; font-weight: 700; color: #15803d; }
+.b2-wallet-total-wrap { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+.b2-wallet-total-label { color: #6b7280; }
+.b2-wallet-total-val { font-weight: 700; color: #374151; min-width: 54px; }
+.b2-wallet-total-val.enough    { color: #16a34a; }
+.b2-wallet-total-val.not-enough { color: #dc2626; }
+.b2-wallet-sep { color: #9ca3af; }
+.b2-wallet-goal-tag {
+    background: #bbf7d0;
+    color: #166534;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.b2-wallet-progress-wrap { margin-bottom: 8px; }
+.b2-wallet-progress {
+    background: #d1fae5;
+    border-radius: 8px;
+    height: 10px;
+    overflow: hidden;
+}
+.b2-wallet-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #34d399, #10b981);
+    border-radius: 8px;
+    transition: width 0.3s ease;
+}
+.b2-wallet-progress-fill.near { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.b2-wallet-progress-fill.full { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.b2-wallet-coins {
+    min-height: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    background: #fff;
+    border: 2px dashed #86efac;
+    transition: background 0.15s, border-color 0.15s;
+}
+.b2-wallet-coins.b2-drop-active {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+.b2-wallet-empty { color: #9ca3af; font-size: 14px; margin: auto; }
+.b2-wallet-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.b2-wallet-coin.b2-wallet-ghost-slot {
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+}
+.b2-wc-removable { cursor: grab; }
+.b2-wc-removable.b2-dragging { opacity: 0.4; }
+.b2-wc-remove {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+}
+
+/* ── 確認按鈕 ───────────────────────────────────────────── */
+.b2-wallet-confirm-btn {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #166534;
+    border: 2px solid #6ee7b7;
+    border-radius: 14px;
+    padding: 12px 32px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+}
+.b2-wallet-confirm-btn.b2-confirm-ready {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border-color: #16a34a;
+    box-shadow: 0 4px 14px rgba(22,163,74,0.4);
+    animation: b2ConfirmPulse 1.6s ease-in-out infinite;
+}
+.b2-wallet-confirm-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+.b2-wallet-confirm-btn:not(:disabled):hover { transform: scale(1.04); }
+@keyframes b2ConfirmPulse {
+    0%,100% { box-shadow: 0 4px 14px rgba(22,163,74,0.4); }
+    50%     { box-shadow: 0 4px 24px rgba(22,163,74,0.7); }
+}
+
+/* ── 錢幣拖曳盤 ─────────────────────────────────────────── */
+.b2-coin-tray {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 2px solid #fcd34d;
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin: 0 auto;
+    max-width: 540px;
+}
+.b2-tray-title { font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 10px; }
+.b2-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: flex-end;
+}
+.b2-coin-draggable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: grab;
+    padding: 6px;
+    border-radius: 10px;
+    transition: transform 0.12s, box-shadow 0.12s;
+    user-select: none;
+}
+.b2-coin-draggable:hover { transform: scale(1.12); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.b2-coin-draggable.b2-dragging { opacity: 0.4; }
+.b2-coin-draggable.b2-coin-hint {
+    box-shadow: 0 0 18px rgba(255,193,7,0.8);
+    outline: 3px solid #FFC107;
+    border-radius: 10px;
+    animation: b2HintPulse 1.4s ease-in-out infinite;
+}
+@keyframes b2HintPulse {
+    0%,100% { box-shadow: 0 0 12px rgba(255,193,7,0.7); }
+    50%     { box-shadow: 0 0 22px rgba(255,193,7,1); }
+}
+.b2-coin-draggable .coin-img     { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+.b2-coin-draggable .banknote-img { width: 100px; border-radius: 4px; object-fit: cover; }
+.b2-denom-label { font-size: 12px; font-weight: 600; color: #374151; }
+
+/* ── 浮動標籤 ───────────────────────────────────────────── */
+.b2-coin-popup {
+    background: rgba(34,197,94,0.9);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 9999;
+    animation: b2PopupUp 0.9s ease forwards;
+}
+@keyframes b2PopupUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+}
+.b2-total-pop {
+    animation: b2TotalPop 0.5s ease;
+}
+@keyframes b2TotalPop {
+    0%,100% { transform: scale(1); }
+    50%     { transform: scale(1.2); }
+}
+
+/* ── 提示彈窗 ───────────────────────────────────────────── */
+.b2-hint-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.52);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10200;
+}
+.b2-hint-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+    text-align: center;
+}
+.b2-hm-title { font-size: 1.2rem; font-weight: 800; color: #0369a1; margin-bottom: 16px; }
+.b2-hm-body  { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 12px; }
+.b2-hm-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.b2-hm-imgs  { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.b2-hm-count { font-size: 13px; font-weight: 600; color: #374151; }
+.b2-hm-total { font-size: 15px; font-weight: 700; color: #0369a1; margin-bottom: 14px; }
+.b2-hm-close {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.b2-hm-close:hover { filter: brightness(1.1); }
+
+@media (max-width: 480px) {
+    .b2-ref-card, .b2-wallet-area, .b2-coin-tray { border-radius: 12px; padding: 10px 12px; }
+    .b2-coin-draggable .coin-img     { width: 48px; height: 48px; }
+    .b2-coin-draggable .banknote-img { width: 80px; }
+    .b2-wallet-coins { min-height: 64px; }
+}
