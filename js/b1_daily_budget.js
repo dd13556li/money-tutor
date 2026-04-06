@@ -875,29 +875,26 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderMoneyIconsGrouped(amount, maxGroups = 4) {
+        _renderMoneyIconsGrouped(amount, maxCoins = 12) {
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
-            const groups = [];
+            const items = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
                 const count = Math.floor(rem / d);
                 if (count > 0) {
-                    groups.push({ denom: d, count });
+                    for (let i = 0; i < count; i++) items.push(d);
                     rem -= count * d;
                 }
-                if (groups.length >= maxGroups) break;
+                if (items.length >= maxCoins) break;
             }
-            if (groups.length === 0) return '';
-            return groups.map(g => {
-                const isBill = g.denom >= 100;
+            if (items.length === 0) return '';
+            return items.map(d => {
+                const isBill = d >= 100;
                 const w = isBill ? 36 : 26;
-                const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
-                return `<span class="b1-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
-                         onerror="this.style.display='none'" draggable="false">${countBadge}
-                </span>`;
+                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                     onerror="this.style.display='none'" draggable="false">`;
             }).join('');
         },
 
