@@ -898,6 +898,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
         },
 
+        // ── 行程項目金錢圖示（桌面逐枚、手機×N）─────────────────────
+        _renderItemMoneyIcons(amount, maxGroups = 4) {
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
+                if (groups.length >= maxGroups) break;
+            }
+            if (groups.length === 0) return '';
+
+            // 手機版：分組 ×N
+            const mobileHTML = groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
+                return `<span class="b1-mic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${countBadge}
+                </span>`;
+            }).join('');
+
+            // 桌面版：逐枚（最多10枚），尺寸同 B2 Phase 2
+            const items = [];
+            for (const g of groups) {
+                for (let i = 0; i < g.count && items.length < 10; i++) items.push(g.denom);
+            }
+            const desktopHTML = items.map(d => {
+                const isBill = d >= 100;
+                const w = isBill ? 72 : 50;
+                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
+                     onerror="this.style.display='none'" draggable="false">`;
+            }).join('');
+
+            return `<span class="b1-mic-desktop">${desktopHTML}</span><span class="b1-mic-mobile">${mobileHTML}</span>`;
+        },
+
         _generateChoices(correct) {
             const candidates = new Set([correct]);
             const offsets = [10, 20, 15, 30, 25, 5, 40, 50];
@@ -1249,10 +1290,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const delBtn = useCustom
                     ? `<button class="b1-cip-del-btn b1-item-del-btn" data-base-idx="${idx}" title="刪除">✕</button>`
                     : '';
+                const moneyIcons = showAmt ? this._renderItemMoneyIcons(it.cost) : '';
                 return `
                 <div class="b1-schedule-item b1-item-enter" id="b1-cip-base-${idx}" style="animation-delay:${idx * 140 + 200}ms">
                     <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
                     <span class="b1-item-cost">${showAmt ? `${it.cost} 元` : '??? 元'}</span>
+                    ${moneyIcons ? `<div class="b1-item-money-icons">${moneyIcons}</div>` : ''}
                     ${pctBar}
                     ${delBtn}
                 </div>`;

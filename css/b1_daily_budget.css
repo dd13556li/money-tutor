@@ -1521,6 +1521,40 @@
 .b1-calc-eq  { background: #48bb78; color: #fff; }
 .b1-calc-eq:hover { background: #38a169; }
 
+/* ── 行程項目金錢圖示（桌面逐枚、手機×N）── */
+.b1-item-money-icons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+.b1-mic-desktop { display: none; }
+.b1-mic-mobile  { display: contents; }
+.b1-mic-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+.b1-mic-count {
+    font-size: 10px;
+    font-weight: 700;
+    color: #374151;
+    text-align: center;
+    line-height: 1.1;
+    margin-top: 1px;
+}
+@media (min-width: 601px) {
+    .b1-mic-desktop {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+    }
+    .b1-mic-mobile  { display: none; }
+    .b1-item-money-icons { max-width: 280px; }
+}
+
 /* ── 簡單模式：3個選項按鈕 ── */
 .b1-choice-area {
     background: #fff9f0;
