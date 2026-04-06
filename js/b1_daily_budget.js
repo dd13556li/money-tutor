@@ -1336,10 +1336,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b1-cip-add-btn" id="b1-cip-add-btn">＋ 新增</button>
                 </div>` : '';
 
+            const sceneImgBlock = q.imageFile
+                ? `<div class="b1-scene-img-center"><img src="../images/b1/${q.imageFile}" alt="${q.label}" class="b1-scene-img-lg" onerror="this.parentElement.remove()"></div>`
+                : '';
+
             return `
             <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
+                ${sceneImgBlock}
                 <div class="b1-schedule-header">
-                    <span class="b1-schedule-icon">${this._sceneIcon(q)}</span>
+                    ${!q.imageFile ? `<span class="b1-schedule-icon">${q.icon}</span>` : ''}
                     <div class="b1-schedule-text">
                         <div class="b1-schedule-label-row">
                             <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>

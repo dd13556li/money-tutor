@@ -1786,10 +1786,18 @@
     border-radius: 6px;
     display: inline-block;
 }
-/* 行程卡 52px / 手機 40px */
-.b1-schedule-icon .b1-scene-img { height: 52px; border-radius: 8px; }
-@media (max-width: 480px) {
-    .b1-schedule-icon .b1-scene-img { height: 40px; }
+/* Phase1 行程卡：128×128 置中 */
+.b1-scene-img-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.b1-scene-img-lg {
+    width: 128px;
+    height: 128px;
+    object-fit: contain;
+    border-radius: 12px;
+    display: block;
 }
 /* Phase2 參考卡 30px */
 .b1-pr-icon .b1-scene-img { height: 30px; }
