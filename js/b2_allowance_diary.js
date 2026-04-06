@@ -916,12 +916,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 日記卡片
             const diaryCard = `
-                <div class="b2-diary${isHard ? ' b2-memory-mode' : ''}" data-diff="${diff}">
+                <div class="b2-diary" data-diff="${diff}">
                     <div class="b2-diary-header">
                         <span class="b2-diary-icon">📒</span>
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
-                        ${isHard ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
                         <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-left:auto;">
                             <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
                             <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
@@ -1188,18 +1187,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             calcToggle.textContent  = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
                         }, {}, 'gameUI');
                         this._bindB2Calculator();
-                    }
-                }
-                // 困難模式：查看文字切換
-                if (isHard) {
-                    const revealBtn = document.getElementById('b2-reveal-btn');
-                    if (revealBtn) {
-                        Game.EventManager.on(revealBtn, 'click', () => {
-                            const diary = document.querySelector('.b2-diary');
-                            if (!diary) return;
-                            const revealed = diary.classList.toggle('b2-revealed');
-                            revealBtn.textContent = revealed ? '🙈 隱藏' : '👁️ 查看';
-                        }, {}, 'gameUI');
                     }
                 }
             }
