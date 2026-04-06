@@ -719,10 +719,14 @@ document.addEventListener('DOMContentLoaded', () => {
                        <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
                    </div>`
                 : '';
+            const prImgBlock = curr.imageFile
+                ? `<div class="b1-scene-img-center"><img src="../images/b1/${curr.imageFile}" alt="${curr.label}" class="b1-scene-img-lg" onerror="this.parentElement.remove()"></div>`
+                : '';
             return `
             <div class="b1-phase2-ref">
+                ${prImgBlock}
                 <div class="b1-pr-top-row">
-                    <span class="b1-pr-icon">${this._sceneIcon(curr)}</span>
+                    ${!curr.imageFile ? `<span class="b1-pr-icon">${curr.icon}</span>` : ''}
                     <div class="b1-pr-info">
                         <span class="b1-pr-label">今天要去：${fmtLabel(curr.label)}</span>
                         <span class="b1-pr-sub">${itemsSummary}</span>

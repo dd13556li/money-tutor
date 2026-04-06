@@ -1806,8 +1806,8 @@
 /* 任務彈窗 */
 .b1-task-modal-icon .b1-scene-img,
 .b1-task-modal-img {
-    height: 80px;
-    width: 80px;
+    height: 128px;
+    width: 128px;
     object-fit: contain;
     border-radius: 12px;
     margin-bottom: 6px;
