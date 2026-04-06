@@ -978,10 +978,50 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderChoicesHTML(question) {
             const btns = question.choices.map(c => `
                 <button class="b2-choice-btn" data-val="${c}">
-                    ${c}
-                    <span class="b2-choice-suffix">元</span>
+                    <span class="b2-choice-amount">${c} 元</span>
+                    <span class="b2-choice-icons">${this._renderChoiceMoneyIcons(c)}</span>
                 </button>`).join('');
             return `<div class="b2-choices">${btns}</div>`;
+        },
+
+        _renderChoiceMoneyIcons(amount, maxGroups = 4) {
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
+                if (groups.length >= maxGroups) break;
+            }
+            if (groups.length === 0) return '';
+
+            // 手機版：分組 ×N
+            const mobileHTML = groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const countBadge = g.count > 1 ? `<span class="b2-cic-count">×${g.count}</span>` : '';
+                return `<span class="b2-cic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${countBadge}
+                </span>`;
+            }).join('');
+
+            // 桌面版：逐枚（最多10枚）
+            const items = [];
+            for (const g of groups) {
+                for (let i = 0; i < g.count && items.length < 10; i++) items.push(g.denom);
+            }
+            const desktopHTML = items.map(d => {
+                const isBill = d >= 100;
+                const w = isBill ? 36 : 26;
+                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;flex-shrink:0;"
+                     onerror="this.style.display='none'" draggable="false">`;
+            }).join('');
+
+            return `<span class="b2-cic-desktop">${desktopHTML}</span><span class="b2-cic-mobile">${mobileHTML}</span>`;
         },
 
         _renderB2TotalInput(isHard) {
