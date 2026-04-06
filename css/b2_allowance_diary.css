@@ -920,6 +920,20 @@
 }
 
 /* ── 收支事件列：金幣圖示組 ──────────────────────────────────── */
+.b2-mic-desktop { display: none; }
+.b2-mic-mobile  { display: contents; }
+
+/* 桌面端（>600px）：顯示逐枚，隱藏分組 */
+@media (min-width: 601px) {
+    .b2-mic-desktop {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+    }
+    .b2-mic-mobile { display: none; }
+}
+
 .b2-event-money-icons {
     display: flex;
     align-items: center;
@@ -1018,6 +1032,10 @@
 .b2-p2-next-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
 .b2-p2-next-btn:active { transform: scale(0.96); }
 
+/* 桌面端放寬圖示容器 */
+@media (min-width: 601px) {
+    .b2-event-money-icons { max-width: 280px; }
+}
 @media (max-width: 480px) {
     .b2-p2-amount { font-size: 1.9rem; }
     .b2-event-money-icons { max-width: 80px; }

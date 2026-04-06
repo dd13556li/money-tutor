@@ -1073,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        // ── 金額→金幣圖示組（每個面額顯示一次＋數量）────────────────
+        // ── 金額→金幣圖示組（桌面：逐枚；手機：分組×N）─────────────
         _renderMoneyIconsGrouped(amount, maxGroups = 4) {
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
@@ -1081,14 +1081,13 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const d of denoms) {
                 if (rem <= 0) break;
                 const count = Math.floor(rem / d);
-                if (count > 0) {
-                    groups.push({ denom: d, count });
-                    rem -= count * d;
-                }
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
                 if (groups.length >= maxGroups) break;
             }
             if (groups.length === 0) return '';
-            return groups.map(g => {
+
+            // 手機版：分組 ×N（原樣）
+            const mobileHTML = groups.map(g => {
                 const isBill = g.denom >= 100;
                 const w = isBill ? 34 : 24;
                 const countBadge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
@@ -1098,6 +1097,21 @@ document.addEventListener('DOMContentLoaded', () => {
                          onerror="this.style.display='none'" draggable="false">${countBadge}
                 </span>`;
             }).join('');
+
+            // 桌面版：逐枚顯示（最多10枚），尺寸參考 Phase 2
+            const items = [];
+            for (const g of groups) {
+                for (let i = 0; i < g.count && items.length < 10; i++) items.push(g.denom);
+            }
+            const desktopHTML = items.map(d => {
+                const isBill = d >= 100;
+                const w = isBill ? 72 : 50;
+                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
+                     onerror="this.style.display='none'" draggable="false">`;
+            }).join('');
+
+            return `<span class="b2-mic-desktop">${desktopHTML}</span><span class="b2-mic-mobile">${mobileHTML}</span>`;
         },
 
         _bindCustomEventsPanel(question) {
