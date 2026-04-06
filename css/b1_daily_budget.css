@@ -1599,7 +1599,10 @@
     justify-content: center;
     align-items: center;
     gap: 4px;
-    min-height: 28px;
+}
+/* 讓 b1-mic-desktop 在選項按鈕內也能正確置中 */
+.b1-choice-icons .b1-mic-desktop {
+    justify-content: center;
 }
 
 .b1-choice-btn:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(59,130,246,0.4); }

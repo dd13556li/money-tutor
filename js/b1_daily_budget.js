@@ -890,24 +890,41 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderMoneyIconsGrouped(amount, maxCoins = 12) {
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
-            const items = [];
+            const groups = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
                 const count = Math.floor(rem / d);
-                if (count > 0) {
-                    for (let i = 0; i < count; i++) items.push(d);
-                    rem -= count * d;
-                }
-                if (items.length >= maxCoins) break;
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
+                if (groups.length >= 4) break;
             }
-            if (items.length === 0) return '';
-            return items.map(d => {
+            if (groups.length === 0) return '';
+
+            // 手機版：分組 ×N（同 _renderItemMoneyIcons mobile）
+            const mobileHTML = groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
+                return `<span class="b1-mic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${countBadge}
+                </span>`;
+            }).join('');
+
+            // 桌面版：逐枚（同 _renderItemMoneyIcons desktop）
+            const items = [];
+            for (const g of groups) {
+                for (let i = 0; i < g.count && items.length < maxCoins; i++) items.push(g.denom);
+            }
+            const desktopHTML = items.map(d => {
                 const isBill = d >= 100;
-                const w = isBill ? 36 : 26;
+                const w = isBill ? 72 : 50;
                 return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
-                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
+
+            return `<span class="b1-mic-desktop">${desktopHTML}</span><span class="b1-mic-mobile">${mobileHTML}</span>`;
         },
 
         // ── 行程項目金錢圖示（桌面逐枚、手機×N）─────────────────────
