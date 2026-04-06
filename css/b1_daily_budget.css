@@ -1777,3 +1777,31 @@
 }
 .b1-cip-add-btn:hover { background: #059669; }
 
+/* ── 場景圖片（取代 emoji 圖示）──────────────────────────────── */
+.b1-scene-img {
+    height: 1em;
+    width: auto;
+    object-fit: contain;
+    vertical-align: middle;
+    border-radius: 6px;
+    display: inline-block;
+}
+/* 行程卡 52px / 手機 40px */
+.b1-schedule-icon .b1-scene-img { height: 52px; border-radius: 8px; }
+@media (max-width: 480px) {
+    .b1-schedule-icon .b1-scene-img { height: 40px; }
+}
+/* Phase2 參考卡 30px */
+.b1-pr-icon .b1-scene-img { height: 30px; }
+/* 成績頁行程列 22px */
+.b1-sch-icon .b1-scene-img { height: 22px; border-radius: 4px; }
+/* 任務彈窗 */
+.b1-task-modal-icon .b1-scene-img,
+.b1-task-modal-img {
+    height: 80px;
+    width: 80px;
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 6px;
+}
+

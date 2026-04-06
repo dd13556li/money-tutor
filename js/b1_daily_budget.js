@@ -9,68 +9,68 @@
 // 每個 item 以 min/max 定義價格區間，由 _generateQuestions 隨機取值（5元倍數）
 const B1_SCENARIOS = {
     easy: [
-        { icon:'🏫', label:'去學校',    cat:'school',        items:[{ name:'午餐費',   min:40,  max:65  }] },
-        { icon:'🏪', label:'去超商',    cat:'shopping',      items:[{ name:'飲料費',   min:20,  max:35  }] },
-        { icon:'📚', label:'圖書館',    cat:'school',        items:[{ name:'影印費',   min:5,   max:20  }] },
-        { icon:'🎭', label:'看表演',    cat:'entertainment', items:[{ name:'表演票',   min:80,  max:150 }] },
-        { icon:'🏊', label:'游泳課',    cat:'outdoor',       items:[{ name:'入場費',   min:60,  max:100 }] },
-        { icon:'🎨', label:'美術課',    cat:'school',        items:[{ name:'材料費',   min:25,  max:50  }] },
-        { icon:'🚌', label:'搭公車',    cat:'school',        items:[{ name:'公車票',   min:15,  max:30  }] },
-        { icon:'🌿', label:'逛公園',    cat:'outdoor',       items:[{ name:'停車費',   min:15,  max:30  }] },
-        { icon:'☕', label:'買早餐',    cat:'food',          items:[{ name:'早餐費',   min:25,  max:55  }] },
-        { icon:'🐟', label:'買魚飼料',  cat:'shopping',      items:[{ name:'飼料費',   min:35,  max:65  }] },
-        { icon:'🎬', label:'看電影',    cat:'entertainment', items:[{ name:'電影票',   min:100, max:160 }] },
-        { icon:'🍜', label:'吃點心',    cat:'food',          items:[{ name:'點心費',   min:30,  max:60  }] },
-        { icon:'🛒', label:'買文具',    cat:'shopping',      items:[{ name:'文具費',   min:40,  max:75  }] },
-        { icon:'⛺', label:'踏青',      cat:'outdoor',       items:[{ name:'門票費',   min:50,  max:80  }] },
-        { icon:'🍦', label:'買冰淇淋',  cat:'food',          items:[{ name:'冰淇淋費', min:20,  max:50  }] },
-        { icon:'🎮', label:'電玩體驗',  cat:'entertainment', items:[{ name:'遊戲費',   min:30,  max:60  }] },
-        { icon:'🌸', label:'賞花展',    cat:'outdoor',       items:[{ name:'門票費',   min:50,  max:100 }] },
-        { icon:'🐾', label:'寵物店',    cat:'shopping',      items:[{ name:'零食費',   min:30,  max:60  }] },
+        { icon:'🏫', label:'去學校',    cat:'school',        imageFile:'icon-b1-easy-go-to-school.png',              items:[{ name:'午餐費',   min:40,  max:65  }] },
+        { icon:'🏪', label:'去超商',    cat:'shopping',      imageFile:'icon-b1-easy-go-to-convenience-store.png',   items:[{ name:'飲料費',   min:20,  max:35  }] },
+        { icon:'📚', label:'圖書館',    cat:'school',        imageFile:'icon-b1-easy-library.png',                   items:[{ name:'影印費',   min:5,   max:20  }] },
+        { icon:'🎭', label:'看表演',    cat:'entertainment', imageFile:'icon-b1-easy-watch-performance.png',         items:[{ name:'表演票',   min:80,  max:150 }] },
+        { icon:'🏊', label:'游泳課',    cat:'outdoor',       imageFile:'icon-b1-easy-swimming-class.png',            items:[{ name:'入場費',   min:60,  max:100 }] },
+        { icon:'🎨', label:'美術課',    cat:'school',        imageFile:'icon-b1-easy-art-class.png',                 items:[{ name:'材料費',   min:25,  max:50  }] },
+        { icon:'🚌', label:'搭公車',    cat:'school',        imageFile:'icon-b1-easy-take-bus.png',                  items:[{ name:'公車票',   min:15,  max:30  }] },
+        { icon:'🌿', label:'逛公園',    cat:'outdoor',       imageFile:'icon-b1-easy-visit-park.png',                items:[{ name:'停車費',   min:15,  max:30  }] },
+        { icon:'☕', label:'買早餐',    cat:'food',          imageFile:'icon-b1-easy-buy-breakfast.png',             items:[{ name:'早餐費',   min:25,  max:55  }] },
+        { icon:'🐟', label:'買魚飼料',  cat:'shopping',      imageFile:'icon-b1-easy-buy-fish-food.png',             items:[{ name:'飼料費',   min:35,  max:65  }] },
+        { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-easy-watch-movie.png',               items:[{ name:'電影票',   min:100, max:160 }] },
+        { icon:'🍜', label:'吃點心',    cat:'food',                                                                  items:[{ name:'點心費',   min:30,  max:60  }] },
+        { icon:'🛒', label:'買文具',    cat:'shopping',      imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'文具費',   min:40,  max:75  }] },
+        { icon:'⛺', label:'踏青',      cat:'outdoor',       imageFile:'icon-b1-easy-outing.png',                    items:[{ name:'門票費',   min:50,  max:80  }] },
+        { icon:'🍦', label:'買冰淇淋',  cat:'food',          imageFile:'icon-b1-hard-eat-ice-cream.png',             items:[{ name:'冰淇淋費', min:20,  max:50  }] },
+        { icon:'🎮', label:'電玩體驗',  cat:'entertainment',                                                         items:[{ name:'遊戲費',   min:30,  max:60  }] },
+        { icon:'🌸', label:'賞花展',    cat:'outdoor',                                                               items:[{ name:'門票費',   min:50,  max:100 }] },
+        { icon:'🐾', label:'寵物店',    cat:'shopping',                                                              items:[{ name:'零食費',   min:30,  max:60  }] },
     ],
     normal: [
-        { icon:'🏫', label:'上學日',    cat:'school',        items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
-        { icon:'🎨', label:'才藝課',    cat:'school',        items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }] },
-        { icon:'🏥', label:'看醫生',    cat:'school',        items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }] },
-        { icon:'🎬', label:'看電影',    cat:'entertainment', items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }] },
-        { icon:'🚂', label:'搭火車',    cat:'outdoor',       items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }] },
-        { icon:'🏊', label:'去游泳',    cat:'outdoor',       items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }] },
-        { icon:'📖', label:'買書',      cat:'shopping',      items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
-        { icon:'🌄', label:'爬山',      cat:'outdoor',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }] },
-        { icon:'🎮', label:'遊樂場',    cat:'entertainment', items:[{ name:'門票費',  min:150, max:260 }, { name:'零食費',  min:40,  max:80  }] },
-        { icon:'🍜', label:'吃午飯',    cat:'food',          items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🏫', label:'補習班',    cat:'school',        items:[{ name:'課程費',  min:150, max:300 }, { name:'文具費',  min:20,  max:55  }] },
-        { icon:'🍰', label:'下午茶',    cat:'food',          items:[{ name:'飲料費',  min:45,  max:80  }, { name:'點心費',  min:50,  max:95  }] },
-        { icon:'🛒', label:'買玩具',    cat:'shopping',      items:[{ name:'玩具費',  min:200, max:400 }, { name:'電池費',  min:35,  max:65  }] },
-        { icon:'🎡', label:'遊樂場',    cat:'entertainment', items:[{ name:'入場費',  min:120, max:210 }, { name:'零食費',  min:45,  max:85  }] },
-        { icon:'🍣', label:'吃壽司',    cat:'food',          items:[{ name:'壽司費',  min:150, max:300 }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🥐', label:'買麵包',    cat:'food',          items:[{ name:'麵包費',  min:40,  max:75  }, { name:'咖啡費',  min:45,  max:80  }] },
-        { icon:'💇', label:'去剪髮',    cat:'shopping',      items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }] },
-        { icon:'🏋️', label:'健身房',   cat:'outdoor',       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }] },
-        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }] },
-        { icon:'🐠', label:'水族館',    cat:'outdoor',       items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
+        { icon:'🏫', label:'上學日',    cat:'school',                                                                items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
+        { icon:'🎨', label:'才藝課',    cat:'school',        imageFile:'icon-b1-normal-talent-class.png',            items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }] },
+        { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-normal-see-doctor.png',              items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }] },
+        { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-normal-watch-movie.png',             items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }] },
+        { icon:'🚂', label:'搭火車',    cat:'outdoor',       imageFile:'icon-b1-normal-take-train.png',              items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }] },
+        { icon:'🏊', label:'去游泳',    cat:'outdoor',       imageFile:'icon-b1-normal-go-swimming.png',             items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }] },
+        { icon:'📖', label:'買書',      cat:'shopping',                                                              items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
+        { icon:'🌄', label:'爬山',      cat:'outdoor',       imageFile:'icon-b1-normal-mountain-climbing.png',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }] },
+        { icon:'🎮', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'門票費',  min:150, max:260 }, { name:'零食費',  min:40,  max:80  }] },
+        { icon:'🍜', label:'吃午飯',    cat:'food',          imageFile:'icon-b1-normal-have-lunch.png',              items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🏫', label:'補習班',    cat:'school',        imageFile:'icon-b1-normal-cram-school.png',             items:[{ name:'課程費',  min:150, max:300 }, { name:'文具費',  min:20,  max:55  }] },
+        { icon:'🍰', label:'下午茶',    cat:'food',          imageFile:'icon-b1-normal-afternoon-tea.png',           items:[{ name:'飲料費',  min:45,  max:80  }, { name:'點心費',  min:50,  max:95  }] },
+        { icon:'🛒', label:'買玩具',    cat:'shopping',      imageFile:'icon-b1-normal-buy-toys.png',                items:[{ name:'玩具費',  min:200, max:400 }, { name:'電池費',  min:35,  max:65  }] },
+        { icon:'🎡', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'入場費',  min:120, max:210 }, { name:'零食費',  min:45,  max:85  }] },
+        { icon:'🍣', label:'吃壽司',    cat:'food',          imageFile:'icon-b1-hard-eat-sushi.png',                 items:[{ name:'壽司費',  min:150, max:300 }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🥐', label:'買麵包',    cat:'food',          imageFile:'icon-b1-hard-buy-bread.png',                 items:[{ name:'麵包費',  min:40,  max:75  }, { name:'咖啡費',  min:45,  max:80  }] },
+        { icon:'💇', label:'去剪髮',    cat:'shopping',      imageFile:'icon-b1-hard-get-haircut.png',               items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }] },
+        { icon:'🐠', label:'水族館',    cat:'outdoor',                                                               items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
     ],
     hard: [
-        { icon:'🛒', label:'大採購',    cat:'shopping',      items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
-        { icon:'🎂', label:'買禮物',    cat:'shopping',      items:[{ name:'禮物費',  min:200, max:400 }, { name:'蛋糕費',  min:350, max:520 }, { name:'卡片費',  min:25,  max:55  }] },
-        { icon:'🌿', label:'出遊',      cat:'outdoor',       items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費', min:80,  max:160 }, { name:'飲料費', min:25,  max:50 }] },
-        { icon:'🏕️', label:'露營',     cat:'outdoor',       items:[{ name:'食材費',  min:280, max:440 }, { name:'裝備費',  min:150, max:300 }, { name:'入場費',  min:120, max:210 }] },
-        { icon:'🎡', label:'遊樂園',    cat:'entertainment', items:[{ name:'門票費',  min:450, max:720 }, { name:'餐費',    min:200, max:340 }, { name:'紀念品費', min:150, max:260 }] },
-        { icon:'🌍', label:'校外教學',  cat:'school',        items:[{ name:'交通費',  min:60,  max:130 }, { name:'午餐費',  min:90,  max:160 }, { name:'門票費',  min:150, max:300 }, { name:'零用錢', min:80,  max:160 }] },
-        { icon:'🎓', label:'畢業典禮',  cat:'school',        items:[{ name:'服裝費',  min:380, max:580 }, { name:'花束費',  min:200, max:400 }, { name:'聚餐費',  min:280, max:450 }] },
-        { icon:'🏖️', label:'去海邊',   cat:'outdoor',       items:[{ name:'防曬乳',  min:150, max:260 }, { name:'餐費',    min:250, max:400 }, { name:'停車費',  min:80,  max:160 }, { name:'飲料費', min:50,  max:90 }] },
-        { icon:'🍱', label:'聚餐',      cat:'food',          items:[{ name:'餐費',    min:380, max:580 }, { name:'飲料費',  min:100, max:180 }, { name:'甜點費',  min:120, max:210 }] },
-        { icon:'🏫', label:'暑期課程',  cat:'school',        items:[{ name:'課程費',  min:400, max:680 }, { name:'教材費',  min:150, max:260 }, { name:'午餐費',  min:80,  max:160 }] },
-        { icon:'🛍️', label:'換季採購',  cat:'shopping',      items:[{ name:'外套費',  min:550, max:850 }, { name:'褲子費',  min:280, max:450 }, { name:'包包費',  min:350, max:580 }] },
-        { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', items:[{ name:'包廂費',  min:320, max:530 }, { name:'飲料費',  min:100, max:190 }, { name:'小食費',  min:60,  max:130 }] },
-        { icon:'🎳', label:'去打保齡球', cat:'entertainment', items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:75  }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🧸', label:'逛玩具展',  cat:'entertainment', items:[{ name:'門票費',  min:150, max:300 }, { name:'紀念品費', min:120, max:220 }, { name:'餐費',   min:100, max:180 }] },
-        { icon:'📱', label:'買手機殼',  cat:'shopping',      items:[{ name:'手機殼',  min:150, max:260 }, { name:'保護貼',  min:40,  max:75  }, { name:'充電線',  min:80,  max:160 }] },
-        { icon:'🎻', label:'音樂課',    cat:'school',        items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費', min:80,  max:160 }] },
-        { icon:'🍕', label:'吃披薩',    cat:'food',          items:[{ name:'披薩費',  min:280, max:440 }, { name:'飲料費',  min:50,  max:90  }, { name:'甜點費',  min:60,  max:110 }] },
-        { icon:'🏋️', label:'健身房',   cat:'outdoor',       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費', min:30,  max:60  }] },
-        { icon:'🐠', label:'海生館',    cat:'outdoor',       items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
-        { icon:'🎠', label:'親子遊',    cat:'entertainment', items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
+        { icon:'🛒', label:'大採購',    cat:'shopping',                                                              items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
+        { icon:'🎂', label:'買禮物',    cat:'shopping',      imageFile:'icon-b1-hard-buy-gift.png',                  items:[{ name:'禮物費',  min:200, max:400 }, { name:'蛋糕費',  min:350, max:520 }, { name:'卡片費',  min:25,  max:55  }] },
+        { icon:'🌿', label:'出遊',      cat:'outdoor',       imageFile:'icon-b1-normal-trip.png',                    items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費', min:80,  max:160 }, { name:'飲料費', min:25,  max:50 }] },
+        { icon:'🏕️', label:'露營',     cat:'outdoor',       imageFile:'icon-b1-normal-camping.png',                 items:[{ name:'食材費',  min:280, max:440 }, { name:'裝備費',  min:150, max:300 }, { name:'入場費',  min:120, max:210 }] },
+        { icon:'🎡', label:'遊樂園',    cat:'entertainment', imageFile:'icon-b1-hard-amusement-park.png',            items:[{ name:'門票費',  min:450, max:720 }, { name:'餐費',    min:200, max:340 }, { name:'紀念品費', min:150, max:260 }] },
+        { icon:'🌍', label:'校外教學',  cat:'school',        imageFile:'icon-b1-hard-field-trip.png',                items:[{ name:'交通費',  min:60,  max:130 }, { name:'午餐費',  min:90,  max:160 }, { name:'門票費',  min:150, max:300 }, { name:'零用錢', min:80,  max:160 }] },
+        { icon:'🎓', label:'畢業典禮',  cat:'school',        imageFile:'icon-b1-hard-graduation-ceremony.png',       items:[{ name:'服裝費',  min:380, max:580 }, { name:'花束費',  min:200, max:400 }, { name:'聚餐費',  min:280, max:450 }] },
+        { icon:'🏖️', label:'去海邊',   cat:'outdoor',       imageFile:'icon-b1-hard-go-to-beach.png',               items:[{ name:'防曬乳',  min:150, max:260 }, { name:'餐費',    min:250, max:400 }, { name:'停車費',  min:80,  max:160 }, { name:'飲料費', min:50,  max:90 }] },
+        { icon:'🍱', label:'聚餐',      cat:'food',          imageFile:'icon-b1-hard-banquet.png',                   items:[{ name:'餐費',    min:380, max:580 }, { name:'飲料費',  min:100, max:180 }, { name:'甜點費',  min:120, max:210 }] },
+        { icon:'🏫', label:'暑期課程',  cat:'school',        imageFile:'icon-b1-hard-summer-course.png',             items:[{ name:'課程費',  min:400, max:680 }, { name:'教材費',  min:150, max:260 }, { name:'午餐費',  min:80,  max:160 }] },
+        { icon:'🛍️', label:'換季採購',  cat:'shopping',      imageFile:'icon-b1-hard-seasonal-shopping.png',         items:[{ name:'外套費',  min:550, max:850 }, { name:'褲子費',  min:280, max:450 }, { name:'包包費',  min:350, max:580 }] },
+        { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', imageFile:'icon-b1-hard-sing-ktv.png',                  items:[{ name:'包廂費',  min:320, max:530 }, { name:'飲料費',  min:100, max:190 }, { name:'小食費',  min:60,  max:130 }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:75  }, { name:'飲料費',  min:25,  max:50  }] },
+        { icon:'🧸', label:'逛玩具展',  cat:'entertainment', imageFile:'icon-b1-hard-visit-toy-exhibition.png',      items:[{ name:'門票費',  min:150, max:300 }, { name:'紀念品費', min:120, max:220 }, { name:'餐費',   min:100, max:180 }] },
+        { icon:'📱', label:'買手機殼',  cat:'shopping',      imageFile:'icon-b1-hard-buy-phone-case.png',            items:[{ name:'手機殼',  min:150, max:260 }, { name:'保護貼',  min:40,  max:75  }, { name:'充電線',  min:80,  max:160 }] },
+        { icon:'🎻', label:'音樂課',    cat:'school',        imageFile:'icon-b1-hard-music-class.png',               items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費', min:80,  max:160 }] },
+        { icon:'🍕', label:'吃披薩',    cat:'food',          imageFile:'icon-b1-hard-eat-pizza.png',                 items:[{ name:'披薩費',  min:280, max:440 }, { name:'飲料費',  min:50,  max:90  }, { name:'甜點費',  min:60,  max:110 }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費', min:30,  max:60  }] },
+        { icon:'🐠', label:'海生館',    cat:'outdoor',                                                               items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
+        { icon:'🎠', label:'親子遊',    cat:'entertainment',                                                         items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
     ]
 };
 
@@ -554,10 +554,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         : { name: it.name, cost: it.cost }
                 );
                 const total = items.reduce((s, it) => s + it.cost, 0);
-                result.push({ icon: scenario.icon, label: scenario.label, cat: scenario.cat, items, total });
+                result.push({ icon: scenario.icon, label: scenario.label, cat: scenario.cat, imageFile: scenario.imageFile || null, items, total });
             }
             Game.Debug.log('question', `產生題目 ${result.length} 題（類別：${cat}）`);
             return result;
+        },
+
+        // ── 場景圖示 HTML（有圖片用圖片，否則 emoji）────────────────
+        _sceneIcon(q, cls = '') {
+            if (q.imageFile) {
+                return `<img src="../images/b1/${q.imageFile}" alt="${q.label}" class="b1-scene-img${cls ? ' ' + cls : ''}" onerror="this.outerHTML='${q.icon}'">`;
+            }
+            return q.icon;
         },
 
         // ── 自訂項目合併 helpers ────────────────────────────────
@@ -714,7 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b1-phase2-ref">
                 <div class="b1-pr-top-row">
-                    <span class="b1-pr-icon">${curr.icon}</span>
+                    <span class="b1-pr-icon">${this._sceneIcon(curr)}</span>
                     <div class="b1-pr-info">
                         <span class="b1-pr-label">今天要去：${fmtLabel(curr.label)}</span>
                         <span class="b1-pr-sub">${itemsSummary}</span>
@@ -1331,7 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
                 <div class="b1-schedule-header">
-                    <span class="b1-schedule-icon">${q.icon}</span>
+                    <span class="b1-schedule-icon">${this._sceneIcon(q)}</span>
                     <div class="b1-schedule-text">
                         <div class="b1-schedule-label-row">
                             <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
@@ -1959,7 +1967,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.className = 'b1-task-modal';
             modal.innerHTML = `
                 <div class="b1-task-modal-inner">
-                    <div class="b1-task-modal-icon">${curr.icon}</div>
+                    <div class="b1-task-modal-icon">${this._sceneIcon(curr, 'b1-task-modal-img')}</div>
                     <div class="b1-task-modal-dest">今天要去</div>
                     <div class="b1-task-modal-label">${fmtLabel(curr.label)}</div>
                     <div class="b1-task-modal-tap">點任意處繼續</div>
@@ -2127,7 +2135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 : '';
                             return `
                             <div class="b1-schedule-row">
-                                <span class="b1-sch-icon">${s.icon}</span>
+                                <span class="b1-sch-icon">${this._sceneIcon(s)}</span>
                                 <span class="b1-sch-label">${s.label}</span>
                                 <span class="b1-sch-items">${s.items.map(it => `${it.name}${it.cost}元`).join('・')}</span>
                                 <span class="b1-sch-total">${s.total}元</span>
