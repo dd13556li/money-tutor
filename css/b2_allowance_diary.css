@@ -1024,6 +1024,193 @@
 }
 
 /* ══════════════════════════════════════════════════════════
+   B2 Phase 1 — 普通/困難模式日記卡 + 輸入鍵盤
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 總計欄（日記卡底部）─────────────────────────────────── */
+.b2-total-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1.5px solid #93c5fd;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-top: 8px;
+}
+.b2-ts-label  { font-size: 14px; font-weight: 600; color: #1d4ed8; }
+.b2-ts-amount { font-size: 1.3rem; font-weight: 800; color: #1e40af; }
+
+/* ── 輸入數字鍵盤區 ──────────────────────────────────────── */
+.b2-hard-total-area {
+    background: linear-gradient(135deg, #fff9f0, #fffbeb);
+    border: 2px solid #f59e0b;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(245,158,11,0.12);
+}
+.b2-ht-top-row { display: flex; align-items: center; justify-content: center; }
+.b2-ht-label   { font-size: 14px; font-weight: 700; color: #92400e; text-align: center; }
+.b2-ht-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 0 2px;
+    border-top: 2px dashed #f59e0b;
+}
+.b2-ht-total-label { font-size: 15px; font-weight: 700; color: #92400e; }
+.b2-ht-display {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #92400e;
+    background: #fef3c7;
+    border: 2.5px solid #f59e0b;
+    border-radius: 10px;
+    padding: 6px 18px;
+    min-width: 110px;
+    text-align: center;
+}
+.b2-ht-display.b2-ht-correct {
+    color: #16a34a;
+    background: #dcfce7;
+    border-color: #86efac;
+}
+.b2-ht-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+.b2-ht-digit {
+    padding: 13px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: #fef9c3;
+    color: #92400e;
+    border: 2px solid #d97706;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+.b2-ht-digit:hover  { background: #fde68a; transform: scale(1.04); }
+.b2-ht-digit:active { transform: scale(0.96); }
+.b2-ht-back    { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+.b2-ht-back:hover { background: #fca5a5; }
+.b2-ht-confirm {
+    padding: 13px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: #d1fae5;
+    color: #065f46;
+    border: 2px solid #6ee7b7;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+.b2-ht-confirm:hover  { background: #a7f3d0; transform: scale(1.04); }
+.b2-ht-error {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #dc2626;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 7px 12px;
+}
+.b2-ht-error.b2-ht-hint { color: #d97706; background: #fef3c7; border-color: #fbbf24; }
+
+/* ── 日記卡外層包裝（困難模式計算機側欄用）─────────────── */
+.b2-card-outer-wrap { position: relative; }
+.b2-card-outer-wrap .b2-diary { width: 100%; }
+
+/* ── 計算機側欄：桌面端絕對定位在日記卡右邊 ── */
+.b2-calc-side-col {
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 300px;
+}
+.b2-calc-toggle-btn {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.35);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.b2-calc-toggle-btn:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    box-shadow: 0 4px 14px rgba(102,126,234,0.5);
+}
+.b2-calc-panel { margin-top: 10px; }
+.b2-calculator {
+    background: #2d3748;
+    border-radius: 14px;
+    padding: 18px;
+    max-width: 300px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+.b2-calc-display {
+    background: #1a202c;
+    color: #48bb78;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-align: right;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    min-height: 54px;
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+}
+.b2-calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.b2-calc-btn {
+    padding: 16px 0;
+    border: none;
+    border-radius: 9px;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+.b2-calc-btn:active { opacity: 0.75; }
+.b2-calc-num { background: #4a5568; color: #fff; }
+.b2-calc-num:hover { background: #718096; }
+.b2-calc-op  { background: #f6ad55; color: #fff; }
+.b2-calc-op:hover  { background: #ed8936; }
+.b2-calc-eq  { background: #48bb78; color: #fff; }
+.b2-calc-eq:hover  { background: #38a169; }
+
+/* ── 手機端：計算機側欄回歸文件流 ─────────────────────────── */
+@media (max-width: 600px) {
+    .b2-calc-side-col {
+        position: static;
+        width: 100%;
+        margin-top: 8px;
+    }
+    .b2-calculator { max-width: 100%; }
+}
+
+/* ══════════════════════════════════════════════════════════
    B2 Phase 2 — 錢包拖曳介面（普通/困難）
    ══════════════════════════════════════════════════════════ */
 

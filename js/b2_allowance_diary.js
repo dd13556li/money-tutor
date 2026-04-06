@@ -823,13 +823,15 @@ document.addEventListener('DOMContentLoaded', () => {
             AssistClick.deactivate();
             this.state.isProcessing  = false;
             this.state.quiz.currentInput = '';
-            // 重置 Phase 2 錢包狀態
+            // 重置 Phase 1/2 狀態
             this.state.wallet = [];
             this.state.uidCounter = 0;
             this.state.quiz.showHint = false;
             this.state.quiz.hintSlots = [];
             this.state.quiz.walletRevealed = false;
             this.state.quiz.p2ErrorCount = 0;
+            this.state.quiz.hardTotalInput = '';
+            this.state.quiz.errorCount = 0;
 
             const q   = this.state.quiz;
             // 重置自訂事件狀態
@@ -880,8 +882,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const q    = this.state.quiz;
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
             const useCustom = this.state.settings.customItemsEnabled && diff !== 'easy';
+            const isHard = diff === 'hard';
+            const isNormalOrHard = diff === 'normal' || isHard;
 
-            // 累計金額欄（Round 38）
+            // 累計金額欄
             let runningAmt = question.startAmount;
             const eventsHTML = question.events.map((e, idx) => {
                 runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
@@ -899,30 +903,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             const customPanelHTML = useCustom ? this._renderCustomEventsPanel() : '';
 
-            return `
-            <div class="b-header">
-                <div class="b-header-left">
-                    <span class="b-header-unit">📒 零用錢日記</span>
-                </div>
-                <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}${ (() => { const t = B2_THEMES[this.state.settings.diaryTheme]; return t ? ` · ${t.icon}${t.name}` : ''; })() }</div>
-                <div class="b-header-right">
-                    <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
-                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
-                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
-                </div>
-            </div>
-            <div class="game-container">
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" style="width:${pct}%"></div>
-                </div>
-                <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
+            // 普通模式顯示總計，困難模式顯示 ???
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+            const totalStripHTML = isNormalOrHard ? `
+                <div class="b2-total-strip">
+                    <span class="b2-ts-label">💰 最後剩下</span>
+                    <span class="b2-ts-amount">${isHard ? '??? 元' : `${effectiveAnswer} 元`}</span>
+                </div>` : '';
 
-                <div class="b2-diary${diff === 'hard' ? ' b2-memory-mode' : ''}" data-diff="${diff}">
+            const themeText = (() => { const t = B2_THEMES[this.state.settings.diaryTheme]; return t ? ` · ${t.icon}${t.name}` : ''; })();
+            const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
+
+            // 日記卡片
+            const diaryCard = `
+                <div class="b2-diary${isHard ? ' b2-memory-mode' : ''}" data-diff="${diff}">
                     <div class="b2-diary-header">
                         <span class="b2-diary-icon">📒</span>
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
-                        ${diff === 'hard' ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
+                        ${isHard ? `<button class="b2-reveal-btn" id="b2-reveal-btn">👁️ 查看</button>` : ''}
                         <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-left:auto;">
                             <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
                             <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
@@ -936,18 +935,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${eventsHTML}
                     <div id="b2-cep-custom-list"></div>
                     ${customPanelHTML}
+                    ${isNormalOrHard ? totalStripHTML : `
                     <div class="b2-question-row">
                         <span class="b2-question-label">💰 現在剩下</span>
                         <span class="b2-question-blank">___ 元</span>
-                    </div>
-                </div>
+                    </div>`}
+                    ${isNormalOrHard ? this._renderB2TotalInput(isHard) : ''}
+                </div>`;
 
+            return `
+            <div class="b-header">
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-center">${diffLabel}${themeText}</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
+                </div>
+            </div>
+            <div class="${isNormalOrHard ? 'b-game-wrap' : 'game-container'}">
+                ${isNormalOrHard ? '' : `
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+                <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>`}
+                ${isNormalOrHard ? `
+                <div class="b2-card-outer-wrap">
+                    ${diaryCard}
+                    ${isHard ? `
+                    <div class="b2-calc-side-col">
+                        <button class="b2-calc-toggle-btn" id="b2-calc-toggle">🧮 開啟計算機</button>
+                        <div class="b2-calc-panel" id="b2-calc-panel" style="display:none;">
+                            ${this._getB2CalculatorHTML()}
+                        </div>
+                    </div>` : ''}
+                </div>` : diaryCard}
+                ${diff === 'easy' ? `
                 <div class="b2-answer-card" id="b2-answer-area">
                     <div class="b2-answer-prompt">請選擇或輸入最後剩下的金額：</div>
-                    ${diff === 'easy'
-                        ? this._renderChoicesHTML(question)
-                        : this._renderNumpadHTML()}
-                </div>
+                    ${this._renderChoicesHTML(question)}
+                </div>` : ''}
             </div>`;
         },
 
@@ -960,7 +985,61 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="b2-choices">${btns}</div>`;
         },
 
+        _renderB2TotalInput(isHard) {
+            return `
+            <div class="b2-hard-total-area" id="b2-hard-total-area">
+                <div class="b2-ht-top-row">
+                    <div class="b2-ht-label">${isHard ? '計算各筆收支，最後剩下幾元？' : '把各筆收支算一算，最後剩下幾元？'}</div>
+                </div>
+                <div class="b2-ht-total-row">
+                    <span class="b2-ht-total-label">剩下</span>
+                    <div class="b2-ht-display" id="b2-ht-display">___</div>
+                    <span class="b2-ht-total-label">元</span>
+                </div>
+                <div class="b2-ht-numpad" id="b2-ht-numpad">
+                    <button class="b2-ht-digit" data-digit="1">1</button>
+                    <button class="b2-ht-digit" data-digit="2">2</button>
+                    <button class="b2-ht-digit" data-digit="3">3</button>
+                    <button class="b2-ht-digit" data-digit="4">4</button>
+                    <button class="b2-ht-digit" data-digit="5">5</button>
+                    <button class="b2-ht-digit" data-digit="6">6</button>
+                    <button class="b2-ht-digit" data-digit="7">7</button>
+                    <button class="b2-ht-digit" data-digit="8">8</button>
+                    <button class="b2-ht-digit" data-digit="9">9</button>
+                    <button class="b2-ht-digit b2-ht-back" data-digit="back">⌫</button>
+                    <button class="b2-ht-digit" data-digit="0">0</button>
+                    <button class="b2-ht-confirm" id="b2-ht-confirm">✓ 確認</button>
+                </div>
+                <div class="b2-ht-error" id="b2-ht-error" style="display:none"></div>
+            </div>`;
+        },
+
+        _getB2CalculatorHTML() {
+            return `
+            <div class="b2-calculator">
+                <div class="b2-calc-display" id="b2-calc-display">0</div>
+                <div class="b2-calc-buttons">
+                    <button class="b2-calc-btn b2-calc-num" data-v="7">7</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="8">8</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="9">9</button>
+                    <button class="b2-calc-btn b2-calc-op"  data-v="C">C</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="4">4</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="5">5</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="6">6</button>
+                    <button class="b2-calc-btn b2-calc-op"  data-v="+">+</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="1">1</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="2">2</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="3">3</button>
+                    <button class="b2-calc-btn b2-calc-op"  data-v="-">-</button>
+                    <button class="b2-calc-btn b2-calc-num" data-v="0">0</button>
+                    <button class="b2-calc-btn b2-calc-op"  data-v="⌫">⌫</button>
+                    <button class="b2-calc-btn b2-calc-eq"  data-v="=" style="grid-column:span 2">=</button>
+                </div>
+            </div>`;
+        },
+
         _renderNumpadHTML() {
+            // 保留供舊路徑呼叫（不應再被 normal/hard 使用）
             const digits = [7, 8, 9, 4, 5, 6, 1, 2, 3];
             const diff = this.state.settings.difficulty;
             return `
@@ -1087,6 +1166,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 12. 事件綁定 ──────────────────────────────────────
         _bindQuestionEvents(question) {
             const diff = this.state.settings.difficulty;
+            const isHard = diff === 'hard';
+
             if (diff === 'easy') {
                 document.querySelectorAll('.b2-choice-btn').forEach(btn => {
                     Game.EventManager.on(btn, 'click', () => {
@@ -1094,26 +1175,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'gameUI');
                 });
             } else {
-                document.querySelectorAll('.b2-numpad-btn').forEach(btn => {
-                    Game.EventManager.on(btn, 'click', () => {
-                        if (this.state.isProcessing) return;
-                        this.audio.play('click');
-                        const action = btn.dataset.action;
-                        const digit  = btn.dataset.digit;
-                        if (digit !== undefined) {
-                            if (this.state.quiz.currentInput.length < 5) {
-                                this.state.quiz.currentInput += digit;
-                            }
-                        } else if (action === 'del') {
-                            this.state.quiz.currentInput = this.state.quiz.currentInput.slice(0, -1);
-                        } else if (action === 'ok') {
-                            this._handleNumpadAnswer(question);
-                            return;
-                        }
-                        this._updateInputDisplay();
-                    }, {}, 'gameUI');
-                });
+                // 普通/困難模式：B1 style numpad
+                this._bindB2TotalNumpad(question);
+                // 困難模式：計算機切換
+                if (isHard) {
+                    const calcToggle = document.getElementById('b2-calc-toggle');
+                    const calcPanel  = document.getElementById('b2-calc-panel');
+                    if (calcToggle && calcPanel) {
+                        Game.EventManager.on(calcToggle, 'click', () => {
+                            const open = calcPanel.style.display === 'none';
+                            calcPanel.style.display = open ? '' : 'none';
+                            calcToggle.textContent  = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
+                        }, {}, 'gameUI');
+                        this._bindB2Calculator();
+                    }
+                }
+                // 困難模式：查看文字切換
+                if (isHard) {
+                    const revealBtn = document.getElementById('b2-reveal-btn');
+                    if (revealBtn) {
+                        Game.EventManager.on(revealBtn, 'click', () => {
+                            const diary = document.querySelector('.b2-diary');
+                            if (!diary) return;
+                            const revealed = diary.classList.toggle('b2-revealed');
+                            revealBtn.textContent = revealed ? '🙈 隱藏' : '👁️ 查看';
+                        }, {}, 'gameUI');
+                    }
+                }
             }
+
             // 語音重播
             const replayBtn = document.getElementById('replay-speech-btn');
             if (replayBtn) {
@@ -1122,11 +1212,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
-            // 提示按鈕（三難度均顯示）：困難→彈窗，其他→算式卡片（B3/B5/B6 pattern）
+            // 提示按鈕
             const b2HintBtn = document.getElementById('b2-hint-btn');
             if (b2HintBtn) {
                 Game.EventManager.on(b2HintBtn, 'click', () => {
-                    if (diff === 'hard') {
+                    if (isHard) {
                         this._showHardModeHintModal(question);
                     } else {
                         this._showCalcBreakdown(question);
@@ -1145,33 +1235,125 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             }
-            // 困難模式專屬重聽鈕（inline numpad 區域）
-            if (diff === 'hard') {
-                const hardReplayBtn = document.getElementById('b2-replay-btn');
-                if (hardReplayBtn) {
-                    Game.EventManager.on(hardReplayBtn, 'click', () => {
-                        const q = this.state.quiz.questions[this.state.quiz.currentQuestion];
-                        if (q) {
-                            const evtText = q.events.map(e => `${e.amount > 0 ? '收入' : '支出'}${Math.abs(e.amount)}元`).join('，');
-                            Game.Speech.speak(`起始${q.startAmount}元，${evtText}，最後餘額是多少？`);
-                        }
-                    }, {}, 'gameUI');
-                }
-                // 困難模式：查看文字切換（聽力記憶模式，Round 43）
-                const revealBtn = document.getElementById('b2-reveal-btn');
-                if (revealBtn) {
-                    Game.EventManager.on(revealBtn, 'click', () => {
-                        const diary = document.querySelector('.b2-diary');
-                        if (!diary) return;
-                        const revealed = diary.classList.toggle('b2-revealed');
-                        revealBtn.textContent = revealed ? '🙈 隱藏' : '👁️ 查看';
-                    }, {}, 'gameUI');
-                }
-            }
             // 自訂事件面板
             if (this.state.settings.customItemsEnabled && diff !== 'easy') {
                 this._bindCustomEventsPanel(question);
             }
+        },
+
+        // ── B2 B1-style 總計輸入數字鍵盤 ─────────────────────────
+        _bindB2TotalNumpad(question) {
+            const q = this.state.quiz;
+            const display = document.getElementById('b2-ht-display');
+            const errorEl = document.getElementById('b2-ht-error');
+            const isHard  = this.state.settings.difficulty === 'hard';
+
+            const updateDisplay = () => {
+                if (display) display.textContent = q.hardTotalInput || '___';
+            };
+
+            document.querySelectorAll('.b2-ht-digit').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const d = btn.dataset.digit;
+                    if (d === 'back') {
+                        q.hardTotalInput = (q.hardTotalInput || '').slice(0, -1);
+                    } else {
+                        const next = (q.hardTotalInput || '') + d;
+                        if (parseInt(next, 10) <= 99999) q.hardTotalInput = next;
+                    }
+                    this.audio.play('click');
+                    updateDisplay();
+                }, {}, 'gameUI');
+            });
+
+            const confirmBtn = document.getElementById('b2-ht-confirm');
+            if (confirmBtn) {
+                Game.EventManager.on(confirmBtn, 'click', () => {
+                    const entered = parseInt(q.hardTotalInput, 10);
+                    if (!q.hardTotalInput || isNaN(entered)) return;
+                    const correctTotal = this._getEffectiveAnswer(question);
+                    if (entered === correctTotal) {
+                        this.audio.play('correct');
+                        if (errorEl) errorEl.style.display = 'none';
+                        if (display) { display.textContent = correctTotal; display.classList.add('b2-ht-correct'); }
+                        confirmBtn.disabled = true;
+                        document.querySelectorAll('.b2-ht-digit').forEach(b => { b.disabled = true; });
+                        // 困難模式揭露總計
+                        if (isHard) {
+                            const tsAmt = document.querySelector('.b2-ts-amount');
+                            if (tsAmt) tsAmt.textContent = `${correctTotal} 元`;
+                        }
+                        Game.Speech.speak(`答對了！剩下${toTWD(correctTotal)}`, () => {
+                            this._renderPhase2(question, correctTotal);
+                        });
+                    } else {
+                        this.audio.play('error');
+                        q.errorCount = (q.errorCount || 0) + 1;
+                        const isOver = entered > correctTotal;
+                        const errMsg = isOver ? '算多了，再算算看！' : '算少了，再算算看！';
+                        if (errorEl) {
+                            errorEl.textContent = `❌ ${errMsg}`;
+                            errorEl.style.display = '';
+                            errorEl.classList.remove('b2-ht-hint');
+                        }
+                        Game.Speech.speak(`不對喔，${errMsg}`);
+                        q.hardTotalInput = '';
+                        updateDisplay();
+                        if (q.errorCount >= 3) {
+                            Game.TimerManager.setTimeout(() => {
+                                if (isHard) {
+                                    this._showHardModeHintModal(question);
+                                } else {
+                                    const effEvents = this._getEffectiveEvents(question);
+                                    const parts = effEvents.map(e => `${e.name}${toTWD(e.amount)}`).join('，');
+                                    Game.Speech.speak(`${parts}，加起來剩下${toTWD(correctTotal)}`);
+                                    if (errorEl) {
+                                        const formula = effEvents.map(e => `${e.type === 'income' ? '+' : '-'}${e.amount}`).join(' ');
+                                        errorEl.textContent = `💡 ${question.startAmount} ${formula} = ${correctTotal}`;
+                                        errorEl.style.display = '';
+                                        errorEl.classList.add('b2-ht-hint');
+                                    }
+                                }
+                            }, 600, 'ui');
+                        }
+                    }
+                }, {}, 'gameUI');
+            }
+        },
+
+        // ── B2 計算機邏輯（B1 _bindCalculatorEvents pattern）──────
+        _bindB2Calculator() {
+            let calcVal = '0', calcOp = null, calcFirst = null, calcFresh = true;
+            const display = document.getElementById('b2-calc-display');
+            const update  = () => { if (display) display.textContent = calcVal; };
+            document.querySelectorAll('.b2-calc-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const v = btn.dataset.v;
+                    if (v >= '0' && v <= '9') {
+                        calcVal = calcFresh || calcVal === '0' ? v : (calcVal.length < 8 ? calcVal + v : calcVal);
+                        calcFresh = false;
+                    } else if (v === 'C') {
+                        calcVal = '0'; calcOp = null; calcFirst = null; calcFresh = true;
+                    } else if (v === '⌫') {
+                        calcVal = calcVal.length > 1 ? calcVal.slice(0, -1) : '0';
+                    } else if (v === '+' || v === '-') {
+                        if (calcOp && !calcFresh) {
+                            calcFirst = calcOp === '+' ? parseFloat(calcFirst) + parseFloat(calcVal) : parseFloat(calcFirst) - parseFloat(calcVal);
+                            calcVal = String(calcFirst);
+                        } else {
+                            calcFirst = parseFloat(calcVal);
+                        }
+                        calcOp = v; calcFresh = true;
+                    } else if (v === '=') {
+                        if (calcOp && calcFirst !== null) {
+                            const result = calcOp === '+' ? parseFloat(calcFirst) + parseFloat(calcVal) : parseFloat(calcFirst) - parseFloat(calcVal);
+                            calcVal = String(Math.round(result * 100) / 100);
+                        }
+                        calcOp = null; calcFirst = null; calcFresh = true;
+                    }
+                    update();
+                }, {}, 'gameUI');
+            });
         },
 
         _updateInputDisplay() {
