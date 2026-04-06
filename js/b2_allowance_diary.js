@@ -832,6 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.p2ErrorCount = 0;
             this.state.quiz.hardTotalInput = '';
             this.state.quiz.errorCount = 0;
+            this.state.quiz.easyCoinsClicked = {};
+            this.state.quiz.easyRunningTotal = 0;
+            this.state.quiz.activeInputEl = null;
 
             const q   = this.state.quiz;
             // 重置自訂事件狀態
@@ -883,32 +886,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
             const useCustom = this.state.settings.customItemsEnabled && diff !== 'easy';
             const isHard = diff === 'hard';
-            const isNormalOrHard = diff === 'normal' || isHard;
+            const isNormal = diff === 'normal';
+            const isNormalOrHard = isNormal || isHard;
 
-            // 累計金額欄
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+
+            // 事件列：依難度使用不同元件
             let runningAmt = question.startAmount;
             const eventsHTML = question.events.map((e, idx) => {
                 runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
-                const moneyIcons = this._renderMoneyIconsGrouped(e.amount);
+                const hiddenStyle = diff === 'easy' ? 'style="display:none"' : `style="animation-delay:${0.05 * (idx + 1)}s"`;
+                const delBtn = useCustom ? `<button class="b2-cep-del-btn" data-base-idx="${idx}" title="刪除">✕</button>` : '';
+                const runningValHtml = diff === 'easy'
+                    ? `<span class="b2-running-val" id="b2-running-val-${idx}" style="visibility:hidden">？元</span>`
+                    : `<span class="b2-running-val">${runningAmt}元</span>`;
+
+                let moneyIconsHtml, amountHtml;
+                if (diff === 'easy') {
+                    moneyIconsHtml = this._renderB2ClickableCoins(e.amount, idx);
+                    amountHtml = `<span class="b2-event-amount-easy" id="b2-easy-amt-${idx}">？ 元</span>`;
+                } else {
+                    moneyIconsHtml = this._renderMoneyIconsGrouped(e.amount);
+                    amountHtml = `<div class="b2-cost-input" data-idx="${idx}" data-correct="${e.amount}" id="b2-cost-input-${idx}" tabindex="-1">？ 元</div>`;
+                }
+
                 return `
-                <div class="b2-event-row ${e.type}" style="animation-delay:${0.05 * (idx + 1)}s" id="b2-base-event-${idx}">
-                    <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
-                    <span class="b2-event-icon">${e.icon}</span>
-                    <span class="b2-event-name">${e.name}</span>
-                    <div class="b2-event-money-icons">${moneyIcons}</div>
-                    <span class="b2-event-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount} 元</span>
-                    <span class="b2-running-val">${runningAmt}元</span>
-                    ${useCustom ? `<button class="b2-cep-del-btn" data-base-idx="${idx}" title="刪除">✕</button>` : ''}
+                <div class="b2-event-row ${e.type}" ${hiddenStyle} id="b2-base-event-${idx}">
+                    <div class="b2-event-top">
+                        <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
+                        <span class="b2-event-icon">${e.icon}</span>
+                        <span class="b2-event-name">${e.name}</span>
+                        ${runningValHtml}
+                        ${delBtn}
+                    </div>
+                    <div class="b2-event-bottom">
+                        <div class="b2-event-money-icons">${moneyIconsHtml}</div>
+                        ${amountHtml}
+                    </div>
                 </div>`;
             }).join('');
             const customPanelHTML = useCustom ? this._renderCustomEventsPanel() : '';
 
-            // 普通模式顯示總計，困難模式顯示 ???
-            const effectiveAnswer = this._getEffectiveAnswer(question);
+            // 總計列：普通/困難均改為輸入框
             const totalStripHTML = isNormalOrHard ? `
                 <div class="b2-total-strip">
                     <span class="b2-ts-label">💰 最後剩下</span>
-                    <span class="b2-ts-amount">${isHard ? '??? 元' : `${effectiveAnswer} 元`}</span>
+                    <div class="b2-cost-input b2-total-input" data-idx="total" data-correct="${effectiveAnswer}" id="b2-total-input" tabindex="-1">？ 元</div>
                 </div>` : '';
 
             const themeText = (() => { const t = B2_THEMES[this.state.settings.diaryTheme]; return t ? ` · ${t.icon}${t.name}` : ''; })();
@@ -921,27 +944,40 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-diary-icon">📒</span>
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
-                        <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-left:auto;">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                        <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b2-hint-mascot" onerror="this.style.display='none'">
                             <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
                         </span>
                     </div>
                     ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
-                        <span class="b2-start-label">💼 開始有</span>
-                        <span class="b2-start-amount" id="b2-start-amount">${question.startAmount} 元</span>
-                        <div class="b2-start-money-icons" id="b2-start-money-icons">${this._renderChoiceMoneyIcons(question.startAmount)}</div>
+                        <div class="b2-start-top">
+                            <span class="b2-start-label">💼 開始有</span>
+                            <span class="b2-start-amount" id="b2-start-amount">${question.startAmount} 元</span>
+                        </div>
+                        <div class="b2-start-bottom">
+                            <div class="b2-start-money-icons" id="b2-start-money-icons">${this._renderMoneyIconsGrouped(question.startAmount)}</div>
+                        </div>
                     </div>
                     ${eventsHTML}
                     <div id="b2-cep-custom-list"></div>
                     ${customPanelHTML}
-                    ${isNormalOrHard ? totalStripHTML : `
-                    <div class="b2-question-row">
-                        <span class="b2-question-label">💰 現在剩下</span>
-                        <span class="b2-question-blank">___ 元</span>
-                    </div>`}
-                    ${isNormalOrHard ? this._renderB2TotalInput(isHard) : ''}
+                    ${isNormalOrHard ? totalStripHTML : ''}
                 </div>`;
+
+            // 題目下方互動區（依難度）
+            let interactiveArea = '';
+            if (diff === 'easy') {
+                interactiveArea = ''; // 簡單模式：點擊金幣即可，無需獨立區塊
+            } else if (isNormal) {
+                interactiveArea = `
+                <div id="b2-normal-choice-area" class="b2-normal-choice-area">
+                    <div class="b2-nchoice-btns"></div>
+                </div>`;
+            } else {
+                // hard：共用數字鍵盤
+                interactiveArea = this._renderB2SharedNumpad();
+            }
 
             return `
             <div class="b-header">
@@ -967,12 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${this._getB2CalculatorHTML()}
                         </div>
                     </div>` : ''}
-                </div>` : diaryCard}
-                ${diff === 'easy' ? `
-                <div class="b2-answer-card" id="b2-answer-area">
-                    <div class="b2-answer-prompt">請選擇或輸入最後剩下的金額：</div>
-                    ${this._renderChoicesHTML(question)}
-                </div>` : ''}
+                </div>
+                ${interactiveArea}` : diaryCard}
+                ${diff === 'easy' ? interactiveArea : ''}
             </div>`;
         },
 
@@ -983,6 +1016,80 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b2-choice-icons">${this._renderChoiceMoneyIcons(c)}</span>
                 </button>`).join('');
             return `<div class="b2-choices">${btns}</div>`;
+        },
+
+        // ── 可點擊金幣（Easy 模式 Phase 1）────────────────────────
+        _renderB2ClickableCoins(amount, eventIdx) {
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const items = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const cnt = Math.floor(rem / d);
+                for (let i = 0; i < cnt; i++) items.push({ denom: d, coinIdx: items.length });
+                rem -= cnt * d;
+            }
+
+            // 手機版：分組顯示（不可點擊，僅參考）
+            const groups = [];
+            let rem2 = amount;
+            for (const d of denoms) {
+                if (rem2 <= 0) break;
+                const cnt = Math.floor(rem2 / d);
+                if (cnt > 0) groups.push({ denom: d, count: cnt });
+                rem2 -= cnt * d;
+                if (groups.length >= 4) break;
+            }
+            const mobileHTML = groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const badge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
+                return `<span class="b2-mic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${badge}
+                </span>`;
+            }).join('');
+
+            // 桌面版：逐枚可點擊按鈕
+            const desktopHTML = items.map(item => {
+                const isBill = item.denom >= 100;
+                const w = isBill ? 72 : 50;
+                return `<button class="b2-coin-clickable"
+                    data-event-idx="${eventIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
+                    aria-label="${item.denom}元" style="position:relative;">
+                    <img src="../images/money/${item.denom}_yuan_front.png" alt="${item.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;pointer-events:none;"
+                         onerror="this.style.display='none'" draggable="false">
+                </button>`;
+            }).join('');
+
+            return `<span class="b2-mic-desktop">${desktopHTML}</span><span class="b2-mic-mobile">${mobileHTML}</span>`;
+        },
+
+        // ── 共用數字鍵盤（困難模式 Phase 1）──────────────────────────
+        _renderB2SharedNumpad() {
+            return `
+            <div class="b2-hard-total-area" id="b2-hard-total-area">
+                <div class="b2-ht-active-hint" id="b2-ht-active-hint">
+                    <span>點選上方輸入框開始輸入</span>
+                </div>
+                <div class="b2-ht-numpad" id="b2-ht-numpad">
+                    <button class="b2-ht-digit" data-digit="1">1</button>
+                    <button class="b2-ht-digit" data-digit="2">2</button>
+                    <button class="b2-ht-digit" data-digit="3">3</button>
+                    <button class="b2-ht-digit" data-digit="4">4</button>
+                    <button class="b2-ht-digit" data-digit="5">5</button>
+                    <button class="b2-ht-digit" data-digit="6">6</button>
+                    <button class="b2-ht-digit" data-digit="7">7</button>
+                    <button class="b2-ht-digit" data-digit="8">8</button>
+                    <button class="b2-ht-digit" data-digit="9">9</button>
+                    <button class="b2-ht-digit b2-ht-back" data-digit="back">⌫</button>
+                    <button class="b2-ht-digit" data-digit="0">0</button>
+                    <button class="b2-ht-confirm" id="b2-ht-confirm">✓ 確認</button>
+                </div>
+                <div class="b2-ht-error" id="b2-ht-error" style="display:none"></div>
+            </div>`;
         },
 
         _renderChoiceMoneyIcons(amount, maxGroups = 4) {
@@ -1223,26 +1330,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHard = diff === 'hard';
 
             if (diff === 'easy') {
-                document.querySelectorAll('.b2-choice-btn').forEach(btn => {
-                    Game.EventManager.on(btn, 'click', () => {
-                        this._handleChoiceAnswer(parseInt(btn.dataset.val), question);
-                    }, {}, 'gameUI');
-                });
+                // 簡單模式：金幣點擊（動畫結束後 _animateEasyEntriesSequential 會觸發 activate）
+                // 綁定在動畫結束後由 _bindB2EasyModeCoins 執行
+            } else if (diff === 'normal') {
+                this._bindB2NormalModeInputs(question);
             } else {
-                // 普通/困難模式：B1 style numpad
-                this._bindB2TotalNumpad(question);
-                // 困難模式：計算機切換
-                if (isHard) {
-                    const calcToggle = document.getElementById('b2-calc-toggle');
-                    const calcPanel  = document.getElementById('b2-calc-panel');
-                    if (calcToggle && calcPanel) {
-                        Game.EventManager.on(calcToggle, 'click', () => {
-                            const open = calcPanel.style.display === 'none';
-                            calcPanel.style.display = open ? '' : 'none';
-                            calcToggle.textContent  = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
-                        }, {}, 'gameUI');
-                        this._bindB2Calculator();
-                    }
+                // 困難模式：共用鍵盤
+                this._bindB2HardModeNumpad(question);
+                // 計算機切換
+                const calcToggle = document.getElementById('b2-calc-toggle');
+                const calcPanel  = document.getElementById('b2-calc-panel');
+                if (calcToggle && calcPanel) {
+                    Game.EventManager.on(calcToggle, 'click', () => {
+                        const open = calcPanel.style.display === 'none';
+                        calcPanel.style.display = open ? '' : 'none';
+                        calcToggle.textContent  = open ? '🧮 關閉計算機' : '🧮 開啟計算機';
+                    }, {}, 'gameUI');
+                    this._bindB2Calculator();
                 }
             }
 
@@ -1361,6 +1465,256 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, {}, 'gameUI');
             }
+        },
+
+        // ── Easy 模式：金幣點擊綁定 ──────────────────────────────
+        _bindB2EasyModeCoins(question) {
+            const q = this.state.quiz;
+            const effEvents = this._getEffectiveEvents(question);
+
+            // 計算每個事件的硬幣總數
+            const totalCoinsPerEvent = effEvents.map(e => {
+                const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                let rem = e.amount, cnt = 0;
+                for (const d of denoms) { if (rem <= 0) break; const n = Math.floor(rem / d); cnt += n; rem -= n * d; }
+                return cnt;
+            });
+            effEvents.forEach((_, i) => { q.easyCoinsClicked[i] = 0; });
+
+            document.querySelectorAll('.b2-coin-clickable').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    if (btn.classList.contains('b2-coin-clicked') || btn.disabled) return;
+                    const evIdx = parseInt(btn.dataset.eventIdx);
+                    const denom = parseInt(btn.dataset.denom);
+
+                    btn.classList.add('b2-coin-clicked');
+                    btn.disabled = true;
+                    q.easyCoinsClicked[evIdx]++;
+                    q.easyRunningTotal += denom;
+
+                    this.audio.play('click');
+                    Game.Speech.speak(`${q.easyRunningTotal}元`);
+
+                    // 當該事件所有硬幣都點擊後，顯示金額
+                    if (q.easyCoinsClicked[evIdx] >= totalCoinsPerEvent[evIdx]) {
+                        const ev = effEvents[evIdx];
+                        const amtEl = document.getElementById(`b2-easy-amt-${evIdx}`);
+                        if (amtEl) {
+                            amtEl.textContent = `${ev.type === 'income' ? '+' : '-'}${ev.amount} 元`;
+                            amtEl.classList.add('b2-amt-done', ev.type);
+                        }
+                        const runVal = document.getElementById(`b2-running-val-${evIdx}`);
+                        if (runVal) { runVal.style.visibility = ''; }
+                    }
+
+                    // 所有事件完成後進入 Phase 2
+                    const allDone = effEvents.every((_, i) => q.easyCoinsClicked[i] >= totalCoinsPerEvent[i]);
+                    if (allDone) {
+                        const effectiveAnswer = this._getEffectiveAnswer(question);
+                        Game.TimerManager.setTimeout(() => {
+                            this._proceedB2FromPhase1(question, effectiveAnswer);
+                        }, 600, 'ui');
+                    }
+                }, {}, 'gameUI');
+            });
+        },
+
+        // ── 普通模式：點擊輸入→3選擇 ────────────────────────────
+        _bindB2NormalModeInputs(question) {
+            const q = this.state.quiz;
+            const effEvents = this._getEffectiveEvents(question);
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+
+            effEvents.forEach((e, idx) => {
+                const input = document.getElementById(`b2-cost-input-${idx}`);
+                if (!input) return;
+                Game.EventManager.on(input, 'click', () => {
+                    if (input.classList.contains('b2-input-correct')) return;
+                    this._showB2NormalChoices(input, e.amount, question, effectiveAnswer);
+                }, {}, 'gameUI');
+            });
+
+            const totalInput = document.getElementById('b2-total-input');
+            if (totalInput) {
+                Game.EventManager.on(totalInput, 'click', () => {
+                    if (totalInput.classList.contains('b2-input-correct')) return;
+                    const allEventsDone = [...document.querySelectorAll('.b2-cost-input:not([data-idx="total"])')].every(
+                        el => el.classList.contains('b2-input-correct')
+                    );
+                    if (!allEventsDone) {
+                        Game.Speech.speak('請先完成所有事件的金額');
+                        return;
+                    }
+                    this._showB2NormalChoices(totalInput, effectiveAnswer, question, effectiveAnswer);
+                }, {}, 'gameUI');
+            }
+        },
+
+        _showB2NormalChoices(inputEl, correct, question, effectiveAnswer) {
+            const q = this.state.quiz;
+            q.activeInputEl = inputEl;
+
+            // 高亮活躍輸入框
+            document.querySelectorAll('.b2-cost-input').forEach(el => el.classList.remove('b2-input-active'));
+            inputEl.classList.add('b2-input-active');
+
+            const choices = this._generateB2NumChoices(correct);
+            const area = document.getElementById('b2-normal-choice-area');
+            if (!area) return;
+            area.classList.add('b2-choices-visible');
+            const btnsContainer = area.querySelector('.b2-nchoice-btns');
+            if (!btnsContainer) return;
+
+            btnsContainer.innerHTML = choices.map(c =>
+                `<button class="b2-nchoice-btn" data-val="${c}">${c} 元</button>`
+            ).join('');
+
+            btnsContainer.querySelectorAll('.b2-nchoice-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const chosen = parseInt(btn.dataset.val);
+                    if (chosen === correct) {
+                        this.audio.play('correct');
+                        inputEl.textContent = `${correct} 元`;
+                        inputEl.classList.remove('b2-input-active');
+                        inputEl.classList.add('b2-input-correct');
+                        area.classList.remove('b2-choices-visible');
+                        q.activeInputEl = null;
+
+                        if (this._checkB2AllInputsCorrect()) {
+                            Game.TimerManager.setTimeout(() => {
+                                this._proceedB2FromPhase1(question, effectiveAnswer);
+                            }, 500, 'ui');
+                        }
+                    } else {
+                        this.audio.play('error');
+                        btn.style.cssText += 'background:#fee2e2;border-color:#fca5a5;';
+                        btn.disabled = true;
+                        Game.Speech.speak('不對喔，再想想看');
+                    }
+                }, {}, 'gameUI');
+            });
+        },
+
+        // ── 困難模式：共用數字鍵盤 ────────────────────────────────
+        _bindB2HardModeNumpad(question) {
+            const q = this.state.quiz;
+            const effEvents = this._getEffectiveEvents(question);
+            const effectiveAnswer = this._getEffectiveAnswer(question);
+            const errorEl = document.getElementById('b2-ht-error');
+
+            const activateInput = (inputEl) => {
+                if (inputEl.classList.contains('b2-input-correct')) return;
+                document.querySelectorAll('.b2-cost-input').forEach(el => el.classList.remove('b2-input-active'));
+                inputEl.classList.add('b2-input-active');
+                q.activeInputEl = inputEl;
+                q.hardTotalInput = '';
+                inputEl.textContent = '？ 元';
+                const hint = document.getElementById('b2-ht-active-hint');
+                const label = inputEl.dataset.idx === 'total' ? '最後剩下' : `第${parseInt(inputEl.dataset.idx) + 1}筆`;
+                if (hint) hint.innerHTML = `<span>正在輸入：${label}</span>`;
+                if (errorEl) errorEl.style.display = 'none';
+            };
+
+            effEvents.forEach((_, idx) => {
+                const input = document.getElementById(`b2-cost-input-${idx}`);
+                if (input) Game.EventManager.on(input, 'click', () => activateInput(input), {}, 'gameUI');
+            });
+            const totalInput = document.getElementById('b2-total-input');
+            if (totalInput) Game.EventManager.on(totalInput, 'click', () => activateInput(totalInput), {}, 'gameUI');
+
+            document.querySelectorAll('.b2-ht-digit').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    if (!q.activeInputEl || q.activeInputEl.classList.contains('b2-input-correct')) return;
+                    const d = btn.dataset.digit;
+                    if (d === 'back') {
+                        q.hardTotalInput = (q.hardTotalInput || '').slice(0, -1);
+                    } else {
+                        const next = (q.hardTotalInput || '') + d;
+                        if (parseInt(next, 10) <= 99999) q.hardTotalInput = next;
+                    }
+                    this.audio.play('click');
+                    q.activeInputEl.textContent = q.hardTotalInput ? `${q.hardTotalInput} 元` : '？ 元';
+                }, {}, 'gameUI');
+            });
+
+            const confirmBtn = document.getElementById('b2-ht-confirm');
+            if (confirmBtn) {
+                Game.EventManager.on(confirmBtn, 'click', () => {
+                    if (!q.activeInputEl) return;
+                    const entered = parseInt(q.hardTotalInput, 10);
+                    if (!q.hardTotalInput || isNaN(entered)) return;
+
+                    const inputEl = q.activeInputEl;
+                    const correct = parseInt(inputEl.dataset.correct);
+
+                    if (entered === correct) {
+                        this.audio.play('correct');
+                        if (errorEl) errorEl.style.display = 'none';
+                        inputEl.textContent = `${correct} 元`;
+                        inputEl.classList.remove('b2-input-active');
+                        inputEl.classList.add('b2-input-correct');
+                        q.activeInputEl = null;
+                        q.hardTotalInput = '';
+                        const hint = document.getElementById('b2-ht-active-hint');
+                        if (hint) hint.innerHTML = '<span>點選上方輸入框開始輸入</span>';
+
+                        if (this._checkB2AllInputsCorrect()) {
+                            Game.TimerManager.setTimeout(() => {
+                                this._proceedB2FromPhase1(question, effectiveAnswer);
+                            }, 500, 'ui');
+                        }
+                    } else {
+                        this.audio.play('error');
+                        q.errorCount = (q.errorCount || 0) + 1;
+                        const isOver = entered > correct;
+                        const errMsg = isOver ? '算多了，再算算看！' : '算少了，再算算看！';
+                        if (errorEl) {
+                            errorEl.textContent = `❌ ${errMsg}`;
+                            errorEl.style.display = '';
+                            errorEl.classList.remove('b2-ht-hint');
+                        }
+                        Game.Speech.speak(`不對喔，${errMsg}`);
+                        q.hardTotalInput = '';
+                        inputEl.textContent = '？ 元';
+
+                        if (q.errorCount >= 3) {
+                            Game.TimerManager.setTimeout(() => {
+                                this._showHardModeHintModal(question);
+                            }, 600, 'ui');
+                        }
+                    }
+                }, {}, 'gameUI');
+            }
+        },
+
+        // ── 輔助函數 ──────────────────────────────────────────────
+        _generateB2NumChoices(correct) {
+            const choices = new Set([correct]);
+            const range = Math.max(50, Math.round(correct * 0.2));
+            let attempts = 0;
+            while (choices.size < 3 && attempts < 40) {
+                const offset = (Math.floor(Math.random() * range) + 1) * (Math.random() < 0.5 ? 1 : -1);
+                const c = correct + offset;
+                if (c > 0 && !choices.has(c)) choices.add(c);
+                attempts++;
+            }
+            let extra = 1;
+            while (choices.size < 3) { choices.add(correct + extra * 10); extra++; }
+            return [...choices].sort(() => Math.random() - 0.5);
+        },
+
+        _checkB2AllInputsCorrect() {
+            const all = document.querySelectorAll('.b2-cost-input');
+            return all.length > 0 && [...all].every(el => el.classList.contains('b2-input-correct'));
+        },
+
+        _proceedB2FromPhase1(question, effectiveAnswer) {
+            this.audio.play('correct');
+            Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`, () => {
+                Game.TimerManager.setTimeout(() => {
+                    this._renderPhase2(question, effectiveAnswer);
+                }, 300, 'turnTransition');
+            });
         },
 
         // ── B2 計算機邏輯（B1 _bindCalculatorEvents pattern）──────
@@ -1493,100 +1847,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // ── Easy 模式逐項動畫（語音回調鏈，確保每段語音播完再進下一步）────
+        // ── Easy 模式逐項動畫（語音回調鏈）────────────────────────
         _animateEasyEntriesSequential(question) {
-            const answerArea = document.getElementById('b2-answer-area');
-            if (!answerArea) return;
-            answerArea.style.visibility = 'hidden';
-
             const entries = Array.from(document.querySelectorAll('.b2-event-row'));
-            if (entries.length === 0) { answerArea.style.visibility = ''; return; }
-
-            // 建立逐項小計顯示
-            const runEl = document.createElement('div');
-            runEl.id = 'b2-running-total';
-            runEl.className = 'b2-running-total';
-            runEl.innerHTML = `<span class="b2-rt-label">目前小計</span><span class="b2-rt-val" id="b2-rt-val">${question.startAmount} 元</span>`;
-            const startRow = document.querySelector('.b2-start-row');
-            if (startRow) startRow.insertAdjacentElement('afterend', runEl);
-
-            entries.forEach(r => r.classList.add('b2-entry-dim'));
-
-            // 預先計算每步餘額
-            let balance = question.startAmount;
-            const balances = question.events.map(e => {
-                balance = e.type === 'income' ? balance + e.amount : balance - e.amount;
-                return balance;
-            });
+            if (entries.length === 0) {
+                // 無事件列 → 直接進入金幣點擊模式
+                this._bindB2EasyModeCoins(question);
+                return;
+            }
 
             let idx = 0;
-            const highlightNext = () => {
+            const revealNext = () => {
                 if (idx >= entries.length) {
-                    // 所有項目播完：移除最後 active，顯示週小結，然後顯示答題區
-                    if (entries.length > 0) entries[entries.length - 1].classList.remove('b2-entry-active');
-
-                    const totalIncome  = question.events.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-                    const totalExpense = question.events.filter(e => e.type !== 'income').reduce((s, e) => s + e.amount, 0);
-
-                    const summary = document.createElement('div');
-                    summary.id = 'b2-week-summary';
-                    summary.className = 'b2-week-summary';
-                    summary.innerHTML = `
-                        <span class="b2-ws-item income">📥 收入 ${totalIncome} 元</span>
-                        <span class="b2-ws-sep">｜</span>
-                        <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
-                    const runningEl = document.getElementById('b2-running-total');
-                    if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
-
-                    // 週小結顯示 1.2s 後，清理並顯示答題區
-                    Game.TimerManager.setTimeout(() => {
-                        entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
-                        if (runEl.parentNode) runEl.remove();
-                        document.getElementById('b2-week-summary')?.remove();
-                        answerArea.style.visibility = '';
-                        answerArea.style.animation = 'b2FadeIn 0.35s ease';
-                        // Easy 模式輔助點擊在動畫結束後啟動
-                        if (this.state.settings.clickMode === 'on') {
-                            Game.TimerManager.setTimeout(() => AssistClick.activate(question), 300, 'ui');
-                        }
-                    }, 1200, 'ui');
+                    // 所有項目顯示完畢 → 啟動金幣點擊模式
+                    this._bindB2EasyModeCoins(question);
+                    if (this.state.settings.clickMode === 'on') {
+                        Game.TimerManager.setTimeout(() => AssistClick.activate(question), 300, 'ui');
+                    }
                     return;
                 }
 
                 const row = entries[idx];
                 const ev  = question.events[idx];
-                const i   = idx;
                 idx++;
 
-                if (i > 0) entries[i - 1].classList.remove('b2-entry-active');
-                row.classList.remove('b2-entry-dim');
-                row.classList.add('b2-entry-active');
-
-                // 更新小計顯示
-                const valEl = document.getElementById('b2-rt-val');
-                if (valEl) {
-                    valEl.textContent = `${balances[i]} 元`;
-                    valEl.className = 'b2-rt-val ' + (ev.type === 'income' ? 'b2-rt-up' : 'b2-rt-down');
-                    valEl.style.animation = 'none';
-                    void valEl.offsetWidth;
-                    valEl.style.animation = 'b2RtPop 0.3s ease';
-                }
-
-                // 更新「開始有」金額 + 金錢圖示（隨每筆累計變動）
-                const startAmtEl   = document.getElementById('b2-start-amount');
-                const startIconsEl = document.getElementById('b2-start-money-icons');
-                if (startAmtEl)   startAmtEl.textContent = `${balances[i]} 元`;
-                if (startIconsEl) startIconsEl.innerHTML = this._renderChoiceMoneyIcons(balances[i]);
+                // 顯示這一列（淡入）
+                row.style.display = '';
+                row.style.animation = 'b2FadeIn 0.35s ease';
 
                 // 逐項語音，語音結束後才進下一步（300ms 緩衝）
                 const verb = ev.type === 'income' ? '收入' : '花了';
                 Game.Speech.speak(`${ev.name}，${verb}${ev.amount}元`, () => {
-                    Game.TimerManager.setTimeout(highlightNext, 300, 'ui');
+                    Game.TimerManager.setTimeout(revealNext, 300, 'ui');
                 });
             };
 
             // 短暫停頓後開始
-            Game.TimerManager.setTimeout(highlightNext, 200, 'ui');
+            Game.TimerManager.setTimeout(revealNext, 200, 'ui');
         },
 
         // ── 開題起始金額彈窗（B1 _showTaskModal pattern）─────────

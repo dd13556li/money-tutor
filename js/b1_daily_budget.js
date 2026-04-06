@@ -594,6 +594,9 @@ document.addEventListener('DOMContentLoaded', () => {
             q.hardTotalInput = '';
             q.walletRevealed = false;
             q.customItems    = [];
+            q.easyCoinsClicked = {};
+            q.easyRunningTotal = 0;
+            q.activeInputEl = null;
             q.phase = 1;
             // 先顯示場景彈窗（只含目的地），關閉後再渲染 Phase 1
             const curr = q.questions[q.currentQuestion];
