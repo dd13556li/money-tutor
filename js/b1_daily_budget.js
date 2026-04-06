@@ -1322,19 +1322,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const moneyIcons = showAmt ? this._renderItemMoneyIcons(it.cost) : '';
                 return `
                 <div class="b1-schedule-item b1-item-enter" id="b1-cip-base-${idx}" style="animation-delay:${idx * 140 + 200}ms">
-                    <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
-                    <span class="b1-item-cost">${showAmt ? `${it.cost} 元` : '??? 元'}</span>
-                    ${moneyIcons ? `<div class="b1-item-money-icons">${moneyIcons}</div>` : ''}
+                    <div class="b1-item-top">
+                        <span class="b1-item-name">📌 ${it.name}${catBadge}</span>
+                        ${delBtn}
+                    </div>
+                    <div class="b1-item-bottom">
+                        <div class="b1-item-money-icons">${moneyIcons}</div>
+                        <span class="b1-item-cost">${showAmt ? `${it.cost} 元` : '??? 元'}</span>
+                    </div>
                     ${pctBar}
-                    ${delBtn}
                 </div>`;
             }).join('');
 
             const totalTag = showTotal
-                ? `<div class="b1-total-right">
-                       <div class="b1-total-right-label">共需金額</div>
-                       <span class="b1-total-tag">${q.total} 元</span>
-                   </div>`
+                ? `<span class="b1-total-tag">${q.total} 元</span>`
                 : '';
 
             const isEasyMode = this.state.settings.difficulty === 'easy';
@@ -1357,24 +1358,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b1-cip-add-btn" id="b1-cip-add-btn">＋ 新增</button>
                 </div>` : '';
 
-            const sceneImgBlock = q.imageFile
-                ? `<div class="b1-scene-img-center"><img src="../images/b1/${q.imageFile}" alt="${q.label}" class="b1-scene-img-lg" onerror="this.parentElement.remove()"></div>`
-                : '';
+            // 中欄：圖片或 emoji
+            const centerContent = q.imageFile
+                ? `<img src="../images/b1/${q.imageFile}" alt="${q.label}" class="b1-scene-img-lg" onerror="this.style.display='none'">`
+                : `<span class="b1-schedule-icon">${q.icon}</span>`;
+
+            // 右欄：提示按鈕（上）+ 需要帶這些錢（下）+ 共需金額（困難）
+            const rightCol = !isEasyMode ? `
+                ${hintWrap}
+                <span class="b1-sch-hdr-subtitle">需要帶這些錢 👇</span>
+                ${this.state.settings.difficulty === 'hard' ? totalTag : ''}
+            ` : '';
 
             return `
             <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
-                ${sceneImgBlock}
-                <div class="b1-schedule-header">
-                    ${!q.imageFile ? `<span class="b1-schedule-icon">${q.icon}</span>` : ''}
-                    <div class="b1-schedule-text">
-                        <div class="b1-schedule-label-row">
-                            <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
-                            <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
-                        </div>
-                        ${isEasyMode ? '' : '<div class="b1-schedule-subtitle">需要帶這些錢 👇</div>'}
+                <div class="b1-sch-hdr">
+                    <div class="b1-sch-hdr-left">
+                        <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
+                        <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
-                    ${(isEasyMode || this.state.settings.difficulty === 'normal') ? '' : totalTag}
-                    ${hintWrap}
+                    <div class="b1-sch-hdr-center">${centerContent}</div>
+                    <div class="b1-sch-hdr-right">${rightCol}</div>
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
                 ${customListAbove}

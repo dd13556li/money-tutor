@@ -14,26 +14,37 @@
     animation: bFadeIn 0.4s ease;
 }
 
-.b1-schedule-header {
-    display: flex;
+/* ── 行程卡三欄標題列 ─────────────────────────────────────────── */
+.b1-sch-hdr {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: center;
     gap: 12px;
     margin-bottom: 14px;
 }
-
-.b1-schedule-text {
-    flex: 1;
-    min-width: 0;
-    text-align: center;
-}
-
-.b1-schedule-label-row {
+.b1-sch-hdr-left {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     flex-wrap: wrap;
+}
+.b1-sch-hdr-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.b1-sch-hdr-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+.b1-sch-hdr-subtitle {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1f2937;
+    text-align: right;
+    line-height: 1.2;
 }
 
 /* 共需金額（右側） */
@@ -98,9 +109,8 @@
 
 .b1-schedule-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    flex-direction: column;
+    gap: 6px;
     padding: 10px 14px;
     background: #fff;
     border: 1.5px solid #fde68a;
@@ -112,20 +122,35 @@
     background: #fffbeb;
 }
 
+.b1-item-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.b1-item-bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 8px;
+}
+
 .b1-item-name {
     font-size: 16px;
     color: #374151;
     display: flex;
     align-items: center;
     gap: 6px;
+    flex: 1;
 }
 
 .b1-item-cost {
     font-size: 18px;
     font-weight: bold;
     color: var(--b-danger);
-    margin-left: auto;
     white-space: nowrap;
+    align-self: start;
+    text-align: right;
 }
 
 /* 行程卡底部總計列 */
@@ -290,13 +315,11 @@
     margin-top: 8px;
 }
 
-/* ── 行程卡提示按鈕包裹 ──────────────────────────────────────── */
+/* ── 行程卡提示按鈕包裹（在右欄 flex-column 內靠右上）────────── */
 .b1-schedule-hint-wrap {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-shrink: 0;
-    margin-left: 4px;
 }
 
 /* 吉祥物圖示（對齊 A1 48px + settingsBounce）*/
@@ -784,6 +807,9 @@
 @media (max-width: 480px) {
     .b1-schedule-icon { font-size: 40px; }
     .b1-schedule-label { font-size: 18px; }
+    .b1-sch-hdr-subtitle { font-size: 18px; }
+    .b1-sch-hdr { gap: 8px; }
+    .b1-scene-img-lg { width: 80px; height: 80px; }
     .b1-total-amount { font-size: 22px; }
     .b1-wallet-total-amount { font-size: 20px; }
     .b1-confirm-btn { font-size: 17px; padding: 13px 28px; }
@@ -1809,10 +1835,14 @@
 /* 任務彈窗 */
 .b1-task-modal-icon .b1-scene-img,
 .b1-task-modal-img {
-    height: 128px;
-    width: 128px;
+    height: 300px;
+    width: 300px;
     object-fit: contain;
-    border-radius: 12px;
+    border-radius: 16px;
     margin-bottom: 6px;
+}
+@media (max-width: 480px) {
+    .b1-task-modal-icon .b1-scene-img,
+    .b1-task-modal-img { height: 180px; width: 180px; }
 }
 
