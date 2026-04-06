@@ -323,6 +323,57 @@
     color: #dc2626;
 }
 
+/* 選項內金錢圖示（普通模式）*/
+.b4-diff-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.b4-diff-opt-coins {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    min-height: 24px;
+}
+.b4-diff-opt-coins img {
+    width: 36px;
+    height: auto;
+}
+.b4-diff-opt-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: inherit;
+}
+
+/* 簡單模式單一選項 */
+.b4-diff-options-easy {
+    justify-content: center;
+}
+.b4-diff-opt-solo {
+    min-width: 140px;
+    padding: 18px 36px;
+    font-size: 24px;
+    border: 3px solid #10b981;
+    background: #d1fae5;
+    color: #059669;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+    animation: b4SoloBtnPulse 1.8s ease-in-out infinite;
+}
+.b4-diff-opt-solo:hover {
+    background: #a7f3d0;
+    border-color: #059669;
+    transform: translateY(-3px);
+}
+.b4-diff-opt-solo .b4-diff-opt-coins img {
+    width: 44px;
+}
+@keyframes b4SoloBtnPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25); }
+    50%       { box-shadow: 0 6px 24px rgba(16, 185, 129, 0.55); }
+}
+
 /* ── 數字鍵盤（困難模式）────────────────────────────────────── */
 .b4-input-display {
     background: #1f2937;
@@ -1138,26 +1189,34 @@
     gap: 6px 10px;
     backdrop-filter: blur(6px);
 }
-.b4-sl-best-label {
-    font-size: 13px;
+.b4-sl-best-star {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.b4-sl-best-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+.b4-sl-best-tag {
+    font-size: 11px;
     color: #fde68a;
     font-weight: 700;
-    flex-shrink: 0;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
 }
-.b4-sl-best-item {
-    font-size: 15px;
-    font-weight: 800;
-    color: #fff;
-}
-.b4-sl-best-store {
-    font-size: 13px;
-    color: rgba(255,255,255,0.8);
-}
-.b4-sl-best-saved {
+.b4-sl-best-desc {
     font-size: 14px;
-    font-weight: 800;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.b4-sl-best-desc strong {
     color: #86efac;
-    margin-left: auto;
+    font-size: 16px;
 }
 
 /* 明細標題 */
@@ -1178,35 +1237,41 @@
 .b4-sl-card {
     background: #fff;
     border-radius: 16px;
-    padding: 14px 14px 14px 16px;
+    padding: 14px 16px 16px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     animation: slCardIn 0.4s ease both;
+    border: 2px solid transparent;
+}
+.b4-sl-card-gold {
+    background: linear-gradient(135deg, #fffbeb, #fef9ec);
+    border-color: #f59e0b;
+    box-shadow: 0 6px 22px rgba(245,158,11,0.28);
 }
 @keyframes slCardIn {
     from { opacity: 0; transform: translateX(-18px); }
     to   { opacity: 1; transform: translateX(0); }
 }
-.b4-sl-card-left {
+
+/* 卡片頂部（商品名 + 獎牌） */
+.b4-sl-card-top {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex: 1;
+    justify-content: space-between;
+    gap: 8px;
+}
+.b4-sl-card-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
 }
 .b4-sl-item-icon {
-    font-size: 30px;
+    font-size: 28px;
     flex-shrink: 0;
     line-height: 1;
-}
-.b4-sl-item-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-width: 0;
 }
 .b4-sl-item-name {
     font-size: 15px;
@@ -1216,34 +1281,65 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.b4-sl-stores {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 3px 6px;
-    font-size: 12px;
+.b4-sl-card-medal {
+    font-size: 22px;
+    flex-shrink: 0;
 }
-.b4-sl-cheap       { color: #065f46; font-weight: 600; }
-.b4-sl-cheap em    { font-style: normal; font-weight: 800; }
-.b4-sl-vs          { color: #9ca3af; font-size: 11px; }
-.b4-sl-exp         { color: #b91c1c; font-weight: 600; }
-.b4-sl-exp em      { font-style: normal; font-weight: 800; }
 
-/* 省了徽章 */
-.b4-sl-saved-badge {
+/* 算式列（較貴 − 便宜 = 省下） */
+.b4-sl-equation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+}
+.b4-sl-eq-block {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(145deg, #10b981, #059669);
-    border-radius: 14px;
-    padding: 8px 12px 6px;
-    flex-shrink: 0;
-    min-width: 68px;
-    box-shadow: 0 3px 10px rgba(5,150,105,0.4);
+    padding: 6px 12px;
+    border-radius: 10px;
+    line-height: 1.3;
 }
-.b4-sl-saved-label { font-size: 10px; color: rgba(255,255,255,0.88); font-weight: 700; letter-spacing: 0.5px; }
-.b4-sl-saved-num   { font-size: 24px; font-weight: 900; color: #fff; line-height: 1.1; }
-.b4-sl-saved-unit  { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; }
+.b4-sl-eq-exp {
+    background: #fee2e2;
+    border: 1.5px solid #fca5a5;
+}
+.b4-sl-eq-cheap {
+    background: #dcfce7;
+    border: 1.5px solid #86efac;
+}
+.b4-sl-eq-saved {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 3px 10px rgba(5,150,105,0.35);
+}
+.b4-sl-eq-store {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.75;
+}
+.b4-sl-eq-exp .b4-sl-eq-store   { color: #991b1b; }
+.b4-sl-eq-cheap .b4-sl-eq-store { color: #166534; }
+.b4-sl-eq-price {
+    font-size: 16px;
+    font-weight: 800;
+}
+.b4-sl-eq-exp .b4-sl-eq-price   { color: #b91c1c; }
+.b4-sl-eq-cheap .b4-sl-eq-price { color: #15803d; }
+.b4-sl-eq-saved-txt {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    padding: 0 2px;
+}
+.b4-sl-eq-op {
+    font-size: 18px;
+    font-weight: 900;
+    flex-shrink: 0;
+    user-select: none;
+}
+.b4-sl-eq-minus  { color: #dc2626; }
+.b4-sl-eq-equals { color: #059669; }
 
 /* 空狀態 */
 .b4-sl-empty {
@@ -1284,11 +1380,126 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* 裝飾圓圈 */
+.b4-sl-deco-circles {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+}
+.b4-sl-header { position: relative; }
+
+/* ── 比較歷程表格算子欄 ── */
+.b4-cmp-op-th {
+    width: 14px;
+    padding: 0 !important;
+}
+.b4-cmp-op {
+    font-size: 15px;
+    font-weight: 900;
+    text-align: center !important;
+    padding: 6px 2px !important;
+    user-select: none;
+}
+.b4-cmp-minus  { color: #dc2626; }
+.b4-cmp-equals { color: #059669; }
+
 /* ── 響應式 ── */
 @media (max-width: 480px) {
-    .b4-sl-total-amount { font-size: 44px; }
-    .b4-sl-total-box    { padding: 14px 28px 12px; }
-    .b4-sl-item-icon    { font-size: 24px; }
-    .b4-sl-item-name    { font-size: 14px; }
-    .b4-sl-next-btn     { padding: 14px 36px; font-size: 16px; }
+    .b4-sl-total-amount  { font-size: 44px; }
+    .b4-sl-total-box     { padding: 14px 28px 12px; }
+    .b4-sl-item-icon     { font-size: 24px; }
+    .b4-sl-item-name     { font-size: 14px; }
+    .b4-sl-next-btn      { padding: 14px 36px; font-size: 16px; }
+    .b4-sl-eq-block      { padding: 5px 8px; }
+    .b4-sl-eq-price      { font-size: 14px; }
+    .b4-sl-eq-saved-txt  { font-size: 13px; }
+    .b4-sl-eq-op         { font-size: 15px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   計算機（困難模式差額頁）
+   ══════════════════════════════════════════════════════════════ */
+.b4-diff-hard-outer {
+    position: relative;
+}
+.b4-calc-side-col {
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 280px;
+}
+.b4-calc-toggle-btn {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.35);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.b4-calc-toggle-btn:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    box-shadow: 0 4px 14px rgba(102,126,234,0.5);
+}
+.b4-calc-panel { margin-top: 10px; }
+.b4-calculator {
+    background: #2d3748;
+    border-radius: 15px;
+    padding: 18px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+.b4-calc-display {
+    background: #1a202c;
+    color: #48bb78;
+    font-size: 1.9em;
+    font-weight: bold;
+    text-align: right;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    min-height: 56px;
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+}
+.b4-calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+}
+.b4-calc-btn {
+    padding: 16px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+.b4-calc-btn:active { opacity: 0.72; }
+.b4-calc-num        { background: #4a5568; color: #fff; }
+.b4-calc-num:hover  { background: #718096; }
+.b4-calc-op         { background: #f6ad55; color: #fff; }
+.b4-calc-op:hover   { background: #ed8936; }
+.b4-calc-eq         { background: #48bb78; color: #fff; }
+.b4-calc-eq:hover   { background: #38a169; }
+
+/* 手機端：計算機回歸文件流，顯示於差額區下方 */
+@media (max-width: 900px) {
+    .b4-calc-side-col {
+        position: static;
+        width: 100%;
+        margin-top: 12px;
+    }
+    .b4-calculator { max-width: 100%; }
 }

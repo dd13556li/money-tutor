@@ -918,3 +918,107 @@
     background: #6b7280; color: #fff; border: none; border-radius: 8px;
     padding: 8px; font-size: 14px; cursor: pointer;
 }
+
+/* ── 收支事件列：金幣圖示組 ──────────────────────────────────── */
+.b2-event-money-icons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    flex-shrink: 0;
+    max-width: 120px;
+}
+.b2-mic-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.b2-mic-count {
+    font-size: 10px;
+    font-weight: 700;
+    color: #374151;
+    text-align: center;
+    line-height: 1.1;
+    margin-top: 1px;
+}
+
+/* ── 第2頁：金錢圖示展示卡 ─────────────────────────────────── */
+.b2-phase2-card {
+    background: linear-gradient(135deg, #fffbeb, #fef9c3);
+    border: 3px solid #fde68a;
+    border-radius: 20px;
+    padding: 20px 16px 16px;
+    text-align: center;
+    box-shadow: 2px 4px 16px rgba(245,158,11,0.15);
+    animation: b2P2FadeUp 0.4s ease;
+}
+.b2-p2-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.b2-p2-icon  { font-size: 28px; }
+.b2-p2-title { font-size: 16px; font-weight: 700; color: #92400e; }
+.b2-p2-amount {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #d97706;
+    letter-spacing: 1px;
+    margin: 6px 0;
+}
+.b2-p2-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 14px;
+}
+.b2-p2-coins-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 80px;
+    padding: 12px 8px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 14px;
+    border: 2px dashed #fde68a;
+    margin-bottom: 16px;
+}
+.b2-p2-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    opacity: 0;
+    animation: b2CoinIn 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+.b2-p2-coin-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #374151;
+    text-align: center;
+    white-space: nowrap;
+}
+.b2-p2-next-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.3);
+    animation: b2P2FadeUp 0.5s ease 0.3s both;
+}
+.b2-p2-next-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+.b2-p2-next-btn:active { transform: scale(0.96); }
+
+@media (max-width: 480px) {
+    .b2-p2-amount { font-size: 1.9rem; }
+    .b2-event-money-icons { max-width: 80px; }
+}

@@ -466,6 +466,7 @@ toolbarConfig: {
 | B4 商品介紹彈窗 afterClose 模式（2026-04-05）| B4 | `_showItemIntroModal(curr, afterClose)` 加 B1 pattern：`closed` guard + 朗讀 `curr.name` + 語音結束後 `afterClose?.()`；`renderQuestion()` 及 `_renderTripleQuestion()` 移除獨立 400ms speech timer，改由 afterClose 銜接問題語音；困難模式記憶倒數改為語音回調後 300ms 啟動；搜尋 `afterClose`、`b4-item-intro-modal`、`_startMemoryCountdown` |
 | B5 商品選取浮動標籤（2026-04-05）| B5 | 新增 `_showItemFlyout(item, el)`（B6 `_showItemFlyout` pattern）：選取商品時顯示 icon+名稱+金額 浮動標籤（`b5-item-flyout`，紫色漸層膠囊，`b5FlyoutUp` 動畫 1s 上飄淡出）；取消選取時不顯示；搜尋 `_showItemFlyout`、`b5-item-flyout`、`b5FlyoutUp` |
 | B2 困難模式提示彈窗（2026-04-05）| B2 | 新增 `_showHardModeHintModal(question)`（B3/B5/B6 pattern）：困難模式提示按鈕→彈窗顯示逐步計算步驟（起始→各事件→最終餘額）+ 語音「從N元開始，加上/減去…最後剩下N元」；困難模式錯誤2次+ → 800ms 後自動彈出；其他模式維持 `_showCalcBreakdown` 行內卡片；搜尋 `_showHardModeHintModal`、`b2-hm-overlay`、`b2-hard-hint-modal` |
+| B2 語音動畫鏈式���＋金錢圖示＋第2頁（2026-04-06）| B2 | ①語音串接：`renderQuestion` 移除平�� `_animateEasyEntries`，改由 `_showTaskIntroModal afterClose → Game.Speech.speak callback → _animateEasyEntriesSequential`（語音回調鏈，每段語音播完������下一步）；②每個事件列新增 `_renderMoneyIconsGrouped(amount)` 金幣圖示（最多4種面額，圖+×N）；③答對/proceed答錯後��入第2頁 `_renderPhase2(question, effectiveAnswer)`：顯示答案金額對應金幣（≤10枚逐枚動畫，>10枚分組×N），5秒後自動前進；搜尋 `_animateEasyEntriesSequential`、`_renderMoneyIconsGrouped`、`_renderPhase2`、`b2-phase2-card`、`b2-p2-coin` |
 
 ---
 

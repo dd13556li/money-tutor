@@ -478,6 +478,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     from { opacity: 0; transform: translateX(-12px); }
                     to   { opacity: 1; transform: translateX(0); }
                 }
+                @keyframes b2CoinIn {
+                    0%   { opacity: 0; transform: translateY(-18px) scale(0.5); }
+                    65%  { transform: translateY(4px) scale(1.1); }
+                    100% { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                @keyframes b2P2FadeUp {
+                    from { opacity: 0; transform: translateY(12px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
             `;
             document.head.appendChild(style);
         },
@@ -816,12 +825,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
             const diff = this.state.settings.difficulty;
 
-            // Easy 模式：逐項動畫高亮（C2 逐一計數 pattern）—— 視覺動畫立即開始
-            if (diff === 'easy') {
-                this._animateEasyEntries(currentQ);
-            }
-            // 開題起始金額彈窗（B1 _showTaskModal afterClose pattern）
-            // 語音結束後才關閉彈窗，再播主題語音
             const themeKey = this.state.settings.diaryTheme;
             const themeIntros = {
                 school:  '學校週記，',
@@ -835,18 +838,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 hard:   `${themePrefix}仔細看每筆記錄，輸入最後剩下多少元。`,
             };
             this.state.quiz.lastSpeechText = speechMap[diff];
-            this._showTaskIntroModal(currentQ, () => {
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(speechMap[diff]), 200, 'speech');
-            });
-            // 類別圖示動畫導引（Round 44）
-            Game.TimerManager.setTimeout(() => this._showThemeGuide(), 2400, 'ui');
 
-            // 輔助點擊啟動（待動畫完成後）
-            if (this.state.settings.clickMode === 'on') {
-                const _q = q.questions[q.currentQuestion];
-                const _animDelay = diff === 'easy' ? (500 + (_q.events.length * 800) + 800) : 600;
-                Game.TimerManager.setTimeout(() => AssistClick.activate(_q), _animDelay, 'ui');
-            }
+            // 完整鏈式順序：起始彈窗語音 → 關閉彈窗 → 主題語音 → Easy逐項動畫 or 輔助點擊
+            this._showTaskIntroModal(currentQ, () => {
+                Game.TimerManager.setTimeout(() => {
+                    Game.Speech.speak(speechMap[diff], () => {
+                        // 主題語音結束後才啟動 Easy 動畫或輔助點擊，避免語音互相中斷
+                        if (diff === 'easy') {
+                            this._animateEasyEntriesSequential(currentQ);
+                        } else if (this.state.settings.clickMode === 'on') {
+                            Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 300, 'ui');
+                        }
+                        Game.TimerManager.setTimeout(() => this._showThemeGuide(), 200, 'ui');
+                    });
+                }, 200, 'speech');
+            });
         },
 
         _renderQuestionHTML(question) {
@@ -859,11 +865,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let runningAmt = question.startAmount;
             const eventsHTML = question.events.map((e, idx) => {
                 runningAmt = e.type === 'income' ? runningAmt + e.amount : runningAmt - e.amount;
+                const moneyIcons = this._renderMoneyIconsGrouped(e.amount);
                 return `
                 <div class="b2-event-row ${e.type}" style="animation-delay:${0.05 * (idx + 1)}s" id="b2-base-event-${idx}">
                     <span class="b2-type-badge ${e.type}">${e.type === 'income' ? '收入 📥' : '支出 📤'}</span>
                     <span class="b2-event-icon">${e.icon}</span>
                     <span class="b2-event-name">${e.name}</span>
+                    <div class="b2-event-money-icons">${moneyIcons}</div>
                     <span class="b2-event-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount} 元</span>
                     <span class="b2-running-val">${runningAmt}元</span>
                     ${useCustom ? `<button class="b2-cep-del-btn" data-base-idx="${idx}" title="刪除">✕</button>` : ''}
@@ -965,6 +973,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b2-cep-add-btn" id="b2-cep-add-btn">＋ 新增</button>
                 </div>
             </div>`;
+        },
+
+        // ── 金額→金幣圖示組（每個面額顯示一次＋數量）────────────────
+        _renderMoneyIconsGrouped(amount, maxGroups = 4) {
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) {
+                    groups.push({ denom: d, count });
+                    rem -= count * d;
+                }
+                if (groups.length >= maxGroups) break;
+            }
+            if (groups.length === 0) return '';
+            return groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const countBadge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
+                return `<span class="b2-mic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${countBadge}
+                </span>`;
+            }).join('');
         },
 
         _bindCustomEventsPanel(question) {
@@ -1181,10 +1216,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`);
                 this._showNetTrend(question);
-                this._showFinancialTip(question); // 理財建議（Round 32）
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
+                this._showFinancialTip(question);
+                // 語音播完後進入第2頁（金錢圖示）
+                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`, () => {
+                    Game.TimerManager.setTimeout(() => this._renderPhase2(question, effectiveAnswer), 400, 'turnTransition');
+                });
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1204,14 +1241,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1600, 'turnTransition');
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`);
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
+                    // 告知正確答案後進入第2頁
+                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`, () => {
+                        Game.TimerManager.setTimeout(() => this._renderPhase2(question, effectiveAnswer), 400, 'turnTransition');
+                    });
                 }
             }
         },
 
-        // ── Easy 模式逐項動畫（C2 逐一計數 pattern）─────────────
-        _animateEasyEntries(question) {
+        // ── Easy 模式逐項動畫（語音回調鏈，確保每段語音播完再進下一步）────
+        _animateEasyEntriesSequential(question) {
             const answerArea = document.getElementById('b2-answer-area');
             if (!answerArea) return;
             answerArea.style.visibility = 'hidden';
@@ -1236,85 +1275,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 return balance;
             });
 
-            entries.forEach((row, i) => {
-                Game.TimerManager.setTimeout(() => {
-                    if (i > 0) entries[i - 1].classList.remove('b2-entry-active');
-                    row.classList.remove('b2-entry-dim');
-                    row.classList.add('b2-entry-active');
-                    // 更新小計顯示
-                    const valEl = document.getElementById('b2-rt-val');
-                    if (valEl) {
-                        valEl.textContent = `${balances[i]} 元`;
-                        valEl.className = 'b2-rt-val ' + (question.events[i].type === 'income' ? 'b2-rt-up' : 'b2-rt-down');
-                        valEl.style.animation = 'none';
-                        void valEl.offsetWidth; // 觸發 reflow
-                        valEl.style.animation = 'b2RtPop 0.3s ease';
-                    }
-                    // 逐項語音（C1 逐一計數 pattern）
-                    const ev = question.events[i];
-                    const verb = ev.type === 'income' ? '收入' : '花了';
-                    Game.Speech.speak(`${ev.name}，${verb}${ev.amount}元`); // B1 _speakItemsOneByOne pattern：逐項朗讀名稱＋金額
-                }, 500 + i * 800, 'ui');
-            });
+            let idx = 0;
+            const highlightNext = () => {
+                if (idx >= entries.length) {
+                    // 所有項目播完：移除最後 active，顯示週小結，然後顯示答題區
+                    if (entries.length > 0) entries[entries.length - 1].classList.remove('b2-entry-active');
 
-            // 動畫結束前：顯示本週收支統計（Round 27）
-            const totalIncome  = question.events.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-            const totalExpense = question.events.filter(e => e.type !== 'income').reduce((s, e) => s + e.amount, 0);
-            const summaryDelay = 500 + entries.length * 800 + 100;
-            Game.TimerManager.setTimeout(() => {
-                const summaryEl = document.getElementById('b2-week-summary');
-                if (summaryEl) summaryEl.remove();
-                const summary = document.createElement('div');
-                summary.id = 'b2-week-summary';
-                summary.className = 'b2-week-summary';
-                summary.innerHTML = `
-                    <span class="b2-ws-item income">📥 收入 ${totalIncome} 元</span>
-                    <span class="b2-ws-sep">｜</span>
-                    <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
-                const runningEl = document.getElementById('b2-running-total');
-                if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
+                    const totalIncome  = question.events.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+                    const totalExpense = question.events.filter(e => e.type !== 'income').reduce((s, e) => s + e.amount, 0);
 
-                // 餘額走勢條（Round 30）
-                const endBalance = balances[balances.length - 1] ?? question.startAmount;
-                const pct = question.startAmount > 0 ? Math.max(0, Math.min(100, Math.round(endBalance / question.startAmount * 100))) : 0;
-                const trendCls = pct >= 80 ? 'good' : pct >= 50 ? 'ok' : 'low';
-                const trendEl = document.createElement('div');
-                trendEl.className = 'b2-balance-trend';
-                trendEl.innerHTML = `
-                    <span class="b2-bt-label">餘額比例</span>
-                    <div class="b2-bt-bar"><div class="b2-bt-fill ${trendCls}" style="width:${pct}%"></div></div>
-                    <span class="b2-bt-pct ${trendCls}">${pct}%</span>`;
-                summary.insertAdjacentElement('afterend', trendEl);
+                    const summary = document.createElement('div');
+                    summary.id = 'b2-week-summary';
+                    summary.className = 'b2-week-summary';
+                    summary.innerHTML = `
+                        <span class="b2-ws-item income">📥 收入 ${totalIncome} 元</span>
+                        <span class="b2-ws-sep">｜</span>
+                        <span class="b2-ws-item expense">📤 支出 ${totalExpense} 元</span>`;
+                    const runningEl = document.getElementById('b2-running-total');
+                    if (runningEl) runningEl.insertAdjacentElement('afterend', summary);
 
-                // 起始/結束對比條（Round 35）
-                const beforeAfterEl = document.createElement('div');
-                beforeAfterEl.className = 'b2-before-after';
-                const startPct = 100;
-                const endPct   = pct;
-                beforeAfterEl.innerHTML = `
-                    <div class="b2-ba-row">
-                        <span class="b2-ba-label">起始</span>
-                        <div class="b2-ba-bar"><div class="b2-ba-fill start" style="width:${startPct}%"></div></div>
-                        <span class="b2-ba-val">${question.startAmount}元</span>
-                    </div>
-                    <div class="b2-ba-row">
-                        <span class="b2-ba-label">結束</span>
-                        <div class="b2-ba-bar"><div class="b2-ba-fill end ${endPct >= 80 ? 'good' : endPct >= 50 ? 'ok' : 'low'}" style="width:${endPct}%"></div></div>
-                        <span class="b2-ba-val">${question.answer}元</span>
-                    </div>`;
-                trendEl.insertAdjacentElement('afterend', beforeAfterEl);
-            }, summaryDelay, 'ui');
+                    // 週小結顯示 1.2s 後，清理並顯示答題區
+                    Game.TimerManager.setTimeout(() => {
+                        entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
+                        if (runEl.parentNode) runEl.remove();
+                        document.getElementById('b2-week-summary')?.remove();
+                        answerArea.style.visibility = '';
+                        answerArea.style.animation = 'b2FadeIn 0.35s ease';
+                        // Easy 模式輔助點擊在動畫結束後啟動
+                        if (this.state.settings.clickMode === 'on') {
+                            Game.TimerManager.setTimeout(() => AssistClick.activate(question), 300, 'ui');
+                        }
+                    }, 1200, 'ui');
+                    return;
+                }
 
-            const showDelay = 500 + entries.length * 800 + 500;
-            Game.TimerManager.setTimeout(() => {
-                entries.forEach(r => r.classList.remove('b2-entry-active', 'b2-entry-dim'));
-                if (runEl.parentNode) runEl.remove();
-                document.getElementById('b2-week-summary')?.remove();
-                document.querySelector('.b2-balance-trend')?.remove();
-                document.querySelector('.b2-before-after')?.remove();
-                answerArea.style.visibility = '';
-                answerArea.style.animation = 'b2FadeIn 0.35s ease';
-            }, showDelay, 'ui');
+                const row = entries[idx];
+                const ev  = question.events[idx];
+                const i   = idx;
+                idx++;
+
+                if (i > 0) entries[i - 1].classList.remove('b2-entry-active');
+                row.classList.remove('b2-entry-dim');
+                row.classList.add('b2-entry-active');
+
+                // 更新小計顯示
+                const valEl = document.getElementById('b2-rt-val');
+                if (valEl) {
+                    valEl.textContent = `${balances[i]} 元`;
+                    valEl.className = 'b2-rt-val ' + (ev.type === 'income' ? 'b2-rt-up' : 'b2-rt-down');
+                    valEl.style.animation = 'none';
+                    void valEl.offsetWidth; // 觸發 reflow
+                    valEl.style.animation = 'b2RtPop 0.3s ease';
+                }
+
+                // 逐項語音，語音結束後才進下一步（300ms 緩衝）
+                const verb = ev.type === 'income' ? '收入' : '花了';
+                Game.Speech.speak(`${ev.name}，${verb}${ev.amount}元`, () => {
+                    Game.TimerManager.setTimeout(highlightNext, 300, 'ui');
+                });
+            };
+
+            // 短暫停頓後開始
+            Game.TimerManager.setTimeout(highlightNext, 200, 'ui');
         },
 
         // ── 開題起始金額彈窗（B1 _showTaskModal pattern）─────────
@@ -1427,10 +1449,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this.audio.play('correct');
                 this._showCenterFeedback('✅', '答對了！');
-                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`);
                 this._showNetTrend(question);
-                this._showFinancialTip(question); // 理財建議（Round 32）
-                Game.TimerManager.setTimeout(() => this.nextQuestion(), 1600, 'turnTransition');
+                this._showFinancialTip(question);
+                // 語音播完後進入第2頁（金錢圖示）
+                Game.Speech.speak(`答對了！剩下${toTWD(effectiveAnswer)}`, () => {
+                    Game.TimerManager.setTimeout(() => this._renderPhase2(question, effectiveAnswer), 400, 'turnTransition');
+                });
             } else {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
@@ -1467,10 +1491,119 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1800, 'turnTransition');
                 } else {
                     this._showCenterFeedback('❌', '答錯了！');
-                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`);
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2500, 'turnTransition');
+                    // 告知正確答案後進入第2頁
+                    Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`, () => {
+                        Game.TimerManager.setTimeout(() => this._renderPhase2(question, effectiveAnswer), 400, 'turnTransition');
+                    });
                 }
             }
+        },
+
+        // ── 第2頁：正確金錢圖示展示（B1 Phase 2 pattern）────────────
+        _renderPhase2(question, effectiveAnswer) {
+            Game.TimerManager.clearByCategory('turnTransition');
+            Game.EventManager.removeByCategory('gameUI');
+
+            const q    = this.state.quiz;
+            const diff = this.state.settings.difficulty;
+            const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
+            const isLast = (q.currentQuestion + 1) >= q.totalQuestions;
+
+            // 貪婪分解面額
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = effectiveAnswer;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
+            }
+
+            // 判斷顯示方式：總數 ≤ 10 枚 → 逐枚顯示；否則 → 分組×N
+            const totalCoins = groups.reduce((s, g) => s + g.count, 0);
+            let coinsHTML = '';
+            if (totalCoins <= 10) {
+                // 逐枚顯示，帶入場動畫
+                let animIdx = 0;
+                for (const g of groups) {
+                    for (let i = 0; i < g.count; i++) {
+                        const isBill = g.denom >= 100;
+                        const w = isBill ? '80px' : '56px';
+                        coinsHTML += `
+                        <div class="b2-p2-coin" style="animation-delay:${animIdx * 150}ms">
+                            <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                                 style="width:${w};${isBill ? 'border-radius:6px' : 'border-radius:50%'}"
+                                 onerror="this.style.display='none'" draggable="false">
+                            <span class="b2-p2-coin-label">${g.denom}</span>
+                        </div>`;
+                        animIdx++;
+                    }
+                }
+            } else {
+                // 分組顯示：每種面額一張圖＋×N
+                groups.forEach((g, i) => {
+                    const isBill = g.denom >= 100;
+                    const w = isBill ? '80px' : '56px';
+                    coinsHTML += `
+                    <div class="b2-p2-coin" style="animation-delay:${i * 180}ms">
+                        <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                             style="width:${w};${isBill ? 'border-radius:6px' : 'border-radius:50%'}"
+                             onerror="this.style.display='none'" draggable="false">
+                        <span class="b2-p2-coin-label">${g.denom}元 ×${g.count}</span>
+                    </div>`;
+                });
+            }
+
+            const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
+            const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
+            const centerText = diffLabel + (themeInfo ? ` · ${themeInfo.icon}${themeInfo.name}` : '');
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            <div class="b-header">
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-center">${centerText}</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
+                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
+                </div>
+            </div>
+            <div class="game-container">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width:${pct}%"></div>
+                </div>
+                <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
+                <div class="b2-phase2-card">
+                    <div class="b2-p2-header">
+                        <span class="b2-p2-icon">💰</span>
+                        <span class="b2-p2-title">最後剩下</span>
+                    </div>
+                    <div class="b2-p2-amount">${effectiveAnswer} 元</div>
+                    <div class="b2-p2-subtitle">換成錢幣看起來像這樣 👇</div>
+                    <div class="b2-p2-coins-wrap">
+                        ${groups.length > 0 ? coinsHTML : '<span style="color:#9ca3af;font-size:14px;">（無需找零）</span>'}
+                    </div>
+                    <button class="b2-p2-next-btn" id="b2-p2-next-btn">
+                        ${isLast ? '🏆 查看結果' : '下一題 ▶'}
+                    </button>
+                </div>
+            </div>`;
+
+            // 播語音
+            Game.Speech.speak(`剩下${toTWD(effectiveAnswer)}`);
+
+            // 按鈕 + 防重複觸發
+            let advanced = false;
+            const advance = () => {
+                if (advanced) return;
+                advanced = true;
+                Game.TimerManager.clearByCategory('p2auto');
+                this.nextQuestion();
+            };
+            Game.EventManager.on(document.getElementById('b2-p2-next-btn'), 'click', advance, {}, 'gameUI');
+            // 5秒後自動前進
+            Game.TimerManager.setTimeout(advance, 5000, 'p2auto');
         },
 
         // ── 收支趨勢指示（Round 26）───────────────────────────
