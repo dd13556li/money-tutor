@@ -1358,27 +1358,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b1-cip-add-btn" id="b1-cip-add-btn">＋ 新增</button>
                 </div>` : '';
 
-            // 中欄：圖片或 emoji
-            const centerContent = q.imageFile
+            // 圖示或 emoji
+            const imgContent = q.imageFile
                 ? `<img src="../images/b1/${q.imageFile}" alt="${q.label}" class="b1-scene-img-lg" onerror="this.style.display='none'">`
                 : `<span class="b1-schedule-icon">${q.icon}</span>`;
 
-            // 右欄：提示按鈕（上）+ 需要帶這些錢（下）+ 共需金額（困難）
-            const rightCol = !isEasyMode ? `
-                ${hintWrap}
-                <span class="b1-sch-hdr-subtitle">需要帶這些錢 👇</span>
-                ${this.state.settings.difficulty === 'hard' ? totalTag : ''}
-            ` : '';
+            // 文字欄第1列：今天要去 + （easy模式🔊在右；normal/hard放hintWrap）
+            const row1Right = isEasyMode
+                ? `<button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>`
+                : hintWrap;
+
+            // 文字欄第2列（non-easy）：需要帶這些錢 + 🔊 右對齊 + totalTag（hard）
+            const row2 = !isEasyMode ? `
+                <div class="b1-sch-hdr-row2">
+                    <span class="b1-sch-hdr-subtitle">需要帶這些錢 👇${this.state.settings.difficulty === 'hard' ? `&nbsp;${totalTag}` : ''}</span>
+                    <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
+                </div>` : '';
 
             return `
             <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
                 <div class="b1-sch-hdr">
-                    <div class="b1-sch-hdr-left">
-                        <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
-                        <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
+                    <div class="b1-sch-hdr-img">${imgContent}</div>
+                    <div class="b1-sch-hdr-text">
+                        <div class="b1-sch-hdr-row1">
+                            <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
+                            ${row1Right}
+                        </div>
+                        ${row2}
                     </div>
-                    <div class="b1-sch-hdr-center">${centerContent}</div>
-                    <div class="b1-sch-hdr-right">${rightCol}</div>
                 </div>
                 <div class="b1-schedule-items">${itemsHtml}</div>
                 ${customListAbove}
