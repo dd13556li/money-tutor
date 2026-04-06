@@ -866,10 +866,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b1-choice-label">這次出門，總共需要帶多少錢？</div>
                 <div class="b1-choice-btns">
                     ${choices.map(amt => `
-                    <button class="b1-choice-btn" data-amount="${amt}">${amt} 元</button>
+                    <button class="b1-choice-btn" data-amount="${amt}">
+                        <span class="b1-choice-amount">${amt} 元</span>
+                        <span class="b1-choice-icons">${this._renderMoneyIconsGrouped(amt)}</span>
+                    </button>
                     `).join('')}
                 </div>
             </div>`;
+        },
+
+        _renderMoneyIconsGrouped(amount, maxGroups = 4) {
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) {
+                    groups.push({ denom: d, count });
+                    rem -= count * d;
+                }
+                if (groups.length >= maxGroups) break;
+            }
+            if (groups.length === 0) return '';
+            return groups.map(g => {
+                const isBill = g.denom >= 100;
+                const w = isBill ? 36 : 26;
+                const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
+                return `<span class="b1-mic-item">
+                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${countBadge}
+                </span>`;
+            }).join('');
         },
 
         _generateChoices(correct) {

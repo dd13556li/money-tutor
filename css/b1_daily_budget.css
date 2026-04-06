@@ -1543,7 +1543,11 @@
     flex-wrap: wrap;
 }
 .b1-choice-btn {
-    padding: 14px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: #fff;
     border: none;
@@ -1552,7 +1556,31 @@
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.12s, box-shadow 0.12s;
-    min-width: 100px;
+    min-width: 110px;
+}
+.b1-choice-amount { white-space: nowrap; }
+.b1-choice-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    min-height: 28px;
+}
+.b1-mic-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.b1-mic-count {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    padding: 0 3px;
+    line-height: 1.4;
 }
 .b1-choice-btn:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(59,130,246,0.4); }
 .b1-choice-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
