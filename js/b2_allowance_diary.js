@@ -929,7 +929,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${diff === 'easy' ? `<div class="b2-legend"><span class="b2-legend-in">📥 收入</span><span class="b2-legend-sep">·</span><span class="b2-legend-out">📤 支出</span></div>` : ''}
                     <div class="b2-start-row">
                         <span class="b2-start-label">💼 開始有</span>
-                        <span class="b2-start-amount">${question.startAmount} 元</span>
+                        <span class="b2-start-amount" id="b2-start-amount">${question.startAmount} 元</span>
+                        <div class="b2-start-money-icons" id="b2-start-money-icons">${this._renderChoiceMoneyIcons(question.startAmount)}</div>
                     </div>
                     ${eventsHTML}
                     <div id="b2-cep-custom-list"></div>
@@ -1567,9 +1568,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     valEl.textContent = `${balances[i]} 元`;
                     valEl.className = 'b2-rt-val ' + (ev.type === 'income' ? 'b2-rt-up' : 'b2-rt-down');
                     valEl.style.animation = 'none';
-                    void valEl.offsetWidth; // 觸發 reflow
+                    void valEl.offsetWidth;
                     valEl.style.animation = 'b2RtPop 0.3s ease';
                 }
+
+                // 更新「開始有」金額 + 金錢圖示（隨每筆累計變動）
+                const startAmtEl   = document.getElementById('b2-start-amount');
+                const startIconsEl = document.getElementById('b2-start-money-icons');
+                if (startAmtEl)   startAmtEl.textContent = `${balances[i]} 元`;
+                if (startIconsEl) startIconsEl.innerHTML = this._renderChoiceMoneyIcons(balances[i]);
 
                 // 逐項語音，語音結束後才進下一步（300ms 緩衝）
                 const verb = ev.type === 'income' ? '收入' : '花了';
@@ -1584,8 +1591,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 開題起始金額彈窗（B1 _showTaskModal pattern）─────────
         _showTaskIntroModal(question, afterClose) {
-            // B1 _showTaskModal afterClose pattern：語音結束後才關閉彈窗並執行後續語音
             document.getElementById('b2-task-intro-modal')?.remove();
+            const moneyIcons = this._renderChoiceMoneyIcons(question.startAmount);
             const modal = document.createElement('div');
             modal.id = 'b2-task-intro-modal';
             modal.className = 'b2-task-intro-modal';
@@ -1594,6 +1601,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b2-task-intro-icon">📒</div>
                     <div class="b2-task-intro-label">起始金額</div>
                     <div class="b2-task-intro-amount">${question.startAmount} 元</div>
+                    <div class="b2-task-intro-money">${moneyIcons}</div>
                     <div class="b2-task-intro-tap">點任意處繼續</div>
                 </div>`;
             document.body.appendChild(modal);
