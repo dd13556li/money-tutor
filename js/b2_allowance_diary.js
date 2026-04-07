@@ -2051,12 +2051,12 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderPhase2(question, effectiveAnswer) {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
+            this._renderB2WalletPhase(question, effectiveAnswer);
+        },
 
+        // ── (舊) 簡單模式靜態金錢圖示展示（已由 _renderB2WalletPhase 取代，保留備查）──
+        _renderPhase2_easyStatic_UNUSED(question, effectiveAnswer) {
             const diff = this.state.settings.difficulty;
-            if (diff === 'normal' || diff === 'hard') {
-                this._renderB2WalletPhase(question, effectiveAnswer);
-                return;
-            }
 
             // ── 簡單模式：靜態金錢圖示展示 ──
             const q    = this.state.quiz;
@@ -2147,10 +2147,11 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(advance, 5000, 'p2auto');
         },
 
-        // ── Phase 2 錢包拖曳（普通/困難）────────────────────────────
+        // ── Phase 2 錢包拖曳（三難度）──────────────────────────────
         _renderB2WalletPhase(question, effectiveAnswer) {
             const q    = this.state.quiz;
             const diff = this.state.settings.difficulty;
+            const isEasy = diff === 'easy';
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
 
             // 重置錢包
@@ -2162,7 +2163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.p2ErrorCount = 0;
 
             const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
-            const diffLabel = { normal: '普通模式', hard: '困難模式' }[diff] || '';
+            const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
             const centerText = diffLabel + (themeInfo ? ` · ${themeInfo.icon}${themeInfo.name}` : '');
 
             const app = document.getElementById('app');
@@ -2179,14 +2180,31 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-game-wrap">
                 ${this._renderB2Phase2RefCard(question, effectiveAnswer)}
                 ${this._renderB2WalletArea(effectiveAnswer)}
+                ${isEasy ? '' : `
                 <div style="display:flex;justify-content:center;margin:8px 0;">
                     <button class="b2-wallet-confirm-btn" id="b2-wallet-confirm-btn" ${diff === 'hard' ? '' : 'disabled'}>✅ 準備好了！</button>
-                </div>
+                </div>`}
                 ${this._renderB2CoinTray(diff)}
             </div>`;
 
             this._bindB2WalletPhaseEvents(question, effectiveAnswer);
             Game.Speech.speak(`最後剩下${toTWD(effectiveAnswer)}，請用錢幣組合出來`);
+
+            // 簡單模式：自動顯示 ghost slot 提示（靜默，無語音/彈窗）
+            if (isEasy) {
+                Game.TimerManager.setTimeout(() => this._b2AutoSetGhostSlots(effectiveAnswer), 300, 'ui');
+            }
+        },
+
+        // ── 靜默設定 ghost slots（簡單模式自動提示）────────────────
+        _b2AutoSetGhostSlots(effectiveAnswer) {
+            const diff   = this.state.settings.difficulty;
+            const denoms = B2_DENOM_BY_DIFF[diff] || B2_DENOM_BY_DIFF.easy;
+            const optimal = this._b2CalcOptimalCoins(effectiveAnswer, denoms);
+            const q = this.state.quiz;
+            q.showHint  = true;
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            this._updateB2WalletDisplay(effectiveAnswer);
         },
 
         _renderB2Phase2RefCard(question, effectiveAnswer) {
@@ -2351,6 +2369,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.state.settings.difficulty === 'normal') {
                     const walletNow = this._getB2WalletTotal();
                     Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
+                }
+                // 簡單模式：所有 ghost slot 填滿後自動確認（同 B1 pattern）
+                if (this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled)) {
+                    Game.TimerManager.setTimeout(() => this._handleB2WalletConfirm(requiredTotal, null), 400, 'ui');
                 }
             } else {
                 this.audio.play('coin');
