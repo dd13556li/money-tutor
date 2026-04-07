@@ -906,7 +906,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
             const catLabels = { all:'全部', food:'食品飲料', stationery:'文具書籍', daily:'生活用品', clothing:'服飾配件' };
             const catLabel  = catLabels[this.state.settings.itemCat || 'all'];
-            const centerTxt = catLabel !== '全部' ? `${diffLabel}・${catLabel}` : diffLabel;
+            const stepLabel = { select:'第 1 步：找出較便宜的價格', tripleRank:'第 1 步：找出較便宜的價格', diff:'第 2 步：算出差額' }[this.state.phase] || '';
+            const centerTxt = stepLabel || (catLabel !== '全部' ? `${diffLabel}・${catLabel}` : diffLabel);
             return `
             <div class="b-header">
                 <div class="b-header-left">
@@ -1544,12 +1545,14 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
             const refCardHTML = `
-            <div class="b4-diff-ref-card">
-                <span class="b4-diff-ref-icon">${curr.icon}</span>
-                <div class="b4-diff-ref-info">
-                    <span class="b4-diff-ref-name">${curr.name}</span>
-                    <span class="b4-diff-ref-cheap">✅ ${curr.sortedAsc[0].storeIcon} ${curr.sortedAsc[0].store} 最便宜</span>
+            <div class="b4-ref-card-wrap">
+                <div class="b4-diff-ref-card">
+                    <span class="b4-diff-ref-icon">${curr.icon}</span>
+                    <div class="b4-diff-ref-info">
+                        <span class="b4-diff-ref-name">${curr.name}</span>
+                    </div>
                 </div>
+                <div class="b4-diff-ref-cheap">✅ ${curr.sortedAsc[0].storeIcon} ${curr.sortedAsc[0].store} 最便宜</div>
             </div>`;
 
             const app = document.getElementById('app');
@@ -1561,7 +1564,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        <div class="b4-diff-phase-label">第 2 步：答案揭曉</div>
                     </div>
                     <div class="b4-diff-section">
                         ${barsHTML}
@@ -1613,7 +1615,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-game-wrap">
                 <div class="b4-item-hero" style="position:relative;">
                     ${refCardHTML}
-                    <div class="b4-diff-phase-label">第 2 步：算出差額</div>
                     ${hintWrap}
                 </div>
                 <div class="b4-diff-section">
@@ -1774,12 +1775,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const expOpt   = curr.isUnit ? curr.optA : (curr.optA.price >= curr.optB.price ? curr.optA : curr.optB);
 
             const refCardHTML = `
-            <div class="b4-diff-ref-card">
-                <span class="b4-diff-ref-icon">${curr.icon}</span>
-                <div class="b4-diff-ref-info">
-                    <span class="b4-diff-ref-name">${curr.name}</span>
-                    <span class="b4-diff-ref-cheap">✅ ${cheapOpt.storeIcon} ${cheapOpt.store} 比較便宜</span>
+            <div class="b4-ref-card-wrap">
+                <div class="b4-diff-ref-card">
+                    <span class="b4-diff-ref-icon">${curr.icon}</span>
+                    <div class="b4-diff-ref-info">
+                        <span class="b4-diff-ref-name">${curr.name}</span>
+                    </div>
                 </div>
+                <div class="b4-diff-ref-cheap">✅ ${cheapOpt.storeIcon} ${cheapOpt.store} 比較便宜</div>
             </div>`;
 
             const app = document.getElementById('app');
@@ -1791,7 +1794,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        <div class="b4-diff-phase-label">第 2 步：答案揭曉</div>
                     </div>
                     <div class="b4-diff-section">
                         ${barsHTML}
@@ -1847,7 +1849,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        <div class="b4-diff-phase-label">第 2 步：算出差額</div>
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-section">
@@ -1887,7 +1888,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        <div class="b4-diff-phase-label">第 2 步：算出差額</div>
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-hard-outer">

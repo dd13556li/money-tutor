@@ -88,6 +88,12 @@
     margin-top: 6px;
     letter-spacing: 0.5px;
 }
+.b4-ref-card-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
 .b4-diff-ref-card {
     display: inline-flex;
     align-items: center;
@@ -110,9 +116,13 @@
     color: #1f2937;
 }
 .b4-diff-ref-cheap {
-    font-size: 13px;
+    font-size: 14px;
     color: #059669;
-    font-weight: 600;
+    font-weight: 700;
+    padding: 4px 10px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border: 1px solid #86efac;
 }
 
 /* ── 差額區 price bar 右側欄 ──────────────────────────────────── */
