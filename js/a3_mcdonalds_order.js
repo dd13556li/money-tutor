@@ -5340,8 +5340,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let hintListHTML = '';
                 sortedValues.forEach(val => {
                     const cnt = valueCounts[val];
-                    const moneyData = this.storeData.moneyItems.find(item => item.value === val);
-                    const imgSrc = moneyData ? moneyData.images.front : '';
+                    const moneyData = this.moneyItems.find(item => item.value === val);
+                    const imgSrc = moneyData?.images?.front || '';
                     const isCoin = val < 100;
                     const imgStyle = isCoin
                         ? 'width:50px;height:50px;object-fit:contain;'
@@ -5400,8 +5400,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let hintListHTML = '';
             sortedValues.forEach(val => {
                 const cnt = valueCounts[val];
-                const moneyData = this.storeData.moneyItems.find(item => item.value === val);
-                const imgSrc = moneyData ? moneyData.images.front : '';
+                const moneyData = this.moneyItems.find(item => item.value === val);
+                const imgSrc = moneyData ? `../images/${moneyData.image}` : '';
                 const isCoin = val < 100;
                 const imgStyle = isCoin
                     ? 'width:50px;height:50px;object-fit:contain;'
