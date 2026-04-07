@@ -466,6 +466,11 @@ toolbarConfig: {
 | B4 商品介紹彈窗 afterClose 模式（2026-04-05）| B4 | `_showItemIntroModal(curr, afterClose)` 加 B1 pattern：`closed` guard + 朗讀 `curr.name` + 語音結束後 `afterClose?.()`；`renderQuestion()` 及 `_renderTripleQuestion()` 移除獨立 400ms speech timer，改由 afterClose 銜接問題語音；困難模式記憶倒數改為語音回調後 300ms 啟動；搜尋 `afterClose`、`b4-item-intro-modal`、`_startMemoryCountdown` |
 | B5 商品選取浮動標籤（2026-04-05）| B5 | 新增 `_showItemFlyout(item, el)`（B6 `_showItemFlyout` pattern）：選取商品時顯示 icon+名稱+金額 浮動標籤（`b5-item-flyout`，紫色漸層膠囊，`b5FlyoutUp` 動畫 1s 上飄淡出）；取消選取時不顯示；搜尋 `_showItemFlyout`、`b5-item-flyout`、`b5FlyoutUp` |
 | B2 困難模式提示彈窗（2026-04-05）| B2 | 新增 `_showHardModeHintModal(question)`（B3/B5/B6 pattern）：困難模式提示按鈕→彈窗顯示逐步計算步驟（起始→各事件→最終餘額）+ 語音「從N元開始，加上/減去…最後剩下N元」；困難模式錯誤2次+ → 800ms 後自動彈出；其他模式維持 `_showCalcBreakdown` 行內卡片；搜尋 `_showHardModeHintModal`、`b2-hm-overlay`、`b2-hard-hint-modal` |
+| C5/C6 反復測試錯誤語音精簡（2026-04-07）| C5/C6 | 反復測試模式選錯只播「不對喔，請再試一次」（不含進題語音）；`mode === 'single'` 保留雙語音；C6 `selectC6ChangeOption` 錯誤分支依 mode 拆分；搜尋 `不對喔，請再試一次`、`mode === 'single'` |
+| A6 困難模式付款語音 `_showPaidAmount` 旗標（2026-04-07）| A6 | 困難模式拖曳放置金錢時不播語音，按提示鈕後 `_showPaidAmount=true` 才播；桌面/觸控兩處加 `difficulty !== 'hard' \|\| _showPaidAmount` 守衛（50ms timer）；搜尋 `_showPaidAmount`、`paymentSpeech` |
+| A6 step-hint 樣式更新（2026-04-07）| A6 | `::after` 改 `👇 點這裡`；`top:-54px;bottom:auto`（上方）；橙色漸層；新增 `@keyframes bounceHint`；搜尋 `bounceHint`、`step-hint::after` |
+| A3 困難模式付款提示彈窗（2026-04-07）| A3 | `showPaymentHint()` 新增 inline style 彈窗（`a3PaymentHintModal`）含金錢圖片×張數；新增 `McDonald.replayPaymentHintSpeech()`、`McDonald.confirmPaymentHint()`（確認後才顯示勾）；搜尋 `a3PaymentHintModal`、`confirmPaymentHint` |
+| A4 困難模式付款提示彈窗（2026-04-07）| A4 | `showPaidAmountHint()` 新增 inline style 彈窗（`a4PaymentHintModal`）含金錢圖片×張數；新增 `Game.replayPaymentHintSpeech()`、`Game.confirmPaymentHint()`（確認後才顯示勾，重置 `isProcessingHint`）；搜尋 `a4PaymentHintModal`、`_lastOptimalPaymentA4` |
 | B2 語音動畫鏈式���＋金錢圖示＋第2頁（2026-04-06）| B2 | ①語音串接：`renderQuestion` 移除平�� `_animateEasyEntries`，改由 `_showTaskIntroModal afterClose → Game.Speech.speak callback → _animateEasyEntriesSequential`（語音回調鏈，每段語音播完������下一步）；②每個事件列新增 `_renderMoneyIconsGrouped(amount)` 金幣圖示（最多4種面額，圖+×N）；③答對/proceed答錯後��入第2頁 `_renderPhase2(question, effectiveAnswer)`：顯示答案金額對應金幣（≤10枚逐枚動畫，>10枚分組×N），5秒後自動前進；搜尋 `_animateEasyEntriesSequential`、`_renderMoneyIconsGrouped`、`_renderPhase2`、`b2-phase2-card`、`b2-p2-coin` |
 
 ---
