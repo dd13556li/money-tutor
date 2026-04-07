@@ -898,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hiddenStyle = diff === 'easy' ? 'style="display:none"' : `style="animation-delay:${0.05 * (idx + 1)}s"`;
                 const delBtn = useCustom ? `<button class="b2-cep-del-btn" data-base-idx="${idx}" title="刪除">✕</button>` : '';
                 const runningValHtml = diff === 'easy'
-                    ? `<span class="b2-running-val" id="b2-running-val-${idx}" style="visibility:hidden">？元</span>`
+                    ? ''
                     : `<span class="b2-running-val">${runningAmt}元</span>`;
 
                 let moneyIconsHtml, amountHtml;
@@ -1503,8 +1503,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             amtEl.textContent = `${ev.type === 'income' ? '+' : '-'}${ev.amount} 元`;
                             amtEl.classList.add('b2-amt-done', ev.type);
                         }
-                        const runVal = document.getElementById(`b2-running-val-${evIdx}`);
-                        if (runVal) { runVal.style.visibility = ''; }
                     }
 
                     // 所有事件完成後進入 Phase 2
