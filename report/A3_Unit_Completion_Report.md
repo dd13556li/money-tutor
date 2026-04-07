@@ -1,7 +1,7 @@
 # A3 麥當勞自助點餐單元 — 完成經驗報告書
 
 > **建立日期**：2026-02-09（日）
-> **更新日期**：2026-04-07（困難模式步驟3付款提示改為彈窗）、2026-03-14（簡單模式步驟3/5/6「點這裡」提示動畫 + 方框；步驟5無需找零按鈕提示）
+> **更新日期**：2026-04-07（付款提示彈窗 fallback 修正 + 頁面切換停止語音）、2026-04-07（困難模式步驟3付款提示改為彈窗）、2026-03-14（簡單模式步驟3/5/6「點這裡」提示動畫 + 方框；步驟5無需找零按鈕提示）
 > **專案名稱**：Money Tutor 金錢教學系統
 > **單元編號**：A3 — 麥當勞自助點餐機
 > **報告類型**：單元完成經驗與開發建議
@@ -2006,3 +2006,30 @@ A3 困難模式步驟3（櫃檯付款頁面），按下提示鈕後，仿照 A6 
 ### 關鍵搜尋詞
 
 `a3PaymentHintModal`、`replayPaymentHintSpeech`、`confirmPaymentHint`
+---
+
+## 付款提示彈窗 fallback 修正 + 頁面切換停止語音（2026-04-07）
+
+### 問題
+
+1. A3 困難模式步驟3，按下提示鈕後沒有出現彈窗（仍走舊路徑直接呼叫 `_showCheckmarksOnWallet`）。  
+   根因：`findExactPayment()` 回傳空陣列，進入 fallback 分支，但 fallback 只呼叫 `_showCheckmarksOnWallet` 未顯示彈窗。
+
+2. 切換到新頁面時，前一頁的語音仍繼續播放。  
+   例：點擊前往步驟3時，步驟2播放的導引語音未停止。
+
+### 修改
+
+**`js/a3_mcdonalds_order.js`**
+
+**Bug 1 — fallback 也顯示彈窗**
+- `showPaymentHint()` fallback 分支（`!optimalMoney || optimalMoney.length === 0`）：改用 `optimalPaymentTargets`（完整 money 物件，含 `.images.front`）建立相同 `hintListHTML`，顯示 `a3PaymentHintModal`，儲存 `_lastPaymentHintSpeech`，最後播放語音；保留原有 `walletHintMoney` 設定供 `confirmPaymentHint()` 呼叫 `showWalletHintWithTicks` 用
+
+**Bug 2 — 頁面切換停止語音**
+- `showCounterPayment()` 頂部加 `window.speechSynthesis.cancel()`
+- `showPaymentMethodSelection()` 頂部加 `window.speechSynthesis.cancel()`
+- `showPickupComplete()` 頂部加 `window.speechSynthesis.cancel()`
+
+### 關鍵搜尋詞
+
+`顯示付款提示彈窗（fallback）`、`speechSynthesis.cancel` in `a3_mcdonalds_order.js`

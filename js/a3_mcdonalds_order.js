@@ -4868,6 +4868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         showPaymentMethodSelection() {
+            window.speechSynthesis.cancel();
             const app = document.getElementById('app');
             if (!app) return;
 
@@ -5021,6 +5022,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         showCounterPayment() {
+            // 切換頁面時停止前一頁的語音
+            window.speechSynthesis.cancel();
             this.audio.playSound('beep');
             // 重置付款狀態（保留 showPaymentHints 狀態，因為可能是錯誤3次後呼叫）
             this.state.gameState.paymentArea = [];
@@ -5320,15 +5323,66 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             if (!optimalMoney || optimalMoney.length === 0) {
-                // 回退到原本的 optimalPaymentTargets
+                // 回退到原本的 optimalPaymentTargets（完整 money 物件，含 images）
                 const optimalPayment = this.state.gameState.optimalPaymentTargets;
                 if (!optimalPayment || optimalPayment.length === 0) {
                     this.Debug.log('flow', '[A3-McDonald] 沒有付款目標');
                     return;
                 }
-                this._showCheckmarksOnWallet(optimalPayment);
+                // 用 fallback 物件顯示相同彈窗
+                this.state.gameState.walletHintMoney = optimalPayment;
+                this._lastPaymentHintSpeech = this.generateHintSpeech(optimalPayment);
                 _revealPaidAmount();
-                this.speech.speakText(this.generateHintSpeech(optimalPayment));
+
+                const valueCounts = {};
+                optimalPayment.forEach(m => { valueCounts[m.value] = (valueCounts[m.value] || 0) + 1; });
+                const sortedValues = Object.keys(valueCounts).map(Number).sort((a, b) => b - a);
+                let hintListHTML = '';
+                sortedValues.forEach(val => {
+                    const cnt = valueCounts[val];
+                    const moneyData = this.storeData.moneyItems.find(item => item.value === val);
+                    const imgSrc = moneyData ? moneyData.images.front : '';
+                    const isCoin = val < 100;
+                    const imgStyle = isCoin
+                        ? 'width:50px;height:50px;object-fit:contain;'
+                        : 'width:80px;height:auto;max-height:50px;object-fit:contain;';
+                    hintListHTML += `
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#f9f9f9;border-radius:10px;border:1px solid #eee;">
+                            ${imgSrc ? `<img src="${imgSrc}" alt="${val}元" style="${imgStyle}">` : ''}
+                            <span style="font-size:20px;font-weight:bold;color:#333;">${val}元</span>
+                            <span style="color:#999;font-size:16px;">×</span>
+                            <span style="font-size:20px;font-weight:bold;color:#e65100;">${cnt} 張</span>
+                        </div>`;
+                });
+
+                const existingFallback = document.getElementById('a3PaymentHintModal');
+                if (existingFallback) existingFallback.remove();
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div id="a3PaymentHintModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:10050;">
+                        <div style="background:linear-gradient(135deg,#fff 0%,#f8f9fa 100%);border-radius:20px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:3px solid #FF9800;">
+                            <div style="background:linear-gradient(135deg,#FF9800 0%,#FFb040 100%);padding:20px 30px;display:flex;align-items:center;justify-content:center;gap:12px;color:white;">
+                                <span style="font-size:40px;line-height:1;">💡</span>
+                                <h2 style="margin:0;font-size:22px;font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,0.2);">付款提示</h2>
+                            </div>
+                            <div style="padding:24px 30px;">
+                                <p style="font-size:16px;color:#555;margin-bottom:16px;font-weight:500;text-align:center;">建議的付款方式：</p>
+                                ${hintListHTML}
+                            </div>
+                            <div style="padding:0 30px 24px;display:flex;gap:10px;justify-content:center;">
+                                <button onclick="McDonald.replayPaymentHintSpeech()"
+                                    style="background:linear-gradient(135deg,#4caf50,#45a049);border:none;color:white;padding:8px 18px;border-radius:25px;cursor:pointer;font-size:16px;display:flex;align-items:center;gap:6px;">
+                                    🔊 再播一次
+                                </button>
+                                <button onclick="McDonald.confirmPaymentHint()"
+                                    style="background:linear-gradient(135deg,#FF9800,#e65100);border:none;color:white;padding:8px 22px;border-radius:25px;cursor:pointer;font-size:16px;font-weight:bold;">
+                                    我知道了
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                this.speech.speakText(this._lastPaymentHintSpeech);
+                this.Debug.log('flow', '[A3-McDonald] 顯示付款提示彈窗（fallback）', optimalPayment.map(m => m.value));
                 return;
             }
 
@@ -9388,6 +9442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 🎯 第一階段：顯示餐點內容
         showPickupComplete() {
+            window.speechSynthesis.cancel();
             // 注意：pickup queue 已在 startOrderNumberAnimation 按鈕顯示時建立
             // 此處不需要重複建立
 

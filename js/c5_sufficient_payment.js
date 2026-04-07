@@ -5447,49 +5447,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mode = this.state.settings.mode;
                 let message;
 
-                if (autoJudgmentData) {
-                    // 自動判斷使用新格式訊息
-                    const { currentTotal, itemPrice, itemName } = autoJudgmentData;
-                    // 🔧 [修正] 使用阿拉伯數字格式
+                if (mode === 'single') {
+                    // 單次作答：包含正確答案提示與結尾文字
+                    const isLastQuestion = this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions;
+                    const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
 
-                    if (mode === 'single') {
-                        // 單次作答：包含正確答案提示
+                    if (autoJudgmentData) {
+                        const { currentTotal, itemPrice, itemName } = autoJudgmentData;
                         const correctAnswerHint = userSaysEnough ?
                             '你的錢不夠，無法購買這個物品' :
                             '你的錢已經足夠購買這個物品';
-                        // 判斷是否為最後一題
-                        const isLastQuestion = this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions;
-                        const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
                         message = userSaysEnough ?
                             `不好意思，你的錢總共${currentTotal}元，不能購買${itemPrice}元的${itemName}！正確答案：${correctAnswerHint}，${endingText}` :
                             `恭喜你！你的錢總共${currentTotal}元，可以買${itemPrice}元的${itemName}！正確答案：${correctAnswerHint}，${endingText}`;
                     } else {
-                        // 反復作答：原有訊息
-                        message = userSaysEnough ?
-                            `不好意思，你的錢總共${currentTotal}元，不能購買${itemPrice}元的${itemName}！請再試一次` :
-                            `恭喜你！你的錢總共${currentTotal}元，可以買${itemPrice}元的${itemName}！請再試一次`;
-                    }
-                } else {
-                    // 手動判斷使用原始格式訊息
-                    // 🔧 [修正] 使用阿拉伯數字格式
-
-                    if (mode === 'single') {
-                        // 單次作答：包含正確答案提示
                         const correctAnswerHint = userSaysEnough ?
                             '你的錢不夠，無法購買這個物品' :
                             '你的錢已經足夠購買這個物品';
-                        // 判斷是否為最後一題
-                        const isLastQuestion = this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions;
-                        const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
                         message = userSaysEnough ?
                             `錯誤！你的錢不夠買${itemPrice}元的${itemName}！正確答案：${correctAnswerHint}，${endingText}` :
                             `錯誤！你的錢夠買${itemPrice}元的${itemName}！正確答案：${correctAnswerHint}，${endingText}`;
-                    } else {
-                        // 反復作答：原有訊息
-                        message = userSaysEnough ?
-                            `錯誤！你的錢不夠買${itemPrice}元的${itemName}！請再試一次` :
-                            `錯誤！你的錢夠買${itemPrice}元的${itemName}！請再試一次`;
                     }
+                } else {
+                    // 反復作答：精簡語音
+                    message = '不對喔，請再試一次';
                 }
 
                 Game.Debug.log('ui', '💬 顯示錯誤訊息:', message);

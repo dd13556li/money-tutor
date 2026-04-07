@@ -471,6 +471,9 @@ toolbarConfig: {
 | A6 step-hint 樣式更新（2026-04-07）| A6 | `::after` 改 `👇 點這裡`；`top:-54px;bottom:auto`（上方）；橙色漸層；新增 `@keyframes bounceHint`；搜尋 `bounceHint`、`step-hint::after` |
 | A3 困難模式付款提示彈窗（2026-04-07）| A3 | `showPaymentHint()` 新增 inline style 彈窗（`a3PaymentHintModal`）含金錢圖片×張數；新增 `McDonald.replayPaymentHintSpeech()`、`McDonald.confirmPaymentHint()`（確認後才顯示勾）；搜尋 `a3PaymentHintModal`、`confirmPaymentHint` |
 | A4 困難模式付款提示彈窗（2026-04-07）| A4 | `showPaidAmountHint()` 新增 inline style 彈窗（`a4PaymentHintModal`）含金錢圖片×張數；新增 `Game.replayPaymentHintSpeech()`、`Game.confirmPaymentHint()`（確認後才顯示勾，重置 `isProcessingHint`）；搜尋 `a4PaymentHintModal`、`_lastOptimalPaymentA4` |
+| A4 付款提示彈窗音效修正（2026-04-07）| A4 | `replayPaymentHintSpeech`/`confirmPaymentHint` 的 `this.playSound('click')` 改為 `this.menuSelectAudio?.play().catch(()=>{})`（A4 無 `playSound` 方法）；搜尋 `menuSelectAudio` in `confirmPaymentHint` |
+| A3 付款提示 fallback 路徑顯示彈窗（2026-04-07）| A3 | `showPaymentHint()` fallback 分支（`findExactPayment` 回傳空時）改為也顯示 `a3PaymentHintModal`，使用 `optimalPaymentTargets` 物件（有 `.images.front`）建立相同 HTML；搜尋 `顯示付款提示彈窗（fallback）` |
+| A3 切換頁面停止語音（2026-04-07）| A3 | `showCounterPayment()`、`showPaymentMethodSelection()`、`showPickupComplete()` 頂部加 `window.speechSynthesis.cancel()`，防止前頁語音跨頁播放；搜尋 `speechSynthesis.cancel` in `a3_mcdonalds_order.js` |
 | B2 語音動畫鏈式���＋金錢圖示＋第2頁（2026-04-06）| B2 | ①語音串接：`renderQuestion` 移除平�� `_animateEasyEntries`，改由 `_showTaskIntroModal afterClose → Game.Speech.speak callback → _animateEasyEntriesSequential`（語音回調鏈，每段語音播完������下一步）；②每個事件列新增 `_renderMoneyIconsGrouped(amount)` 金幣圖示（最多4種面額，圖+×N）；③答對/proceed答錯後��入第2頁 `_renderPhase2(question, effectiveAnswer)`：顯示答案金額對應金幣（≤10枚逐枚動畫，>10枚分組×N），5秒後自動前進；搜尋 `_animateEasyEntriesSequential`、`_renderMoneyIconsGrouped`、`_renderPhase2`、`b2-phase2-card`、`b2-p2-coin` |
 
 ---

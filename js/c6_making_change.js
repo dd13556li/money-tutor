@@ -6389,47 +6389,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 const correctOption = document.querySelector('.change-option[data-is-correct="true"]');
                 const mode = this.state.settings.mode;
 
-                // 🎯 步驟3：播放第一段語音「不對，你選的是×元」
-                const firstSpeechText = changeAmount === 0 ?
-                    '不對，你選的是不需找零' :
-                    `不對，你選的是${changeAmount}元`;
+                if (mode === 'single') {
+                    // 單次作答：播放兩段語音並自動進入下一題
+                    const firstSpeechText = changeAmount === 0 ?
+                        '不對，你選的是不需找零' :
+                        `不對，你選的是${changeAmount}元`;
 
-                this.speech.speak(firstSpeechText, {
-                    callback: () => {
-                        // 🎯 步驟4：第一段語音結束後，顯示綠色勾
-                        if (correctOption) {
-                            correctOption.classList.add('correct-selected');
-                            Game.Debug.log('state', '✅ [C6-選項選擇] 顯示正確答案的綠色勾');
-                        }
+                    this.speech.speak(firstSpeechText, {
+                        callback: () => {
+                            if (correctOption) {
+                                correctOption.classList.add('correct-selected');
+                            }
+                            const isLastQuestion = this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions;
+                            const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
+                            const secondSpeechText = correctAmount === 0 ?
+                                `正確答案是不需找零，${endingText}` :
+                                `正確的找零應該是${correctAmount}元，${endingText}`;
 
-                        // 🎯 步驟5：播放第二段語音「正確的找零應該是×元」
-                        const isLastQuestion = this.state.quiz.currentQuestion >= this.state.quiz.totalQuestions;
-                        const endingText = isLastQuestion ? '測驗結束' : '進入下一題';
-                        const secondSpeechText = correctAmount === 0 ?
-                            `正確答案是不需找零，${endingText}` :
-                            `正確的找零應該是${correctAmount}元，${endingText}`;
-
-                        this.speech.speak(secondSpeechText, {
-                            callback: () => {
-                                if (mode === 'single') {
-                                    // 單次作答：自動進入下一題
+                            this.speech.speak(secondSpeechText, {
+                                callback: () => {
                                     Game.TimerManager.setTimeout(() => {
                                         Game.Debug.log('state', '➡️ 單次作答模式，自動前往下一題');
                                         this.loadNextQuestion();
                                     }, 1500);
-                                } else {
-                                    // 反復作答：允許重新選擇
-                                    selectedOption.classList.remove('incorrect-selected', 'clicked');
-                                    if (correctOption) {
-                                        correctOption.classList.remove('correct-selected');
-                                    }
-                                    this.state.gameState.questionAnswered = false;
-                                    Game.Debug.log('state', '✅ [C6-選項選擇] 錯誤提示完成，可以重新選擇');
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                } else {
+                    // 反復作答：精簡語音，允許重新選擇
+                    this.speech.speak('不對喔，請再試一次', {
+                        callback: () => {
+                            selectedOption.classList.remove('incorrect-selected', 'clicked');
+                            this.state.gameState.questionAnswered = false;
+                            Game.Debug.log('state', '✅ [C6-選項選擇] 錯誤提示完成，可以重新選擇');
+                        }
+                    });
+                }
             }
         },
 

@@ -14085,7 +14085,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 重播付款提示語音
         replayPaymentHintSpeech() {
-            this.playSound('click');
+            try { this.menuSelectAudio?.play().catch(() => {}); } catch(e) {}
             if (this._lastPaymentHintSpeech) {
                 this.speech.speak(this._lastPaymentHintSpeech, { interrupt: true });
             }
@@ -14093,7 +14093,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 確認付款提示彈窗，套用視覺勾勾提示
         confirmPaymentHint() {
-            this.playSound('click');
+            try { this.menuSelectAudio?.play().catch(() => {}); } catch(e) {}
             const modal = document.getElementById('a4PaymentHintModal');
             if (modal) modal.remove();
             if (this._lastOptimalPaymentA4 && this._lastOptimalPaymentA4.length > 0) {

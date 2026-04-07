@@ -1775,27 +1775,35 @@ a.selection-btn {
 }
 
 .step-hint::after {
-    content: '👆 點這裡' !important;
+    content: '👇 點這裡' !important;
     position: absolute !important;
-    bottom: -40px !important;
+    top: -54px !important;
+    bottom: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
+    background: linear-gradient(135deg, #F58025 0%, #FFa040 100%) !important;
     padding: 8px 16px !important;
-    border-radius: 20px !important;
-    color: white;
+    border-radius: 25px !important;
+    border: none !important;
+    color: white !important;
     font-weight: bold !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 4px 15px rgba(245, 128, 37, 0.6), 0 0 20px rgba(245, 128, 37, 0.4) !important;
     animation: bounceHint 1s ease-in-out infinite !important;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 9999;
+}
+
+@keyframes bounceHint {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(-5px); }
 }
 
 /* 車種卡片提示特殊處理 */
 .train-type-card.step-hint::after {
-    bottom: -45px;
+    top: -54px;
+    bottom: auto;
 }
 
 /* 票數顯示提示特殊處理 */
@@ -1806,7 +1814,8 @@ a.selection-btn {
 
 .count-display.step-hint::after {
     content: '這是正確的張數' !important;
-    bottom: -45px;
+    top: -54px;
+    bottom: auto;
 }
 
 /* ========================================

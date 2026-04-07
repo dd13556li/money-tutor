@@ -7512,12 +7512,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const imagePath = this.getRandomMoneyImage(moneyData);
                     this.state.gameState.currentTransaction.paidMoney.push({ index, value, imagePath });
 
-                    // 🎙️ 播放語音：累計已付金額
-                    const totalPaid = this.state.gameState.currentTransaction.amountPaid;
-                    const difficulty = this.state.settings.difficulty;
-                    const isNormalOrHard = difficulty === 'normal' || difficulty === 'hard';
-                    this.Speech.speak(`你付了${this.convertAmountToSpeech(totalPaid)}`);
-
                     // 清空並重新渲染付款區
                     paymentArea.innerHTML = '';
 
@@ -7541,6 +7535,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 🆕 更新按鈕文本
                     this.updatePaymentButton();
                     this.updateWalletTotalDisplay();
+
+                    // 🎙️ 播放語音：累計已付金額（困難模式未按提示前不播，讓學生自判）
+                    const totalPaid = this.state.gameState.currentTransaction.amountPaid;
+                    if (this.state.settings.difficulty !== 'hard' || this._showPaidAmount) {
+                        this.TimerManager.setTimeout(() => {
+                            this.Speech.speak(`你付了${this.convertAmountToSpeech(totalPaid)}`);
+                        }, 50, 'paymentSpeech');
+                    }
                 }
             }, {}, 'paymentDrag');
 
@@ -7722,11 +7724,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const imagePath = this.getRandomMoneyImage(moneyData);
                                 this.state.gameState.currentTransaction.paidMoney.push({ index, value, imagePath });
 
-                                // 🎙️ 播放語音：累計已付金額
-                                const totalPaidT2 = this.state.gameState.currentTransaction.amountPaid;
-                                const difficulty = this.state.settings.difficulty;
-                                this.Speech.speak(`你付了${this.convertAmountToSpeech(totalPaidT2)}`);
-
                                 // 重新渲染付款區
                                 this.renderPaymentMoney(paymentArea, this.state.gameState.currentTransaction.paidMoney);
 
@@ -7738,6 +7735,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // 🆕 更新按鈕文本
                                 this.updatePaymentButton();
                                 this.updateWalletTotalDisplay();
+
+                                // 🎙️ 播放語音：累計已付金額（困難模式未按提示前不播）
+                                const totalPaidT2 = this.state.gameState.currentTransaction.amountPaid;
+                                if (this.state.settings.difficulty !== 'hard' || this._showPaidAmount) {
+                                    this.TimerManager.setTimeout(() => {
+                                        this.Speech.speak(`你付了${this.convertAmountToSpeech(totalPaidT2)}`);
+                                    }, 50, 'paymentSpeech');
+                                }
                             }
                         },
                         onDragEnd: (element, event) => {
