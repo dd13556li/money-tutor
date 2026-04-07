@@ -3106,19 +3106,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!q) return;
 
             if (diff === 'easy') {
-                const btn = document.querySelector(`.b2-choice-btn[data-val="${q.answer}"]`);
-                if (!btn) return;
-                this._queue = [{ el: btn, action: () => btn.click() }];
-            } else {
-                // Normal / Hard：逐位數輸入 → 確認
+                // Easy：依序點擊各事件的金幣按鈕
+                const coins = Array.from(document.querySelectorAll('.b2-coin-clickable:not(.b2-coin-clicked):not(:disabled)'));
+                this._queue = coins.map(btn => ({ el: btn, action: () => btn.click() }));
+            } else if (diff === 'normal') {
+                // Normal：點擊各輸入框 → 正確選項 → 總計輸入框 → 正確選項
                 const steps = [];
-                const digits = String(q.answer).split('');
-                for (const d of digits) {
-                    const btn = document.querySelector(`.b2-numpad-btn[data-digit="${d}"]`);
-                    if (btn) steps.push({ el: btn, action: () => btn.click() });
-                }
-                const okBtn = document.querySelector('.b2-numpad-btn[data-action="ok"]');
-                if (okBtn) steps.push({ el: okBtn, action: () => okBtn.click() });
+                const effEvents = Game._getEffectiveEvents ? Game._getEffectiveEvents(q) : q.events;
+                const effAnswer = Game._getEffectiveAnswer ? Game._getEffectiveAnswer(q) : (q.answer || 0);
+
+                const addInputStep = (inputId, correctVal) => {
+                    const input = document.getElementById(inputId);
+                    if (!input || input.classList.contains('b2-input-correct')) return;
+                    steps.push({ el: input, action: () => {
+                        input.click();
+                        Game.TimerManager.setTimeout(() => {
+                            const btn = document.querySelector(`.b2-nchoice-btn[data-val="${correctVal}"]`);
+                            if (btn) btn.click();
+                        }, 200, 'ui');
+                    }});
+                };
+
+                (effEvents || q.events).forEach((e, i) => addInputStep(`b2-cost-input-${i}`, e.amount));
+                addInputStep('b2-total-input', effAnswer);
+                this._queue = steps;
+            } else {
+                // Hard：點擊輸入框（啟動） → 逐位數 → 確認，循環所有輸入框
+                const steps = [];
+                const effEvents = Game._getEffectiveEvents ? Game._getEffectiveEvents(q) : q.events;
+                const effAnswer = Game._getEffectiveAnswer ? Game._getEffectiveAnswer(q) : (q.answer || 0);
+
+                const addHardInputStep = (inputId, correctVal) => {
+                    const input = document.getElementById(inputId);
+                    if (!input || input.classList.contains('b2-input-correct')) return;
+                    steps.push({ el: input, action: () => {
+                        input.click();
+                        const digits = String(correctVal).split('');
+                        let delay = 150;
+                        digits.forEach(d => {
+                            Game.TimerManager.setTimeout(() => {
+                                document.querySelector(`.b2-ht-digit[data-digit="${d}"]`)?.click();
+                            }, delay, 'ui');
+                            delay += 120;
+                        });
+                        Game.TimerManager.setTimeout(() => {
+                            document.getElementById('b2-ht-confirm')?.click();
+                        }, delay + 100, 'ui');
+                    }});
+                };
+
+                (effEvents || q.events).forEach((e, i) => addHardInputStep(`b2-cost-input-${i}`, e.amount));
+                addHardInputStep('b2-total-input', effAnswer);
                 this._queue = steps;
             }
 
