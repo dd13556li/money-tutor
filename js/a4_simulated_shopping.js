@@ -14013,19 +14013,94 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Debug.log('hint', '💡 [提示] 最佳付款方案面額:', optimalPayment);
             const speechText = this.generateOptimalPaymentSpeech(optimalPayment);
 
-            // 立即播放語音提示
-            this.speech.speak(speechText, { interrupt: true });
+            // 儲存提示資料供確認按鈕使用
+            this._lastPaymentHintSpeech = speechText;
+            this._lastOptimalPaymentA4 = optimalPayment;
 
-            // 同時顯示綠色勾勾動畫（不等待語音播放完畢）
+            // 建立提示清單 HTML（含金錢圖片）
+            let hintListHTML = '';
             if (optimalPayment && optimalPayment.length > 0) {
-                const moneyObjectsToHighlight = optimalPayment.map(val => ({ value: val }));
-                this.showWalletHintWithTicks(moneyObjectsToHighlight);
+                const valueCounts = {};
+                optimalPayment.forEach(val => { valueCounts[val] = (valueCounts[val] || 0) + 1; });
+                const sortedValues = Object.keys(valueCounts).map(Number).sort((a, b) => b - a);
+                sortedValues.forEach(val => {
+                    const cnt = valueCounts[val];
+                    const moneyData = this.storeData.moneyItems.find(m => m.value === val);
+                    const imgSrc = moneyData ? moneyData.images.front : '';
+                    const isCoin = val < 100;
+                    const imgStyle = isCoin
+                        ? 'width:50px;height:50px;object-fit:contain;'
+                        : 'width:80px;height:auto;max-height:50px;object-fit:contain;';
+                    hintListHTML += `
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#f9f9f9;border-radius:10px;border:1px solid #eee;">
+                            ${imgSrc ? `<img src="${imgSrc}" alt="${val}元" style="${imgStyle}">` : ''}
+                            <span style="font-size:20px;font-weight:bold;color:#333;">${val}元</span>
+                            <span style="color:#999;font-size:16px;">×</span>
+                            <span style="font-size:20px;font-weight:bold;color:#e65100;">${cnt} 張</span>
+                        </div>`;
+                });
             }
+
+            // 顯示提示彈窗
+            const existingModal = document.getElementById('a4PaymentHintModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHTML = `
+                <div id="a4PaymentHintModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:10050;">
+                    <div style="background:linear-gradient(135deg,#fff 0%,#f8f9fa 100%);border-radius:20px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:3px solid #FF9800;">
+                        <div style="background:linear-gradient(135deg,#FF9800 0%,#FFb040 100%);padding:20px 30px;display:flex;align-items:center;justify-content:center;gap:12px;color:white;">
+                            <span style="font-size:40px;line-height:1;">💡</span>
+                            <h2 style="margin:0;font-size:22px;font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,0.2);">付款提示</h2>
+                        </div>
+                        <div style="padding:24px 30px;">
+                            <p style="font-size:16px;color:#555;margin-bottom:16px;font-weight:500;text-align:center;">建議的付款方式：</p>
+                            ${hintListHTML}
+                        </div>
+                        <div style="padding:0 30px 24px;display:flex;gap:10px;justify-content:center;">
+                            <button onclick="Game.replayPaymentHintSpeech()"
+                                style="background:linear-gradient(135deg,#4caf50,#45a049);border:none;color:white;padding:8px 18px;border-radius:25px;cursor:pointer;font-size:16px;display:flex;align-items:center;gap:6px;">
+                                🔊 再播一次
+                            </button>
+                            <button onclick="Game.confirmPaymentHint()"
+                                style="background:linear-gradient(135deg,#FF9800,#e65100);border:none;color:white;padding:8px 22px;border-radius:25px;cursor:pointer;font-size:16px;font-weight:bold;">
+                                我知道了
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            // 播放語音提示
+            this.speech.speak(speechText, { interrupt: true });
 
             // 500ms 後解除處理狀態，允許再次點擊
             this.TimerManager.setTimeout(() => {
                 this.state.gameState.isProcessingHint = false;
             }, 500, 'uiAnimation');
+
+            Game.Debug.log('hint', '💡 [付款提示] 彈窗已顯示，語音:', speechText);
+        },
+
+        // 重播付款提示語音
+        replayPaymentHintSpeech() {
+            this.playSound('click');
+            if (this._lastPaymentHintSpeech) {
+                this.speech.speak(this._lastPaymentHintSpeech, { interrupt: true });
+            }
+        },
+
+        // 確認付款提示彈窗，套用視覺勾勾提示
+        confirmPaymentHint() {
+            this.playSound('click');
+            const modal = document.getElementById('a4PaymentHintModal');
+            if (modal) modal.remove();
+            if (this._lastOptimalPaymentA4 && this._lastOptimalPaymentA4.length > 0) {
+                const moneyObjectsToHighlight = this._lastOptimalPaymentA4.map(val => ({ value: val }));
+                this.showWalletHintWithTicks(moneyObjectsToHighlight);
+            }
+            this.state.gameState.isProcessingHint = false;
         },
 
         showChangeCalculationHint() {
