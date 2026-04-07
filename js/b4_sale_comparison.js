@@ -102,6 +102,23 @@ const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertT
 
 // ── 金錢圖示渲染（貪婪分解，每枚各顯示一張圖）────────────────
 const B4_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+// 較小圖示版（用於差額頁價格條，配合 flex-wrap:nowrap）
+function b4PriceCoinsBar(price) {
+    let rem = price;
+    const coins = [];
+    for (const d of B4_DENOMS) {
+        const n = Math.floor(rem / d);
+        for (let i = 0; i < n; i++) coins.push(d);
+        rem -= d * n;
+    }
+    return coins.map(d => {
+        const isBill = d >= 100;
+        const w  = isBill ? '60px' : '44px';
+        const h  = isBill ? 'auto' : '44px';
+        const br = isBill ? '4px'  : '50%';
+        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:${h};border-radius:${br};flex-shrink:0;" draggable="false" onerror="this.style.display='none'">`;
+    }).join('');
+}
 function b4PriceCoins(price) {
     let rem = price;
     const coins = [];
@@ -1508,12 +1525,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const pct = Math.round(s.price / maxP * 100);
                     const colorClass = s.price === maxP ? 'b4-pbar-high' : s.price === curr.sortedAsc[0].price ? 'b4-pbar-low' : 'b4-pbar-mid';
                     return `<div class="b4-pbar-row">
-                        <span class="b4-pbar-label">${s.storeIcon} ${s.store}</span>
-                        <div class="b4-pbar-track"><div class="b4-pbar-fill ${colorClass}" style="width:${pct}%"></div></div>
-                        <div class="b4-pbar-price-col">
-                            <span class="b4-pbar-price">${s.price} 元</span>
-                            <div class="b4-pbar-coins">${b4PriceCoins(s.price)}</div>
+                        <div class="b4-pbar-store-hd">
+                            <span class="b4-pbar-store-icon-lg">${s.storeIcon}</span>
+                            <span class="b4-pbar-store-name-lg">${s.store}</span>
                         </div>
+                        <div class="b4-pbar-money-row">
+                            <div class="b4-pbar-coins">${b4PriceCoinsBar(s.price)}</div>
+                            <span class="b4-pbar-price">${s.price} 元</span>
+                        </div>
+                        <div class="b4-pbar-track"><div class="b4-pbar-fill ${colorClass}" style="width:${pct}%"></div></div>
                     </div>`;
                 }).join('')}
             </div>`;
@@ -1689,26 +1709,25 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 視覺價差比例條（F5 量比較 pattern）─────────────────────
         _renderPriceBars(curr) {
             if (curr.isUnit) {
-                // 單位比價模式：用每單位價格畫比例條
+                // 單位比價模式：用每單位價格畫比例條（無金幣圖示）
                 const maxP = Math.max(curr.perA, curr.perB);
                 const pctA = Math.round(curr.perA / maxP * 100);
                 const pctB = Math.round(curr.perB / maxP * 100);
+                const mkUnitRow = (opt, per, pct, cls) => `
+                <div class="b4-pbar-row">
+                    <div class="b4-pbar-store-hd">
+                        <span class="b4-pbar-store-icon-lg">${opt.storeIcon}</span>
+                        <span class="b4-pbar-store-name-lg">${opt.store}</span>
+                        <span class="b4-pbar-price b4-pbar-unit-price">${per} 元/${curr.unit}</span>
+                    </div>
+                    <div class="b4-pbar-track">
+                        <div class="b4-pbar-fill ${cls}" style="width:${pct}%"></div>
+                    </div>
+                </div>`;
                 return `
                 <div class="b4-price-bars">
-                    <div class="b4-pbar-row">
-                        <span class="b4-pbar-label">${curr.optA.storeIcon} ${curr.optA.store}</span>
-                        <div class="b4-pbar-track">
-                            <div class="b4-pbar-fill b4-pbar-high" style="width:${pctA}%"></div>
-                        </div>
-                        <span class="b4-pbar-price">${curr.perA} 元/${curr.unit}</span>
-                    </div>
-                    <div class="b4-pbar-row">
-                        <span class="b4-pbar-label">${curr.optB.storeIcon} ${curr.optB.store}</span>
-                        <div class="b4-pbar-track">
-                            <div class="b4-pbar-fill b4-pbar-low" style="width:${pctB}%"></div>
-                        </div>
-                        <span class="b4-pbar-price">${curr.perB} 元/${curr.unit}</span>
-                    </div>
+                    ${mkUnitRow(curr.optA, curr.perA, pctA, 'b4-pbar-high')}
+                    ${mkUnitRow(curr.optB, curr.perB, pctB, 'b4-pbar-low')}
                 </div>`;
             }
             const maxP = Math.max(curr.optA.price, curr.optB.price);
@@ -1716,28 +1735,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const pctB = Math.round(curr.optB.price / maxP * 100);
             // 加上差距百分比標籤（Round 36）
             const diffPct = maxP > 0 ? Math.round((maxP - Math.min(curr.optA.price, curr.optB.price)) / maxP * 100) : 0;
+            const mkRow = (opt, pct, cls) => `
+            <div class="b4-pbar-row">
+                <div class="b4-pbar-store-hd">
+                    <span class="b4-pbar-store-icon-lg">${opt.storeIcon}</span>
+                    <span class="b4-pbar-store-name-lg">${opt.store}</span>
+                </div>
+                <div class="b4-pbar-money-row">
+                    <div class="b4-pbar-coins">${b4PriceCoinsBar(opt.price)}</div>
+                    <span class="b4-pbar-price">${opt.price} 元</span>
+                </div>
+                <div class="b4-pbar-track">
+                    <div class="b4-pbar-fill ${cls}" style="width:${pct}%"></div>
+                </div>
+            </div>`;
             return `
             <div class="b4-price-bars">
-                <div class="b4-pbar-row">
-                    <span class="b4-pbar-label">${curr.optA.storeIcon} ${curr.optA.store}</span>
-                    <div class="b4-pbar-track">
-                        <div class="b4-pbar-fill b4-pbar-high" style="width:${pctA}%"></div>
-                    </div>
-                    <div class="b4-pbar-price-col">
-                        <span class="b4-pbar-price">${curr.optA.price} 元</span>
-                        <div class="b4-pbar-coins">${b4PriceCoins(curr.optA.price)}</div>
-                    </div>
-                </div>
-                <div class="b4-pbar-row">
-                    <span class="b4-pbar-label">${curr.optB.storeIcon} ${curr.optB.store}</span>
-                    <div class="b4-pbar-track">
-                        <div class="b4-pbar-fill b4-pbar-low" style="width:${pctB}%"></div>
-                    </div>
-                    <div class="b4-pbar-price-col">
-                        <span class="b4-pbar-price">${curr.optB.price} 元</span>
-                        <div class="b4-pbar-coins">${b4PriceCoins(curr.optB.price)}</div>
-                    </div>
-                </div>
+                ${mkRow(curr.optA, pctA, 'b4-pbar-high')}
+                ${mkRow(curr.optB, pctB, 'b4-pbar-low')}
                 ${diffPct > 0 ? `<div class="b4-pbar-diff-pct">便宜了 ${diffPct}%</div>` : ''}
             </div>`;
         },
