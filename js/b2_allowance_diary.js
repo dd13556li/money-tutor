@@ -989,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
                 </div>
             </div>
-            <div class="${isNormalOrHard ? 'b-game-wrap' : 'game-container'}">
+            <div class="b-game-wrap">
                 ${isNormalOrHard ? '' : `
                 <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
                 <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>`}
