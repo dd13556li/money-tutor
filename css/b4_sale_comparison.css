@@ -290,6 +290,55 @@
     margin-bottom: 14px;
 }
 
+/* 差額算式提示表格 */
+.b4-diff-formula {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 4px 8px;
+    margin: 0 auto 16px;
+    max-width: 480px;
+    text-align: center;
+    background: #fefce8;
+    border: 1.5px solid #fde68a;
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+.b4-dff-hd {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.b4-dff-op-hd { /* empty header placeholder */ }
+.b4-dff-result-hd {
+    font-size: 13px;
+    color: #0369a1;
+    font-weight: 700;
+}
+.b4-dff-op {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.b4-dff-price {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+.b4-dff-exp { color: #dc2626; }
+.b4-dff-cheap { color: #059669; }
+.b4-dff-diff { color: #0369a1; }
+
 .b4-diff-sub {
     font-size: 14px;
     color: #6b7280;

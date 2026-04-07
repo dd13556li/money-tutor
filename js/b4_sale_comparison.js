@@ -119,6 +119,23 @@ function b4PriceCoinsBar(price) {
         return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:${h};border-radius:${br};flex-shrink:0;" draggable="false" onerror="this.style.display='none'">`;
     }).join('');
 }
+// 差額算式提示表格：[貴商店] - [便宜商店] = [差額]
+function b4DiffFormula(expStore, expPrice, cheapStore, cheapPrice, diff, unit) {
+    const u = unit || '元';
+    return `
+    <div class="b4-diff-formula">
+        <div class="b4-dff-hd">${expStore}</div>
+        <div class="b4-dff-op-hd"></div>
+        <div class="b4-dff-hd">${cheapStore}</div>
+        <div class="b4-dff-op-hd"></div>
+        <div class="b4-dff-hd b4-dff-result-hd">便宜</div>
+        <div class="b4-dff-price b4-dff-exp">${expPrice} ${u}</div>
+        <div class="b4-dff-op">－</div>
+        <div class="b4-dff-price b4-dff-cheap">${cheapPrice} ${u}</div>
+        <div class="b4-dff-op">＝</div>
+        <div class="b4-dff-price b4-dff-diff">${diff} ${u}</div>
+    </div>`;
+}
 function b4PriceCoins(price) {
     let rem = price;
     const coins = [];
@@ -1519,6 +1536,12 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.removeByCategory('gameUI');
 
             const correctDiff = curr.diff;
+            const tripleExpOpt   = curr.sortedAsc[2];
+            const tripleCheapOpt = curr.sortedAsc[0];
+            const formulaHTML = b4DiffFormula(
+                `${tripleExpOpt.storeIcon} ${tripleExpOpt.store}`, tripleExpOpt.price,
+                `${tripleCheapOpt.storeIcon} ${tripleCheapOpt.store}`, tripleCheapOpt.price,
+                correctDiff);
             const maxP = curr.sortedAsc[2].price;
             const barsHTML = `
             <div class="b4-price-bars">
@@ -1623,6 +1646,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         最貴比最便宜貴多少元？
                         <div class="b4-diff-sub">點選正確的差額（最貴 − 最便宜）</div>
                     </div>
+                    ${formulaHTML}
                     <div class="b4-diff-options">
                         ${options.map(val => `
                         <button class="b4-diff-opt" data-val="${val}">
@@ -1773,6 +1797,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const cheapOpt = curr.isUnit ? curr.optB : (curr.optA.price < curr.optB.price ? curr.optA : curr.optB);
             const expOpt   = curr.isUnit ? curr.optA : (curr.optA.price >= curr.optB.price ? curr.optA : curr.optB);
+            const formulaHTML = curr.isUnit
+                ? b4DiffFormula(`${curr.optA.storeIcon} ${curr.optA.store}`, curr.perA, `${curr.optB.storeIcon} ${curr.optB.store}`, curr.perB, correctDiff, `元/${curr.unit}`)
+                : b4DiffFormula(`${expOpt.storeIcon} ${expOpt.store}`, expOpt.price, `${cheapOpt.storeIcon} ${cheapOpt.store}`, cheapOpt.price, correctDiff);
 
             const refCardHTML = `
             <div class="b4-ref-card-wrap">
@@ -1857,6 +1884,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${diffQuestion}
                             <div class="b4-diff-sub">點選正確的差額</div>
                         </div>
+                        ${formulaHTML}
                         <div class="b4-diff-options">
                             ${options.map(val => `
                             <button class="b4-diff-opt" data-val="${val}">
@@ -1897,6 +1925,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${diffQuestion}
                                 <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
                             </div>
+                            ${formulaHTML}
                             <div class="b4-input-display" id="numpad-display">
                                 <span id="numpad-val">0</span><span class="b4-unit-text"> ${diffUnit}</span>
                             </div>
