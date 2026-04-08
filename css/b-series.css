@@ -570,7 +570,12 @@
 }
 
 /* ── Animations ─────────────────────────────────────────────────── */
-@keyframes bResCelebrate { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes bResCelebrate {
+    0%   { opacity:0; transform: scale(0.4) rotate(-180deg); }
+    60%  { opacity:1; transform: scale(1.05) rotate(4deg); }
+    80%  { transform: scale(0.97) rotate(-2deg); }
+    100% { opacity:1; transform: scale(1) rotate(0deg); }
+}
 @keyframes bResBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 @keyframes bResGlow { 0%,100%{box-shadow:0 4px 15px rgba(0,0,0,0.2)} 50%{box-shadow:0 4px 25px rgba(243,156,18,0.6)} }
 

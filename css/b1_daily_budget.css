@@ -14,40 +14,42 @@
     animation: bFadeIn 0.4s ease;
 }
 
-/* ── 行程卡標題列（圖片左 + 文字右）─────────────────────────── */
+/* ── 行程卡標題列（圖片左置頂、文字右垂直置中）──────────── */
+.b1-schedule-card { position: relative; }   /* 讓提示按鈕可絕對定位 */
 .b1-sch-hdr {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    align-items: stretch;
+    gap: 14px;
     margin-bottom: 14px;
 }
+/* 圖片欄：靠上 + 水平置中 */
 .b1-sch-hdr-img {
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 }
+/* 文字欄：垂直置中（相對圖片高度） */
 .b1-sch-hdr-text {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 6px;
 }
 .b1-sch-hdr-row1 {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
 }
 .b1-sch-hdr-row2 {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
 }
 .b1-sch-hdr-subtitle {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
     color: #1f2937;
     line-height: 1.2;
@@ -157,6 +159,17 @@
     white-space: nowrap;
     align-self: start;
     text-align: right;
+    transition: color 0.3s;
+}
+/* 簡單模式：金額揭露後變綠並放大一下 */
+.b1-item-cost-revealed {
+    color: #16a34a !important;
+    animation: b1CostReveal 0.4s ease;
+}
+@keyframes b1CostReveal {
+    0%   { transform: scale(1);    }
+    50%  { transform: scale(1.25); }
+    100% { transform: scale(1);    }
 }
 
 /* 行程卡底部總計列 */
@@ -321,11 +334,15 @@
     margin-top: 8px;
 }
 
-/* ── 行程卡提示按鈕包裹（在右欄 flex-column 內靠右上）────────── */
+/* ── 行程卡提示按鈕（絕對定位於卡片右上角）────────────────── */
 .b1-schedule-hint-wrap {
+    position: absolute;
+    top: 14px;
+    right: 14px;
     display: flex;
     align-items: center;
     gap: 6px;
+    z-index: 2;
 }
 
 /* 吉祥物圖示（對齊 A1 48px + settingsBounce）*/
@@ -813,9 +830,7 @@
 @media (max-width: 480px) {
     .b1-schedule-icon { font-size: 40px; }
     .b1-schedule-label { font-size: 18px; }
-    .b1-sch-hdr-subtitle { font-size: 18px; }
-    .b1-sch-hdr { gap: 8px; }
-    .b1-sch-hdr-subtitle { font-size: 18px; }
+    .b1-sch-hdr-subtitle { font-size: 16px; }
     .b1-scene-img-lg { width: 80px; height: 80px; }
     .b1-total-amount { font-size: 22px; }
     .b1-wallet-total-amount { font-size: 20px; }
@@ -837,29 +852,170 @@
 /* ── 開題任務說明彈窗 (C4 instruction modal pattern) ─────────── */
 .b1-task-modal {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.5);
     z-index: 9000;
     display: flex; align-items: center; justify-content: center;
     animation: bFadeIn 0.2s ease;
 }
 .b1-task-modal-inner {
     background: #fff;
-    border-radius: 20px;
-    padding: 32px 40px;
+    border-radius: 24px;
+    padding: 28px 40px 32px;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
-    min-width: 220px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+    min-width: 300px;
+    max-width: 420px;
+    width: 90vw;
 }
-.b1-task-modal-icon { font-size: 3.5rem; margin-bottom: 6px; }
+.b1-task-modal-title {
+    font-size: 1.1rem; font-weight: 700; color: #1e40af;
+    margin-bottom: 4px;
+}
+.b1-task-modal-meta {
+    font-size: 0.85rem; color: #64748b;
+    background: #f1f5f9; border-radius: 20px;
+    display: inline-block; padding: 2px 12px;
+    margin-bottom: 14px;
+}
+.b1-task-modal-icon { font-size: 6rem; margin-bottom: 6px; line-height: 1; }
 .b1-task-modal-dest {
     font-size: 1rem; color: #64748b; margin-bottom: 4px;
 }
 .b1-task-modal-label {
     font-size: 2rem; font-weight: bold;
-    color: #f59e0b; margin: 4px 0 12px;
+    color: #f59e0b; margin: 4px 0 10px;
+}
+.b1-task-modal-items {
+    font-size: 0.9rem; color: #475569;
+    background: #fef9c3; border-radius: 10px;
+    padding: 6px 14px; margin-bottom: 12px;
+    display: inline-block;
 }
 .b1-task-modal-tap {
     font-size: 13px; color: #94a3b8; margin-top: 8px;
+}
+
+/* ── 逐項揭露（Easy 模式）──────────────────────────── */
+.b1-item-seq-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+.b1-item-seq-reveal {
+    animation: b1ItemReveal 0.4s ease both;
+}
+@keyframes b1ItemReveal {
+    from { opacity: 0; transform: translateY(-10px); max-height: 0; }
+    to   { opacity: 1; transform: translateY(0);     max-height: 200px; }
+}
+
+/* ── 項目金額按鈕（Normal/Hard 模式）──────────────── */
+.b1-item-box-btn {
+    font-size: 1.2rem; font-weight: 700;
+    background: #fef3c7; color: #92400e;
+    border: 2.5px solid #f59e0b; border-radius: 12px;
+    padding: 8px 22px; cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+    margin-left: auto;
+    display: inline-block;
+}
+.b1-item-box-btn:hover { background: #fde68a; transform: scale(1.04); }
+.b1-item-box-btn.b1-item-cost-revealed {
+    background: #d1fae5; color: #065f46;
+    border-color: #10b981; cursor: default;
+}
+
+/* ── 3選1 中央彈窗（Normal 模式）─────────────────── */
+.b1-nchoice-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 10500;
+    display: flex; align-items: center; justify-content: center;
+}
+.b1-nchoice-modal {
+    background: #fff; border-radius: 20px;
+    padding: 28px 32px; text-align: center;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.25);
+    min-width: 280px; max-width: 380px; width: 90vw;
+}
+.b1-nchoice-title {
+    font-size: 1.15rem; font-weight: 700; color: #1e40af;
+    margin-bottom: 20px;
+}
+.b1-nchoice-btns {
+    display: flex; flex-direction: column; gap: 12px;
+}
+.b1-nchoice-btn {
+    font-size: 1.3rem; font-weight: 700;
+    background: #eff6ff; color: #1d4ed8;
+    border: 2px solid #93c5fd; border-radius: 14px;
+    padding: 14px 24px; cursor: pointer;
+    display: block; width: 100%; text-align: center;
+    transition: background 0.15s, transform 0.12s;
+}
+.b1-nchoice-btn:hover { background: #dbeafe; transform: scale(1.02); }
+.b1-nchoice-btn.b1-nchoice-wrong {
+    background: #fee2e2; border-color: #f87171;
+    animation: b1ShakeX 0.35s;
+}
+@keyframes b1ShakeX {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+.b1-nchoice-icons { font-size: 0.75rem; }
+
+/* ── 中央數字鍵盤彈窗（Hard 模式）──────────────────── */
+.b1-ht-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 10500;
+    display: flex; align-items: center; justify-content: center;
+}
+.b1-ht-modal {
+    background: #fff; border-radius: 20px;
+    padding: 24px 28px; text-align: center;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.25);
+    min-width: 280px; max-width: 340px; width: 90vw;
+}
+.b1-ht-modal-title {
+    font-size: 1.1rem; font-weight: 700; color: #78350f;
+    margin-bottom: 14px;
+}
+.b1-ht-modal-display {
+    font-size: 2rem; font-weight: 800; color: #92400e;
+    background: #fef3c7; border: 2px solid #f59e0b;
+    border-radius: 12px; padding: 10px 20px;
+    min-width: 120px; margin: 0 auto 16px;
+    letter-spacing: 2px;
+}
+.b1-ht-modal-numpad {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 10px;
+}
+.b1-ht-modal-key {
+    font-size: 1.3rem; font-weight: 700;
+    background: #fffbeb; color: #78350f;
+    border: 2px solid #fcd34d; border-radius: 10px;
+    padding: 12px; cursor: pointer;
+    transition: background 0.12s, transform 0.1s;
+}
+.b1-ht-modal-key:hover { background: #fde68a; transform: scale(1.05); }
+.b1-ht-modal-back { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+.b1-ht-modal-ok {
+    background: #d1fae5; color: #065f46;
+    border-color: #6ee7b7; font-size: 1.4rem;
+}
+.b1-ht-modal-ok:hover { background: #a7f3d0; }
+.b1-ht-modal-error {
+    font-size: 0.9rem; color: #dc2626;
+    margin-top: 6px; min-height: 20px;
 }
 
 /* ── 面額使用統計（完成畫面）───────────────────────── */
@@ -904,22 +1060,39 @@
     font-size: 15px;
     color: #1e40af;
 }
-.b1-schedule-rows { display: flex; flex-direction: column; gap: 7px; }
+.b1-schedule-rows { display: flex; flex-direction: column; gap: 12px; }
 .b1-schedule-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
+    padding: 12px 14px;
     background: #fff;
     border: 1.5px solid #bfdbfe;
-    border-radius: 10px;
+    border-radius: 14px;
     font-size: 13px;
-    flex-wrap: wrap;
 }
-.b1-sch-icon   { font-size: 22px; flex-shrink: 0; }
-.b1-sch-label  { font-weight: bold; color: #1e3a8a; min-width: 70px; }
-.b1-sch-items  { flex: 1; color: #4b5563; font-size: 12px; }
-.b1-sch-total  { font-weight: bold; color: #d97706; white-space: nowrap; }
+/* 圖片左置頂＋水平置中，文字右垂直置中（page 3）*/
+.b1-sch-row-v {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+.b1-sch-icon-center {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: 48px;
+    line-height: 1;
+}
+.b1-sch-icon-center .b1-scene-img { height: 128px; width: 128px; object-fit: contain; border-radius: 12px; display: block; }
+.b1-sch-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.b1-sch-label  { font-weight: bold; color: #1e3a8a; font-size: 15px; }
+/* 條列式費用（Change 8）*/
+.b1-sch-items-list { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.b1-sch-item-row  { font-size: 13px; color: #374151; padding: 2px 0; }
+.b1-sch-item-total {
+    font-size: 14px; font-weight: 700; color: #d97706;
+    margin-top: 4px; padding-top: 4px;
+    border-top: 1px dashed #fed7aa;
+}
 
 /* ── B1 Exact Match Toast (Round 24) ── */
 .b1-exact-toast {
@@ -1274,39 +1447,45 @@
     box-shadow: 0 2px 8px rgba(245,158,11,0.15);
     gap: 8px;
 }
-.b1-pr-top-row {
+/* 圖片左置頂＋水平置中，文字右垂直置中 */
+.b1-pr-hdr {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: stretch;
+    gap: 14px;
 }
-.b1-pr-icon { font-size: 30px; flex-shrink: 0; }
-.b1-pr-info {
+.b1-pr-text {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    justify-content: center;
+    gap: 4px;
 }
 .b1-pr-label {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     color: #1f2937;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
-.b1-pr-sub {
-    font-size: 12px;
-    color: #6b7280;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.b1-pr-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.b1-pr-item-row {
+    font-size: 14px;
+    color: #374151;
 }
 .b1-pr-hint-wrap {
     display: flex;
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
+}
+/* Phase 2 提示按鈕：絕對定位於卡片右上角 */
+.b1-pr-hint-abs {
+    position: absolute;
+    top: 10px;
+    right: 12px;
 }
 .b1-pr-total-row {
     display: flex;
@@ -1587,6 +1766,42 @@
     .b1-mic-mobile  { display: none; }
 }
 
+/* ── 普通/困難模式：行程項目靜態金錢圖示（尺寸同 B2，紙鈔大於硬幣）── */
+.b1-item-icons-static .b1-mic-desktop .b1-mi-bill { max-width: 72px !important; height: auto !important; }
+.b1-item-icons-static .b1-mic-desktop .b1-mi-coin { max-width: 50px !important; max-height: 50px !important; }
+
+/* ── 簡單模式：可點擊金幣 ── */
+.b1-coin-clickable {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s;
+    flex-shrink: 0;
+    position: relative;
+}
+.b1-coin-clickable:hover:not(:disabled) { transform: scale(1.12); }
+.b1-coin-clickable:active:not(:disabled) { transform: scale(0.92); }
+.b1-coin-clickable.b1-coin-clicked {
+    cursor: default;
+    transform: none;
+}
+.b1-coin-clickable.b1-coin-clicked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #16a34a;
+    text-shadow: 0 0 4px #fff, 0 0 8px #fff;
+    line-height: 1;
+}
+
 /* ── 簡單模式：3個選項按鈕 ── */
 .b1-choice-area {
     background: #fff9f0;
@@ -1821,11 +2036,18 @@
     border-radius: 6px;
     display: inline-block;
 }
-/* Phase1 行程卡：128×128 置中 */
-.b1-scene-img-center {
+/* Phase1 行程卡圖片置中 */
+.b1-sch-img-center {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+}
+/* Phase2 ref card 圖片欄：靠上＋水平置中 */
+.b1-scene-img-center {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
 }
 .b1-scene-img-lg {
     width: 128px;
@@ -1836,8 +2058,8 @@
 }
 /* Phase2 參考卡 30px */
 .b1-pr-icon .b1-scene-img { height: 30px; }
-/* 成績頁行程列 22px */
-.b1-sch-icon .b1-scene-img { height: 22px; border-radius: 4px; }
+/* 成績頁行程列圖片同 Phase 2（128×128）*/
+.b1-sch-icon .b1-scene-img { height: 128px; width: 128px; object-fit: contain; border-radius: 12px; }
 /* 任務彈窗 */
 .b1-task-modal-icon .b1-scene-img,
 .b1-task-modal-img {

@@ -8735,6 +8735,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 .money-label { display: block; font-size: 12px; font-weight: bold; color: #333; text-align: center; margin: 4px 0 0 0; }
                 .faded { opacity: 0.4; }
                 .target-active { opacity: 1; }
+                .target-money.target-active {
+                    background: white;
+                    border: 2px solid #4CAF50;
+                    border-radius: 12px;
+                    padding: 2px 2px 6px 2px;
+                    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+                }
                 .checkmark-area { width: 36px; height: 36px; align-self: center; margin-top: 35px; }
                 .checkmark { width: 36px; height: 36px; color: #4CAF50; transition: opacity 0.3s ease; }
                 

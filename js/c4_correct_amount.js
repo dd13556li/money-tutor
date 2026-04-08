@@ -2613,38 +2613,63 @@ document.addEventListener('DOMContentLoaded', () => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    padding: 10px;
+                    padding: 0;
                     border-radius: 12px;
                     transition: all 0.3s ease;
                     flex-shrink: 0;
-                    background: white;
-                    border: 2px solid #4CAF50;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    background: transparent;
+                    border: none;
+                    box-shadow: none;
                     margin: 5px;
-                    min-width: 100px;
                 }
 
                 .hint-item img {
-                    max-width: 70px;
-                    max-height: 50px;
+                    max-width: 154px;
+                    max-height: 110px;
                     object-fit: contain;
                     margin-bottom: 8px;
+                }
+
+                /* 依面額對應我的金錢區圖示大小 */
+                .hint-item[data-value="1000"] img {
+                    max-width: 154px !important;
+                    max-height: 110px !important;
+                }
+                .hint-item[data-value="500"] img {
+                    max-width: 133px !important;
+                    max-height: 95px !important;
+                }
+                .hint-item[data-value="100"] img {
+                    max-width: 126px !important;
+                    max-height: 90px !important;
+                }
+                .hint-item[data-value="50"] img {
+                    max-width: 140px !important;
+                    max-height: 100px !important;
+                }
+                .hint-item[data-value="10"] img {
+                    max-width: 133px !important;
+                    max-height: 95px !important;
+                }
+                .hint-item[data-value="5"] img {
+                    max-width: 126px !important;
+                    max-height: 90px !important;
+                }
+                .hint-item[data-value="1"] img {
+                    max-width: 119px !important;
+                    max-height: 85px !important;
                 }
 
                 /* 淡化狀態 */
                 .hint-item.faded {
                     opacity: 0.4;
                     filter: grayscale(80%);
-                    border: 2px dashed #ccc;
-                    background: transparent;
                 }
 
                 /* 點亮狀態 */
                 .hint-item.lit-up {
                     opacity: 1;
                     filter: none;
-                    background: white;
-                    border: 2px solid #2ecc71;
                     box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
                 }
             `;

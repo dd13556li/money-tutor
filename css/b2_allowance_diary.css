@@ -44,7 +44,13 @@
     align-items: center;
     gap: 8px;
 }
-.b2-start-bottom { /* money icons fill full width */ }
+.b2-start-bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding-left: 2px;
+}
 .b2-start-money-icons {
     display: flex;
     flex-wrap: wrap;
@@ -454,28 +460,44 @@
 .b2-rt-val.b2-rt-up   { color: #059669; }
 .b2-rt-val.b2-rt-down { color: #dc2626; }
 
-/* ── 開題起始金額彈窗（B1 task modal pattern）────────────── */
+
+/* ── 開題整合彈窗（game info + starting amount）──────────── */
 .b2-task-intro-modal {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.5);
     z-index: 9000;
     display: flex; align-items: center; justify-content: center;
-    animation: b2FadeIn 0.2s ease;
+    animation: b2FadeIn 0.22s ease;
 }
 .b2-task-intro-inner {
-    background: #fff;
-    border-radius: 20px;
-    padding: 32px 40px;
+    background: linear-gradient(160deg, #fff, #fefce8);
+    border-radius: 24px;
+    padding: 30px 40px 26px;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
-    min-width: 220px;
+    box-shadow: 0 14px 52px rgba(0,0,0,0.28);
+    min-width: 300px;
+    max-width: 460px;
+    width: 90vw;
+}
+.b2-task-intro-title {
+    font-size: 1.5rem; font-weight: 900; color: #1e293b; margin-bottom: 4px;
+}
+.b2-task-intro-meta {
+    font-size: 0.95rem; color: #6366f1; font-weight: 700; margin-bottom: 4px;
+}
+.b2-task-intro-desc {
+    font-size: 0.88rem; color: #9ca3af; margin-bottom: 12px;
+}
+.b2-task-intro-divider {
+    height: 1px; background: linear-gradient(90deg, transparent, #d1d5db, transparent);
+    margin: 0 0 14px;
 }
 .b2-task-intro-icon  { font-size: 3rem; margin-bottom: 8px; }
 .b2-task-intro-label {
-    font-size: 1rem; color: #6b7280; font-weight: 500; margin-bottom: 4px;
+    font-size: 1.05rem; color: #6b7280; font-weight: 500; margin-bottom: 4px;
 }
 .b2-task-intro-amount {
-    font-size: 2.2rem; font-weight: bold; color: #d97706; margin: 8px 0;
+    font-size: 2.6rem; font-weight: bold; color: #d97706; margin: 8px 0;
 }
 .b2-task-intro-tap   { font-size: 13px; color: #94a3b8; margin-top: 12px; }
 .b2-task-intro-money {
@@ -483,9 +505,9 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 4px;
-    margin: 8px auto 4px;
-    max-width: 300px;
+    gap: 8px;
+    margin: 12px auto 4px;
+    max-width: 400px;
 }
 
 /* ── 動畫 ─────────────────────────────────────────────────── */
@@ -1228,6 +1250,78 @@
 }
 .b2-ht-error.b2-ht-hint { color: #d97706; background: #fef3c7; border-color: #fbbf24; }
 
+/* ── 困難模式：中央數字鍵盤彈窗 ─────────────────────────── */
+.b2-ht-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9600;
+    display: flex; align-items: center; justify-content: center;
+    animation: b2FadeIn 0.18s ease;
+}
+.b2-ht-modal {
+    background: linear-gradient(160deg, #fffbeb, #fff9f0);
+    border: 2.5px solid #f59e0b;
+    border-radius: 22px;
+    padding: 28px 28px 20px;
+    text-align: center;
+    box-shadow: 0 12px 44px rgba(245,158,11,0.22);
+    min-width: 280px;
+    max-width: 340px;
+    width: 88vw;
+}
+.b2-ht-modal-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 14px;
+}
+.b2-ht-modal-display {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #92400e;
+    background: #fef3c7;
+    border: 2.5px solid #f59e0b;
+    border-radius: 12px;
+    padding: 8px 20px;
+    margin: 0 auto 18px;
+    min-width: 140px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+.b2-ht-modal-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.b2-ht-modal-btn {
+    padding: 14px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: #fef9c3;
+    color: #92400e;
+    border: 2px solid #d97706;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+.b2-ht-modal-btn:hover  { background: #fde68a; transform: scale(1.04); }
+.b2-ht-modal-btn:active { transform: scale(0.96); }
+.b2-ht-modal-back {
+    background: #fee2e2; border-color: #fca5a5; color: #dc2626;
+}
+.b2-ht-modal-back:hover { background: #fca5a5; }
+.b2-ht-modal-confirm {
+    background: #d1fae5; color: #065f46; border-color: #6ee7b7;
+    font-size: 1.15rem;
+}
+.b2-ht-modal-confirm:hover { background: #a7f3d0; transform: scale(1.04); }
+.b2-ht-modal-error {
+    font-size: 13px; font-weight: 600; color: #dc2626;
+    background: #fee2e2; border: 1px solid #fca5a5;
+    border-radius: 8px; padding: 6px 12px; margin-top: 4px;
+}
+
 /* ── 日記卡外層包裝（困難模式計算機側欄用）─────────────── */
 .b2-card-outer-wrap { position: relative; }
 .b2-card-outer-wrap .b2-diary { width: 100%; }
@@ -1395,6 +1489,123 @@
     background: #e0f2fe;
     border-radius: 10px;
     padding: 2px 14px;
+}
+
+/* ── Phase 2 簡化版參考卡 ── */
+.b2-ref-card-simple { padding: 10px 16px; }
+.b2-ref-simple-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.b2-ref-simple-row .b2-ref-answer-label { font-size: 16px; }
+.b2-ref-simple-row .b2-ref-answer-val { font-size: 1.6rem; }
+.b2-ref-hint-inline {
+    flex-direction: row !important;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+.b2-ref-hint-inline .b2-ref-hint-mascot { width: 28px; height: 28px; }
+
+/* ── 記帳回顧：每題日記卡片 ── */
+.b2-rc-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+/* ── 記帳回顧：收支明細表格 ─────────────────────────────── */
+.b2-summary-table-wrap {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin: 0 0 16px;
+    border: 1.5px solid #e5e7eb;
+}
+.b2-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.b2-st-th {
+    padding: 11px 14px;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+.b2-st-th.income  { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border-right: 1px solid #e5e7eb; }
+.b2-st-th.expense { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+.b2-summary-table tbody tr:nth-child(even) { background: #f9fafb; }
+.b2-summary-table tbody tr:nth-child(odd)  { background: #ffffff; }
+.b2-st-income-cell,
+.b2-st-expense-cell {
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+.b2-st-income-cell  { border-right: 1px solid #e5e7eb; }
+.b2-st-income-cell,
+.b2-st-expense-cell {
+    display: table-cell;
+}
+td.b2-st-income-cell,
+td.b2-st-expense-cell {
+    display: table-cell;
+    white-space: nowrap;
+}
+.b2-st-icon   { font-size: 1.1rem; margin-right: 4px; }
+.b2-st-name   { color: #374151; font-weight: 600; margin-right: 6px; }
+.b2-st-amt    { font-weight: 800; white-space: nowrap; }
+.b2-st-amt.income  { color: #059669; }
+.b2-st-amt.expense { color: #dc2626; }
+
+.b2-rc-diary-card {
+    background: #f8fafc;
+    border: 1.5px solid #bae6fd;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+.b2-rc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.b2-rc-no { font-weight: 700; color: #0369a1; font-size: 13px; }
+.b2-rc-result-tag {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+.b2-rc-result-tag.correct { background: #dcfce7; color: #16a34a; }
+.b2-rc-result-tag.wrong   { background: #fee2e2; color: #dc2626; }
+.b2-rc-start {
+    color: #374151;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+.b2-rc-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 13px;
+}
+.b2-rc-badge { font-size: 13px; flex-shrink: 0; }
+.b2-rc-event-name { flex: 1; color: #334155; }
+.b2-rc-event-amt.income  { color: #16a34a; font-weight: 700; }
+.b2-rc-event-amt.expense { color: #dc2626; font-weight: 700; }
+.b2-rc-answer {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #bae6fd;
+    color: #0369a1;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 /* ── 錢包區 ─────────────────────────────────────────────── */
@@ -1692,6 +1903,18 @@
     color: #15803d;
     cursor: default;
 }
+.b2-cost-input.b2-input-correct-expense {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+.b2-total-auto-fill {
+    animation: b2TotalReveal 0.5s ease;
+}
+@keyframes b2TotalReveal {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
 
 /* ── total-input（在 total strip 內）────────────────────────── */
 .b2-total-input {
@@ -1736,20 +1959,24 @@
 .b2-coin-clickable:hover:not(:disabled) { transform: scale(1.12); }
 .b2-coin-clickable:active:not(:disabled) { transform: scale(0.92); }
 .b2-coin-clickable.b2-coin-clicked {
-    opacity: 0.35;
     cursor: default;
     transform: none;
-    filter: grayscale(0.4);
 }
 .b2-coin-clickable.b2-coin-clicked::after {
     content: '✓';
     position: absolute;
-    font-size: 1rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
     font-weight: 900;
     color: #16a34a;
-    text-shadow: 0 0 3px #fff;
+    text-shadow: 0 0 4px #fff, 0 0 8px #fff;
+    line-height: 1;
 }
 .b2-coin-clickable { position: relative; }
+/* 提示動畫狀態下金幣仍可點擊（覆寫 shared-game-base 的 pointer-events:none）*/
+.b2-coin-clickable.assist-click-hint { pointer-events: auto !important; }
 
 /* 事件右側金額（easy 模式，初始為 ？ 元）*/
 .b2-event-amount-easy {
@@ -1768,36 +1995,75 @@
 .b2-event-amount-easy.income { color: #059669; }
 .b2-event-amount-easy.expense { color: #dc2626; }
 
-/* ── 普通模式：3 選項 ────────────────────────────────────────── */
-.b2-normal-choice-area {
-    background: #f0f9ff;
-    border: 2px solid #bae6fd;
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin-top: 2px;
-    display: none;
-}
-.b2-normal-choice-area.b2-choices-visible { display: block; }
-.b2-nchoice-btns {
+/* ── 簡單模式：總計列 ─────────────────────────────────────────── */
+.b2-easy-total-row {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, #f0fdf4, #dcfce7);
+    border: 2px solid #86efac;
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-top: 8px;
+    font-size: 1.3rem;
+    font-weight: 700;
 }
-.b2-nchoice-btn {
-    padding: 10px 18px;
+.b2-easy-total-icon { font-size: 1.6rem; }
+.b2-easy-total-label { color: #166534; flex: 1; }
+.b2-easy-total-val { color: #15803d; font-size: 1.5rem; white-space: nowrap; }
+
+/* ── 普通模式：3 選項 ────────────────────────────────────────── */
+/* ── 普通模式：中央選項彈窗 ──────────────────────────────────── */
+.b2-nchoice-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 9500;
+    display: flex; align-items: center; justify-content: center;
+    animation: b2FadeIn 0.18s ease;
+}
+.b2-nchoice-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 36px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.22);
+    min-width: 260px;
+}
+.b2-nchoice-modal-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1d4ed8;
-    background: #fff;
-    border: 2px solid #93c5fd;
-    border-radius: 10px;
+    color: #374151;
+    margin-bottom: 18px;
+}
+.b2-nchoice-modal-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.b2-nchoice-btn {
+    padding: 14px 22px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    border-radius: 12px;
     cursor: pointer;
     transition: background 0.12s, transform 0.1s;
-    min-width: 70px;
+    min-width: 90px;
     text-align: center;
+    border: 2.5px solid;
 }
-.b2-nchoice-btn:hover  { background: #dbeafe; transform: scale(1.05); }
+.b2-nchoice-btn.income {
+    color: #047857;
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+}
+.b2-nchoice-btn.income:hover { background: #d1fae5; transform: scale(1.06); }
+.b2-nchoice-btn.expense {
+    color: #b91c1c;
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+.b2-nchoice-btn.expense:hover { background: #fee2e2; transform: scale(1.06); }
 .b2-nchoice-btn:active { transform: scale(0.95); }
 
 /* ── 共用數字鍵盤（困難模式）標題提示 ───────────────────────── */

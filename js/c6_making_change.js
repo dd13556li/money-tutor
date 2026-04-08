@@ -5872,7 +5872,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const changeMoneyElements = document.querySelectorAll('.change-money');
             const walletTargets = document.querySelectorAll('.wallet-target');
             const changeArea = document.querySelector('.store-change');
-            const walletArea = document.querySelector('.my-wallet-area');
+            const walletArea = document.querySelector('.c6-my-wallet-area');
 
             // 設置店家找零金錢的拖放事件
             changeMoneyElements.forEach((moneyEl) => {
