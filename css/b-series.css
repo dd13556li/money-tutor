@@ -544,6 +544,44 @@
     margin: 0 0 10px;
     font-weight: 700;
 }
+/* ── B 系列：通用翻頁導覽（日記清單 / 行程清單）──────────────── */
+.b-review-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0 0 12px;
+}
+.b-ds-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.b-ds-nav-btn {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.b-ds-nav-btn:hover { background: #2563eb; }
+.b-ds-nav-label {
+    font-size: 14px;
+    color: #374151;
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+}
+
 .b-review-next-btn {
     display: block;
     width: 100%;

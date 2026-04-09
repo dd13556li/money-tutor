@@ -79,6 +79,9 @@ const EXCHANGE_RULES = [
 const toTWD = v => typeof convertToTraditionalCurrency === 'function'
     ? convertToTraditionalCurrency(v) : `${v}元`;
 
+// ── 隨機正反面（所有面額 50/50）──────────────────────────────────
+const b3Rf = () => Math.random() < 0.5 ? 'back' : 'front';
+
 // ── Game 物件 ────────────────────────────────────────────────────
 let Game;
 
@@ -1313,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let imgs = '';
                 for (let i = 0; i < count; i++) {
                     const isNew = isChanged && (i === count - 1);
-                    imgs += `<span class="b3-pig-img-wrap${isNew ? ' b3-pig-img-new' : ''}"><img src="../images/money/${denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元"></span>`;
+                    imgs += `<span class="b3-pig-img-wrap${isNew ? ' b3-pig-img-new' : ''}"><img src="../images/money/${denom}_yuan_${b3Rf()}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元"></span>`;
                 }
 
                 // 兌換按鈕
@@ -1324,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 return `<div class="b3-pig-row">
                     <div class="b3-pig-row-label">
-                        <img src="../images/money/${denom}_yuan_front.png" style="width:${thumbSize};height:auto;" draggable="false" alt="" class="b3-pig-row-thumb">
+                        <img src="../images/money/${denom}_yuan_${b3Rf()}.png" style="width:${thumbSize};height:auto;" draggable="false" alt="" class="b3-pig-row-thumb">
                         <span class="b3-pig-row-denom">${denom}元 ×${count}</span>
                     </div>
                     <div class="b3-pig-row-imgs">${imgs}</div>
@@ -1539,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dx = (Math.random() - 0.5) * 80;          // -40 ~ +40 px 水平漂移
                 const delay = i * 60;                            // 每粒間隔 60ms
                 const dur   = 700 + Math.random() * 300;        // 700~1000ms
-                span.innerHTML = `<img src="../images/money/${denom}_yuan_front.png" style="width:${imgSize};height:auto;display:block;" draggable="false">`;
+                span.innerHTML = `<img src="../images/money/${denom}_yuan_${b3Rf()}.png" style="width:${imgSize};height:auto;display:block;" draggable="false">`;
                 span.style.cssText = [
                     'position:fixed',
                     `left:${cx}px`,
@@ -1563,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 while (rem >= d && imgs.length < 3) {
                     const isBanknote = d >= 100;
                     const w = isBanknote ? '64px' : '56px';
-                    imgs.push(`<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:auto;" draggable="false" alt="${d}元">`);
+                    imgs.push(`<img src="../images/money/${d}_yuan_${b3Rf()}.png" style="width:${w};height:auto;" draggable="false" alt="${d}元">`);
                     rem -= d;
                 }
                 if (imgs.length >= 3) break;
@@ -1609,6 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _startDragSession(day) {
             const c = this.state.calendar;
             const items = this._decomposeToDenomItems(c.dailyAmount);
+            items.forEach(item => { item.face = b3Rf(); }); // 每枚隨機正/反面
             c.drag = { dayBeingSaved: day, items, placedCount: 0, placedAmount: 0 };
 
             const pigBank = document.getElementById('b3-pig-bank');
@@ -1637,10 +1641,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return items.map(item => {
                 const isBill  = item.denom >= 100;
                 const imgSize = isBill ? '80px' : '58px';
+                const face    = item.face || b3Rf();
                 return `<div class="b3-drag-coin" draggable="true"
                              data-denom="${item.denom}" data-slot-idx="${item.slotIdx}"
                              id="b3-drag-coin-${item.slotIdx}">
-                    <img src="../images/money/${item.denom}_yuan_front.png"
+                    <img src="../images/money/${item.denom}_yuan_${face}.png"
                          style="width:${imgSize};height:auto;" draggable="false" alt="${item.denom}元">
                 </div>`;
             }).join('');
@@ -1650,8 +1655,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return items.map(item => {
                 const isBill  = item.denom >= 100;
                 const imgSize = isBill ? '80px' : '58px';
+                const face    = item.face || b3Rf();
                 return `<div class="b3-drop-slot" data-denom="${item.denom}" data-slot-idx="${item.slotIdx}">
-                    <img src="../images/money/${item.denom}_yuan_front.png"
+                    <img src="../images/money/${item.denom}_yuan_${face}.png"
                          style="width:${imgSize};height:auto;" draggable="false" alt="${item.denom}元">
                 </div>`;
             }).join('');
@@ -1804,14 +1810,19 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="b3-normal-target-unit">元</div>
 </div>
 <div class="b3-normal-denom-sources">
-    ${drag.availDenoms.map(d => {
-        const isBill = d >= 100;
-        const imgSize = isBill ? '72px' : '54px';
-        return `<div class="b3-ndrag-denom" draggable="true" data-denom="${d}">
-            <img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">
-            <div class="b3-ndrag-label">${d}元</div>
-        </div>`;
-    }).join('')}
+    ${(() => {
+        const tf = {};
+        drag.availDenoms.forEach(d => { tf[d] = b3Rf(); });
+        this.state.calendar.drag.trayFaces = tf;
+        return drag.availDenoms.map(d => {
+            const isBill = d >= 100;
+            const imgSize = isBill ? '72px' : '54px';
+            return `<div class="b3-ndrag-denom" draggable="true" data-denom="${d}">
+                <img src="../images/money/${d}_yuan_${tf[d]}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">
+                <div class="b3-ndrag-label">${d}元</div>
+            </div>`;
+        }).join('');
+    })()}
 </div>`;
         },
 
@@ -1825,12 +1836,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 提示模式：ghost slots（未填=淡化，已填=正常）；一般模式：每枚各自顯示
             let placedHTML;
+            const tf = drag.trayFaces || {};
             if (drag.showHint && drag.hintSlots?.length) {
                 placedHTML = drag.hintSlots.map((slot, idx) => {
                     const isBill = slot.denom >= 100;
                     const imgSize = isBill ? '68px' : '44px';
+                    const face = slot.face || tf[slot.denom] || 'front';
                     return `<div class="b3-nplaced-item${slot.filled ? '' : ' b3-nplaced-ghost-slot'}" data-hint-idx="${idx}">
-                        <img src="../images/money/${slot.denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${slot.denom}元">
+                        <img src="../images/money/${slot.denom}_yuan_${face}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${slot.denom}元">
                     </div>`;
                 }).join('');
             } else {
@@ -1838,8 +1851,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? drag.placedItems.map(({ denom }) => {
                         const isBill = denom >= 100;
                         const imgSize = isBill ? '68px' : '44px';
+                        const face = tf[denom] || 'front';
                         return `<div class="b3-nplaced-item">
-                            <img src="../images/money/${denom}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元">
+                            <img src="../images/money/${denom}_yuan_${face}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${denom}元">
                         </div>`;
                     }).join('')
                     : `<div class="b3-nplace-hint">拖曳或點擊面額放入此處</div>`;
@@ -2043,10 +2057,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ALL_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
                 let rem = c.drag.targetAmount;
                 const slots = [];
+                const tf = c.drag.trayFaces || {};
                 ALL_DENOMS.forEach(d => {
                     if (rem >= d) {
                         const cnt = Math.floor(rem / d);
-                        for (let i = 0; i < cnt; i++) slots.push({ denom: d, filled: false });
+                        for (let i = 0; i < cnt; i++) slots.push({ denom: d, filled: false, face: tf[d] || b3Rf() });
                         rem %= d;
                     }
                 });
@@ -2108,7 +2123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b3-hint-modal-imgs">
                     ${items.map(d => {
                         const imgSize = d >= 100 ? '62px' : '48px';
-                        return `<img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
+                        return `<img src="../images/money/${d}_yuan_${b3Rf()}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
                     }).join('')}
                 </div>
                 <button class="b3-hint-modal-close">✕ 關閉</button>
@@ -2996,66 +3011,119 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
-            // 存錢目標清單（review card）
+            // ── 省錢清單 金錢圖示 helper ──────────────────────────────
+            const b3MkMoneyIcons = (amt) => {
+                if (!amt) return '';
+                const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                let rem = amt; const parts = [];
+                for (const d of denoms) {
+                    if (rem <= 0) break;
+                    const cnt = Math.floor(rem / d);
+                    if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
+                    if (parts.length >= 4) break;
+                }
+                return parts.map(p =>
+                    `<span style="display:inline-flex;align-items:center;gap:2px;margin:2px 3px 2px 0;">
+                        <img src="../images/money/${p.d}_yuan_${b3Rf()}.png" alt="${p.d}元"
+                             style="width:36px;height:36px;object-fit:contain;" draggable="false" onerror="this.style.display='none'">
+                        ${p.cnt > 1 ? `<span style="font-size:13px;font-weight:bold;color:#374151;">×${p.cnt}</span>` : ''}
+                    </span>`
+                ).join('');
+            };
+
+            // ── 存錢目標卡片（省錢清單主體）─────────────────────────────
             const catLabels = { toy:'🎮 玩具類', book:'📚 書本類', outdoor:'🌿 戶外類', tech:'💻 科技類' };
-            const catLabel  = (() => { const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })();
-            const goalsCardHTML = q.achievedGoals && q.achievedGoals.length > 0 ? `
-            <div class="b-review-card">
-                <h3>🐷 存錢目標清單${catLabel}</h3>
-                <div class="b3-goal-list">
-                    ${q.achievedGoals.map(g => `
-                    <div class="b3-goal-row">
-                        <span class="b3-goal-icon">${g.item.icon || '🎁'}</span>
-                        <span class="b3-goal-name">${g.item.name}</span>
-                        <span class="b3-goal-price">${g.item.price}元</span>
-                        <span class="b3-goal-weeks">每週存${g.weekly}元 × ${g.answer}週</span>
-                    </div>`).join('')}
+            const catColors  = { toy:'#7c3aed', book:'#1d4ed8', outdoor:'#15803d', tech:'#b45309' };
+            const catBg      = { toy:'#f5f3ff', book:'#eff6ff', outdoor:'#f0fdf4', tech:'#fffbeb' };
+            const catBorder  = { toy:'#c4b5fd', book:'#93c5fd', outdoor:'#86efac', tech:'#fde68a' };
+            const catLabel   = (() => { const c = this.state.settings.itemCat; return (c && c !== 'all') ? ` · ${catLabels[c] || ''}` : ''; })();
+
+            const goalsGridHTML = q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b3-goals-grid">
+                ${q.achievedGoals.map(g => {
+                    const cat   = g.item.cat || 'toy';
+                    const color = catColors[cat] || '#7c3aed';
+                    const bg    = catBg[cat]    || '#f5f3ff';
+                    const bdr   = catBorder[cat] || '#c4b5fd';
+                    return `
+                    <div class="b3-goal-result-card" style="background:${bg};border-color:${bdr};">
+                        <div class="b3-grc-top-badge" style="background:${color};">${catLabels[cat] || '🎁'}</div>
+                        <div class="b3-grc-icon">${this._itemIconHTML(g.item, '72px')}</div>
+                        <div class="b3-grc-name" style="color:${color};">${g.item.name}</div>
+                        <div class="b3-grc-section">
+                            <div class="b3-grc-label">目標金額</div>
+                            <div class="b3-grc-price" style="color:${color};">${g.item.price} 元</div>
+                            <div class="b3-grc-icons">${b3MkMoneyIcons(g.item.price)}</div>
+                        </div>
+                        <div class="b3-grc-divider"></div>
+                        <div class="b3-grc-section">
+                            <div class="b3-grc-label">每週存款</div>
+                            <div class="b3-grc-weekly">${g.weekly} 元 / 週</div>
+                            <div class="b3-grc-icons">${b3MkMoneyIcons(g.weekly)}</div>
+                        </div>
+                        <div class="b3-grc-weeks-badge">⏱ 共需 <strong>${g.answer}</strong> 週</div>
+                    </div>`;
+                }).join('')}
+            </div>` : '';
+
+            const totalPrice = q.achievedGoals ? q.achievedGoals.reduce((s, g) => s + g.item.price, 0) : 0;
+            const avgWeeks   = q.achievedGoals?.length ? Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length) : 0;
+            const statsHTML  = q.achievedGoals && q.achievedGoals.length > 0 ? `
+            <div class="b3-res-stats-row">
+                <div class="b3-res-stat-card b3-rsc-purple">
+                    <div class="b3-rsc-icon">🎯</div>
+                    <div class="b3-rsc-val">${q.achievedGoals.length}</div>
+                    <div class="b3-rsc-label">目標數量</div>
+                </div>
+                <div class="b3-res-stat-card b3-rsc-orange">
+                    <div class="b3-rsc-icon">💰</div>
+                    <div class="b3-rsc-val">${totalPrice}</div>
+                    <div class="b3-rsc-label">合計金額（元）</div>
+                    <div class="b3-rsc-icons">${b3MkMoneyIcons(totalPrice)}</div>
+                </div>
+                <div class="b3-res-stat-card b3-rsc-green">
+                    <div class="b3-rsc-icon">📅</div>
+                    <div class="b3-rsc-val">${avgWeeks}</div>
+                    <div class="b3-rsc-label">平均所需週數</div>
                 </div>
             </div>` : '';
 
-            const summaryCardHTML = q.achievedGoals && q.achievedGoals.length > 0 ? `
-            <div class="b-review-card">
-                <h3>📊 存錢統計摘要</h3>
-                <div class="b3-goal-summary">
-                    <div class="b3-gs-item">
-                        <span class="b3-gs-label">目標數量</span>
-                        <span class="b3-gs-val">${q.achievedGoals.length} 個</span>
-                    </div>
-                    <div class="b3-gs-item">
-                        <span class="b3-gs-label">合計目標金額</span>
-                        <span class="b3-gs-val">${q.achievedGoals.reduce((s, g) => s + g.item.price, 0)} 元</span>
-                    </div>
-                    <div class="b3-gs-item">
-                        <span class="b3-gs-label">平均需要週數</span>
-                        <span class="b3-gs-val">${Math.round(q.achievedGoals.reduce((s, g) => s + g.answer, 0) / q.achievedGoals.length)} 週</span>
-                    </div>
-                </div>
-            </div>` : '';
+            const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
 
-            // ── 第一頁：測驗回顧 ──
+            // ── 第一頁：省錢清單 ──
             app.innerHTML = `
+<div class="b-header">
+    <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-center">${diffLabel}${catLabel} · 省錢清單</div>
+    <div class="b-header-right">
+        <button class="b-reward-btn" id="b3-res1-reward-btn">🎁 獎勵</button>
+        <button class="b-back-btn" id="b3-res1-back-btn">返回設定</button>
+    </div>
+</div>
 <div class="b-review-wrapper">
     <div class="b-review-screen">
-        <div class="b-review-header">
-            <div class="b-review-emoji">🐷</div>
-            <h1 class="b-review-title">存錢目標達成！</h1>
-            <p class="b-review-subtitle">看看完成了哪些存錢目標</p>
-        </div>
         ${lastItem.name ? `
-        <div class="b-review-card" style="text-align:center;">
-            <div class="b3-cal-success-item" style="margin:0;">
-                <span class="b3-cal-success-icon">${this._itemIconHTML(lastItem, '120px')}</span>
-                <div class="b3-cal-success-name">${lastItem.name} 買到了！</div>
-                <div class="b3-cal-success-price">${lastItem.price} 元</div>
+        <div class="b3-res-success-banner">
+            <span class="b3-rsb-icon">${this._itemIconHTML(lastItem, '64px')}</span>
+            <div class="b3-rsb-text">
+                <div class="b3-rsb-title">🎉 ${lastItem.name} 買到了！</div>
+                <div class="b3-rsb-price">${lastItem.price} 元 ${b3MkMoneyIcons(lastItem.price)}</div>
             </div>
         </div>` : ''}
-        ${goalsCardHTML}
-        ${summaryCardHTML}
+        ${goalsGridHTML}
+        ${statsHTML}
         <button id="b3-view-summary-btn" class="b-review-next-btn">
             📊 查看測驗總結
         </button>
     </div>
 </div>`;
+
+            Game.EventManager.on(document.getElementById('b3-res1-reward-btn'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b3-res1-back-btn'), 'click',
+                () => this.showSettings(), {}, 'gameUI');
 
             Game.TimerManager.setTimeout(() => {
                 document.getElementById('success-sound')?.play();
@@ -3068,6 +3136,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.removeByCategory('gameUI');
                 // ── 第二頁：測驗總結 ──
                 app.innerHTML = `
+<div class="b-header">
+    <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-center">${diffLabel} · 測驗總結</div>
+    <div class="b-header-right">
+        <button class="b-reward-btn" id="b3-res2-reward-btn">🎁 獎勵</button>
+        <button class="b-back-btn" id="b3-res2-back-btn">返回設定</button>
+    </div>
+</div>
 <div class="b-res-wrapper">
     <div class="b-res-screen">
         <div class="b-res-header">
@@ -3078,11 +3154,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h1 class="b-res-title">🎉 存錢達人 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>
             </div>
-        </div>
-        <div class="b-res-reward-wrap">
-            <a href="#" id="endgame-reward-link" class="b-res-reward-link">
-                🎁 開啟獎勵系統
-            </a>
         </div>
         <div class="b-res-container">
             <div class="b-res-grid" style="grid-template-columns:1fr 1fr;">
@@ -3155,11 +3226,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     () => this.startGame(), {}, 'gameUI');
                 Game.EventManager.on(document.getElementById('back-settings-btn'), 'click',
                     () => this.showSettings(), {}, 'gameUI');
-                Game.EventManager.on(document.getElementById('endgame-reward-link'), 'click', (e) => {
-                    e.preventDefault();
+                Game.EventManager.on(document.getElementById('b3-res2-reward-btn'), 'click', () => {
                     if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
                     else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
                 }, {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('b3-res2-back-btn'), 'click',
+                    () => this.showSettings(), {}, 'gameUI');
                 this._fireConfetti();
                 Game.TimerManager.setTimeout(() => {
                     let msg;

@@ -2129,18 +2129,20 @@ td.b2-st-expense-cell {
 }
 .b2-ds-tag.correct { background: #dcfce7; color: #16a34a; }
 .b2-ds-tag.wrong   { background: #fee2e2; color: #dc2626; }
-.b2-ds-items { display: flex; flex-direction: column; gap: 3px; }
-.b2-ds-item-row { font-size: 13px; color: #374151; padding: 2px 0; }
-.b2-ds-item-row.start { font-size: 12px; color: #64748b; }
+.b2-ds-items { display: flex; flex-direction: column; gap: 8px; }
+.b2-ds-item-row { font-size: 16px; color: #374151; padding: 2px 0; display: flex; flex-direction: column; }
+.b2-ds-item-row.start { font-size: 16px; color: #64748b; }
 .b2-ds-amt.income  { color: #16a34a; font-weight: 700; }
 .b2-ds-amt.expense { color: #dc2626; font-weight: 700; }
 .b2-ds-item-total {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 700;
     color: #0f172a;
     margin-top: 6px;
     padding-top: 6px;
     border-top: 1px solid #cbd5e1;
+    display: flex;
+    flex-direction: column;
 }
 .b2-ds-header-row {
     display: flex;
@@ -2188,5 +2190,5 @@ td.b2-st-expense-cell {
     vertical-align: middle;
     margin-left: 4px;
 }
-.b2-ds-item-row { align-items: center; flex-wrap: wrap; }
-.b2-ds-item-row.start, .b2-ds-item-total { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.b2-ds-item-row { flex-wrap: wrap; }
+.b2-ds-money-icons { display: flex; flex-wrap: wrap; align-items: center; margin-top: 4px; }

@@ -368,18 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
-                            <label class="b-setting-label">🎪 派對主題</label>
-                            <div class="b-btn-group" id="theme-group">
-                                <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
-                                <button class="b-sel-btn" data-theme="halloween">萬聖節 🎃</button>
-                                <button class="b-sel-btn" data-theme="picnic">春日野餐 🌸</button>
-                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                每個主題有不同的必買商品和預算挑戰！
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label class="b-setting-label">難度：</label>
                             <div class="b-btn-group" id="diff-group">
                                 <button class="b-sel-btn b-diff-easy"   data-val="easy">簡單</button>
@@ -434,6 +422,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                    style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
                                     開啟獎勵系統
                                 </a>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">🎪 派對主題</label>
+                            <div class="b-btn-group" id="theme-group">
+                                <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
+                                <button class="b-sel-btn" data-theme="halloween">萬聖節 🎃</button>
+                                <button class="b-sel-btn" data-theme="picnic">春日野餐 🌸</button>
+                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
+                            </div>
+                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
+                                每個主題有不同的必買商品和預算挑戰！
                             </div>
                         </div>
                         <div class="b-setting-group">

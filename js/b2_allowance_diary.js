@@ -797,13 +797,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const basePool  = themeData ? themeData.templates[diff] : B2_TEMPLATES[diff];
                 templates = (basePool && basePool.length > 0 ? basePool : B2_TEMPLATES[diff]).slice().sort(() => Math.random() - 0.5);
             }
-            const result    = [];
 
+            // 金額浮動（±15%，四捨五入至5元，最小5元）
+            const randVariant = (base) => {
+                const step = 5;
+                const v  = Math.max(step, Math.round(base * 0.15 / step) * step);
+                const lo = Math.max(step, base - v);
+                const hi = base + v;
+                return Math.round((lo + Math.random() * (hi - lo)) / step) * step || step;
+            };
+
+            const result = [];
             for (let i = 0; i < count; i++) {
-                const tmpl   = templates[i % templates.length];
-                const answer = this._calcAnswer(tmpl);
+                const tmpl = templates[i % templates.length];
+                // 嘗試浮動金額
+                const startAmountR = randVariant(tmpl.startAmount);
+                const eventsR = tmpl.events.map(e => ({ ...e, amount: randVariant(e.amount) }));
+                let answerR = startAmountR;
+                eventsR.forEach(e => { answerR += e.type === 'income' ? e.amount : -e.amount; });
+                // 答案若為負值或過小，退回原始金額（保留題目可玩性）
+                const useVariant = answerR >= 5;
+                const startAmount = useVariant ? startAmountR : tmpl.startAmount;
+                const events      = useVariant ? eventsR : tmpl.events.map(e => ({ ...e }));
+                const answer      = useVariant ? answerR  : this._calcAnswer(tmpl);
                 const choices = diff === 'easy' ? this._generateChoices(answer) : null;
-                result.push({ ...tmpl, answer, choices });
+                result.push({ ...tmpl, startAmount, events, answer, choices });
             }
             return result;
         },
@@ -1034,13 +1052,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 可點擊金幣（Easy 模式 Phase 1）────────────────────────
         _renderB2ClickableCoins(amount, eventIdx) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const items = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
                 const cnt = Math.floor(rem / d);
-                for (let i = 0; i < cnt; i++) items.push({ denom: d, coinIdx: items.length });
+                for (let i = 0; i < cnt; i++) items.push({ denom: d, coinIdx: items.length, face: rf(d) });
                 rem -= cnt * d;
             }
 
@@ -1050,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const d of denoms) {
                 if (rem2 <= 0) break;
                 const cnt = Math.floor(rem2 / d);
-                if (cnt > 0) groups.push({ denom: d, count: cnt });
+                if (cnt > 0) groups.push({ denom: d, count: cnt, face: rf(d) });
                 rem2 -= cnt * d;
                 if (groups.length >= 4) break;
             }
@@ -1059,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const badge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
                 return `<span class="b2-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${g.face}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${badge}
                 </span>`;
@@ -1072,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<button class="b2-coin-clickable"
                     data-event-idx="${eventIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
                     aria-label="${item.denom}元" style="position:relative;">
-                    <img src="../images/money/${item.denom}_yuan_front.png" alt="${item.denom}元"
+                    <img src="../images/money/${item.denom}_yuan_${item.face}.png" alt="${item.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;pointer-events:none;"
                          onerror="this.style.display='none'" draggable="false">
                 </button>`;
@@ -1107,6 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderChoiceMoneyIcons(amount, maxGroups = 4) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const groups = [];
@@ -1124,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const countBadge = g.count > 1 ? `<span class="b2-cic-count">×${g.count}</span>` : '';
                 return `<span class="b2-cic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${countBadge}
                 </span>`;
@@ -1138,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const desktopHTML = items.map(d => {
                 const isBill = d >= 100;
                 const w = isBill ? 36 : 26;
-                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
@@ -1237,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 金額→金幣圖示組（桌面：逐枚；手機：分組×N）─────────────
         _renderMoneyIconsGrouped(amount, maxGroups = 4) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const groups = [];
@@ -1254,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const countBadge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
                 return `<span class="b2-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${countBadge}
                 </span>`;
@@ -1268,7 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const desktopHTML = items.map(d => {
                 const isBill = d >= 100;
                 const w = isBill ? 72 : 50;
-                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
@@ -2490,7 +2511,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const optimal = this._b2CalcOptimalCoins(effectiveAnswer, denoms);
             const q = this.state.quiz;
             q.showHint  = true;
-            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             this._updateB2WalletDisplay(effectiveAnswer);
         },
 
@@ -2538,12 +2559,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderB2CoinTray(diff) {
             const denoms = B2_DENOM_BY_DIFF[diff] || B2_DENOM_BY_DIFF.normal;
+            // 為每個面額決定正/反面（1/5/10元隨機；紙鈔固定正面）並存入 trayFaces 供 ghost slot 對應
+            const trayFaces = {};
+            denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            this.state.quiz.trayFaces = trayFaces;
             const coinsHtml = denoms.map(d => {
                 const isBanknote = d >= 100;
+                const face = trayFaces[d];
                 const imgClass = isBanknote ? 'banknote-img' : 'coin-img';
                 return `
                 <div class="b2-coin-draggable" draggable="true" data-denom="${d}" title="${d}元 — 拖曳放入零用錢">
-                    <img src="../images/money/${d}_yuan_front.png" alt="${d}元" class="${imgClass}" draggable="false"
+                    <img src="../images/money/${d}_yuan_${face}.png" alt="${d}元" class="${imgClass}" draggable="false"
                          onerror="this.style.display='none'">
                     <span class="b2-denom-label">${d}元</span>
                 </div>`;
@@ -2638,7 +2664,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 q.hintSlots[slotIdx].filled = true;
                 this.audio.play('coin');
                 const uid = ++this.state.uidCounter;
-                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                const face = q.trayFaces?.[denom] || 'front';
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100, face });
                 const slotEl = document.querySelector(`[data-b2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b2-wallet-ghost-slot');
                 this._updateB2WalletStatusOnly(requiredTotal);
@@ -2658,7 +2685,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('coin');
                 }
                 const uid = ++this.state.uidCounter;
-                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                const face2 = q.trayFaces?.[denom] || 'front';
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100, face: face2 });
                 this._updateB2WalletDisplay(requiredTotal);
                 if (!isHardNotRevealed) {
                     const walletNow2 = this._getB2WalletTotal();
@@ -2731,8 +2759,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isBanknote = slot.denom >= 100;
                     const imgW = isBanknote ? '100px' : '60px';
                     const ghostClass = slot.filled ? '' : ' b2-wallet-ghost-slot';
+                    const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                     return `<div class="b2-wallet-coin${ghostClass}" data-b2-hint-idx="${idx}">
-                        <img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                        <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
                              style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
                              draggable="false" onerror="this.style.display:'none'">
                     </div>`;
@@ -2742,9 +2771,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 coinsEl.innerHTML = this.state.wallet.map(coin => {
                     const imgW = coin.isBanknote ? '100px' : '60px';
+                    const coinFace = coin.face || 'front';
                     return `
                     <div class="b2-wallet-coin b2-wc-removable" draggable="true" data-uid="${coin.uid}">
-                        <img src="../images/money/${coin.denom}_yuan_front.png" alt="${coin.denom}元"
+                        <img src="../images/money/${coin.denom}_yuan_${coinFace}.png" alt="${coin.denom}元"
                              style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
                              onerror="this.style.display:'none'" draggable="false">
                         <button class="b2-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>
@@ -2922,7 +2952,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const q = this.state.quiz;
             q.showHint  = true;
-            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             const placed = [...this.state.wallet];
             placed.forEach(coin => {
                 const idx = q.hintSlots.findIndex(s => s.denom === coin.denom && !s.filled);
@@ -3134,26 +3164,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     const denoms = [1000, 500, 100, 50, 10, 5, 1];
                     let rem = amt; const parts = [];
                     for (const d of denoms) {
-                        if (rem <= 0 || parts.length >= 3) break;
+                        if (rem <= 0) break;
                         const cnt = Math.floor(rem / d);
                         if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
                     }
-                    return parts.map(p => {
-                        const isBill = p.d >= 100;
-                        const w = isBill ? 28 : 20;
-                        const badge = p.cnt > 1 ? `<span style="font-size:10px;color:#6b7280;">×${p.cnt}</span>` : '';
-                        return `<img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
-                            style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:2px' : 'border-radius:50%'};vertical-align:middle;display:inline-block;margin:0 1px;"
-                            onerror="this.style.display='none'" draggable="false">${badge}`;
-                    }).join('');
+                    return parts.map(p =>
+                        `<span style="display:inline-flex;align-items:center;gap:2px;margin:2px 4px 2px 0;">
+                            <img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
+                                style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                            ${p.cnt > 1 ? `<span style="font-size:16px;font-weight:bold;color:#374151;">×${p.cnt}</span>` : ''}
+                        </span>`
+                    ).join('');
                 };
                 const rowsArr = hist.map((h, i) => {
                     const entryTheme = B2_THEMES[h._theme || theme];
                     const entryIcon = entryTheme ? entryTheme.icon : '📒';
                     const eventsHtml = h.events.map(e =>
-                        `<div class="b2-ds-item-row ${e.type}">
-                            ${e.icon || (e.type === 'income' ? '📥' : '📤')} ${e.name}：<span class="b2-ds-amt ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount}元</span>
-                            <span class="b2-ds-money-icons">${mkMoneyIcons(e.amount)}</span>
+                        `<div class="b2-ds-item-row ${e.type}" style="font-size:16px;padding:4px 0;">
+                            <span>${e.icon || (e.type === 'income' ? '📥' : '📤')} ${e.name}：<span class="b2-ds-amt ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount}元</span></span>
+                            <div class="b2-ds-money-icons" style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(e.amount)}</div>
                         </div>`
                     ).join('');
                     const resultTag = h.correct !== false
@@ -3162,11 +3191,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     return `<div class="b2-ds-row">
                         <div class="b2-ds-icon">${entryIcon}</div>
                         <div class="b2-ds-detail">
-                            <div class="b2-ds-label">第 ${i + 1} 題 ${resultTag}</div>
+                            <div class="b2-ds-label" style="font-size:16px;">第 ${i + 1} 題 ${resultTag}</div>
                             <div class="b2-ds-items">
-                                <div class="b2-ds-item-row start">💼 開始：${h.startAmount}元 <span class="b2-ds-money-icons">${mkMoneyIcons(h.startAmount)}</span></div>
+                                <div class="b2-ds-item-row start" style="font-size:16px;padding:4px 0;">
+                                    <span>💼 開始：${h.startAmount}元</span>
+                                    <div class="b2-ds-money-icons" style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(h.startAmount)}</div>
+                                </div>
                                 ${eventsHtml}
-                                <div class="b2-ds-item-total">結餘：${h.answer}元 <span class="b2-ds-money-icons">${mkMoneyIcons(h.answer)}</span></div>
+                                <div class="b2-ds-item-total" style="font-size:17px;font-weight:700;padding-top:6px;margin-top:4px;">
+                                    <span>結餘：${h.answer}元</span>
+                                    <div style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(h.answer)}</div>
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -3215,22 +3250,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     : '';
                 return `
                 <div class="b-review-card">
-                    <h3>💰 本期收支總計</h3>
-                    <div class="b2-totals-row">
-                        <div class="b2-total-item income">
-                            <span class="b2-total-label">總收入</span>
-                            <span class="b2-total-val">＋${totalIncome}元</span>
+                    <h3 class="b2-ds-header-row" style="cursor:pointer;" id="b2-income-total-hdr">
+                        <span>💰 本期收支總計</span>
+                        <button class="b2-ds-nav-btn b2-collapse-toggle" id="b2-income-total-toggle" aria-expanded="false" style="font-size:14px;padding:2px 8px;">▼</button>
+                    </h3>
+                    <div id="b2-income-total-body" style="display:none;">
+                        <div class="b2-totals-row">
+                            <div class="b2-total-item income">
+                                <span class="b2-total-label">總收入</span>
+                                <span class="b2-total-val">＋${totalIncome}元</span>
+                            </div>
+                            <div class="b2-total-item expense">
+                                <span class="b2-total-label">總支出</span>
+                                <span class="b2-total-val">－${totalExpense}元</span>
+                            </div>
+                            <div class="b2-total-item net ${net >= 0 ? 'positive' : 'negative'}">
+                                <span class="b2-total-label">淨餘額</span>
+                                <span class="b2-total-val">${net >= 0 ? '＋' : ''}${net}元</span>
+                            </div>
                         </div>
-                        <div class="b2-total-item expense">
-                            <span class="b2-total-label">總支出</span>
-                            <span class="b2-total-val">－${totalExpense}元</span>
-                        </div>
-                        <div class="b2-total-item net ${net >= 0 ? 'positive' : 'negative'}">
-                            <span class="b2-total-label">淨餘額</span>
-                            <span class="b2-total-val">${net >= 0 ? '＋' : ''}${net}元</span>
-                        </div>
+                        ${commentHTML}
                     </div>
-                    ${commentHTML}
                 </div>`;
             })();
 
@@ -3246,20 +3286,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!maxIncome && !maxExpense) return '';
                 return `
                 <div class="b-review-card">
-                    <h3>📌 本期最大記錄</h3>
-                    <div class="b2-max-row">
-                        ${maxIncome ? `<div class="b2-max-item income">
-                            <span class="b2-max-icon">${maxIncome.icon || '💰'}</span>
-                            <span class="b2-max-label">最大收入</span>
-                            <span class="b2-max-name">${maxIncome.name}</span>
-                            <span class="b2-max-val">＋${maxIncome.amount}元</span>
-                        </div>` : ''}
-                        ${maxExpense ? `<div class="b2-max-item expense">
-                            <span class="b2-max-icon">${maxExpense.icon || '💸'}</span>
-                            <span class="b2-max-label">最大支出</span>
-                            <span class="b2-max-name">${maxExpense.name}</span>
-                            <span class="b2-max-val">－${maxExpense.amount}元</span>
-                        </div>` : ''}
+                    <h3 class="b2-ds-header-row" style="cursor:pointer;" id="b2-max-record-hdr">
+                        <span>📌 本期最大記錄</span>
+                        <button class="b2-ds-nav-btn b2-collapse-toggle" id="b2-max-record-toggle" aria-expanded="false" style="font-size:14px;padding:2px 8px;">▼</button>
+                    </h3>
+                    <div id="b2-max-record-body" style="display:none;">
+                        <div class="b2-max-row">
+                            ${maxIncome ? `<div class="b2-max-item income">
+                                <span class="b2-max-icon">${maxIncome.icon || '💰'}</span>
+                                <span class="b2-max-label">最大收入</span>
+                                <span class="b2-max-name">${maxIncome.name}</span>
+                                <span class="b2-max-val">＋${maxIncome.amount}元</span>
+                            </div>` : ''}
+                            ${maxExpense ? `<div class="b2-max-item expense">
+                                <span class="b2-max-icon">${maxExpense.icon || '💸'}</span>
+                                <span class="b2-max-label">最大支出</span>
+                                <span class="b2-max-name">${maxExpense.name}</span>
+                                <span class="b2-max-val">－${maxExpense.amount}元</span>
+                            </div>` : ''}
+                        </div>
                     </div>
                 </div>`;
             })();
@@ -3360,6 +3405,22 @@ document.addEventListener('DOMContentLoaded', () => {
         </button>
     </div>
 </div>`;
+
+            // 收支總計 / 最大記錄 折疊切換
+            const bindCollapse = (toggleId, bodyId) => {
+                const btn = document.getElementById(toggleId);
+                const body = document.getElementById(bodyId);
+                if (!btn || !body) return;
+                Game.EventManager.on(btn, 'click', (e) => {
+                    e.stopPropagation();
+                    const expanded = btn.getAttribute('aria-expanded') === 'true';
+                    btn.setAttribute('aria-expanded', String(!expanded));
+                    btn.textContent = expanded ? '▼' : '▲';
+                    body.style.display = expanded ? 'none' : '';
+                }, {}, 'gameUI');
+            };
+            bindCollapse('b2-income-total-toggle', 'b2-income-total-body');
+            bindCollapse('b2-max-record-toggle', 'b2-max-record-body');
 
             // 日記導覽按鈕事件綁定
             if (this._b2DiaryNavRows && this._b2DiaryNavRows.length > 1) {

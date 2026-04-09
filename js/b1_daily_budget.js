@@ -20,22 +20,22 @@ const B1_SCENARIOS = {
         { icon:'☕', label:'買早餐',    cat:'food',          imageFile:'icon-b1-easy-buy-breakfast.png',             items:[{ name:'早餐費',   min:25,  max:55  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🐟', label:'買魚飼料',  cat:'shopping',      imageFile:'icon-b1-easy-buy-fish-food.png',             items:[{ name:'飼料費',   min:35,  max:65  }, { name:'魚缸砂',  min:15, max:25 }] },
         { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-easy-watch-movie.png',               items:[{ name:'電影票',   min:100, max:160 }, { name:'爆米花',  min:25, max:45 }] },
-        { icon:'🍜', label:'吃點心',    cat:'food',                                                                  items:[{ name:'點心費',   min:30,  max:60  }, { name:'飲料費',  min:10, max:20 }] },
+        { icon:'🍜', label:'吃點心',    cat:'food',          imageFile:'icon-b1-easy-buy-snack.png',                 items:[{ name:'點心費',   min:30,  max:60  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🛒', label:'買文具',    cat:'shopping',      imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'文具費',   min:40,  max:75  }, { name:'橡皮擦',  min:5,  max:10 }] },
         { icon:'⛺', label:'踏青',      cat:'outdoor',       imageFile:'icon-b1-easy-outing.png',                    items:[{ name:'門票費',   min:50,  max:80  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🍦', label:'買冰淇淋',  cat:'food',          imageFile:'icon-b1-hard-eat-ice-cream.png',             items:[{ name:'冰淇淋費', min:20,  max:50  }, { name:'飲料費',  min:10, max:20 }] },
-        { icon:'🎮', label:'電玩體驗',  cat:'entertainment',                                                         items:[{ name:'遊戲費',   min:30,  max:60  }, { name:'零食費',  min:10, max:20 }] },
-        { icon:'🌸', label:'賞花展',    cat:'outdoor',                                                               items:[{ name:'門票費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
-        { icon:'🐾', label:'寵物店',    cat:'shopping',                                                              items:[{ name:'零食費',   min:30,  max:60  }, { name:'玩具費',  min:15, max:25 }] },
+        { icon:'🎮', label:'電玩體驗',  cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',              items:[{ name:'遊戲費',   min:30,  max:60  }, { name:'零食費',  min:10, max:20 }] },
+        { icon:'🌸', label:'賞花展',    cat:'outdoor',       imageFile:'icon-b1-easy-flower-show.png',               items:[{ name:'門票費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
+        { icon:'🐾', label:'寵物店',    cat:'shopping',      imageFile:'icon-b1-easy-pet-shop.png',                  items:[{ name:'零食費',   min:30,  max:60  }, { name:'玩具費',  min:15, max:25 }] },
     ],
     normal: [
-        { icon:'🏫', label:'上學日',    cat:'school',                                                                items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
+        { icon:'🏫', label:'上學日',    cat:'school',        imageFile:'icon-b1-normal-school-day.png',              items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
         { icon:'🎨', label:'才藝課',    cat:'school',        imageFile:'icon-b1-normal-talent-class.png',            items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }] },
         { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-normal-see-doctor.png',              items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }] },
         { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-normal-watch-movie.png',             items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }] },
         { icon:'🚂', label:'搭火車',    cat:'outdoor',       imageFile:'icon-b1-normal-take-train.png',              items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }] },
         { icon:'🏊', label:'去游泳',    cat:'outdoor',       imageFile:'icon-b1-normal-go-swimming.png',             items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }] },
-        { icon:'📖', label:'買書',      cat:'shopping',                                                              items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
+        { icon:'📖', label:'買書',      cat:'shopping',      imageFile:'icon-b1-normal-buy-books.png',               items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
         { icon:'🌄', label:'爬山',      cat:'outdoor',       imageFile:'icon-b1-normal-mountain-climbing.png',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }] },
         { icon:'🎮', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'門票費',  min:150, max:260 }, { name:'零食費',  min:40,  max:80  }] },
         { icon:'🍜', label:'吃午飯',    cat:'food',          imageFile:'icon-b1-normal-have-lunch.png',              items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }] },
@@ -48,10 +48,11 @@ const B1_SCENARIOS = {
         { icon:'💇', label:'去剪髮',    cat:'shopping',      imageFile:'icon-b1-hard-get-haircut.png',               items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }] },
         { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }] },
         { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }] },
-        { icon:'🐠', label:'水族館',    cat:'outdoor',                                                               items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
+        { icon:'🐠', label:'水族館',    cat:'outdoor',       imageFile:'icon-b1-normal-aquarium.png',                items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
+        { icon:'⛺', label:'踏青',      cat:'outdoor',       imageFile:'icon-b1-normal-outing.png',                  items:[{ name:'門票費',  min:80,  max:150 }, { name:'飲料費',  min:20,  max:45  }, { name:'零食費',  min:25,  max:50  }] },
     ],
     hard: [
-        { icon:'🛒', label:'大採購',    cat:'shopping',                                                              items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
+        { icon:'🛒', label:'大採購',    cat:'shopping',      imageFile:'icon-b1-hard-big-shopping.png',              items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
         { icon:'🎂', label:'買禮物',    cat:'shopping',      imageFile:'icon-b1-hard-buy-gift.png',                  items:[{ name:'禮物費',  min:200, max:400 }, { name:'蛋糕費',  min:350, max:520 }, { name:'卡片費',  min:25,  max:55  }] },
         { icon:'🌿', label:'出遊',      cat:'outdoor',       imageFile:'icon-b1-normal-trip.png',                    items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費', min:80,  max:160 }, { name:'飲料費', min:25,  max:50 }] },
         { icon:'🏕️', label:'露營',     cat:'outdoor',       imageFile:'icon-b1-normal-camping.png',                 items:[{ name:'食材費',  min:280, max:440 }, { name:'裝備費',  min:150, max:300 }, { name:'入場費',  min:120, max:210 }] },
@@ -69,8 +70,11 @@ const B1_SCENARIOS = {
         { icon:'🎻', label:'音樂課',    cat:'school',        imageFile:'icon-b1-hard-music-class.png',               items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費', min:80,  max:160 }] },
         { icon:'🍕', label:'吃披薩',    cat:'food',          imageFile:'icon-b1-hard-eat-pizza.png',                 items:[{ name:'披薩費',  min:280, max:440 }, { name:'飲料費',  min:50,  max:90  }, { name:'甜點費',  min:60,  max:110 }] },
         { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費', min:30,  max:60  }] },
-        { icon:'🐠', label:'海生館',    cat:'outdoor',                                                               items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
-        { icon:'🎠', label:'親子遊',    cat:'entertainment',                                                         items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
+        { icon:'🐠', label:'海生館',    cat:'outdoor',       imageFile:'icon-b1-hard-marine-museum.png',             items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
+        { icon:'🎠', label:'親子遊',    cat:'entertainment', imageFile:'icon-b1-hard-family-outing.png',             items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
+        { icon:'🕹️', label:'夾娃娃機', cat:'entertainment', imageFile:'icon-b1-hard-claw-machine.png',              items:[{ name:'遊戲幣費', min:150, max:280 }, { name:'飲料費',  min:25,  max:50  }, { name:'零食費',  min:40,  max:80  }] },
+        { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-hard-see-doctor.png',                items:[{ name:'掛號費',  min:150, max:300 }, { name:'檢查費',  min:200, max:400 }, { name:'藥費',    min:120, max:250 }] },
+        { icon:'🚂', label:'搭火車出遊', cat:'outdoor',      imageFile:'icon-b1-hard-take-train.png',                items:[{ name:'火車票',  min:350, max:680 }, { name:'便當費',  min:80,  max:150 }, { name:'飲料費',  min:35,  max:65  }, { name:'紀念品費', min:100, max:200 }] },
     ]
 };
 
@@ -753,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const optimal = this._calcOptimalCoins(this._getEffectiveTotal(curr), denoms);
             const q = this.state.quiz;
             q.showHint   = true;
-            q.hintSlots  = optimal.map(d => ({ denom: d, filled: false }));
+            q.hintSlots  = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             this._updateWalletDisplay();
         },
 
@@ -940,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderMoneyIconsGrouped(amount, maxCoins = 12) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const groups = [];
@@ -957,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
                 return `<span class="b1-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${countBadge}
                 </span>`;
@@ -971,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const desktopHTML = items.map(d => {
                 const isBill = d >= 100;
                 const w = isBill ? 72 : 50;
-                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
@@ -981,6 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 行程項目金錢圖示（桌面逐枚、手機×N）─────────────────────
         _renderItemMoneyIcons(amount, maxGroups = 4) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const groups = [];
@@ -998,7 +1004,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const countBadge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
                 return `<span class="b1-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${countBadge}
                 </span>`;
@@ -1012,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const desktopHTML = items.map(d => {
                 const isBill = d >= 100;
                 const w = isBill ? 72 : 50;
-                return `<img src="../images/money/${d}_yuan_front.png" alt="${d}元" class="${isBill ? 'b1-mi-bill' : 'b1-mi-coin'}"
+                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元" class="${isBill ? 'b1-mi-bill' : 'b1-mi-coin'}"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
@@ -1022,13 +1028,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Easy 模式：可點擊金幣（行程項目）─────────────────────────
         _renderB1ClickableCoins(amount, itemIdx) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
             const items = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
                 const cnt = Math.floor(rem / d);
-                for (let i = 0; i < cnt; i++) items.push({ denom: d, coinIdx: items.length });
+                for (let i = 0; i < cnt; i++) items.push({ denom: d, coinIdx: items.length, face: rf(d) });
                 rem -= cnt * d;
             }
 
@@ -1038,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const d of denoms) {
                 if (rem2 <= 0) break;
                 const cnt = Math.floor(rem2 / d);
-                if (cnt > 0) groups.push({ denom: d, count: cnt });
+                if (cnt > 0) groups.push({ denom: d, count: cnt, face: rf(d) });
                 rem2 -= cnt * d;
                 if (groups.length >= 4) break;
             }
@@ -1047,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 34 : 24;
                 const badge = g.count > 1 ? `<span class="b1-mic-count">×${g.count}</span>` : '';
                 return `<span class="b1-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_front.png" alt="${g.denom}元"
+                    <img src="../images/money/${g.denom}_yuan_${g.face}.png" alt="${g.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
                          onerror="this.style.display='none'" draggable="false">${badge}
                 </span>`;
@@ -1060,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<button class="b1-coin-clickable"
                     data-item-idx="${itemIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
                     aria-label="${item.denom}元">
-                    <img src="../images/money/${item.denom}_yuan_front.png" alt="${item.denom}元"
+                    <img src="../images/money/${item.denom}_yuan_${item.face}.png" alt="${item.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;pointer-events:none;"
                          onerror="this.style.display='none'" draggable="false">
                 </button>`;
@@ -1859,9 +1866,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderCoinTray(diff) {
             const denoms = DENOM_BY_DIFF[diff] || DENOM_BY_DIFF.easy;
+            // 為每個面額決定正/反面（1/5/10元隨機；紙鈔固定正面）並存入 trayFaces 供 ghost slot 對應
+            const trayFaces = {};
+            denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            this.state.quiz.trayFaces = trayFaces;
             const coinsHtml = denoms.map(d => {
                 const isBanknote = d >= 100;
-                const imgSrc = `../images/money/${d}_yuan_front.png`;
+                const face = trayFaces[d];
+                const imgSrc = `../images/money/${d}_yuan_${face}.png`;
                 const imgClass = isBanknote ? 'banknote-img' : 'coin-img';
                 return `
                 <div class="b1-coin-draggable" draggable="true" data-denom="${d}" title="${d}元 — 拖曳放入錢包">
@@ -1893,7 +1905,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 q.hintSlots[slotIdx].filled = true;
                 this.audio.play('coin');
                 const uid = ++this.state.uidCounter;
-                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+                const face = q.trayFaces?.[denom] || 'front';
+                this.state.wallet.push({ denom, uid, isBanknote: denom >= 100, face });
                 q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
                 Game.Debug.log('wallet', `加入 ${denom}元（ghost slot ${slotIdx}），合計 ${this._getWalletTotal()}`);
                 // 直接移除 ghost class，CSS transition opacity:0.35→1（B3 pattern）
@@ -1927,7 +1940,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.audio.play('coin');
             const uid = ++this.state.uidCounter;
-            this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
+            const face2 = q.trayFaces?.[denom] || 'front';
+            this.state.wallet.push({ denom, uid, isBanknote: denom >= 100, face: face2 });
             q.denomStats[denom] = (q.denomStats[denom] || 0) + 1;
             Game.Debug.log('wallet', `加入 ${denom}元，合計 ${this._getWalletTotal()}`);
             this._updateWalletDisplay();
@@ -2010,8 +2024,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const isBanknote = slot.denom >= 100;
                         const imgW = isBanknote ? '100px' : '60px';
                         const ghostClass = slot.filled ? '' : ' b1-wallet-ghost-slot';
+                        const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                         return `<div class="b1-wallet-coin${ghostClass}" data-hint-idx="${idx}">
-                            <img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                            <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
                                  style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
                                  draggable="false" onerror="this.style.display='none'">
                         </div>`;
@@ -2021,7 +2036,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const removable = this.state.settings.difficulty === 'normal' || this.state.settings.difficulty === 'hard';
                     coinsEl.innerHTML = this.state.wallet.map(coin => {
-                        const imgSrc   = `../images/money/${coin.denom}_yuan_front.png`;
+                        const coinFace = coin.face || 'front';
+                        const imgSrc   = `../images/money/${coin.denom}_yuan_${coinFace}.png`;
                         const imgClass = coin.isBanknote ? 'banknote-img' : 'coin-img';
                         const imgW     = coin.isBanknote ? '100px' : '60px';
                         const removableAttrs = removable ? `draggable="true" data-denom="${coin.denom}" class="b1-wallet-coin b1-wc-removable"` : `class="b1-wallet-coin"`;
@@ -2498,7 +2514,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ghost slots（在 Phase 2 wallet 中顯示）
             const q = this.state.quiz;
             q.showHint = true;
-            q.hintSlots = optimal.map(d => ({ denom: d, filled: false }));
+            q.hintSlots = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             const placed = [...this.state.wallet];
             placed.forEach(coin => {
                 const idx = q.hintSlots.findIndex(s => s.denom === coin.denom && !s.filled);
@@ -2592,38 +2608,71 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
-            // 行程費用清單（最貴/最便宜標記 Round 40）
+            // 行程費用清單（最貴/最便宜標記，翻頁式 ◀/▶）
             const scheduleCardHTML = (() => {
                 if (!q.solvedSchedules || q.solvedSchedules.length === 0) return '';
                 const maxTotal = Math.max(...q.solvedSchedules.map(s => s.total));
                 const minTotal = Math.min(...q.solvedSchedules.map(s => s.total));
-                return `
-                <div class="b1-res-schedules">
-                    <h3>🗓️ 預定的行程</h3>
-                    <div class="b1-schedule-rows">
-                        ${q.solvedSchedules.map(s => {
-                            const tag = s.total === maxTotal && q.solvedSchedules.length > 1
-                                ? `<span class="b1-sch-tag most-exp">最貴 💸</span>`
-                                : s.total === minTotal && q.solvedSchedules.length > 1
-                                ? `<span class="b1-sch-tag cheapest">最便宜 💚</span>`
-                                : '';
-                            // 條列式費用明細（Change 8）
-                            const itemRows = s.items.map(it =>
-                                `<div class="b1-sch-item-row">📌 ${it.name}：${it.cost}元</div>`
-                            ).join('');
-                            return `
-                            <div class="b1-schedule-row b1-sch-row-v">
-                                <div class="b1-sch-icon-center">${this._sceneIcon(s)}</div>
-                                <div class="b1-sch-detail">
-                                    <span class="b1-sch-label">${s.label}${tag ? '&nbsp;' + tag : ''}</span>
-                                    <div class="b1-sch-items-list">
-                                        ${itemRows}
-                                        <div class="b1-sch-item-total">合計：${s.total}元</div>
-                                    </div>
+                // 44×44 金錢圖示（全面額，實際數量）
+                const mkMoneyIcons44 = (amt) => {
+                    const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                    let rem = amt; const parts = [];
+                    for (const d of denoms) {
+                        if (rem <= 0) break;
+                        const cnt = Math.floor(rem / d);
+                        if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
+                    }
+                    return parts.map(p =>
+                        `<span style="display:inline-flex;align-items:center;gap:2px;margin:2px 4px 2px 0;">
+                            <img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
+                                style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                            ${p.cnt > 1 ? `<span style="font-size:16px;font-weight:bold;color:#374151;">×${p.cnt}</span>` : ''}
+                        </span>`
+                    ).join('');
+                };
+                const rowsArr = q.solvedSchedules.map(s => {
+                    const tag = s.total === maxTotal && q.solvedSchedules.length > 1
+                        ? `<span class="b1-sch-tag most-exp">最貴 💸</span>`
+                        : s.total === minTotal && q.solvedSchedules.length > 1
+                        ? `<span class="b1-sch-tag cheapest">最便宜 💚</span>`
+                        : '';
+                    const itemRows = s.items.map(it => `
+                        <div class="b1-sch-item-row" style="margin-bottom:10px;">
+                            <span style="font-size:16px;font-weight:600;">📌 ${it.name}：${it.cost}元</span>
+                            <div style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons44(it.cost)}</div>
+                        </div>`
+                    ).join('');
+                    return `
+                    <div class="b1-schedule-row b1-sch-row-v">
+                        <div class="b1-sch-icon-center">${this._sceneIcon(s)}</div>
+                        <div class="b1-sch-detail">
+                            <span class="b1-sch-label" style="font-size:18px;">${s.label}${tag ? '&nbsp;' + tag : ''}</span>
+                            <div class="b1-sch-items-list">
+                                ${itemRows}
+                                <div class="b1-sch-item-total" style="font-size:17px;font-weight:700;margin-top:8px;border-top:1px solid #fde68a;padding-top:6px;">
+                                    合計：${s.total}元
+                                    <div style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons44(s.total)}</div>
                                 </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                const total = rowsArr.length;
+                this._b1ScheduleNavRows = rowsArr;
+                this._b1ScheduleNavIdx  = 0;
+                const navHTML = total > 1 ? `
+                    <div class="b-ds-nav">
+                        <button class="b-ds-nav-btn" id="b1-sch-prev">◀</button>
+                        <span class="b-ds-nav-label" id="b1-sch-nav-label">1 / ${total}</span>
+                        <button class="b-ds-nav-btn" id="b1-sch-next">▶</button>
+                    </div>` : '';
+                return `
+                <div class="b-review-card" id="b1-res-schedules-card">
+                    <h3 class="b-review-card-header">
+                        <span>🗓️ 預定的行程</span>
+                        ${navHTML}
+                    </h3>
+                    <div id="b1-sch-rows-container">${rowsArr[0] || ''}</div>
                 </div>`;
             })();
 
@@ -2687,6 +2736,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
             }, {}, 'gameUI');
             Game.EventManager.on(document.getElementById('b1-review-back-btn'), 'click', () => this.showSettings(), {}, 'gameUI');
+
+            // 行程翻頁按鈕
+            if (this._b1ScheduleNavRows && this._b1ScheduleNavRows.length > 1) {
+                const navRows = this._b1ScheduleNavRows;
+                let navIdx = 0;
+                const showSchEntry = (i) => {
+                    navIdx = (i + navRows.length) % navRows.length;
+                    const c = document.getElementById('b1-sch-rows-container');
+                    const lbl = document.getElementById('b1-sch-nav-label');
+                    if (c) c.innerHTML = navRows[navIdx];
+                    if (lbl) lbl.textContent = `${navIdx + 1} / ${navRows.length}`;
+                };
+                const prevBtn = document.getElementById('b1-sch-prev');
+                const nextBtn = document.getElementById('b1-sch-next');
+                if (prevBtn) Game.EventManager.on(prevBtn, 'click', () => showSchEntry(navIdx - 1), {}, 'gameUI');
+                if (nextBtn) Game.EventManager.on(nextBtn, 'click', () => showSchEntry(navIdx + 1), {}, 'gameUI');
+            }
 
             Game.EventManager.on(document.getElementById('b1-view-summary-btn'), 'click', () => {
                 Game.EventManager.removeByCategory('gameUI');

@@ -452,3 +452,101 @@
 | 單元 | 改進 | 搜尋關鍵字 |
 |------|------|-----------|
 | B1 | 按提示後錢包顯示淡化 ghost slots（`b1-wallet-ghost-slot`）；`addCoin()` 只允許匹配面額（防隱形幣）；`_updateWalletStatusOnly()` 防閃爍 | `b1-wallet-ghost-slot`、`showHint`、`hintSlots`、`_updateWalletStatusOnly` |
+
+---
+
+## B 系列 金錢圖示正反面 + B3 省錢清單重設計 + B5 設定頁（2026-04-09）
+
+### B1/B2 金錢圖示全面隨機正反面
+
+**目標**：所有拖曳盤、Phase1、Phase2、Ghost Slot 金錢圖示均可隨機顯示正面或反面，且 Ghost Slot 與拖曳盤同面向。
+
+**根因**：原本 `rf = d => d < 100 && Math.random() < 0.5 ? 'back' : 'front'` 僅對 100 元以下面額隨機，50/100/500/1000 元固定正面；Ghost Slot 建立時未紀錄 `face` 屬性，渲染時查 `trayFaces` 也因為 `hintSlots` 漏帶 face 而 fallback 成正面。
+
+**修正方式**：
+
+1. **`trayFaces` 字典**（B1 `_renderCoinTray` / B2 `_renderB2CoinTray`）：
+   ```javascript
+   const trayFaces = {};
+   denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+   this.state.quiz.trayFaces = trayFaces;
+   // 每個 denom img src: `${d}_yuan_${trayFaces[d]}.png`
+   ```
+
+2. **Ghost Slot face 烘入**（`_autoSetGhostSlots` / `_showCoinHint` / `_b2AutoSetGhostSlots` / `_showB2CoinHint`）：
+   ```javascript
+   q.hintSlots = optimal.map(d => ({
+       denom: d, filled: false,
+       face: q.trayFaces?.[d] || 'front'   // ← 新增
+   }));
+   ```
+
+3. **Ghost Slot 渲染**（`_updateWalletDisplay` / `_updateB2WalletDisplay`）：
+   ```javascript
+   const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
+   // img src: `${slot.denom}_yuan_${slotFace}.png`
+   ```
+
+4. **放入錢包幣帶 face**（`addCoin` / `_b2AddCoin`）：
+   ```javascript
+   wallet.push({ denom, face: q.trayFaces?.[denom] || 'front', ... });
+   ```
+
+5. **Phase1 helper 無面額限制**（`_renderMoneyIconsGrouped` / `_renderItemMoneyIcons` / `_renderB2CoinTray` 等）：
+   ```javascript
+   const rf = () => Math.random() < 0.5 ? 'back' : 'front'; // 無 d<100 條件
+   ```
+
+搜尋關鍵字：`trayFaces`、`slot.face`、`_autoSetGhostSlots`、`rf()`
+
+---
+
+### B3 所有金錢圖示隨機正反面
+
+模組層級 helper：
+```javascript
+const b3Rf = () => Math.random() < 0.5 ? 'back' : 'front';
+```
+
+套用位置：`_startDragSession`（item.face）、`_renderDailyItemsHTML`、`_renderDropZoneHTML`、normal 模式 `trayFaces` dict、`_toggleDepositHint` ghost slot face、`_renderNormalDropZoneHTML`（ghost/placed）、`_renderPiggyBankCard`、`_animateCoinFloat`、`_getMoneyImagesHTML`、`_showHardModeHintModal`、`showResults` 的 `b3MkMoneyIcons`。
+
+---
+
+### B3 省錢清單（showResults）卡片版面重設計
+
+**變更前**：`goalsCardHTML` 橫向清單 + `summaryCardHTML` 摘要；無標題列。
+
+**變更後（第一頁）**：
+- `.b-header`（`b3-res1-reward-btn` / `b3-res1-back-btn`）
+- `b3MkMoneyIcons(amt)` helper：貪婪分解面額，最多 4 種，36px 圖示 + ×N 徽章，`b3Rf()` 正反面
+- `.b3-res-success-banner`：最後購買物品展示（圖示 + 名稱 + 金額 + 金錢圖示）
+- `.b3-goals-grid`（`auto-fill minmax(200px,1fr)`）→ `.b3-goal-result-card`：
+  - `.b3-grc-top-badge`（類別色頂部標籤，絕對定位）
+  - 圖示 72px、商品名稱、目標金額 + 金錢圖示、每週存款 + 金錢圖示、週數橘色徽章
+  - 類別色系：toy 紫 / book 藍 / outdoor 綠 / tech 琥珀
+- `.b3-res-stats-row`（3欄）→ `.b3-res-stat-card`（purple/orange/green 變體）
+
+**變更後（第二頁）**：
+- 新增 `.b-header`（`b3-res2-reward-btn` / `b3-res2-back-btn`）
+- 移除舊 `.b-res-reward-wrap` 獎勵連結區塊（功能移至標題列按鈕）
+
+**CSS 新增**（`css/b3_savings_plan.css` 末尾）：`.b3-res-success-banner`、`.b3-rsb-*`、`.b3-goals-grid`、`.b3-goal-result-card`、`.b3-grc-*`、`.b3-res-stats-row`、`.b3-res-stat-card`、`.b3-rsc-*`、響應式 480px / 340px。
+
+搜尋關鍵字：`b3MkMoneyIcons`、`b3-goals-grid`、`b3-goal-result-card`、`b3-res1-reward-btn`、`b3-res2-reward-btn`、`b3-rsc-purple`
+
+---
+
+### B5 設定頁選項排序修正（對齊 B6）
+
+B5 原本「🎪 派對主題」置於最上方（難度之前），與 B6「🏪 市場類型」置於最下方不一致。
+
+**修正後排序**（同 B6）：
+1. 難度
+2. 自訂商品（conditional）
+3. 輔助點擊（conditional）
+4. 關卡數
+5. 作業單
+6. 獎勵系統
+7. 🎪 派對主題（移至最後）
+
+搜尋關鍵字：`theme-group`（在 `game-settings` 底部）
