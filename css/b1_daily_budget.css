@@ -916,7 +916,8 @@
 }
 
 /* ── 項目金額按鈕（Normal/Hard 模式）──────────────── */
-.b1-item-box-btn {
+.b1-item-box-btn,
+.b1-cip-cost-btn {
     font-size: 1.2rem; font-weight: 700;
     background: #fef3c7; color: #92400e;
     border: 2.5px solid #f59e0b; border-radius: 12px;
@@ -925,8 +926,10 @@
     margin-left: auto;
     display: inline-block;
 }
-.b1-item-box-btn:hover { background: #fde68a; transform: scale(1.04); }
-.b1-item-box-btn.b1-item-cost-revealed {
+.b1-item-box-btn:hover,
+.b1-cip-cost-btn:hover { background: #fde68a; transform: scale(1.04); }
+.b1-item-box-btn.b1-item-cost-revealed,
+.b1-cip-cost-btn.b1-item-cost-revealed {
     background: #d1fae5; color: #065f46;
     border-color: #10b981; cursor: default;
 }

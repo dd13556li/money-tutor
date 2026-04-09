@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, retryMode: null, clickMode: 'off', diaryTheme: null, customItemsEnabled: false },
+            settings: { difficulty: null, questionCount: null, retryMode: 'retry', clickMode: 'off', diaryTheme: null, customItemsEnabled: false },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -565,25 +565,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-val="10">10題</button>
                                 <button class="b-sel-btn" data-val="15">15題</button>
                                 <button class="b-sel-btn" data-val="20">20題</button>
-                            </div>
-                        </div>
-                        <div class="b-setting-group" id="mode-settings-group">
-                            <label class="b-setting-label">🔄 作答模式：</label>
-                            <div class="b-btn-group" id="mode-group">
-                                <button class="b-sel-btn" data-val="retry">反複作答</button>
-                                <button class="b-sel-btn" data-val="proceed">單次作答</button>
-                            </div>
-                            <div style="margin-top:4px;font-size:12px;color:#6b7280;">
-                                反複作答：答錯可以再試 ｜ 單次作答：顯示答案後繼續
+                                <button class="b-sel-btn" id="b2-custom-count-btn">自訂選項</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">📓 日記主題：</label>
                             <div class="b-btn-group" id="theme-group">
+                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                                 <button class="b-sel-btn" data-theme="school">🏫 學校</button>
                                 <button class="b-sel-btn" data-theme="holiday">🎉 假期</button>
                                 <button class="b-sel-btn" data-theme="family">👨‍👩‍👧 家庭</button>
-                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                             </div>
                             <div id="b2-custom-events-toggle-row" style="display:none;margin-top:8px;">
                                 <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂事件</label>
@@ -643,25 +634,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const desc = document.getElementById('diff-desc');
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
                     const assistGroup = document.getElementById('assist-click-group');
-                    const modeGroup   = document.getElementById('mode-settings-group');
                     const customRow = document.getElementById('b2-custom-events-toggle-row');
                     if (btn.dataset.val === 'easy') {
                         if (assistGroup) assistGroup.style.display = '';
-                        if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
                         if (customRow) customRow.style.display = 'none';
                         this.state.settings.customItemsEnabled = false;
                         document.querySelectorAll('#b2-custom-events-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
                     } else {
                         if (assistGroup) assistGroup.style.display = 'none';
                         this.state.settings.clickMode = 'off';
-                        if (modeGroup) modeGroup.style.display = '';
                         if (customRow) customRow.style.display = '';
                     }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
 
-            document.querySelectorAll('#count-group .b-sel-btn').forEach(btn => {
+            document.querySelectorAll('#count-group .b-sel-btn:not(#b2-custom-count-btn)').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#count-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -670,14 +658,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            document.querySelectorAll('#mode-group .b-sel-btn').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#mode-group .b-sel-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.retryMode = btn.dataset.val;
-                    this._checkCanStart();
+            // 自訂題數
+            const b2CustomCountBtn = document.getElementById('b2-custom-count-btn');
+            if (b2CustomCountBtn) {
+                Game.EventManager.on(b2CustomCountBtn, 'click', () => {
+                    this._showSettingsCountNumpad('題數', (n) => {
+                        document.querySelectorAll('#count-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        b2CustomCountBtn.classList.add('active');
+                        b2CustomCountBtn.textContent = `${n}題`;
+                        this.state.settings.questionCount = n;
+                        this._checkCanStart();
+                    });
                 }, {}, 'settings');
-            });
+            }
 
             const rewardLink = document.getElementById('settings-reward-link');
             Game.EventManager.on(rewardLink, 'click', (e) => {
@@ -708,10 +701,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.clickMode = btn.dataset.val;
-                    const modeGroup = document.getElementById('mode-settings-group');
-                    if (modeGroup) {
-                        modeGroup.style.display = (this.state.settings.difficulty === 'easy' && btn.dataset.val === 'on') ? 'none' : '';
-                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -729,8 +718,46 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkCanStart() {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
-            const retryOk = (s.difficulty === 'easy' && s.clickMode === 'on') || !!s.retryMode;
-            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !retryOk || !s.diaryTheme;
+            if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.diaryTheme;
+        },
+
+        _showSettingsCountNumpad(label, onConfirm) {
+            document.getElementById('b-snp-overlay')?.remove();
+            let val = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-snp-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">自訂${label}</div>
+                    <div id="b-snp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">---</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-snpk="${k}">${k}</button>`).join('')}
+                    </div>
+                    <button id="b-snp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-snp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-snpk]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.snpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 99) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 99) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-snp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         },
 
         // ── 9. 遊戲開始 ───────────────────────────────────────
@@ -1249,6 +1276,77 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<span class="b2-mic-desktop">${desktopHTML}</span><span class="b2-mic-mobile">${mobileHTML}</span>`;
         },
 
+        // ── 自訂事件數字鍵盤（普通模式用，取代3選1彈窗）───────────────
+        _showB2CustomEventNumpad(inputEl, correct, evType, evName, question) {
+            const q = this.state.quiz;
+            const isIncome = evType === 'income';
+            document.getElementById('b2-cep-numpad-overlay')?.remove();
+            let inputVal = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b2-cep-numpad-overlay';
+            overlay.className = 'b2-nchoice-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b2-nchoice-modal" style="max-width:280px;">
+                    <div class="b2-nchoice-modal-title">${isIncome ? '📥 收入' : '📤 支出'}金額是多少？</div>
+                    <div id="b2-cep-np-disp" style="font-size:1.6rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin:8px 0;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b2-nchoice-btn ${isIncome ? 'income' : 'expense'}" data-cepnp="${k}" style="padding:10px;">${k}</button>`).join('')}
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            inputEl.classList.add('b2-input-active');
+            const disp = overlay.querySelector('#b2-cep-np-disp');
+            const updateDisp = () => { disp.textContent = inputVal || '___'; };
+            overlay.querySelectorAll('[data-cepnp]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.cepnp;
+                    if (k === '⌫') { inputVal = inputVal.slice(0, -1); }
+                    else if (k === '✓') {
+                        const entered = parseInt(inputVal);
+                        if (entered === correct) {
+                            this.audio.play('correct');
+                            const prefix = isIncome ? '+' : '-';
+                            inputEl.textContent = `${prefix}${correct} 元`;
+                            inputEl.classList.remove('b2-input-active');
+                            inputEl.classList.add('b2-input-correct');
+                            if (!isIncome) inputEl.classList.add('b2-input-correct-expense');
+                            overlay.remove();
+                            q.activeInputEl = null;
+                            const verb = isIncome ? `增加${correct}元` : `花掉${correct}元`;
+                            const evSpeech = evName ? `${evName}，${verb}` : verb;
+                            if (this._checkB2EventInputsCorrect()) {
+                                Game.Speech.speak(evSpeech, () => {
+                                    this._b2AutoFillTotalAndProceed(question, this._getEffectiveAnswer(question));
+                                });
+                            } else {
+                                Game.Speech.speak(evSpeech);
+                            }
+                        } else {
+                            this.audio.play('error');
+                            disp.style.color = '#ef4444';
+                            Game.TimerManager.setTimeout(() => { disp.style.color = ''; }, 600, 'ui');
+                            inputVal = '';
+                            Game.Speech.speak('不對喔，再試一次');
+                        }
+                        updateDisp();
+                        return;
+                    } else {
+                        const next = inputVal + k;
+                        if (parseInt(next, 10) <= 99999) inputVal = next;
+                    }
+                    this.audio.play('click');
+                    updateDisp();
+                });
+            });
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                    inputEl.classList.remove('b2-input-active');
+                    q.activeInputEl = null;
+                }
+            });
+        },
+
         _bindCustomEventsPanel(question) {
             // 刪除原有事件
             document.querySelectorAll('#b2-base-event-0, #b2-base-event-1, #b2-base-event-2, #b2-base-event-3').forEach(row => {
@@ -1276,12 +1374,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newEvent = { type, name, amount, icon: type === 'income' ? '💰' : '💸', _deleted: false };
                 q.customEvents.push(newEvent);
                 const ci = q.customEvents.length - 1;
+                const diff2 = this.state.settings.difficulty;
+                const isHard2 = diff2 === 'hard';
                 const list = document.getElementById('b2-cep-custom-list');
                 const row = document.createElement('div');
                 row.className = `b2-event-row ${type} b2-cep-custom-row`;
                 row.id = `b2-custom-event-${ci}`;
-                row.innerHTML = `<span class="b2-type-badge ${type}">${type === 'income' ? '收入 📥' : '支出 📤'}</span><span class="b2-event-icon">${newEvent.icon}</span><span class="b2-event-name">${name}</span><span class="b2-event-amount ${type}">${type === 'income' ? '+' : '-'}${amount} 元</span><button class="b2-cep-del-btn" data-custom-idx="${ci}">✕</button>`;
+                const moneyIconsHtml2 = this._renderMoneyIconsGrouped(amount);
+                row.innerHTML = `
+                    <div class="b2-event-top">
+                        <span class="b2-type-badge ${type}">${type === 'income' ? '收入 📥' : '支出 📤'}</span>
+                        <span class="b2-event-icon">${newEvent.icon}</span>
+                        <span class="b2-event-name">${name}</span>
+                        <button class="b2-cep-del-btn" data-custom-idx="${ci}">✕</button>
+                    </div>
+                    <div class="b2-event-bottom">
+                        <div class="b2-event-money-icons">${moneyIconsHtml2}</div>
+                        <div class="b2-cost-input b2-cep-cost-input" data-idx="custom-${ci}" data-correct="${amount}">？ 元</div>
+                    </div>`;
                 list.appendChild(row);
+                // 綁定 ? 輸入框（自訂事件一律使用數字鍵盤）
+                const costInput = row.querySelector('.b2-cep-cost-input');
+                if (costInput) {
+                    Game.EventManager.on(costInput, 'click', () => {
+                        if (costInput.classList.contains('b2-input-correct')) return;
+                        if (isHard2 && q._openNumpadModal) {
+                            q._openNumpadModal(costInput);
+                        } else {
+                            this._showB2CustomEventNumpad(costInput, amount, type, name, question);
+                        }
+                    }, {}, 'gameUI');
+                }
                 const delBtn2 = row.querySelector('[data-custom-idx]');
                 Game.EventManager.on(delBtn2, 'click', () => {
                     q.customEvents[ci]._deleted = true;
@@ -1613,9 +1736,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         overlay.remove();
                         q.activeInputEl = null;
 
-                        // 所有事件輸入完成 → 自動顯示總計並進下一頁
+                        // 播放事件語音（NAME花掉/增加AMOUNt元）
+                        const eIdx = parseInt(inputEl.dataset.idx);
+                        const ev = this._getEffectiveEvents(question)[eIdx];
+                        const verb = isIncome ? `增加${correct}元` : `花掉${correct}元`;
+                        const evSpeech = ev ? `${ev.name}，${verb}` : verb;
+
+                        // 所有事件輸入完成 → 語音完成後再進下一頁（動態重算，包含自訂事件）
                         if (this._checkB2EventInputsCorrect()) {
-                            this._b2AutoFillTotalAndProceed(question, effectiveAnswer);
+                            Game.Speech.speak(evSpeech, () => {
+                                this._b2AutoFillTotalAndProceed(question, this._getEffectiveAnswer(question));
+                            });
+                        } else {
+                            Game.Speech.speak(evSpeech);
                         }
                     } else {
                         this.audio.play('error');
@@ -1656,6 +1789,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlay.className = 'b2-ht-modal-overlay';
                 overlay.innerHTML = `
                     <div class="b2-ht-modal">
+                        <button class="b2-ht-modal-close-btn" id="b2-ht-modal-close-btn" title="關閉">✕</button>
                         <div class="b2-ht-modal-title">${label}</div>
                         <div class="b2-ht-modal-display" id="b2-ht-modal-display">＿＿＿</div>
                         <div class="b2-ht-modal-numpad">
@@ -1685,15 +1819,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             const correct = parseInt(inputEl.dataset.correct);
                             if (entered === correct) {
                                 this.audio.play('correct');
-                                inputEl.textContent = `${correct} 元`;
+                                const eIdx = inputEl.dataset.idx;
+                                let displayText = `${correct} 元`;
+                                let isExpenseEntry = false;
+                                if (eIdx !== 'total') {
+                                    const ev = effEvents[parseInt(eIdx)];
+                                    if (ev) {
+                                        if (ev.type === 'income') {
+                                            displayText = `+${correct} 元`;
+                                        } else {
+                                            displayText = `-${correct} 元`;
+                                            isExpenseEntry = true;
+                                        }
+                                    }
+                                }
+                                inputEl.textContent = displayText;
                                 inputEl.classList.remove('b2-input-active');
                                 inputEl.classList.add('b2-input-correct');
+                                if (isExpenseEntry) inputEl.classList.add('b2-input-correct-expense');
                                 overlay.remove();
                                 q.activeInputEl = null;
                                 q.hardTotalInput = '';
+
+                                // 播放事件語音（非 total 欄位才播）
+                                if (eIdx !== 'total') {
+                                    const evForSpeech = effEvents[parseInt(eIdx)];
+                                    if (evForSpeech) {
+                                        const verb = evForSpeech.type === 'income' ? `增加${correct}元` : `花掉${correct}元`;
+                                        Game.Speech.speak(`${evForSpeech.name}，${verb}`);
+                                    }
+                                }
+
                                 if (this._checkB2AllInputsCorrect()) {
                                     Game.TimerManager.setTimeout(() => {
-                                        this._proceedB2FromPhase1(question, effectiveAnswer);
+                                        this._proceedB2FromPhase1(question, this._getEffectiveAnswer(question));
                                     }, 500, 'ui');
                                 }
                             } else {
@@ -1728,9 +1887,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
 
+                document.getElementById('b2-ht-modal-close-btn')?.addEventListener('click', closeModal);
                 // 點遮罩外部關閉
                 overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
             };
+            // 供自訂事件動態綁定使用（_bindCustomEventsPanel 中的 q._openNumpadModal）
+            q._openNumpadModal = openNumpadModal;
 
             effEvents.forEach((_, idx) => {
                 const input = document.getElementById(`b2-cost-input-${idx}`);
@@ -1780,6 +1942,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _proceedB2FromPhase1(question, effectiveAnswer) {
+            // 記錄答題歷史（三難度統一在此記錄）
+            const q = this.state.quiz;
+            if (!q.answeredHistory.some(h => h._qIdx === q.currentQuestion)) {
+                q.correctCount++;
+                q.answeredHistory.push({
+                    startAmount: question.startAmount,
+                    events: this._getEffectiveEvents(question),
+                    answer: effectiveAnswer,
+                    correct: true,
+                    _theme: question._theme,
+                    _qIdx: q.currentQuestion,
+                });
+            }
             this.audio.play('correct');
             this._fireConfetti();
             Game.Speech.speak(`最後剩下${effectiveAnswer}元`, () => {
@@ -1879,7 +2054,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
-                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: effectiveAnswer, correct: true });
+                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: effectiveAnswer, correct: true, _theme: question._theme });
                 this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
@@ -1910,7 +2085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }, 1600, 'turnTransition');
                 } else {
-                    this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: effectiveAnswer, correct: false });
+                    this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: question.events, answer: effectiveAnswer, correct: false, _theme: question._theme });
                     this._showCenterFeedback('❌', '答錯了！');
                     // 告知正確答案後進入第2頁
                     Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`, () => {
@@ -1939,12 +2114,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ev  = (this._getEffectiveEvents(question))[idx] || question.events[idx];
                 row.style.display = '';
                 row.style.animation = 'b2FadeIn 0.35s ease';
-                Game.Speech.speak(ev.name, () => {
-                    if (idx === 0) {
-                        // 首列語音結束後啟動金幣點擊
-                        this._bindB2EasyModeCoins(question);
-                    }
-                });
+                Game.Speech.speak(ev.name);
+                if (idx === 0) {
+                    // 首列顯示後立即啟動金幣點擊（不等語音結束）
+                    this._bindB2EasyModeCoins(question);
+                }
             };
 
             Game.TimerManager.setTimeout(() => revealRow(0), 200, 'ui');
@@ -2102,7 +2276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isCorrect) {
                 this.state.quiz.correctCount++;
-                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: this._getEffectiveEvents(question), answer: effectiveAnswer, correct: true });
+                this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: this._getEffectiveEvents(question), answer: effectiveAnswer, correct: true, _theme: question._theme });
                 this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
                 if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
@@ -2150,7 +2324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.querySelectorAll('.b2-numpad-btn').forEach(btn => btn.disabled = false);
                     }, 1800, 'turnTransition');
                 } else {
-                    this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: this._getEffectiveEvents(question), answer: effectiveAnswer, correct: false });
+                    this.state.quiz.answeredHistory.push({ startAmount: question.startAmount, events: this._getEffectiveEvents(question), answer: effectiveAnswer, correct: false, _theme: question._theme });
                     this._showCenterFeedback('❌', '答錯了！');
                     // 告知正確答案後進入第2頁
                     Game.Speech.speak(`正確答案是${toTWD(effectiveAnswer)}`, () => {
@@ -2328,7 +2502,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b2-ref-simple-row">
                     <span class="b2-ref-answer-label">💰 最後剩下</span>
                     <span class="b2-ref-answer-val" id="b2-ref-answer-val">
-                        ${isHard ? '??? 元' : `${effectiveAnswer} 元`}
+                        ${effectiveAnswer} 元
                     </span>
                     <div class="b2-ref-hint-wrap b2-ref-hint-inline">
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b2-ref-hint-mascot" onerror="this.style.display='none'">
@@ -2339,13 +2513,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB2WalletArea(requiredTotal) {
+            const isHard = this.state.settings.difficulty === 'hard';
             return `
             <div class="b2-wallet-area" id="b2-wallet-area">
                 <div class="b2-wallet-header">
                     <span class="b2-wallet-title">👛 我的零用錢</span>
                     <div class="b2-wallet-total-wrap">
                         <span class="b2-wallet-total-label">已放</span>
-                        <span class="b2-wallet-total-val" id="b2-wallet-total">0 元</span>
+                        <span class="b2-wallet-total-val" id="b2-wallet-total">${isHard ? '??? 元' : '0 元'}</span>
                         <span class="b2-wallet-sep">/</span>
                         <span class="b2-wallet-goal-tag">需要 ${requiredTotal} 元</span>
                     </div>
@@ -2430,10 +2605,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 提示按鈕
             Game.EventManager.on(document.getElementById('b2-wallet-hint-btn'), 'click', () => {
-                if (this.state.settings.difficulty === 'hard') {
+                const diff = this.state.settings.difficulty;
+                if (diff === 'hard') {
                     this.state.quiz.walletRevealed = true;
-                    const valEl = document.getElementById('b2-ref-answer-val');
-                    if (valEl) valEl.textContent = `${effectiveAnswer} 元`;
+                }
+                if (diff !== 'easy') {
+                    // 普通/困難：清空已放金幣再顯示提示
+                    this.state.wallet = [];
+                    this.state.uidCounter = 0;
                     this._updateB2WalletDisplay(effectiveAnswer);
                 }
                 this._showB2CoinHint(effectiveAnswer);
@@ -2452,6 +2631,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── B2 Wallet Operations ───────────────────────────────────
         _b2AddCoin(denom, requiredTotal) {
             const q = this.state.quiz;
+            const isHardNotRevealed = this.state.settings.difficulty === 'hard' && !q.walletRevealed;
             if (q.showHint && q.hintSlots?.length) {
                 const slotIdx = q.hintSlots.findIndex(s => s.denom === denom && !s.filled);
                 if (slotIdx === -1) { this.audio.play('error'); return; }
@@ -2463,18 +2643,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slotEl) slotEl.classList.remove('b2-wallet-ghost-slot');
                 this._updateB2WalletStatusOnly(requiredTotal);
                 const walletNow1 = this._getB2WalletTotal();
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow1)), 80, 'ui');
+                if (!isHardNotRevealed) {
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow1)), 80, 'ui');
+                }
                 // 簡單模式：所有 ghost slot 填滿後自動確認（同 B1 pattern）
                 if (this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled)) {
                     Game.TimerManager.setTimeout(() => this._handleB2WalletConfirm(requiredTotal, null), 400, 'ui');
                 }
             } else {
-                this.audio.play('coin');
+                if (isHardNotRevealed) {
+                    // 困難模式未按提示前：只播放 drop 音效，不播語音
+                    try { const s = document.getElementById('drop-sound'); if (s) { s.currentTime = 0; s.play().catch(() => {}); } } catch(e) {}
+                } else {
+                    this.audio.play('coin');
+                }
                 const uid = ++this.state.uidCounter;
                 this.state.wallet.push({ denom, uid, isBanknote: denom >= 100 });
                 this._updateB2WalletDisplay(requiredTotal);
-                const walletNow2 = this._getB2WalletTotal();
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow2)), 80, 'ui');
+                if (!isHardNotRevealed) {
+                    const walletNow2 = this._getB2WalletTotal();
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow2)), 80, 'ui');
+                }
             }
             // 浮動標籤
             const wc = document.getElementById('b2-wallet-coins');
@@ -2934,6 +3123,74 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (accuracy >= 50) { badge = '努力 🥉'; badgeColor = '#6366f1'; }
             else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; }
 
+            // 日記清單（B1 行程卡風格）
+            const diaryScheduleCardHTML = (() => {
+                const hist = q.answeredHistory;
+                if (!hist || hist.length === 0) return '';
+                const theme = this.state.settings.diaryTheme;
+                const themeInfo = B2_THEMES[theme];
+                const themeTitle = themeInfo ? `${themeInfo.icon} ${themeInfo.name}日記清單` : '📋 日記清單';
+                const mkMoneyIcons = (amt) => {
+                    const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                    let rem = amt; const parts = [];
+                    for (const d of denoms) {
+                        if (rem <= 0 || parts.length >= 3) break;
+                        const cnt = Math.floor(rem / d);
+                        if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
+                    }
+                    return parts.map(p => {
+                        const isBill = p.d >= 100;
+                        const w = isBill ? 28 : 20;
+                        const badge = p.cnt > 1 ? `<span style="font-size:10px;color:#6b7280;">×${p.cnt}</span>` : '';
+                        return `<img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
+                            style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:2px' : 'border-radius:50%'};vertical-align:middle;display:inline-block;margin:0 1px;"
+                            onerror="this.style.display='none'" draggable="false">${badge}`;
+                    }).join('');
+                };
+                const rowsArr = hist.map((h, i) => {
+                    const entryTheme = B2_THEMES[h._theme || theme];
+                    const entryIcon = entryTheme ? entryTheme.icon : '📒';
+                    const eventsHtml = h.events.map(e =>
+                        `<div class="b2-ds-item-row ${e.type}">
+                            ${e.icon || (e.type === 'income' ? '📥' : '📤')} ${e.name}：<span class="b2-ds-amt ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount}元</span>
+                            <span class="b2-ds-money-icons">${mkMoneyIcons(e.amount)}</span>
+                        </div>`
+                    ).join('');
+                    const resultTag = h.correct !== false
+                        ? `<span class="b2-ds-tag correct">✅</span>`
+                        : `<span class="b2-ds-tag wrong">❌</span>`;
+                    return `<div class="b2-ds-row">
+                        <div class="b2-ds-icon">${entryIcon}</div>
+                        <div class="b2-ds-detail">
+                            <div class="b2-ds-label">第 ${i + 1} 題 ${resultTag}</div>
+                            <div class="b2-ds-items">
+                                <div class="b2-ds-item-row start">💼 開始：${h.startAmount}元 <span class="b2-ds-money-icons">${mkMoneyIcons(h.startAmount)}</span></div>
+                                ${eventsHtml}
+                                <div class="b2-ds-item-total">結餘：${h.answer}元 <span class="b2-ds-money-icons">${mkMoneyIcons(h.answer)}</span></div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                const total = rowsArr.length;
+                const navHTML = total > 1 ? `
+                    <div class="b2-ds-nav">
+                        <button class="b2-ds-nav-btn" id="b2-ds-prev">◀</button>
+                        <span class="b2-ds-nav-label" id="b2-ds-nav-label">1 / ${total}</span>
+                        <button class="b2-ds-nav-btn" id="b2-ds-next">▶</button>
+                    </div>` : '';
+                // Store rowsArr for post-render nav binding
+                this._b2DiaryNavRows = rowsArr;
+                this._b2DiaryNavIdx  = 0;
+                return `
+                <div class="b-review-card" id="b2-diary-schedule-card">
+                    <h3 class="b2-ds-header-row">
+                        <span>${themeTitle}</span>
+                        ${navHTML}
+                    </h3>
+                    <div class="b2-ds-rows" id="b2-ds-rows-container">${rowsArr[0] || ''}</div>
+                </div>`;
+            })();
+
             // 本期收支總計
             const totalCardHTML = (() => {
                 const hist = q.answeredHistory;
@@ -3080,23 +3337,53 @@ document.addEventListener('DOMContentLoaded', () => {
             })();
 
             // ── 第一頁：測驗回顧 ──
+            const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
+            const diffLabelR = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
+            const centerTextR = diffLabelR + (themeInfo ? ` · ${themeInfo.icon}${themeInfo.name}` : '');
             app.innerHTML = `
+<div class="b-header">
+    <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+    <div class="b-header-center">${centerTextR}</div>
+    <div class="b-header-right">
+        <span class="b-progress">第 ${q.totalQuestions} 題 / 共 ${q.totalQuestions} 題</span>
+        <button class="b-reward-btn" id="b2-review-reward-btn">🎁 獎勵</button>
+        <button class="b-back-btn" id="b2-review-back-btn">返回設定</button>
+    </div>
+</div>
 <div class="b-review-wrapper">
     <div class="b-review-screen">
-        <div class="b-review-header">
-            <div class="b-review-emoji">📒</div>
-            <h1 class="b-review-title">記帳回顧</h1>
-            <p class="b-review-subtitle">這週的收支紀錄</p>
-        </div>
-        ${summaryTableHTML}
+        ${diaryScheduleCardHTML}
         ${totalCardHTML}
         ${maxCardHTML}
-        ${historyCardHTML}
         <button id="b2-view-summary-btn" class="b-review-next-btn">
             📊 查看測驗總結
         </button>
     </div>
 </div>`;
+
+            // 日記導覽按鈕事件綁定
+            if (this._b2DiaryNavRows && this._b2DiaryNavRows.length > 1) {
+                const navRows = this._b2DiaryNavRows;
+                let navIdx = 0;
+                const showEntry = (i) => {
+                    navIdx = (i + navRows.length) % navRows.length;
+                    const c = document.getElementById('b2-ds-rows-container');
+                    const lbl = document.getElementById('b2-ds-nav-label');
+                    if (c) c.innerHTML = navRows[navIdx];
+                    if (lbl) lbl.textContent = `${navIdx + 1} / ${navRows.length}`;
+                };
+                const prevBtn = document.getElementById('b2-ds-prev');
+                const nextBtn = document.getElementById('b2-ds-next');
+                if (prevBtn) Game.EventManager.on(prevBtn, 'click', () => showEntry(navIdx - 1), {}, 'gameUI');
+                if (nextBtn) Game.EventManager.on(nextBtn, 'click', () => showEntry(navIdx + 1), {}, 'gameUI');
+            }
+
+            // 標題列按鈕
+            Game.EventManager.on(document.getElementById('b2-review-reward-btn'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b2-review-back-btn'), 'click', () => this.showSettings(), {}, 'gameUI');
 
             Game.TimerManager.setTimeout(() => {
                 document.getElementById('success-sound')?.play();

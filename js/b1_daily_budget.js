@@ -353,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-count="10">10題</button>
                                 <button class="b-sel-btn" data-count="15">15題</button>
                                 <button class="b-sel-btn" data-count="20">20題</button>
+                                <button class="b-sel-btn" id="b1-custom-count-btn">自訂選項</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -421,11 +422,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     // 輔助點擊：只有簡單模式才顯示
                     const assistGroup  = document.getElementById('assist-click-group');
-                    const modeGroup    = document.getElementById('mode-settings-group');
                     const customRow    = document.getElementById('custom-items-toggle-row');
                     if (btn.dataset.diff === 'easy') {
                         if (assistGroup) assistGroup.style.display = '';
-                        if (modeGroup && this.state.settings.clickMode === 'on') modeGroup.style.display = 'none';
                         // 簡單模式：隱藏自訂項目，重設為關閉
                         if (customRow) customRow.style.display = 'none';
                         this.state.settings.customItemsEnabled = false;
@@ -435,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         if (assistGroup) assistGroup.style.display = 'none';
                         this.state.settings.clickMode = 'off';
-                        if (modeGroup) modeGroup.style.display = '';
                         // 普通/困難：顯示自訂項目切換列
                         if (customRow) customRow.style.display = '';
                     }
@@ -447,12 +445,26 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-count]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('[data-count]').forEach(b => b.classList.remove('active'));
+                    document.getElementById('b1-custom-count-btn')?.classList.remove('active');
                     btn.classList.add('active');
                     this.state.settings.questionCount = parseInt(btn.dataset.count);
                     this._checkCanStart();
                 }, {}, 'settings');
             });
 
+            // 自訂題數
+            const b1CustomCountBtn = document.getElementById('b1-custom-count-btn');
+            if (b1CustomCountBtn) {
+                Game.EventManager.on(b1CustomCountBtn, 'click', () => {
+                    this._showSettingsCountNumpad('題數', (n) => {
+                        document.querySelectorAll('[data-count]').forEach(b => b.classList.remove('active'));
+                        b1CustomCountBtn.classList.add('active');
+                        b1CustomCountBtn.textContent = `${n}題`;
+                        this.state.settings.questionCount = n;
+                        this._checkCanStart();
+                    });
+                }, {}, 'settings');
+            }
 
             Game.EventManager.on(document.getElementById('settings-reward-link'), 'click', (e) => {
                 e.preventDefault();
@@ -473,10 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#assist-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.clickMode = btn.dataset.assist;
-                    const modeGroup = document.getElementById('mode-settings-group');
-                    if (modeGroup) {
-                        modeGroup.style.display = (this.state.settings.difficulty === 'easy' && btn.dataset.assist === 'on') ? 'none' : '';
-                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -500,6 +508,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const s   = this.state.settings;
             const btn = document.getElementById('start-btn');
             if (btn) btn.disabled = !s.difficulty || !s.questionCount || !s.sceneCategory;
+        },
+
+        _showSettingsCountNumpad(label, onConfirm) {
+            document.getElementById('b-snp-overlay')?.remove();
+            let val = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-snp-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">自訂${label}</div>
+                    <div id="b-snp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">---</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-snpk="${k}">${k}</button>`).join('')}
+                    </div>
+                    <button id="b-snp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-snp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-snpk]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.snpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 99) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 99) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-snp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         },
 
         // ── Start Game ─────────────────────────────────────────
@@ -622,6 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 初始化逐項揭露狀態
             q.easyRevealedUpTo = 0;
             q.itemsCorrect = [];
+            q.customItemsPendingCount = 0;
 
             // showTotal：normal/hard 均不顯示總計（逐項輸入後自動算出）
             const showTotal  = false;
@@ -1338,6 +1386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _checkB1AllItemsCorrect(curr, items) {
             const q = this.state.quiz;
             if (!q.itemsCorrect.every(Boolean)) return;
+            if ((q.customItemsPendingCount || 0) > 0) return;
             const effectiveTotal = this._getEffectiveTotal(curr);
             const totalAmtEl = document.getElementById('b1-easy-total-amt');
             if (totalAmtEl) totalAmtEl.textContent = `${effectiveTotal} 元`;
@@ -1348,6 +1397,66 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._renderPhase2(curr, diff);
                 });
             }, 400, 'ui');
+        },
+
+        // ── 自訂項目：數字鍵盤彈窗（答題用）────────────────────────
+        _showB1CustomItemNumpad(btn, cost, curr) {
+            const q = this.state.quiz;
+            document.getElementById('b1-cip-numpad-overlay')?.remove();
+            let inputVal = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b1-cip-numpad-overlay';
+            overlay.className = 'b1-nchoice-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b1-nchoice-modal">
+                    <div class="b1-nchoice-title">📌 這個項目需要幾元？</div>
+                    <div id="b1-cip-np-disp" style="font-size:1.8rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin:8px 0;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b1-nchoice-btn" data-cipnp="${k}" style="padding:10px;">${k}</button>`).join('')}
+                    </div>
+                    <div id="b1-cip-np-err" style="color:#ef4444;font-size:13px;text-align:center;margin-top:4px;display:none;"></div>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b1-cip-np-disp');
+            const errEl = overlay.querySelector('#b1-cip-np-err');
+            const updateDisp = () => { disp.textContent = inputVal || '___'; };
+            overlay.querySelectorAll('[data-cipnp]').forEach(npBtn => {
+                npBtn.addEventListener('click', () => {
+                    const k = npBtn.dataset.cipnp;
+                    if (k === '⌫') { inputVal = inputVal.slice(0, -1); }
+                    else if (k === '✓') {
+                        const entered = parseInt(inputVal);
+                        if (entered === cost) {
+                            overlay.remove();
+                            this.audio.play('correct');
+                            btn.textContent = `${cost} 元`;
+                            btn.classList.add('b1-item-cost-revealed');
+                            btn.disabled = true;
+                            q.customItemsPendingCount = Math.max(0, (q.customItemsPendingCount || 0) - 1);
+                            Game.Speech.speak(`${cost}元，答對了！`, () => {
+                                this._checkB1AllItemsCorrect(curr, this._getEffectiveItems(curr));
+                            });
+                        } else {
+                            this.audio.play('error');
+                            inputVal = '';
+                            const isOver = entered > cost;
+                            errEl.textContent = `❌ ${isOver ? '算多了' : '算少了'}，再想想看！`;
+                            errEl.style.display = '';
+                            Game.TimerManager.setTimeout(() => { errEl.style.display = 'none'; }, 1500, 'ui');
+                            Game.Speech.speak(`不對喔，${isOver ? '算多了' : '算少了'}，再想想看`);
+                        }
+                        updateDisp();
+                        return;
+                    } else {
+                        errEl.style.display = 'none';
+                        const next = inputVal + k;
+                        if (parseInt(next, 10) <= 99999) inputVal = next;
+                    }
+                    updateDisp();
+                });
+            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+            Game.Speech.speak('這個項目需要幾元？');
         },
 
         // ── 自訂項目面板事件繫結 ──────────────────────────────────
@@ -1378,19 +1487,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     const customIdx = q.customItems.length - 1;
                     const list = document.getElementById('b1-cip-custom-list');
                     if (list) {
-                        // 新增項目樣式與原有行程項目一致（b1-schedule-item）
+                        q.customItemsPendingCount = (q.customItemsPendingCount || 0) + 1;
+                        const moneyIconsHtml = this._renderMoneyIconsGrouped(cost);
                         const row = document.createElement('div');
-                        row.className = 'b1-schedule-item b1-cip-custom-row';
+                        row.className = 'b1-schedule-item b1-cip-custom-row b1-item-enter';
                         row.id = `b1-cip-custom-${customIdx}`;
-                        row.innerHTML = `<span class="b1-item-name">📌 ${name}</span>
-                                         <span class="b1-item-cost">${cost} 元</span>
-                                         <button class="b1-cip-del-btn" data-custom-idx="${customIdx}">✕</button>`;
+                        row.innerHTML = `
+                            <div class="b1-item-top">
+                                <span class="b1-item-name">📌 ${name}</span>
+                                <button class="b1-cip-del-btn" data-custom-idx="${customIdx}">✕</button>
+                            </div>
+                            <div class="b1-item-bottom">
+                                <div class="b1-item-money-icons b1-item-icons-static">${moneyIconsHtml}</div>
+                                <button class="b1-cip-cost-btn" id="b1-cip-cost-btn-${customIdx}">？元</button>
+                            </div>`;
                         list.appendChild(row);
+                        // 綁定 ? 框 → 數字鍵盤
+                        const costBtn = row.querySelector('.b1-cip-cost-btn');
+                        if (costBtn) {
+                            Game.EventManager.on(costBtn, 'click', () => {
+                                if (costBtn.classList.contains('b1-item-cost-revealed')) return;
+                                this._showB1CustomItemNumpad(costBtn, cost, curr);
+                            }, {}, 'gameUI');
+                        }
+                        // 刪除自訂項目
                         const delBtn2 = row.querySelector('[data-custom-idx]');
                         if (delBtn2) {
                             Game.EventManager.on(delBtn2, 'click', () => {
                                 const ci = parseInt(delBtn2.dataset.customIdx);
                                 q.customItems[ci]._deleted = true;
+                                // 若 ? 框未答對，減少待答計數
+                                const cb = document.getElementById(`b1-cip-cost-btn-${ci}`);
+                                if (cb && !cb.classList.contains('b1-item-cost-revealed')) {
+                                    q.customItemsPendingCount = Math.max(0, (q.customItemsPendingCount || 0) - 1);
+                                    this._checkB1AllItemsCorrect(curr, this._getEffectiveItems(curr));
+                                }
                                 row.remove();
                                 this._updateCustomTotalPreview(curr);
                                 this.audio.play('click');
@@ -2152,37 +2283,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.quiz.streak = 0;
                 this.audio.play('error');
                 this.state.quiz.errorCount = (this.state.quiz.errorCount || 0) + 1;
-                this._showFeedback('❌', this.state.settings.retryMode === 'proceed' ? '答錯了！' : '再試一次！');
-                if (this.state.settings.retryMode === 'proceed') {
-                    Game.Speech.speak(`需要${toTWD(requiredTotal)}，繼續下一題`);
-                    Game.TimerManager.setTimeout(() => this.nextQuestion(), 2000, 'turnTransition');
+                this._showFeedback('❌', '再試一次！');
+                if (diff === 'normal' || diff === 'hard') {
+                    // 普通/困難：清空錢包 + 方向提示
+                    const isOver = walletTotal > requiredTotal;
+                    const errSpeech = isOver
+                        ? `拿了太多的錢，請再試一次`
+                        : `拿了太少的錢，請再試一次`;
+                    Game.Speech.speak(errSpeech);
+                    this.state.wallet = [];
+                    this.state.quiz.showHint = false;
+                    this.state.quiz.hintSlots = [];
                 } else {
-                    if (diff === 'normal' || diff === 'hard') {
-                        // 普通/困難：清空錢包 + 方向提示
-                        const isOver = walletTotal > requiredTotal;
-                        const errSpeech = isOver
-                            ? `拿了太多的錢，請再試一次`
-                            : `拿了太少的錢，請再試一次`;
-                        Game.Speech.speak(errSpeech);
-                        this.state.wallet = [];
-                        this.state.quiz.showHint = false;
-                        this.state.quiz.hintSlots = [];
-                    } else {
-                        Game.Speech.speak(`不對喔，你付的錢太少，請再試一次`);
-                    }
-                    this.state.isProcessing = false;
-                    const walletArea = document.getElementById('wallet-area');
-                    if (walletArea) {
-                        walletArea.style.animation = 'b1Shake 0.4s ease';
-                        Game.TimerManager.setTimeout(() => {
-                            walletArea.style.animation = '';
-                            this._updateWalletDisplay();
-                        }, 500, 'ui');
-                    }
-                    // 普通模式：3次錯誤後自動顯示 ghost slot 提示
-                    if (this.state.settings.difficulty === 'normal' && this.state.quiz.errorCount >= 3) {
-                        Game.TimerManager.setTimeout(() => this._showCoinHint(), 700, 'ui');
-                    }
+                    Game.Speech.speak(`不對喔，你付的錢太少，請再試一次`);
+                }
+                this.state.isProcessing = false;
+                const walletArea = document.getElementById('wallet-area');
+                if (walletArea) {
+                    walletArea.style.animation = 'b1Shake 0.4s ease';
+                    Game.TimerManager.setTimeout(() => {
+                        walletArea.style.animation = '';
+                        this._updateWalletDisplay();
+                    }, 500, 'ui');
+                }
+                // 普通模式：3次錯誤後自動顯示 ghost slot 提示
+                if (this.state.settings.difficulty === 'normal' && this.state.quiz.errorCount >= 3) {
+                    Game.TimerManager.setTimeout(() => this._showCoinHint(), 700, 'ui');
                 }
                 return;
             }
@@ -2525,14 +2651,22 @@ document.addEventListener('DOMContentLoaded', () => {
             app.style.minHeight = '100vh';
 
             // ── 第一頁：測驗回顧 ──
+            const diffLabelR = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
+            const catLabelsR = { all:'全部', school:'學校 🏫', food:'飲食 🍜', outdoor:'戶外 🌿', entertainment:'娛樂 🎭', shopping:'購物 🛒' };
+            const catLabelR  = catLabelsR[this.state.settings.sceneCategory] || '';
+            const centerTextR = catLabelR && catLabelR !== '全部' ? `${diffLabelR} · ${catLabelR}` : diffLabelR;
             app.innerHTML = `
+<div class="b-header">
+    <div class="b-header-left"><span class="b-header-unit">💰 今天帶多少錢</span></div>
+    <div class="b-header-center">${centerTextR}</div>
+    <div class="b-header-right">
+        <span class="b-progress">第 ${q.totalQuestions} 題 / 共 ${q.totalQuestions} 題</span>
+        <button class="b-reward-btn" id="b1-review-reward-btn">🎁 獎勵</button>
+        <button class="b-back-btn" id="b1-review-back-btn">返回設定</button>
+    </div>
+</div>
 <div class="b-review-wrapper">
     <div class="b-review-screen">
-        <div class="b-review-header">
-            <div class="b-review-emoji">🗓️</div>
-            <h1 class="b-review-title">今日行程總覽</h1>
-            <p class="b-review-subtitle">看看我的錢包裡準備了多少錢！</p>
-        </div>
         ${scheduleCardHTML}
         ${denomCardHTML}
         <button id="b1-view-summary-btn" class="b-review-next-btn">
@@ -2547,6 +2681,12 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => {
                 Game.Speech.speak('完成了！來看看今日行程總覽吧！');
             }, 600, 'speech');
+
+            Game.EventManager.on(document.getElementById('b1-review-reward-btn'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b1-review-back-btn'), 'click', () => this.showSettings(), {}, 'gameUI');
 
             Game.EventManager.on(document.getElementById('b1-view-summary-btn'), 'click', () => {
                 Game.EventManager.removeByCategory('gameUI');

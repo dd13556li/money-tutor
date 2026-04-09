@@ -415,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-val="3">3關</button>
                                 <button class="b-sel-btn" data-val="5">5關</button>
                                 <button class="b-sel-btn" data-val="8">8關</button>
+                                <button class="b-sel-btn" id="b5-custom-rounds-btn">自訂選項</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -493,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'settings');
             });
 
-            document.querySelectorAll('#rounds-group .b-sel-btn').forEach(btn => {
+            document.querySelectorAll('#rounds-group .b-sel-btn:not(#b5-custom-rounds-btn)').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     document.querySelectorAll('#rounds-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -501,6 +502,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._checkCanStart();
                 }, {}, 'settings');
             });
+
+            // 自訂關卡數
+            const b5CustomRoundsBtn = document.getElementById('b5-custom-rounds-btn');
+            if (b5CustomRoundsBtn) {
+                Game.EventManager.on(b5CustomRoundsBtn, 'click', () => {
+                    this._showSettingsCountNumpad('關卡數', (n) => {
+                        document.querySelectorAll('#rounds-group .b-sel-btn').forEach(b => b.classList.remove('active'));
+                        b5CustomRoundsBtn.classList.add('active');
+                        b5CustomRoundsBtn.textContent = `${n}關`;
+                        this.state.settings.rounds = n;
+                        this._checkCanStart();
+                    });
+                }, {}, 'settings');
+            }
 
             const rewardLink = document.getElementById('settings-reward-link');
             Game.EventManager.on(rewardLink, 'click', (e) => {
@@ -540,6 +555,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('start-btn');
             const s = this.state.settings;
             if (btn) btn.disabled = !s.difficulty || !s.rounds || !s.partyTheme;
+        },
+
+        _showSettingsCountNumpad(label, onConfirm) {
+            document.getElementById('b-snp-overlay')?.remove();
+            let val = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-snp-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">自訂${label}</div>
+                    <div id="b-snp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">---</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-snpk="${k}">${k}</button>`).join('')}
+                    </div>
+                    <button id="b-snp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-snp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-snpk]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.snpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 99) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 99) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-snp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         },
 
         // ── 9. 遊戲開始 ───────────────────────────────────────
