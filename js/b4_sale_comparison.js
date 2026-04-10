@@ -120,8 +120,11 @@ function b4PriceCoinsBar(price) {
     }).join('');
 }
 // 差額算式提示表格：[貴商店] - [便宜商店] = [差額]
-function b4DiffFormula(expStore, expPrice, cheapStore, cheapPrice, diff, unit) {
+function b4DiffFormula(expStore, expPrice, cheapStore, cheapPrice, diff, unit, hideResult = false) {
     const u = unit || '元';
+    const diffCell = hideResult
+        ? `<div class="b4-dff-price b4-dff-diff b4-dff-unknown">？？？</div>`
+        : `<div class="b4-dff-price b4-dff-diff">${diff} ${u}</div>`;
     return `
     <div class="b4-diff-formula">
         <div class="b4-dff-hd">${expStore}</div>
@@ -133,7 +136,7 @@ function b4DiffFormula(expStore, expPrice, cheapStore, cheapPrice, diff, unit) {
         <div class="b4-dff-op">－</div>
         <div class="b4-dff-price b4-dff-cheap">${cheapPrice} ${u}</div>
         <div class="b4-dff-op">＝</div>
-        <div class="b4-dff-price b4-dff-diff">${diff} ${u}</div>
+        ${diffCell}
     </div>`;
 }
 function b4PriceCoins(price) {
@@ -147,9 +150,9 @@ function b4PriceCoins(price) {
     return coins.map(d => {
         const isBill = d >= 100;
         const w  = isBill ? '100px' : '60px';
-        const h  = isBill ? 'auto'  : '60px';
+        const h  = isBill ? '48.91px' : '60px';
         const br = isBill ? '4px'   : '50%';
-        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:${h};border-radius:${br};vertical-align:middle;" draggable="false" onerror="this.style.display='none'">`;
+        return `<img src="../images/money/${d}_yuan_front.png" style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;" draggable="false" onerror="this.style.display='none'">`;
     }).join('');
 }
 
@@ -743,6 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${questionLabel}
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
+                    ${diff === 'easy' && !curr.isUnit ? `<div class="b4-easy-coin-hint">👆 點擊每一枚金幣，點完後自動比較</div>` : ''}
                     ${diff !== 'easy' ? `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
@@ -773,39 +777,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindSelectEvents(curr, correctSide, left, right);
 
-            // 依難度揭露卡片：easy 顯示金幣＋金額；normal/hard 只顯示金幣（讓學生從圖示判斷金額）
+            // 依難度揭露卡片
             if (diff === 'easy') {
-                this._revealCardPrices(left, right);
+                this._setupEasyModeCoins(curr, left, right, correctSide);
+            } else if (diff === 'normal') {
+                this._setupNormalModeCoins(curr, left, right, correctSide);
             } else {
-                this._revealCoinsOnly(left, right);
+                // hard: 價格以？？？顯示，金幣保持隱藏，等提示鈕才揭露
+                ['left', 'right'].forEach(s => {
+                    const priceEl = document.querySelector(`#card-${s} .b4-price`);
+                    if (priceEl) {
+                        priceEl.classList.remove('b4-price-hidden');
+                        priceEl.innerHTML = `<span class="b4-price-unknown">？？？</span>`;
+                    }
+                });
             }
 
-            // 語音引導（afterClose pattern：商品名稱介紹完畢後再播問題語音）
+            // 語音引導（afterClose pattern）
             let speechText;
             if (curr.isUnit) {
-                const unitInfo = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}`;
                 const unitSuffix = diff === 'easy'
                     ? `，哪家每${curr.unit}比較划算？`
-                    : diff === 'normal'
-                    ? `，哪家每${curr.unit}比較划算？選出後再回答每${curr.unit}差多少元。`
-                    : `，哪家每${curr.unit}比較划算？選出後輸入每${curr.unit}差額。`;
+                    : `，哪家每${curr.unit}比較划算？請輸入較划算的每${curr.unit}價格。`;
                 speechText = `${left.store}${left.qty}${curr.unit}${toTWD(left.price)}，${right.store}${right.qty}${curr.unit}${toTWD(right.price)}${unitSuffix}`;
             } else {
-                const priceInfo = `${left.store}${toTWD(left.price)}，${right.store}${toTWD(right.price)}`;
+                const s1 = left.store, p1 = left.price;
+                const s2 = right.store, p2 = right.price;
+                const intro = p1 === p2
+                    ? `${s1}跟${s2}都是${p1}元`
+                    : `${s1}${toTWD(p1)}，${s2}${toTWD(p2)}`;
                 const speechMap = {
-                    easy:   `${priceInfo}，哪個比較便宜？`,
-                    normal: `${priceInfo}，哪個比較便宜？選出之後再回答差額。`,
-                    hard:   `${priceInfo}，哪個比較便宜？選出後輸入差額。`,
+                    easy:   `${intro}，請問哪一個商店賣的比較便宜？`,
+                    normal: `${intro}，請問哪一個商店賣的比較便宜？`,
+                    hard:   `${intro}，請問哪一個商店賣的比較便宜？`,
                 };
                 speechText = speechMap[diff] || `哪個地方比較便宜？`;
             }
             this.state.quiz.lastSpeechText = `${curr.name}，${speechText}`;
             this._showItemIntroModal(curr, () => {
-                // 問題語音（modal 介紹商品名稱後銜接）
-                Game.Speech.speak(speechText);
-                // 輔助點擊啟動
-                if (this.state.settings.clickMode === 'on') {
-                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 400, 'ui');
+                if (diff === 'hard') {
+                    // 困難：播完題目語音後才顯示輸入框
+                    Game.Speech.speak(speechText, () => {
+                        this._showPriceInputSection(curr, left, right, correctSide);
+                    });
+                } else {
+                    Game.Speech.speak(speechText);
+                    // 輔助點擊（easy/normal 依賴金幣點擊，不啟動 AssistClick）
                 }
             });
 
@@ -873,23 +890,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const existing = document.getElementById('b4-item-intro-modal');
             if (existing) existing.remove();
 
-            let storesHTML;
-            if (curr.isTriple) {
-                storesHTML = curr.stores.map(s => `<span class="b4-intro-store">${s.storeIcon} ${s.store}<br><strong>${s.price}元</strong></span>`).join('');
-            } else if (curr.isUnit) {
-                storesHTML = `
-                    <span class="b4-intro-store">${curr.optA.storeIcon} ${curr.optA.store}<br><strong>${curr.optA.qty}${curr.unit} / ${curr.optA.price}元</strong></span>
-                    <span class="b4-intro-vs">VS</span>
-                    <span class="b4-intro-store">${curr.optB.storeIcon} ${curr.optB.store}<br><strong>${curr.optB.qty}${curr.unit} / ${curr.optB.price}元</strong></span>`;
-            } else {
-                storesHTML = `
-                    <span class="b4-intro-store">${curr.optA.storeIcon} ${curr.optA.store}<br><strong>${curr.optA.price}元</strong></span>
-                    <span class="b4-intro-vs">VS</span>
-                    <span class="b4-intro-store">${curr.optB.storeIcon} ${curr.optB.store}<br><strong>${curr.optB.price}元</strong></span>`;
-            }
-
-            const questionText = curr.isTriple ? '哪家最便宜？' : (curr.isUnit ? `哪家每${curr.unit}最划算？` : '哪個比較便宜？');
-
             const modal = document.createElement('div');
             modal.id = 'b4-item-intro-modal';
             modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);cursor:pointer;';
@@ -897,8 +897,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-intro-card">
                     <div class="b4-intro-icon">${curr.icon}</div>
                     <div class="b4-intro-name">${curr.name}</div>
-                    <div class="b4-intro-stores">${storesHTML}</div>
-                    <div class="b4-intro-question">${questionText}</div>
                 </div>`;
             document.body.appendChild(modal);
 
@@ -961,6 +959,326 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-price b4-price-hidden">? <span class="b4-price-unit">元</span></div>
                 <div class="b4-price-coins b4-price-coins-hidden"></div>
             </div>`;
+        },
+
+        // ── 簡單模式：逐枚點擊金幣後自動比較 ─────────────────────
+        _getCoinsArray(price) {
+            let rem = price;
+            const arr = [];
+            for (const d of B4_DENOMS) {
+                const n = Math.floor(rem / d);
+                for (let i = 0; i < n; i++) arr.push(d);
+                rem -= d * n;
+            }
+            return arr;
+        },
+
+        _setupEasyModeCoins(curr, left, right, correctSide) {
+            const state = this.state;
+            const coinsData = {
+                left:  { opt: left,  coins: this._getCoinsArray(left.price),  clickedCount: 0, done: false },
+                right: { opt: right, coins: this._getCoinsArray(right.price), clickedCount: 0, done: false }
+            };
+
+            ['left', 'right'].forEach(side => {
+                const card = document.getElementById(`card-${side}`);
+                const coinsEl = card?.querySelector('.b4-price-coins');
+                const priceEl = card?.querySelector('.b4-price');
+                if (!coinsEl) return;
+
+                const data = coinsData[side];
+                let runningTotal = 0;
+
+                // Show coins as clickable, price starts at 0
+                coinsEl.classList.remove('b4-price-coins-hidden');
+                coinsEl.innerHTML = data.coins.map((d, i) => {
+                    const isBill = d >= 100;
+                    const w  = isBill ? '100px' : '60px';
+                    const h  = isBill ? '48.91px' : '60px';
+                    const br = isBill ? '4px' : '50%';
+                    return `<img src="../images/money/${d}_yuan_front.png"
+                        data-cidx="${i}" data-cval="${d}" data-cside="${side}"
+                        class="b4-easy-coin"
+                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
+                        draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+
+                // Show price as 0 元 (visible, not hidden)
+                if (priceEl) {
+                    priceEl.classList.remove('b4-price-hidden');
+                    priceEl.innerHTML = `0 <span class="b4-price-unit">元</span>`;
+                }
+
+                // Attach per-coin click handlers
+                coinsEl.querySelectorAll('.b4-easy-coin').forEach(img => {
+                    Game.EventManager.on(img, 'click', () => {
+                        if (img.dataset.clicked || data.done) return;
+                        img.dataset.clicked = '1';
+                        img.style.opacity = '0.5';
+                        img.style.outline = '3px solid #10b981';
+
+                        runningTotal += parseInt(img.dataset.cval);
+                        data.clickedCount++;
+
+                        if (priceEl) {
+                            priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
+                        }
+
+                        const isLast = data.clickedCount >= data.coins.length;
+                        if (isLast) {
+                            data.done = true;
+                            if (card) card.style.outline = '3px solid #10b981';
+                            // Wait for speech to complete before checking if both sides done
+                            Game.Speech.speak(`${runningTotal}元`, () => {
+                                const other = side === 'left' ? 'right' : 'left';
+                                if (coinsData[other].done) {
+                                    this._handleEasyBothSidesDone(curr, correctSide, left, right);
+                                }
+                            });
+                        } else {
+                            Game.Speech.speak(`${runningTotal}元`);
+                        }
+                    }, {}, 'gameUI');
+                });
+            });
+
+            // Store reference so we can check completion
+            this.state._easyCoinsDone = coinsData;
+        },
+
+        _handleEasyBothSidesDone(curr, correctSide, left, right) {
+            if (this.state.isProcessing) return;
+            this.state.isProcessing = true;
+            this._clearSelectHintTimer();
+
+            // Reveal actual prices
+            this._revealCardPrices(left, right);
+
+            const correctCard = document.getElementById(`card-${correctSide}`);
+            const wrongSide   = correctSide === 'left' ? 'right' : 'left';
+            const wrongCard   = document.getElementById(`card-${wrongSide}`);
+
+            this.audio.play('correct');
+            this._showCenterFeedback('✅', '比較看看！');
+
+            if (correctCard) {
+                correctCard.classList.add('selected-correct', 'b4-card-glow');
+                correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
+                    <div class="b4-cheaper-tag">比較便宜！</div>`;
+            }
+            if (wrongCard) {
+                const delta = Math.abs(left.price - right.price);
+                if (delta > 0) {
+                    wrongCard.classList.add('selected-wrong');
+                    wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴 +${delta}元</div>`;
+                }
+            }
+
+            this.state.quiz.correctCount++;
+            this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+            if (this.state.quiz.streak === 3 || this.state.quiz.streak === 5) {
+                Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
+            }
+
+            const cheapSide = correctSide === 'left' ? left : right;
+            this._showChampionBadge(cheapSide.store);
+            this._showThinkingSteps(curr);
+
+            const priceSpeech = `${cheapSide.store}，${cheapSide.price}元，比較便宜！`;
+            Game.Speech.speak(priceSpeech, () => {
+                this.state.isProcessing = false;
+                this.state.phase = 'diff';
+                this.state.currentDiffItem = curr;
+                this._renderDiffSection(curr, 'easy');
+            });
+        },
+
+        // ── 普通模式：點幣後輸入較便宜價格 ──────────────────────────
+        _setupNormalModeCoins(curr, left, right, correctSide) {
+            const coinsData = {
+                left:  { opt: left,  coins: this._getCoinsArray(left.price),  clickedCount: 0, done: false },
+                right: { opt: right, coins: this._getCoinsArray(right.price), clickedCount: 0, done: false }
+            };
+
+            ['left', 'right'].forEach(side => {
+                const card = document.getElementById(`card-${side}`);
+                const coinsEl = card?.querySelector('.b4-price-coins');
+                const priceEl = card?.querySelector('.b4-price');
+                if (!coinsEl) return;
+
+                const data = coinsData[side];
+                let runningTotal = 0;
+
+                coinsEl.classList.remove('b4-price-coins-hidden');
+                coinsEl.innerHTML = data.coins.map((d, i) => {
+                    const isBill = d >= 100;
+                    const w  = isBill ? '100px' : '60px';
+                    const h  = isBill ? '48.91px' : '60px';
+                    const br = isBill ? '4px' : '50%';
+                    return `<img src="../images/money/${d}_yuan_front.png"
+                        data-cidx="${i}" data-cval="${d}" data-cside="${side}"
+                        class="b4-easy-coin"
+                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
+                        draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+
+                if (priceEl) {
+                    priceEl.classList.remove('b4-price-hidden');
+                    priceEl.innerHTML = `0 <span class="b4-price-unit">元</span>`;
+                }
+
+                coinsEl.querySelectorAll('.b4-easy-coin').forEach(img => {
+                    Game.EventManager.on(img, 'click', () => {
+                        if (img.dataset.clicked || data.done) return;
+                        img.dataset.clicked = '1';
+                        img.style.opacity = '0.5';
+                        img.style.outline = '3px solid #10b981';
+
+                        runningTotal += parseInt(img.dataset.cval);
+                        data.clickedCount++;
+                        if (priceEl) priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
+
+                        const isLast = data.clickedCount >= data.coins.length;
+                        if (isLast) {
+                            data.done = true;
+                            if (card) card.style.outline = '3px solid #10b981';
+                            Game.Speech.speak(`${runningTotal}元`, () => {
+                                const other = side === 'left' ? 'right' : 'left';
+                                if (coinsData[other].done) {
+                                    this._showPriceInputSection(curr, left, right, correctSide);
+                                }
+                            });
+                        } else {
+                            Game.Speech.speak(`${runningTotal}元`);
+                        }
+                    }, {}, 'gameUI');
+                });
+            });
+        },
+
+        _showPriceInputSection(curr, left, right, correctSide) {
+            const diff      = this.state.settings.difficulty;
+            const cheapOpt  = correctSide === 'left' ? left : right;
+            const expOpt    = correctSide === 'left' ? right : left;
+            const cheapPrice = cheapOpt.price;
+
+            const section = document.getElementById('diff-section');
+            if (!section) return;
+
+            const isUnit = curr.isUnit;
+            const label  = isUnit ? `請輸入較划算的每${curr.unit}價格` : '請輸入較便宜的商品價格';
+            const unit   = isUnit ? `元/${curr.unit}` : '元';
+
+            section.innerHTML = `
+            <div class="b4-pi-card">
+                <div class="b4-pi-label">${label}</div>
+                <div class="b4-input-display b4-pi-input-box" id="b4-pi-display" style="cursor:pointer;" title="點我輸入">
+                    <span id="b4-pi-val">？</span><span class="b4-unit-text"> ${unit}</span>
+                </div>
+                <div class="b4-pi-tap-hint">👆 點擊輸入</div>
+            </div>`;
+
+            let piValue = '';
+            const updateDisplay = () => {
+                const el = document.getElementById('b4-pi-val');
+                if (el) el.textContent = piValue || '？';
+            };
+
+            Game.Speech.speak(label);
+
+            const openNumpad = () => {
+                const prev = document.getElementById('b4-pi-modal');
+                if (prev) prev.remove();
+
+                const overlay = document.createElement('div');
+                overlay.id = 'b4-pi-modal';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);';
+                overlay.innerHTML = `
+                <div class="b4-pi-modal-card">
+                    <div class="b4-pi-modal-title">${label}</div>
+                    <div class="b4-input-display" id="b4-pi-m-display">
+                        <span id="b4-pi-m-val">${piValue || '0'}</span><span class="b4-unit-text"> ${unit}</span>
+                    </div>
+                    <div class="b4-numpad">
+                        ${[7,8,9,4,5,6,1,2,3].map(n => `<button class="b4-numpad-btn" data-pinum="${n}">${n}</button>`).join('')}
+                        <button class="b4-numpad-btn btn-del" id="b4-pi-m-del">⌫</button>
+                        <button class="b4-numpad-btn" data-pinum="0">0</button>
+                        <button class="b4-numpad-btn btn-ok" id="b4-pi-m-ok">✓</button>
+                    </div>
+                    <button class="b4-hnp-cancel" id="b4-pi-m-cancel">取消</button>
+                </div>`;
+                document.body.appendChild(overlay);
+
+                const updateM = () => {
+                    const el = document.getElementById('b4-pi-m-val');
+                    if (el) el.textContent = piValue || '0';
+                };
+
+                overlay.querySelectorAll('[data-pinum]').forEach(btn => {
+                    btn.addEventListener('click', e => { e.stopPropagation(); if (piValue.length >= 5) return; piValue += btn.dataset.pinum; updateM(); updateDisplay(); });
+                });
+                document.getElementById('b4-pi-m-del').addEventListener('click', e => { e.stopPropagation(); piValue = piValue.slice(0, -1); updateM(); updateDisplay(); });
+                document.getElementById('b4-pi-m-cancel').addEventListener('click', () => overlay.remove());
+                document.getElementById('b4-pi-m-ok').addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (this.state.isProcessing) return;
+                    const entered = parseInt(piValue) || 0;
+                    if (entered === 0) return;
+                    this.state.isProcessing = true;
+                    overlay.remove();
+
+                    const display = document.getElementById('b4-pi-display');
+                    if (display) display.querySelector('#b4-pi-val').textContent = entered;
+                    const isCorrect = (entered === cheapPrice);
+                    if (isCorrect) {
+                        this.audio.play('correct');
+                        this._showCenterFeedback('✅', '答對了！');
+                        this.state.quiz.correctCount++;
+                        this.state.quiz.streak = (this.state.quiz.streak || 0) + 1;
+
+                        this._revealCardPrices(left, right);
+                        const correctCard = document.getElementById(`card-${correctSide}`);
+                        if (correctCard) {
+                            correctCard.classList.add('selected-correct', 'b4-card-glow');
+                            correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div><div class="b4-cheaper-tag">比較便宜！</div>`;
+                        }
+                        const wrongSide = correctSide === 'left' ? 'right' : 'left';
+                        const wrongCard = document.getElementById(`card-${wrongSide}`);
+                        if (wrongCard) {
+                            const delta = Math.abs(left.price - right.price);
+                            if (delta > 0) {
+                                wrongCard.classList.add('selected-wrong');
+                                wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴 +${delta}元</div>`;
+                            }
+                        }
+
+                        const speech = isUnit
+                            ? `答對了！${cheapOpt.store}每${curr.unit}${cheapPrice}元，比較划算`
+                            : `答對了！${cheapOpt.store}${cheapPrice}元，比較便宜`;
+                        Game.Speech.speak(speech, () => {
+                            this.state.isProcessing = false;
+                            this.state.phase = 'diff';
+                            this.state.currentDiffItem = curr;
+                            this._renderDiffSection(curr, diff);
+                        });
+                    } else {
+                        this.audio.play('error');
+                        const isExpPrice = (entered === expOpt.price);
+                        const errSpeech = isExpPrice
+                            ? `不對喔，${expOpt.store}是${expOpt.price}元，請輸入比較便宜的那家`
+                            : `不對喔，請再想想哪家比較便宜`;
+                        Game.Speech.speak(errSpeech, () => {
+                            Game.TimerManager.setTimeout(() => {
+                                this.state.isProcessing = false;
+                                piValue = '';
+                                updateDisplay();
+                            }, 400, 'ui');
+                        });
+                    }
+                });  // end ok click
+            };  // end openNumpad
+
+            Game.EventManager.on(document.getElementById('b4-pi-display'), 'click', openNumpad, {}, 'gameUI');
         },
 
         // ── 揭露卡片價格 helpers ────────────────────────────────
@@ -1026,24 +1344,28 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _bindSelectEvents(curr, correctSide, left, right) {
-            // 選項卡點擊
-            ['left', 'right'].forEach(side => {
-                const card = document.getElementById(`card-${side}`);
-                Game.EventManager.on(card, 'click', () => {
-                    if (this.state.isProcessing) return;
-                    this.state.isProcessing = true;
-                    const isCorrect = (side === correctSide);
-                    this.handleSelectClick(isCorrect, curr, correctSide, left, right);
-                }, {}, 'gameUI');
-            });
+            const diff = this.state.settings.difficulty;
+            // 選項卡點擊（簡單/普通模式改為逐枚點幣，不可直接點卡片選擇）
+            if (diff !== 'easy' && diff !== 'normal') {
+                ['left', 'right'].forEach(side => {
+                    const card = document.getElementById(`card-${side}`);
+                    Game.EventManager.on(card, 'click', () => {
+                        if (this.state.isProcessing) return;
+                        this.state.isProcessing = true;
+                        const isCorrect = (side === correctSide);
+                        this.handleSelectClick(isCorrect, curr, correctSide, left, right);
+                    }, {}, 'gameUI');
+                });
+            }
 
             // hero 提示鈕
             const heroHintBtn = document.getElementById('b4-hero-hint-btn');
             if (heroHintBtn) {
                 Game.EventManager.on(heroHintBtn, 'click', () => {
                     if (this.state.phase === 'select') {
-                        // 先揭露兩張卡片的價格，再高亮正確卡
+                        // 揭露兩張卡片的價格+金幣，再高亮正確卡
                         this._revealCardPrices(left, right);
+                        if (diff === 'hard') this._revealCoinsOnly(left, right);
                         const hintCard = document.getElementById(`card-${correctSide}`);
                         if (hintCard) {
                             hintCard.classList.add('b4-select-hint');
@@ -1815,19 +2137,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
 
             if (diff === 'easy') {
-                // 簡單：顯示正確答案（單一選項，學生點選後繼續）
+                // 簡單：顯示算式 + 正確答案（單一選項，學生點選後繼續）
                 app.innerHTML = `
                 ${this._renderHeader()}
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
                     </div>
-                    <div class="b4-diff-section">
-                        ${barsHTML}
-                        <div class="b4-diff-question">
+                    <div class="b4-diff-section b4-diff-normal-card">
+                        ${formulaHTML}
+                        <div class="b4-diff-question b4-diff-question-below">
                             ${diffQuestion}
                             <div class="b4-diff-sub">點選答案繼續</div>
                         </div>
+                    </div>
+                    <div class="b4-diff-section b4-diff-options-card">
                         <div class="b4-diff-options b4-diff-options-easy">
                             <button class="b4-diff-opt b4-diff-opt-solo" id="b4-easy-diff-btn" data-val="${correctDiff}">
                                 ${!curr.isUnit ? `<div class="b4-diff-opt-coins">${b4PriceCoins(correctDiff)}</div>` : ''}
@@ -1866,7 +2190,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
                     else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
                 }, {}, 'diffUI');
-                Game.Speech.speak(curr.isUnit ? `每${curr.unit}差${correctDiff}元` : `便宜了${correctDiff}元`);
+                // 進入頁面的語音：商品名稱 + 兩家店價格 + 請選擇
+                const easySpeech = curr.isUnit
+                    ? `${curr.name}，每${curr.unit}差${correctDiff}元，請選擇正確的答案`
+                    : `${curr.name}，${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，請選擇正確的答案`;
+                Game.Speech.speak(easySpeech);
                 return;
 
             } else if (diff === 'normal') {
@@ -1878,26 +2206,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${refCardHTML}
                         ${hintWrap}
                     </div>
-                    <div class="b4-diff-section">
-                        ${barsHTML}
-                        <div class="b4-diff-question">
+                    <div class="b4-diff-section b4-diff-normal-card">
+                        ${formulaHTML}
+                        <div class="b4-diff-question b4-diff-question-below">
                             ${diffQuestion}
                             <div class="b4-diff-sub">點選正確的差額</div>
                         </div>
-                        ${formulaHTML}
+                    </div>
+                    <div class="b4-diff-section b4-diff-options-card">
                         <div class="b4-diff-options">
                             ${options.map(val => `
-                            <button class="b4-diff-opt" data-val="${val}">
-                                ${!curr.isUnit ? `<div class="b4-diff-opt-coins">${b4PriceCoins(val)}</div>` : ''}
-                                <span class="b4-diff-opt-label">${val} ${diffUnit}</span>
+                            <button class="b4-diff-opt b4-diff-opt-masked" data-val="${val}">
+                                ${!curr.isUnit ? `<div class="b4-diff-opt-coins"></div>` : ''}
+                                <span class="b4-diff-opt-label">？？？</span>
                             </button>`).join('')}
                         </div>
                     </div>
                 </div>`;
 
+                // 選項按鈕事件（點後先顯示金額再驗證）
                 document.querySelectorAll('.b4-diff-opt').forEach(btn => {
                     Game.EventManager.on(btn, 'click', () => {
                         if (this.state.isProcessing) return;
+                        // 點擊時顯示所有選項的金額
+                        this._revealNormalDiffOptions(options, correctDiff, curr.isUnit, diffUnit);
                         this.state.isProcessing = true;
                         const chosen    = parseInt(btn.dataset.val);
                         const isCorrect = (chosen === correctDiff);
@@ -1910,7 +2242,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
             } else {
-                // 困難：數字鍵盤 + 計算機
+                // 困難：算式顯示？？？（可點擊）→ 彈窗數字輸入器 + 計算機
+                const hardFormulaHTML = curr.isUnit
+                    ? b4DiffFormula(`${curr.optA.storeIcon} ${curr.optA.store}`, curr.perA, `${curr.optB.storeIcon} ${curr.optB.store}`, curr.perB, correctDiff, `元/${curr.unit}`, true)
+                    : b4DiffFormula(`${expOpt.storeIcon} ${expOpt.store}`, expOpt.price, `${cheapOpt.storeIcon} ${cheapOpt.store}`, cheapOpt.price, correctDiff, null, true);
                 app.innerHTML = `
                 ${this._renderHeader()}
                 <div class="b-game-wrap">
@@ -1919,23 +2254,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-hard-outer">
-                        <div class="b4-diff-section">
-                            ${barsHTML}
-                            <div class="b4-diff-question">
-                                ${diffQuestion}
-                                <div class="b4-diff-sub">用鍵盤輸入差額，再按 ✓</div>
-                            </div>
-                            ${formulaHTML}
-                            <div class="b4-input-display" id="numpad-display">
-                                <span id="numpad-val">0</span><span class="b4-unit-text"> ${diffUnit}</span>
-                            </div>
-                            <div class="b4-numpad">
-                                ${[7,8,9,4,5,6,1,2,3].map(n =>
-                                    `<button class="b4-numpad-btn" data-num="${n}">${n}</button>`).join('')}
-                                <button class="b4-numpad-btn btn-del" id="btn-del">⌫</button>
-                                <button class="b4-numpad-btn" data-num="0">0</button>
-                                <button class="b4-numpad-btn btn-ok" id="btn-ok">✓</button>
-                            </div>
+                        <div class="b4-diff-section b4-diff-normal-card" id="b4-hard-diff-card">
+                            ${hardFormulaHTML}
                         </div>
                         <div class="b4-calc-side-col">
                             <button class="b4-calc-toggle-btn" id="b4-calc-toggle">🧮 開啟計算機</button>
@@ -1946,36 +2266,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>`;
 
-                this.state.numpadValue = '';
-
-                document.querySelectorAll('[data-num]').forEach(btn => {
-                    Game.EventManager.on(btn, 'click', () => {
-                        if (this.state.numpadValue.length >= 5) return;
-                        this.state.numpadValue += btn.dataset.num;
-                        this._updateNumpadDisplay();
-                    }, {}, 'diffUI');
-                });
-
-                Game.EventManager.on(document.getElementById('btn-del'), 'click', () => {
-                    this.state.numpadValue = this.state.numpadValue.slice(0, -1);
-                    this._updateNumpadDisplay();
-                }, {}, 'diffUI');
-
-                Game.EventManager.on(document.getElementById('btn-ok'), 'click', () => {
-                    if (this.state.isProcessing) return;
-                    const entered = parseInt(this.state.numpadValue) || 0;
-                    if (entered === 0) return;
-                    this.state.isProcessing = true;
-                    const isCorrect = (entered === correctDiff);
-                    const display   = document.getElementById('numpad-display');
-                    if (display) {
-                        display.style.background = isCorrect ? '#059669' : '#dc2626';
-                        display.style.color      = '#fff';
+                // ？？？格點擊 → 彈窗數字輸入器
+                Game.TimerManager.setTimeout(() => {
+                    const unknownCell = document.querySelector('.b4-dff-unknown');
+                    if (unknownCell) {
+                        unknownCell.style.cursor = 'pointer';
+                        unknownCell.title = '點我輸入答案';
+                        Game.EventManager.on(unknownCell, 'click', () => {
+                            if (this.state.isProcessing) return;
+                            this._showHardDiffNumpadModal(correctDiff, diffUnit);
+                        }, {}, 'diffUI');
                     }
-                    this.handleDiffAnswer(isCorrect, correctDiff);
-                }, {}, 'diffUI');
+                }, 50, 'ui');
 
-                // 計算機（困難模式）
+                // 計算機
                 this._bindB4Calculator();
             }
 
@@ -1983,11 +2287,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const heroHintBtn = document.getElementById('b4-hero-hint-btn');
             if (heroHintBtn) {
                 Game.EventManager.on(heroHintBtn, 'click', () => {
-                    this._showDiffFormulaHint();
-                    const hintSpeech = curr.isUnit
-                        ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，兩者差多少元？`
-                        : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，兩者差多少元？`;
-                    Game.Speech.speak(hintSpeech);
+                    if (diff === 'hard') {
+                        // 困難：顯示完整算式彈窗
+                        this._showHardDiffFormulaHint(curr, expOpt, cheapOpt, correctDiff, diffUnit);
+                    } else if (diff === 'normal') {
+                        // 普通：揭露所有選項金額 + 高亮正確
+                        const options = this._getDiffOptions(correctDiff, curr.isUnit);
+                        this._revealNormalDiffOptions(options, correctDiff, curr.isUnit, diffUnit);
+                        const correctBtn = document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                        if (correctBtn) {
+                            correctBtn.classList.add('b4-select-hint');
+                            Game.TimerManager.setTimeout(() => correctBtn.classList.remove('b4-select-hint'), 2400, 'ui');
+                        }
+                        const hintSpeech = curr.isUnit
+                            ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，兩者差多少元？`
+                            : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，兩者差多少元？`;
+                        Game.Speech.speak(hintSpeech);
+                    } else {
+                        this._showDiffFormulaHint();
+                        const hintSpeech = curr.isUnit
+                            ? `每${curr.unit}，${curr.optA.store}${curr.perA}元，${curr.optB.store}${curr.perB}元，兩者差多少元？`
+                            : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，兩者差多少元？`;
+                        Game.Speech.speak(hintSpeech);
+                    }
                 }, {}, 'diffUI');
             }
 
@@ -2001,15 +2323,142 @@ document.addEventListener('DOMContentLoaded', () => {
             }, {}, 'diffUI');
 
             // 語音
-            const diffSpeech = curr.isUnit
-                ? `請計算每${curr.unit}差多少元`
-                : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，便宜了多少元？`;
+            let diffSpeech;
+            if (diff === 'easy') {
+                diffSpeech = curr.isUnit
+                    ? `${curr.name}，每${curr.unit}差${correctDiff}元，請選擇正確的答案`
+                    : `${curr.name}，${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，請選擇正確的答案`;
+            } else if (diff === 'normal') {
+                diffSpeech = curr.isUnit
+                    ? `${curr.name}，${curr.optA.store}每${curr.unit}${curr.perA}元，${curr.optB.store}每${curr.unit}${curr.perB}元，${curr.optB.store}便宜了${correctDiff}元，請選擇正確的答案`
+                    : `${curr.name}，${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，${cheapOpt.store}便宜了${correctDiff}元，請選擇正確的答案`;
+            } else {
+                diffSpeech = curr.isUnit
+                    ? `請計算每${curr.unit}差多少元，點擊問號輸入答案`
+                    : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，點擊問號輸入差額`;
+            }
             Game.Speech.speak(diffSpeech);
         },
 
         _updateNumpadDisplay() {
             const el = document.getElementById('numpad-val');
             if (el) el.textContent = this.state.numpadValue || '0';
+        },
+
+        // 普通模式差額選項：揭露所有金額
+        _revealNormalDiffOptions(options, correctDiff, isUnit, diffUnit) {
+            document.querySelectorAll('.b4-diff-opt').forEach(btn => {
+                const val = parseInt(btn.dataset.val);
+                const label = btn.querySelector('.b4-diff-opt-label');
+                if (label) label.textContent = `${val} ${diffUnit}`;
+                const coinsEl = btn.querySelector('.b4-diff-opt-coins');
+                if (coinsEl && !isUnit) coinsEl.innerHTML = b4PriceCoins(val);
+                btn.classList.remove('b4-diff-opt-masked');
+            });
+        },
+
+        // 困難模式差額：彈窗數字輸入器
+        _showHardDiffNumpadModal(correctDiff, diffUnit) {
+            const prev = document.getElementById('b4-hard-np-modal');
+            if (prev) prev.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'b4-hard-np-modal';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);';
+            overlay.innerHTML = `
+            <div class="b4-hnp-card">
+                <div class="b4-hnp-title">便宜了多少${diffUnit}？</div>
+                <div class="b4-input-display" id="b4-hnp-display">
+                    <span id="b4-hnp-val">0</span><span class="b4-unit-text"> ${diffUnit}</span>
+                </div>
+                <div class="b4-numpad">
+                    ${[7,8,9,4,5,6,1,2,3].map(n => `<button class="b4-numpad-btn" data-hnp="${n}">${n}</button>`).join('')}
+                    <button class="b4-numpad-btn btn-del" id="b4-hnp-del">⌫</button>
+                    <button class="b4-numpad-btn" data-hnp="0">0</button>
+                    <button class="b4-numpad-btn btn-ok" id="b4-hnp-ok">✓</button>
+                </div>
+                <button class="b4-hnp-cancel">取消</button>
+            </div>`;
+            document.body.appendChild(overlay);
+
+            let val = '';
+            const updateDisp = () => {
+                const el = document.getElementById('b4-hnp-val');
+                if (el) el.textContent = val || '0';
+            };
+
+            overlay.querySelectorAll('[data-hnp]').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (val.length >= 5) return;
+                    val += btn.dataset.hnp;
+                    updateDisp();
+                });
+            });
+            document.getElementById('b4-hnp-del').addEventListener('click', e => {
+                e.stopPropagation();
+                val = val.slice(0, -1);
+                updateDisp();
+            });
+            document.getElementById('b4-hnp-ok').addEventListener('click', e => {
+                e.stopPropagation();
+                if (this.state.isProcessing) return;
+                const entered = parseInt(val) || 0;
+                if (entered === 0) return;
+                this.state.isProcessing = true;
+                const display = document.getElementById('b4-hnp-display');
+                const isCorrect = (entered === correctDiff);
+                if (display) { display.style.background = isCorrect ? '#059669' : '#dc2626'; display.style.color = '#fff'; }
+                if (isCorrect) {
+                    // 更新算式中的 ？？？ 為正確答案
+                    const unknownCell = document.querySelector('.b4-dff-unknown');
+                    if (unknownCell) {
+                        unknownCell.classList.remove('b4-dff-unknown');
+                        unknownCell.textContent = `${correctDiff} 元`;
+                        unknownCell.style.color = '#059669';
+                    }
+                }
+                Game.TimerManager.setTimeout(() => {
+                    overlay.remove();
+                    this.handleDiffAnswer(isCorrect, correctDiff);
+                }, 600, 'ui');
+            });
+            overlay.querySelector('.b4-hnp-cancel').addEventListener('click', () => overlay.remove());
+        },
+
+        // 困難模式差額：算式提示彈窗
+        _showHardDiffFormulaHint(curr, expOpt, cheapOpt, correctDiff, diffUnit) {
+            const prev = document.getElementById('b4-hard-formula-hint');
+            if (prev) prev.remove();
+
+            const expPrice   = curr.isUnit ? curr.perA : expOpt.price;
+            const cheapPrice = curr.isUnit ? curr.perB : cheapOpt.price;
+            const expStore   = curr.isUnit ? curr.optA.store : expOpt.store;
+            const cheapStore = curr.isUnit ? curr.optB.store : cheapOpt.store;
+
+            const overlay = document.createElement('div');
+            overlay.id = 'b4-hard-formula-hint';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);cursor:pointer;';
+            overlay.innerHTML = `
+            <div class="b4-hfh-card">
+                <div class="b4-hfh-title">💡 算式提示</div>
+                <div class="b4-hfh-formula">
+                    <span class="b4-hfh-store">${expStore}</span>
+                    <span class="b4-hfh-num">${expPrice}</span>
+                    <span class="b4-hfh-op">－</span>
+                    <span class="b4-hfh-store">${cheapStore}</span>
+                    <span class="b4-hfh-num">${cheapPrice}</span>
+                    <span class="b4-hfh-op">＝</span>
+                    <span class="b4-hfh-ans">${correctDiff} ${diffUnit}</span>
+                </div>
+                <div class="b4-hfh-close">點任意處關閉</div>
+            </div>`;
+            document.body.appendChild(overlay);
+
+            const speech = `${expStore}${expPrice}元，減去${cheapStore}${cheapPrice}元，等於${correctDiff}${diffUnit}`;
+            Game.Speech.speak(speech);
+
+            overlay.addEventListener('click', () => overlay.remove());
         },
 
         _getDiffOptions(correct, isUnit = false) {
@@ -2353,82 +2802,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 medalMap.set(idx, ['🥇', '🥈', '🥉'][rank]);
             });
 
-            // ── 每筆比價卡片（equation 格式：貴 − 便宜 = 省） ──
+            // ── 每筆比價卡片（卡片式設計） ──
             const cardsHTML = hist.map((h, i) => {
                 const medal = medalMap.get(i) || '';
                 const expLabel  = h.isUnit ? `每${h.unit} ${h.expPrice}元`   : `${h.expPrice}元`;
                 const cheapLabel= h.isUnit ? `每${h.unit} ${h.cheapPrice}元` : `${h.cheapPrice}元`;
                 const savedLabel= h.isUnit ? `省${h.saved}元/${h.unit}`       : `省 ${h.saved} 元`;
+                const catColor  = { food:'#f0fdf4', stationery:'#eff6ff', daily:'#fdf4ff', clothing:'#fff7ed', other:'#f9fafb' }[h.cat] || '#f9fafb';
+                const catBorder = { food:'#86efac', stationery:'#93c5fd', daily:'#d8b4fe', clothing:'#fdba74', other:'#e5e7eb' }[h.cat] || '#e5e7eb';
                 return `
-                <div class="b4-sl-card${medal === '🥇' ? ' b4-sl-card-gold' : ''}" style="animation-delay:${i * 110 + 300}ms">
-                    <div class="b4-sl-card-top">
-                        <div class="b4-sl-card-name">
-                            <span class="b4-sl-item-icon">${h.icon}</span>
-                            <span class="b4-sl-item-name">${h.name}</span>
-                        </div>
-                        ${medal ? `<span class="b4-sl-card-medal">${medal}</span>` : ''}
+                <div class="b4-sl-card2${medal === '🥇' ? ' b4-sl-card2-gold' : ''}" style="animation-delay:${i * 110 + 300}ms;">
+                    ${medal ? `<div class="b4-sl2-medal-badge">${medal}</div>` : ''}
+                    <div class="b4-sl2-top" style="background:${catColor};border-color:${catBorder};">
+                        <span class="b4-sl2-icon">${h.icon}</span>
+                        <span class="b4-sl2-name">${h.name}</span>
                     </div>
-                    <div class="b4-sl-equation">
-                        <div class="b4-sl-eq-block b4-sl-eq-exp">
-                            <span class="b4-sl-eq-store">${h.expStore}</span>
-                            <span class="b4-sl-eq-price">${expLabel}</span>
-                        </div>
-                        <span class="b4-sl-eq-op b4-sl-eq-minus">−</span>
-                        <div class="b4-sl-eq-block b4-sl-eq-cheap">
-                            <span class="b4-sl-eq-store">${h.cheapStore}</span>
-                            <span class="b4-sl-eq-price">${cheapLabel}</span>
-                        </div>
-                        <span class="b4-sl-eq-op b4-sl-eq-equals">=</span>
-                        <div class="b4-sl-eq-block b4-sl-eq-saved">
-                            <span class="b4-sl-eq-saved-txt">${savedLabel}</span>
+                    <div class="b4-sl2-body">
+                        <div class="b4-sl2-formula">
+                            <div class="b4-sl2-store-block b4-sl2-exp">
+                                <span class="b4-sl2-store-name">${h.expStore}</span>
+                                <span class="b4-sl2-price">${expLabel}</span>
+                            </div>
+                            <span class="b4-sl2-op">－</span>
+                            <div class="b4-sl2-store-block b4-sl2-cheap">
+                                <span class="b4-sl2-store-name">${h.cheapStore}</span>
+                                <span class="b4-sl2-price">${cheapLabel}</span>
+                            </div>
+                            <span class="b4-sl2-op">＝</span>
+                            <div class="b4-sl2-store-block b4-sl2-saved">
+                                <span class="b4-sl2-saved-txt">${savedLabel}</span>
+                            </div>
                         </div>
                     </div>
                 </div>`;
             }).join('');
 
+            const diffLabel = { easy: '簡單', normal: '普通', hard: '困難' }[this.state.settings.difficulty] || '';
+
             app.innerHTML = `
-<div class="b4-sl-wrapper">
-    <div class="b4-sl-header">
-        <div class="b4-sl-deco-circles"></div>
-        <div class="b4-sl-trophy">💰</div>
-        <h1 class="b4-sl-title">省錢清單</h1>
-        ${q.totalSaved > 0 ? `
-        <div class="b4-sl-total-box">
-            <span class="b4-sl-total-label">${isUnit ? '你找到最划算的單位價格！' : '這次比價你總共省了'}</span>
-            <div class="b4-sl-total-row">
-                <span class="b4-sl-total-amount">${q.totalSaved}</span>
-                <span class="b4-sl-total-unit">${isUnit ? '元/單位' : '元'}</span>
-            </div>
-        </div>` : ''}
+<div class="b-header">
+    <div class="b-header-left"><span class="b-header-unit">🏷️ 特賣比一比</span></div>
+    <div class="b-header-center">${diffLabel}模式 · 省錢清單</div>
+    <div class="b-header-right">
+        <button class="b-reward-btn" id="b4-sl-reward-btn">🎁 獎勵</button>
+        <button class="b-back-btn" id="b4-sl-back-btn">返回設定</button>
+    </div>
+</div>
+<div class="b4-sl-page">
+    <div class="b4-sl-summary-card">
+        <div class="b4-sl-sc-trophy">💰</div>
+        <div class="b4-sl-sc-title">省錢清單</div>
+        ${q.totalSaved > 0 ? `<div class="b4-sl-sc-total">${isUnit ? '最划算單位價格' : `總共省了 ${q.totalSaved} 元`}</div>` : ''}
+        ${best ? `<div class="b4-sl-sc-best">🌟 最划算：${best.icon}${best.name}（${best.cheapStore}）省 ${best.saved} 元</div>` : ''}
     </div>
 
-    <div class="b4-sl-body">
-        ${best ? `
-        <div class="b4-sl-best-wrap">
-            <div class="b4-sl-best">
-                <span class="b4-sl-best-star">🌟</span>
-                <div class="b4-sl-best-info">
-                    <span class="b4-sl-best-tag">最划算的一次</span>
-                    <span class="b4-sl-best-desc">${best.icon} ${best.name}　在 ${best.cheapStore} 買，省了 <strong>${best.saved}</strong> 元！</span>
-                </div>
-            </div>
-        </div>` : ''}
+    <div class="b4-sl-cards2">
+        ${hist.length > 0 ? cardsHTML : '<div class="b4-sl-empty">這次沒有比價記錄</div>'}
+    </div>
 
-        ${hist.length > 0 ? `
-        <div class="b4-sl-section-title">📋 比價明細</div>
-        <div class="b4-sl-cards">${cardsHTML}</div>`
-        : '<div class="b4-sl-empty">這次沒有比價記錄</div>'}
-
-        <div class="b4-sl-actions">
-            <button class="b4-sl-next-btn" id="b4-sl-next-btn">
-                查看完整成績 →
-            </button>
-        </div>
+    <div class="b4-sl-actions">
+        <button class="b4-sl-next-btn" id="b4-sl-next-btn">
+            查看完整成績 →
+        </button>
     </div>
 </div>`;
 
             Game.EventManager.on(document.getElementById('b4-sl-next-btn'), 'click', () => {
                 this.showResults();
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b4-sl-reward-btn'), 'click', () => {
+                if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
+                else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
+            }, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b4-sl-back-btn'), 'click', () => {
+                this.showSettings();
             }, {}, 'gameUI');
 
             // 音效 + 煙火
