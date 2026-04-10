@@ -365,17 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <div class="b-setting-group b3-cal-settings" id="cal-daily-group" style="display:none;">
-                    <label class="b-setting-label">📅 存款天數與金額：</label>
-                    <div class="b-btn-group" id="daily-group">
-                        <button class="b-sel-btn" data-daily="6-10">6-10天</button>
-                        <button class="b-sel-btn" data-daily="9-15">9-15天</button>
-                        <button class="b-sel-btn" data-daily="10-20">10-20天</button>
-                        <button class="b-sel-btn" data-daily="custom">自訂金額</button>
-                    </div>
-                </div>
-                <div class="b3-cal-settings b3-days-preview" id="b3-days-preview" style="display:none;"></div>
-
                 <!-- 普通模式設定 -->
                 <div class="b-setting-group b3-normal-settings" id="n-start-date-group" style="display:none;">
                     <label class="b-setting-label">📅 開始日期：</label>
@@ -411,18 +400,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- 自訂物品（所有模式共用，置於所有購買金額選項之後） -->
+                <!-- 自訂物品（所有模式共用，置於所有購買金額選項之後、存款天數之前） -->
                 <div class="b-setting-group">
                     <label class="b-setting-label">🖼️ 自訂物品（選填）：</label>
                     <div class="b3-custom-items-list" id="b3-custom-items-list">
                         ${this._renderCustomItemsPanel()}
                     </div>
                     <div class="b-btn-group" style="margin-top:6px;">
-                        <button class="b-sel-btn" id="b3-add-custom-item-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:#fff;border:none;">＋ 新增物品</button>
+                        <button class="b-sel-btn" id="b3-add-custom-item-btn" style="background:linear-gradient(45deg,#FF6B6B,#4ECDC4);color:#fff;border:none;">${this.state.customItems.length > 0 ? '替換物品' : '上傳物品'}</button>
                     </div>
-                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">上傳圖片作為存錢目標，最多 5 個，會加入題目池一起出題</div>
+                    <div style="margin-top:4px;font-size:12px;color:#6b7280;">上傳圖片作為存錢目標（圖片會自動壓縮）</div>
                     <input type="file" id="b3-custom-image" accept="image/*" style="display:none;">
                 </div>
+
+                <!-- 簡單模式：存款天數與金額（移至自訂物品之後） -->
+                <div class="b-setting-group b3-cal-settings" id="cal-daily-group" style="display:none;">
+                    <label class="b-setting-label">📅 存款天數與金額：</label>
+                    <div class="b-btn-group" id="daily-group">
+                        <button class="b-sel-btn" data-daily="6-10">6-10天</button>
+                        <button class="b-sel-btn" data-daily="9-15">9-15天</button>
+                        <button class="b-sel-btn" data-daily="10-20">10-20天</button>
+                        <button class="b-sel-btn" data-daily="custom">自訂金額</button>
+                    </div>
+                </div>
+                <div class="b3-cal-settings b3-days-preview" id="b3-days-preview" style="display:none;"></div>
 
                 <!-- 普通模式：存款天數與金額 -->
                 <div class="b-setting-group b3-normal-settings" id="n-daily-group" style="display:none;">
@@ -479,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b3-modal-field">
                                 <label class="b3-modal-label">目標金額（元）：</label>
-                                <input type="number" id="b3-custom-item-price" class="b3-modal-input" placeholder="例如：300" min="1" max="9999">
+                                <div id="b3-item-price-display" class="b3-modal-input" style="cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:44px;font-size:20px;font-weight:700;color:#d97706;border:2px dashed #d97706;border-radius:10px;background:#fffbeb;" onclick="Game._openItemPriceNumpad()">點擊輸入金額</div>
                             </div>
                         </div>
                         <div class="b3-modal-footer">
@@ -505,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="game-buttons">
-                <button class="back-btn" onclick="Game.backToMenu()">← 返回主選單</button>
+                <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
                 <button class="start-btn" id="start-btn" disabled>開始練習</button>
             </div>
         </div>
@@ -618,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 _npSource = source;
                 _npValue  = '';
                 numpadDisplay.textContent = '--';
-                // 更新標題說明（困難模式輸入每日平均金額；簡單/普通模式輸入固定每日金額）
                 const titleEl = numpadModal.querySelector('div[style*="font-weight:700"]');
                 if (titleEl) {
                     titleEl.textContent = source === 'hard'
@@ -645,6 +645,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 hideNumpad();
                 this._checkCanStart();
+            };
+
+            // ── 目標金額專用浮動數字鍵盤（z-index > b3-modal-overlay 10300，定位於彈窗右側）──
+            this._openItemPriceNumpad = () => {
+                const existing = document.getElementById('b3-price-numpad');
+                if (existing) existing.remove();
+
+                // 計算定位：優先放在彈窗右側，空間不足則放左側，再不夠則置中
+                const modalBox = document.querySelector('#b3-item-preview-modal .b3-modal-box');
+                let posStyle = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+                if (modalBox) {
+                    const r = modalBox.getBoundingClientRect();
+                    const npW = 260;
+                    if (window.innerWidth - r.right >= npW + 16) {
+                        posStyle = `top:${Math.round(r.top)}px;left:${Math.round(r.right) + 12}px`;
+                    } else if (r.left >= npW + 16) {
+                        posStyle = `top:${Math.round(r.top)}px;left:${Math.round(r.left) - npW - 12}px`;
+                    }
+                }
+
+                let _pVal = '';
+                const el = document.createElement('div');
+                el.id = 'b3-price-numpad';
+                el.style.cssText = `position:fixed;${posStyle};z-index:10400;background:#fff;border-radius:20px;padding:20px;width:260px;border:3px solid #d97706;box-shadow:0 8px 32px rgba(217,119,6,0.4);`;
+                el.innerHTML = `
+                    <div style="text-align:center;margin-bottom:12px;">
+                        <div style="font-size:13px;color:#92400e;font-weight:700;margin-bottom:8px;">🎯 輸入目標金額（最高 9999 元）</div>
+                        <div id="b3-price-np-display" style="font-size:2rem;font-weight:900;color:#92400e;background:#fef3c7;border:2px solid #d97706;border-radius:12px;padding:8px 16px;min-height:52px;display:flex;align-items:center;justify-content:center;">--</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
+                        ${[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['清除','clear'],['0','0'],['確認','confirm']].map(([label, val]) => {
+                            const bg  = val==='clear'?'#fee2e2':val==='confirm'?'#d1fae5':'#fef9c3';
+                            const col = val==='clear'?'#dc2626':val==='confirm'?'#065f46':'#92400e';
+                            const bd  = val==='clear'?'#fca5a5':val==='confirm'?'#6ee7b7':'#d97706';
+                            return `<button data-pnp="${val}" style="padding:12px 0;font-size:1.2rem;font-weight:700;background:${bg};color:${col};border:2px solid ${bd};border-radius:10px;cursor:pointer;">${label}</button>`;
+                        }).join('')}
+                    </div>
+                    <button id="b3-price-np-cancel" style="width:100%;padding:8px;border:2px solid #d97706;border-radius:10px;background:transparent;color:#92400e;font-size:14px;cursor:pointer;font-weight:600;">取消</button>
+                `;
+                document.body.appendChild(el);
+
+                const display = el.querySelector('#b3-price-np-display');
+                const close   = () => el.remove();
+
+                el.querySelectorAll('[data-pnp]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const k = btn.dataset.pnp;
+                        if (k === 'clear') {
+                            _pVal = '';
+                            display.textContent = '--';
+                        } else if (k === 'confirm') {
+                            const v = parseInt(_pVal, 10);
+                            if (!_pVal || v < 1 || v > 9999) return;
+                            this.tempItemPrice = v;
+                            const priceDisplay = document.getElementById('b3-item-price-display');
+                            if (priceDisplay) {
+                                priceDisplay.textContent = `${v} 元`;
+                                priceDisplay.style.color = '#065f46';
+                                priceDisplay.style.borderColor = '#065f46';
+                                priceDisplay.style.background = '#ecfdf5';
+                            }
+                            close();
+                        } else {
+                            if (_pVal.length >= 4) return;
+                            _pVal += k;
+                            display.textContent = _pVal;
+                        }
+                    });
+                });
+                el.querySelector('#b3-price-np-cancel').addEventListener('click', close);
             };
 
             document.querySelectorAll('#b3-numpad-grid [data-np]').forEach(npBtn => {
@@ -835,13 +905,13 @@ document.addEventListener('DOMContentLoaded', () => {
         _updateCustomItemsPanel() {
             const panel = document.getElementById('b3-custom-items-list');
             if (panel) panel.innerHTML = this._renderCustomItemsPanel();
+            // 同步按鈕文字：有物品→替換物品；無物品→上傳物品
+            const btn = document.getElementById('b3-add-custom-item-btn');
+            if (btn) btn.textContent = this.state.customItems.length > 0 ? '替換物品' : '上傳物品';
         },
 
         triggerCustomItemUpload() {
-            if (this.state.customItems.length >= 5) {
-                alert('最多只能新增 5 個自訂物品！');
-                return;
-            }
+            // 不限制數量：上傳新圖片會取代既有的自訂物品
             const fileInput = document.getElementById('b3-custom-image');
             if (fileInput) { fileInput.value = ''; fileInput.click(); }
         },
@@ -861,6 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showCustomItemPreview(imageDataUrl) {
             this.tempItemImageData = imageDataUrl;
+            this.tempItemPrice = null;
             const modal = document.getElementById('b3-item-preview-modal');
             const img   = document.getElementById('b3-preview-image');
             if (!modal || !img) return;
@@ -868,8 +939,13 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.display = 'flex';
             const nameInput = document.getElementById('b3-custom-item-name');
             if (nameInput) { nameInput.value = ''; Game.TimerManager.setTimeout(() => nameInput.focus(), 100, 'ui'); }
-            const priceInput = document.getElementById('b3-custom-item-price');
-            if (priceInput) priceInput.value = '';
+            const priceDisplay = document.getElementById('b3-item-price-display');
+            if (priceDisplay) {
+                priceDisplay.textContent = '點擊輸入金額';
+                priceDisplay.style.color = '#d97706';
+                priceDisplay.style.borderColor = '#d97706';
+                priceDisplay.style.background = '#fffbeb';
+            }
         },
 
         closeCustomItemPreview() {
@@ -878,20 +954,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('b3-custom-image');
             if (fileInput) fileInput.value = '';
             this.tempItemImageData = null;
+            this.tempItemPrice = null;
+            // 關閉時一併移除浮動數字鍵盤
+            const priceNp = document.getElementById('b3-price-numpad');
+            if (priceNp) priceNp.remove();
         },
 
         confirmAddCustomItem() {
             const name  = (document.getElementById('b3-custom-item-name')?.value || '').trim();
-            const price = parseInt(document.getElementById('b3-custom-item-price')?.value || '');
+            const price = this.tempItemPrice;
             if (!name)           { alert('請輸入物品名稱！'); return; }
             if (!this.tempItemImageData) { alert('圖片資料遺失，請重新上傳！'); return; }
-            if (!price || price < 1 || price > 9999) { alert('請輸入 1～9999 之間的目標金額！'); return; }
-            if (this.state.customItems.some(i => i.name === name)) { alert('物品名稱已存在，請使用不同的名稱！'); return; }
-            this.state.customItems.push({ name, price, imageData: this.tempItemImageData, isCustom: true });
+            if (!price || price < 1 || price > 9999) { alert('請點擊金額欄位並輸入 1～9999 之間的目標金額！'); return; }
+            // 限定 1 個：直接取代（不疊加）
+            this.state.customItems = [{ name, price, imageData: this.tempItemImageData, isCustom: true }];
             this.closeCustomItemPreview();
             this._updateCustomItemsPanel();
             this._updateDaysPreview();
-            Game.Speech.speak(`已新增自訂物品：${name}`);
+            this._checkCanStart();
+            Game.Speech.speak(`已設定存錢目標：${name}`);
         },
 
         removeCustomItem(index) {
@@ -974,13 +1055,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('start-btn');
             if (!btn) return;
             if (!s.difficulty) { btn.disabled = true; return; }
+            const hasTarget = !!s.priceRange || this.state.customItems.length > 0;
             if (s.difficulty === 'easy') {
-                btn.disabled = !s.priceRange || !s.dailyAmount || (s.dailyAmount === 'custom');
+                btn.disabled = !hasTarget || !s.dailyAmount || (s.dailyAmount === 'custom');
             } else if (s.difficulty === 'normal') {
-                btn.disabled = !s.priceRange || !s.dailyAmount ||
+                btn.disabled = !hasTarget || !s.dailyAmount ||
                                s.dailyAmount === 'custom' || s.dailyAmount === 'preset-pending';
             } else {
-                btn.disabled = !s.priceRange || !s.dailyAmount || s.dailyAmount === 'custom';
+                btn.disabled = !hasTarget || !s.dailyAmount || s.dailyAmount === 'custom';
             }
         },
 

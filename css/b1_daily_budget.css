@@ -318,12 +318,12 @@
     color: #fff;
 }
 
-/* 錢包中的錢幣排列（單排橫向捲動） */
+/* 錢包中的錢幣排列（多列換行） */
 .b1-wallet-coins {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    overflow-y: auto;
     gap: 10px;
     min-height: 64px;
     align-items: center;
@@ -925,6 +925,8 @@
     transition: transform 0.15s, background 0.15s;
     margin-left: auto;
     display: inline-block;
+    position: relative;
+    overflow: visible;
 }
 .b1-item-box-btn:hover,
 .b1-cip-cost-btn:hover { background: #fde68a; transform: scale(1.04); }
@@ -932,6 +934,38 @@
 .b1-cip-cost-btn.b1-item-cost-revealed {
     background: #d1fae5; color: #065f46;
     border-color: #10b981; cursor: default;
+}
+
+/* ── 提示數字氣泡（提示鈕按下後出現在 ？框上方）──── */
+.b1-cost-hint-tip {
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 60;
+    animation: b1CostHintIn 0.3s ease forwards;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.b1-cost-hint-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #d97706;
+}
+@keyframes b1CostHintIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ── 3選1 中央彈窗（Normal 模式）─────────────────── */

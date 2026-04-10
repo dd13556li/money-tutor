@@ -242,28 +242,33 @@ const B2_THEMES = {
         name: '學校週記', icon: '🏫',
         templates: {
             easy: [
-                { startAmount: 80,  events: [{ type:'income', name:'媽媽給零用錢', amount:50,  icon:'💰'}, { type:'expense', name:'買文具',  amount:30, icon:'✏️'}]},  // 100
+                { startAmount: 80,  events: [{ type:'income', name:'媽媽給零用錢', amount:50,  icon:'💰'}, { type:'expense', name:'買文具',    amount:30, icon:'✏️'}]},  // 100
                 { startAmount: 60,  events: [{ type:'expense',name:'買便當',       amount:40,  icon:'🍱'}, { type:'income',  name:'幫忙打掃', amount:20, icon:'🧹'}]},  // 40
-                { startAmount: 120, events: [{ type:'income', name:'作業獎勵',     amount:30,  icon:'🌟'}, { type:'expense', name:'買橡皮擦', amount:15, icon:'✏️'}]},  // 135
+                { startAmount: 120, events: [{ type:'income', name:'考試滿分獎勵', amount:30,  icon:'🌟'}, { type:'expense', name:'買橡皮擦', amount:15, icon:'✏️'}]},  // 135
                 { startAmount: 50,  events: [{ type:'income', name:'爸爸零用錢',   amount:100, icon:'💰'}, { type:'expense', name:'買書包配件', amount:45, icon:'🎒'}]},  // 105
-                { startAmount: 200, events: [{ type:'expense',name:'買課外讀物',   amount:80,  icon:'📚'}, { type:'income',  name:'節省獎金', amount:30, icon:'🏅'}]},  // 150
-                { startAmount: 90,  events: [{ type:'income', name:'阿嬤零用錢',   amount:40,  icon:'💝'}, { type:'expense', name:'買貼紙',  amount:20, icon:'🌸'}]},  // 110
-                { startAmount: 150, events: [{ type:'expense',name:'買彩色筆',     amount:60,  icon:'🎨'}, { type:'income',  name:'幫忙整理書桌', amount:25, icon:'🗂️'}]},  // 115
-                { startAmount: 70,  events: [{ type:'income', name:'優良獎勵',     amount:50,  icon:'🏆'}, { type:'expense', name:'買點心',  amount:35, icon:'🍪'}]},  // 85
+                { startAmount: 100, events: [{ type:'expense',name:'買手搖飲',     amount:50,  icon:'🧋'}, { type:'income',  name:'幫同學帶便當', amount:20, icon:'🏃'}]},  // 70
+                { startAmount: 90,  events: [{ type:'income', name:'阿嬤零用錢',   amount:40,  icon:'💝'}, { type:'expense', name:'買貼紙',    amount:20, icon:'🌸'}]},  // 110
+                { startAmount: 150, events: [{ type:'expense',name:'社團費',       amount:60,  icon:'🎨'}, { type:'income',  name:'節省獎勵',  amount:25, icon:'🏅'}]},  // 115
+                { startAmount: 70,  events: [{ type:'income', name:'作業優良獎',   amount:50,  icon:'🏆'}, { type:'expense', name:'買點心',    amount:35, icon:'🍪'}]},  // 85
+                { startAmount: 100, events: [{ type:'expense',name:'悠遊卡加值',   amount:50,  icon:'🚌'}, { type:'income',  name:'媽媽補貼',  amount:80, icon:'💰'}]},  // 130
+                { startAmount: 80,  events: [{ type:'income', name:'幫忙跑腿',     amount:30,  icon:'🏃'}, { type:'expense', name:'買鉛筆盒',  amount:40, icon:'✏️'}]},  // 70
             ],
             normal: [
-                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢', amount:100, icon:'💰'}, { type:'expense', name:'買文具',   amount:45, icon:'✏️'}, { type:'expense', name:'買便當', amount:55, icon:'🍱'}, { type:'income', name:'幫忙家事', amount:20, icon:'🧹'}]},  // 220
-                { startAmount: 150, events: [{ type:'income', name:'期末獎勵',   amount:200, icon:'🏆'}, { type:'expense', name:'買參考書', amount:120, icon:'📚'}, { type:'expense', name:'買文具', amount:60, icon:'✏️'}, { type:'expense', name:'買飲料', amount:30, icon:'🧋'}]},  // 140
-                { startAmount: 300, events: [{ type:'expense',name:'買書包',     amount:180, icon:'🎒'}, { type:'income',  name:'幫鄰居抄筆記', amount:50, icon:'📝'}, { type:'expense', name:'買早餐', amount:40, icon:'🥐'}, { type:'income', name:'媽媽獎勵', amount:80, icon:'💝'}]},  // 210
-                { startAmount: 500, events: [{ type:'expense',name:'補習費',     amount:350, icon:'🏫'}, { type:'income',  name:'成績進步獎', amount:100, icon:'🌟'}, { type:'expense', name:'買作業本', amount:55, icon:'📓'}, { type:'income', name:'節省零用錢', amount:50, icon:'💵'}]},  // 245
-                { startAmount: 100, events: [{ type:'income', name:'幫同學收作業', amount:30, icon:'📋'}, { type:'expense', name:'買測驗卷', amount:25, icon:'📄'}, { type:'income', name:'老師獎勵券換現', amount:50, icon:'🎟️'}, { type:'expense', name:'買零食', amount:40, icon:'🍬'}]},  // 115
-                { startAmount: 250, events: [{ type:'expense',name:'買計算機',   amount:100, icon:'🔢'}, { type:'income',  name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買橡皮擦文具', amount:35, icon:'✏️'}, { type:'expense', name:'喝飲料', amount:45, icon:'🥤'}]},  // 220
+                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢',   amount:100, icon:'💰'}, { type:'expense', name:'買文具',     amount:45, icon:'✏️'}, { type:'expense', name:'買便當',      amount:55, icon:'🍱'}, { type:'income', name:'幫忙家事',   amount:20, icon:'🧹'}]},  // 220
+                { startAmount: 150, events: [{ type:'income', name:'期末獎勵',     amount:200, icon:'🏆'}, { type:'expense', name:'買參考書',   amount:120, icon:'📚'}, { type:'expense', name:'買文具',      amount:60, icon:'✏️'}, { type:'expense', name:'買手搖飲',  amount:30, icon:'🧋'}]},  // 140
+                { startAmount: 300, events: [{ type:'expense',name:'買書包',       amount:350, icon:'🎒'}, { type:'income',  name:'媽媽補貼',   amount:200, icon:'💝'}, { type:'expense', name:'買早餐',      amount:40, icon:'🥐'}, { type:'income', name:'考試進步獎', amount:80, icon:'🌟'}]},  // 190
+                { startAmount: 500, events: [{ type:'expense',name:'補習費',       amount:350, icon:'🏫'}, { type:'income',  name:'成績進步獎', amount:100, icon:'🌟'}, { type:'expense', name:'班費',        amount:50, icon:'📋'}, { type:'income', name:'節省零用錢', amount:50, icon:'💵'}]},  // 250
+                { startAmount: 180, events: [{ type:'income', name:'幫同學帶便當', amount:30,  icon:'🍱'}, { type:'expense', name:'買練習卷',   amount:60,  icon:'📄'}, { type:'income',  name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買零食',    amount:40, icon:'🍬'}]},  // 260
+                { startAmount: 250, events: [{ type:'expense',name:'買計算機',     amount:200, icon:'🔢'}, { type:'income',  name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買鉛筆袋',   amount:35, icon:'✏️'}, { type:'expense', name:'買手搖飲', amount:45, icon:'🥤'}]},  // 120
+                { startAmount: 200, events: [{ type:'expense',name:'社團活動費',   amount:120, icon:'🎭'}, { type:'income',  name:'爸爸嘉獎',   amount:100, icon:'👨'}, { type:'expense', name:'買體育服',   amount:150, icon:'👟'}, { type:'income', name:'幫忙掃地',   amount:20, icon:'🧹'}]},  // 50
+                { startAmount: 300, events: [{ type:'income', name:'壓歲錢',       amount:200, icon:'🧧'}, { type:'expense', name:'買參考書',   amount:180, icon:'📚'}, { type:'income',  name:'爸爸嘉獎',   amount:80,  icon:'👨'}, { type:'expense', name:'買手搖飲', amount:50, icon:'🧋'}]},  // 350
             ],
             hard: [
-                { startAmount: 600, events: [{ type:'expense',name:'買教科書',   amount:400, icon:'📘'}, { type:'income',  name:'打工薪資', amount:300, icon:'💼'}, { type:'expense', name:'買制服', amount:280, icon:'👔'}, { type:'income', name:'考試獎勵', amount:150, icon:'🏅'}, { type:'expense', name:'交通費', amount:120, icon:'🚌'}]},  // 250
-                { startAmount: 800, events: [{ type:'income', name:'課輔獎助學金', amount:500, icon:'🎓'}, { type:'expense', name:'買學習平板', amount:650, icon:'💻'}, { type:'income', name:'作業優良獎', amount:100, icon:'🌟'}, { type:'expense', name:'買文具組', amount:95, icon:'✏️'}, { type:'income', name:'節省零用錢', amount:80, icon:'💵'}]},  // 735
-                { startAmount: 1000, events: [{ type:'expense',name:'語言補習費', amount:700, icon:'🗣️'}, { type:'income',  name:'打掃工讀', amount:300, icon:'🧹'}, { type:'expense', name:'買參考書', amount:200, icon:'📚'}, { type:'income', name:'媽媽獎勵', amount:250, icon:'💝'}, { type:'expense', name:'買文具', amount:85, icon:'✏️'}]},  // 565
-                { startAmount: 400, events: [{ type:'income', name:'英文競賽獎', amount:300, icon:'🏆'}, { type:'expense', name:'補習費',   amount:350, icon:'🏫'}, { type:'income', name:'爸爸補貼', amount:200, icon:'👨'}, { type:'expense', name:'買作業組', amount:75, icon:'📓'}, { type:'income', name:'節約獎勵', amount:50, icon:'💰'}]},  // 525
+                { startAmount: 600,  events: [{ type:'expense',name:'買教科書組',  amount:400, icon:'📘'}, { type:'income',  name:'打工薪資',   amount:700, icon:'💼'}, { type:'expense', name:'買制服',      amount:600, icon:'👔'}, { type:'income', name:'考試獎勵',   amount:150, icon:'🏅'}, { type:'expense', name:'悠遊卡加值', amount:200, icon:'🚌'}]},  // 250
+                { startAmount: 800,  events: [{ type:'income', name:'課輔獎助學金', amount:500, icon:'🎓'}, { type:'expense', name:'買無線耳機', amount:800, icon:'🎧'}, { type:'income',  name:'期末考獎勵', amount:200, icon:'🌟'}, { type:'expense', name:'買文具組',   amount:95, icon:'✏️'}, { type:'income', name:'節省零用錢', amount:80, icon:'💵'}]},  // 685
+                { startAmount: 1000, events: [{ type:'expense',name:'語言補習費',  amount:900, icon:'🗣️'}, { type:'income',  name:'打工薪資',   amount:700, icon:'💼'}, { type:'expense', name:'買參考書組', amount:250, icon:'📚'}, { type:'income', name:'媽媽獎勵',   amount:250, icon:'💝'}, { type:'expense', name:'班遊費',     amount:300, icon:'🚌'}]},  // 500
+                { startAmount: 600,  events: [{ type:'income', name:'英語競賽獎金', amount:500, icon:'🏆'}, { type:'expense', name:'補習費',     amount:600, icon:'🏫'}, { type:'income',  name:'爸爸補貼',   amount:500, icon:'👨'}, { type:'expense', name:'買球鞋',     amount:800, icon:'👟'}, { type:'income', name:'節約獎勵',   amount:100, icon:'💰'}]},  // 300
+                { startAmount: 500,  events: [{ type:'expense',name:'暑期才藝課',  amount:600, icon:'🎵'}, { type:'income',  name:'打工薪資',   amount:800, icon:'💼'}, { type:'expense', name:'買教科書',   amount:350, icon:'📚'}, { type:'income', name:'考試滿分獎', amount:200, icon:'🌟'}, { type:'expense', name:'買手機殼',   amount:150, icon:'📱'}]},  // 400
             ],
         },
     },
@@ -271,28 +276,33 @@ const B2_THEMES = {
         name: '假期日記', icon: '🎉',
         templates: {
             easy: [
-                { startAmount: 100, events: [{ type:'income', name:'過年紅包',   amount:200, icon:'🧧'}, { type:'expense', name:'買玩具',  amount:150, icon:'🎮'}]},  // 150
-                { startAmount: 80,  events: [{ type:'expense',name:'看電影',     amount:60,  icon:'🎬'}, { type:'income',  name:'壓歲錢', amount:50, icon:'🎊'}]},  // 70
-                { startAmount: 200, events: [{ type:'income', name:'阿姨紅包',   amount:100, icon:'💝'}, { type:'expense', name:'買糖果',  amount:45, icon:'🍬'}]},  // 255
-                { startAmount: 50,  events: [{ type:'income', name:'中秋紅包',   amount:100, icon:'🎑'}, { type:'expense', name:'買月餅',  amount:60, icon:'🥮'}]},  // 90
-                { startAmount: 150, events: [{ type:'expense',name:'遊樂園票',   amount:100, icon:'🎡'}, { type:'income',  name:'幫忙家事', amount:40, icon:'🧹'}]},  // 90
-                { startAmount: 120, events: [{ type:'income', name:'聖誕紅包',   amount:80,  icon:'🎄'}, { type:'expense', name:'買禮物',  amount:65, icon:'🎁'}]},  // 135
-                { startAmount: 80,  events: [{ type:'expense',name:'買冰淇淋',   amount:35,  icon:'🍦'}, { type:'income',  name:'爺爺獎勵', amount:50, icon:'👴'}]},  // 95
-                { startAmount: 200, events: [{ type:'expense',name:'買書',       amount:90,  icon:'📚'}, { type:'income',  name:'叔叔紅包', amount:120, icon:'🧧'}]},  // 230
+                { startAmount: 100, events: [{ type:'income', name:'過年紅包',    amount:200, icon:'🧧'}, { type:'expense', name:'買遊戲點數', amount:150, icon:'🎮'}]},  // 150
+                { startAmount: 80,  events: [{ type:'expense',name:'看電影',      amount:60,  icon:'🎬'}, { type:'income',  name:'壓歲錢',    amount:50,  icon:'🎊'}]},  // 70
+                { startAmount: 200, events: [{ type:'income', name:'阿姨紅包',    amount:100, icon:'💝'}, { type:'expense', name:'買零食飲料', amount:45,  icon:'🍬'}]},  // 255
+                { startAmount: 50,  events: [{ type:'income', name:'中秋紅包',    amount:100, icon:'🎑'}, { type:'expense', name:'買月餅',     amount:60,  icon:'🥮'}]},  // 90
+                { startAmount: 150, events: [{ type:'expense',name:'遊樂園票',    amount:100, icon:'🎡'}, { type:'income',  name:'幫忙家事',  amount:40,  icon:'🧹'}]},  // 90
+                { startAmount: 120, events: [{ type:'income', name:'聖誕紅包',    amount:80,  icon:'🎄'}, { type:'expense', name:'買交換禮物', amount:65,  icon:'🎁'}]},  // 135
+                { startAmount: 80,  events: [{ type:'expense',name:'逛夜市',      amount:50,  icon:'🌙'}, { type:'income',  name:'爺爺獎勵',  amount:60,  icon:'👴'}]},  // 90
+                { startAmount: 200, events: [{ type:'expense',name:'買漫畫',      amount:90,  icon:'📚'}, { type:'income',  name:'叔叔紅包',  amount:120, icon:'🧧'}]},  // 230
+                { startAmount: 100, events: [{ type:'income', name:'端午紅包',    amount:80,  icon:'🎋'}, { type:'expense', name:'買手搖飲',   amount:45,  icon:'🧋'}]},  // 135
+                { startAmount: 70,  events: [{ type:'expense',name:'買冰淇淋',    amount:35,  icon:'🍦'}, { type:'income',  name:'假期幫忙獎', amount:50,  icon:'🏅'}]},  // 85
             ],
             normal: [
-                { startAmount: 200, events: [{ type:'income', name:'過年紅包',   amount:500, icon:'🧧'}, { type:'expense', name:'買玩具', amount:220, icon:'🎮'}, { type:'expense', name:'看電影', amount:80, icon:'🎬'}, { type:'expense', name:'買零食', amount:45, icon:'🍿'}]},  // 355
-                { startAmount: 150, events: [{ type:'income', name:'生日禮金',   amount:300, icon:'🎂'}, { type:'expense', name:'買遊樂園票', amount:150, icon:'🎡'}, { type:'expense', name:'買紀念品', amount:85, icon:'🎠'}, { type:'expense', name:'買飲料', amount:40, icon:'🧋'}]},  // 175
-                { startAmount: 300, events: [{ type:'expense',name:'聖誕購物',   amount:180, icon:'🎄'}, { type:'income',  name:'爺爺紅包', amount:200, icon:'👴'}, { type:'expense', name:'買裝飾', amount:65, icon:'✨'}, { type:'income', name:'幫忙家事', amount:50, icon:'🧹'}]},  // 305
-                { startAmount: 500, events: [{ type:'expense',name:'暑期夏令營', amount:350, icon:'⛺'}, { type:'income',  name:'壓歲錢', amount:300, icon:'🎊'}, { type:'expense', name:'買游泳用品', amount:120, icon:'🏊'}, { type:'income', name:'叔叔補貼', amount:100, icon:'👨'}]},  // 430
-                { startAmount: 100, events: [{ type:'income', name:'中秋紅包',   amount:200, icon:'🎑'}, { type:'expense', name:'買月餅盒', amount:90, icon:'🥮'}, { type:'income', name:'幫忙採購', amount:30, icon:'🛒'}, { type:'expense', name:'買燈籠', amount:50, icon:'🏮'}]},  // 190
-                { startAmount: 250, events: [{ type:'expense',name:'跨年煙火行', amount:120, icon:'🎆'}, { type:'income',  name:'阿姨紅包', amount:150, icon:'💝'}, { type:'expense', name:'買飲料零食', amount:65, icon:'🥤'}, { type:'expense', name:'買帽子', amount:45, icon:'🎩'}]},  // 170
+                { startAmount: 200, events: [{ type:'income', name:'過年紅包',    amount:500, icon:'🧧'}, { type:'expense', name:'買衣服',     amount:220, icon:'👕'}, { type:'expense', name:'看電影',   amount:80,  icon:'🎬'}, { type:'expense', name:'買零食',   amount:45,  icon:'🍿'}]},  // 355
+                { startAmount: 150, events: [{ type:'income', name:'生日禮金',    amount:300, icon:'🎂'}, { type:'expense', name:'買遊樂園票', amount:150, icon:'🎡'}, { type:'expense', name:'買紀念品', amount:85,  icon:'🎠'}, { type:'expense', name:'買飲料',   amount:40,  icon:'🧋'}]},  // 175
+                { startAmount: 300, events: [{ type:'expense',name:'聖誕購物',    amount:180, icon:'🎄'}, { type:'income',  name:'爺爺紅包',  amount:200, icon:'👴'}, { type:'expense', name:'買裝飾品', amount:65,  icon:'✨'}, { type:'income', name:'幫忙家事', amount:50,  icon:'🧹'}]},  // 305
+                { startAmount: 500, events: [{ type:'expense',name:'暑期夏令營',  amount:350, icon:'⛺'}, { type:'income',  name:'壓歲錢',    amount:300, icon:'🎊'}, { type:'expense', name:'買泳鏡泳帽', amount:120, icon:'🏊'}, { type:'income', name:'叔叔補貼', amount:100, icon:'👨'}]},  // 430
+                { startAmount: 100, events: [{ type:'income', name:'中秋紅包',    amount:200, icon:'🎑'}, { type:'expense', name:'買月餅盒',  amount:90,  icon:'🥮'}, { type:'income', name:'幫忙採購', amount:30, icon:'🛒'}, { type:'expense', name:'買燈籠',   amount:50,  icon:'🏮'}]},  // 190
+                { startAmount: 250, events: [{ type:'expense',name:'跨年煙火活動', amount:120, icon:'🎆'}, { type:'income', name:'阿姨紅包',  amount:150, icon:'💝'}, { type:'expense', name:'買飲料零食', amount:65, icon:'🥤'}, { type:'expense', name:'買帽子',   amount:45,  icon:'🎩'}]},  // 170
+                { startAmount: 200, events: [{ type:'income', name:'生日禮金',    amount:300, icon:'🎂'}, { type:'expense', name:'唱KTV',     amount:150, icon:'🎤'}, { type:'expense', name:'買衣服',   amount:120, icon:'👕'}, { type:'income', name:'爸媽補貼', amount:50,  icon:'💰'}]},  // 280
+                { startAmount: 300, events: [{ type:'income', name:'暑假打工薪資', amount:400, icon:'💼'}, { type:'expense', name:'買球鞋',    amount:500, icon:'👟'}, { type:'income', name:'阿嬤紅包', amount:200, icon:'👵'}, { type:'expense', name:'逛夜市',   amount:80,  icon:'🌙'}]},  // 320
             ],
             hard: [
-                { startAmount: 600,  events: [{ type:'income', name:'過年紅包合計', amount:800, icon:'🧧'}, { type:'expense', name:'買電動', amount:680, icon:'🎮'}, { type:'expense', name:'春節旅遊', amount:350, icon:'🚌'}, { type:'income', name:'爺爺另外給', amount:200, icon:'👴'}, { type:'expense', name:'買紀念品', amount:120, icon:'🎁'}]},  // 450
-                { startAmount: 800,  events: [{ type:'expense',name:'暑期日本旅遊', amount:1200, icon:'✈️'}, { type:'income',  name:'打工收入', amount:600, icon:'💼'}, { type:'expense', name:'買伴手禮', amount:280, icon:'🎀'}, { type:'income', name:'叔叔補助', amount:400, icon:'👨'}, { type:'expense', name:'逛夜市', amount:150, icon:'🌙'}]},  // 170
-                { startAmount: 1000, events: [{ type:'income', name:'生日禮金合計', amount:700, icon:'🎂'}, { type:'expense', name:'買電動遊戲機', amount:980, icon:'🎮'}, { type:'income', name:'爸媽補貼', amount:400, icon:'💰'}, { type:'expense', name:'買生日蛋糕', amount:200, icon:'🎂'}, { type:'expense', name:'買衣服', amount:150, icon:'👗'}]},  // 770
-                { startAmount: 500,  events: [{ type:'expense',name:'聖誕購物節', amount:450, icon:'🎄'}, { type:'income',  name:'聖誕紅包', amount:300, icon:'🎅'}, { type:'expense', name:'買裝飾品', amount:180, icon:'✨'}, { type:'income', name:'義賣義工', amount:120, icon:'💚'}, { type:'expense', name:'買聖誕禮', amount:95, icon:'🎁'}]},  // 195
+                { startAmount: 600,  events: [{ type:'income', name:'過年紅包合計', amount:800, icon:'🧧'}, { type:'expense', name:'買電玩遊戲', amount:680, icon:'🎮'}, { type:'expense', name:'春節旅遊',   amount:350, icon:'🚌'}, { type:'income', name:'爺爺另外給', amount:200, icon:'👴'}, { type:'expense', name:'買紀念品', amount:120, icon:'🎁'}]},  // 450
+                { startAmount: 800,  events: [{ type:'expense',name:'暑假旅遊零花', amount:1200, icon:'✈️'}, { type:'income', name:'打工收入',   amount:600, icon:'💼'}, { type:'expense', name:'買伴手禮',   amount:280, icon:'🎀'}, { type:'income', name:'叔叔補助', amount:400, icon:'👨'}, { type:'expense', name:'逛夜市',    amount:150, icon:'🌙'}]},  // 170
+                { startAmount: 1000, events: [{ type:'income', name:'生日禮金合計', amount:700, icon:'🎂'}, { type:'expense', name:'買二手Switch', amount:980, icon:'🎮'}, { type:'income', name:'爸媽補貼',   amount:400, icon:'💰'}, { type:'expense', name:'買生日蛋糕', amount:200, icon:'🎂'}, { type:'expense', name:'買新衣服',  amount:150, icon:'👗'}]},  // 770
+                { startAmount: 500,  events: [{ type:'expense',name:'聖誕購物節',   amount:450, icon:'🎄'}, { type:'income',  name:'聖誕紅包',   amount:300, icon:'🎅'}, { type:'expense', name:'買裝飾品',   amount:180, icon:'✨'}, { type:'income', name:'義賣義工',  amount:120, icon:'💚'}, { type:'expense', name:'買聖誕禮',  amount:95,  icon:'🎁'}]},  // 195
+                { startAmount: 400,  events: [{ type:'income', name:'暑假打工月薪', amount:800, icon:'💼'}, { type:'expense', name:'音樂節門票', amount:600, icon:'🎵'}, { type:'income',  name:'阿姨補貼',   amount:300, icon:'💝'}, { type:'expense', name:'買夏季服裝', amount:450, icon:'👕'}, { type:'income', name:'節省獎勵',  amount:100, icon:'🏅'}]},  // 550
             ],
         },
     },
@@ -300,28 +310,33 @@ const B2_THEMES = {
         name: '家庭日記', icon: '👨‍👩‍👧',
         templates: {
             easy: [
-                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢', amount:50,  icon:'💰'}, { type:'expense', name:'買早餐',   amount:30, icon:'🥐'}]},  // 120
-                { startAmount: 60,  events: [{ type:'income', name:'幫忙洗碗',   amount:20,  icon:'🍽️'}, { type:'expense', name:'買點心',   amount:15, icon:'🍪'}]},  // 65
-                { startAmount: 150, events: [{ type:'expense',name:'家庭採購幫手', amount:50, icon:'🛒'}, { type:'income',  name:'爸爸獎勵', amount:30, icon:'👨'}]},  // 130
-                { startAmount: 80,  events: [{ type:'income', name:'幫忙打掃',   amount:30,  icon:'🧹'}, { type:'expense', name:'買衛生紙', amount:20, icon:'🧻'}]},  // 90
-                { startAmount: 200, events: [{ type:'expense',name:'買洗碗精',   amount:40,  icon:'🧴'}, { type:'income',  name:'媽媽感謝', amount:50, icon:'💝'}]},  // 210
-                { startAmount: 70,  events: [{ type:'income', name:'幫忙倒垃圾', amount:15,  icon:'🗑️'}, { type:'expense', name:'買水果',   amount:35, icon:'🍎'}]},  // 50
-                { startAmount: 120, events: [{ type:'income', name:'幫做家常菜', amount:40,  icon:'🍳'}, { type:'expense', name:'買食材',   amount:55, icon:'🥦'}]},  // 105
-                { startAmount: 90,  events: [{ type:'expense',name:'買家用品',   amount:25,  icon:'🏠'}, { type:'income',  name:'阿嬤零用錢', amount:60, icon:'👵'}]},  // 125
+                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢',   amount:50,  icon:'💰'}, { type:'expense', name:'買早餐',     amount:30, icon:'🥐'}]},  // 120
+                { startAmount: 60,  events: [{ type:'income', name:'幫忙洗碗',     amount:20,  icon:'🍽️'}, { type:'expense', name:'買點心',     amount:15, icon:'🍪'}]},  // 65
+                { startAmount: 150, events: [{ type:'expense',name:'幫媽媽採買',   amount:50,  icon:'🛒'}, { type:'income',  name:'爸爸獎勵',  amount:30, icon:'👨'}]},  // 130
+                { startAmount: 80,  events: [{ type:'income', name:'幫忙打掃',     amount:30,  icon:'🧹'}, { type:'expense', name:'買衛生紙',   amount:20, icon:'🧻'}]},  // 90
+                { startAmount: 200, events: [{ type:'expense',name:'買洗碗精',     amount:40,  icon:'🧴'}, { type:'income',  name:'媽媽感謝',  amount:50, icon:'💝'}]},  // 210
+                { startAmount: 70,  events: [{ type:'income', name:'幫忙倒垃圾',   amount:15,  icon:'🗑️'}, { type:'expense', name:'買水果',     amount:35, icon:'🍎'}]},  // 50
+                { startAmount: 120, events: [{ type:'income', name:'幫做家常菜',   amount:40,  icon:'🍳'}, { type:'expense', name:'買食材',     amount:55, icon:'🥦'}]},  // 105
+                { startAmount: 90,  events: [{ type:'expense',name:'買家用品',     amount:25,  icon:'🏠'}, { type:'income',  name:'阿嬤零用錢', amount:60, icon:'👵'}]},  // 125
+                { startAmount: 100, events: [{ type:'income', name:'幫忙整理房間', amount:30,  icon:'🛏️'}, { type:'expense', name:'買家用零食', amount:25, icon:'🍬'}]},  // 105
+                { startAmount: 80,  events: [{ type:'expense',name:'幫媽媽代買物', amount:40,  icon:'🛒'}, { type:'income',  name:'爸爸感謝金', amount:50, icon:'👨'}]},  // 90
             ],
             normal: [
-                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢', amount:100, icon:'💰'}, { type:'expense', name:'買菜',     amount:80, icon:'🥦'}, { type:'income', name:'幫忙買菜', amount:20, icon:'🛒'}, { type:'expense', name:'買調味料', amount:35, icon:'🧂'}]},  // 205
-                { startAmount: 300, events: [{ type:'expense',name:'家庭聚餐費', amount:200, icon:'🍜'}, { type:'income',  name:'奶奶紅包', amount:150, icon:'💝'}, { type:'expense', name:'買甜點', amount:60, icon:'🎂'}, { type:'expense', name:'買飲料', amount:40, icon:'🧃'}]},  // 150
-                { startAmount: 150, events: [{ type:'income', name:'幫忙家務',   amount:80,  icon:'🧹'}, { type:'expense', name:'買清潔劑', amount:45, icon:'🧴'}, { type:'income', name:'媽媽感謝金', amount:50, icon:'💰'}, { type:'expense', name:'買零食', amount:30, icon:'🍬'}]},  // 205
-                { startAmount: 400, events: [{ type:'expense',name:'買廚房用品', amount:250, icon:'🍳'}, { type:'income',  name:'叔叔給的', amount:200, icon:'👨'}, { type:'expense', name:'買食材', amount:90, icon:'🥕'}, { type:'income', name:'幫忙採購獎', amount:60, icon:'🌟'}]},  // 320
-                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢', amount:150, icon:'💰'}, { type:'expense', name:'買菜',     amount:60, icon:'🥬'}, { type:'expense', name:'買水果', amount:45, icon:'🍊'}, { type:'income', name:'爸爸嘉獎', amount:30, icon:'👨'}]},  // 175
-                { startAmount: 250, events: [{ type:'expense',name:'家庭旅遊費', amount:180, icon:'🚌'}, { type:'income',  name:'阿公零用', amount:150, icon:'👴'}, { type:'expense', name:'買零食', amount:40, icon:'🍿'}, { type:'income', name:'幫忙整理', amount:25, icon:'🗂️'}]},  // 205
+                { startAmount: 200, events: [{ type:'income', name:'爸爸零用錢',   amount:100, icon:'💰'}, { type:'expense', name:'買菜',       amount:80, icon:'🥦'}, { type:'income', name:'幫忙買菜', amount:20, icon:'🛒'}, { type:'expense', name:'買調味料',   amount:35, icon:'🧂'}]},  // 205
+                { startAmount: 300, events: [{ type:'expense',name:'家庭聚餐費',   amount:200, icon:'🍜'}, { type:'income',  name:'奶奶紅包',  amount:150, icon:'💝'}, { type:'expense', name:'買甜點',  amount:60, icon:'🎂'}, { type:'expense', name:'買飲料',     amount:40, icon:'🧃'}]},  // 150
+                { startAmount: 150, events: [{ type:'income', name:'幫忙家務',     amount:80,  icon:'🧹'}, { type:'expense', name:'買清潔劑',  amount:45, icon:'🧴'}, { type:'income', name:'媽媽感謝金', amount:50, icon:'💰'}, { type:'expense', name:'買零食',     amount:30, icon:'🍬'}]},  // 205
+                { startAmount: 400, events: [{ type:'expense',name:'買廚具組',     amount:250, icon:'🍳'}, { type:'income',  name:'叔叔給的', amount:200, icon:'👨'}, { type:'expense', name:'買食材',  amount:90, icon:'🥕'}, { type:'income', name:'幫忙採購獎', amount:60, icon:'🌟'}]},  // 320
+                { startAmount: 100, events: [{ type:'income', name:'媽媽零用錢',   amount:150, icon:'💰'}, { type:'expense', name:'買菜',       amount:60, icon:'🥬'}, { type:'expense', name:'買水果',  amount:45, icon:'🍊'}, { type:'income', name:'爸爸嘉獎',   amount:30, icon:'👨'}]},  // 175
+                { startAmount: 250, events: [{ type:'expense',name:'家庭旅遊費',   amount:180, icon:'🚌'}, { type:'income',  name:'阿公零用', amount:150, icon:'👴'}, { type:'expense', name:'買零食',  amount:40, icon:'🍿'}, { type:'income', name:'幫忙整理',   amount:25, icon:'🗂️'}]},  // 205
+                { startAmount: 200, events: [{ type:'income', name:'辦生日聚會獎', amount:100, icon:'🎂'}, { type:'expense', name:'買蛋糕材料', amount:130, icon:'🎂'}, { type:'income', name:'爺爺贈金', amount:150, icon:'👴'}, { type:'expense', name:'買飲料',    amount:50, icon:'🧃'}]},  // 270
+                { startAmount: 150, events: [{ type:'expense',name:'幫媽媽繳電費', amount:100, icon:'⚡'}, { type:'income',  name:'家務獎勵', amount:80,  icon:'🧹'}, { type:'income', name:'阿嬤給零用', amount:120, icon:'👵'}, { type:'expense', name:'買家用零食', amount:40, icon:'🍬'}]},  // 210
             ],
             hard: [
-                { startAmount: 500,  events: [{ type:'expense',name:'買冰箱（家電）', amount:600, icon:'🧊'}, { type:'income',  name:'爸爸補貼', amount:400, icon:'👨'}, { type:'expense', name:'電費', amount:150, icon:'⚡'}, { type:'income', name:'媽媽補貼', amount:300, icon:'💰'}, { type:'expense', name:'買食材', amount:120, icon:'🥦'}]},  // 330
-                { startAmount: 800,  events: [{ type:'income', name:'年終家庭獎金', amount:500, icon:'💵'}, { type:'expense', name:'買家具',   amount:650, icon:'🛋️'}, { type:'income', name:'舊物變賣', amount:200, icon:'♻️'}, { type:'expense', name:'買裝飾品', amount:180, icon:'🖼️'}, { type:'expense', name:'外送費', amount:90, icon:'🛵'}]},  // 580
-                { startAmount: 1000, events: [{ type:'expense',name:'全家旅遊費', amount:800,  icon:'✈️'}, { type:'income',  name:'幫忙打工', amount:350, icon:'💼'}, { type:'expense', name:'買旅行用品', amount:200, icon:'🧳'}, { type:'income', name:'爺爺補貼', amount:300, icon:'👴'}, { type:'expense', name:'景點紀念品', amount:150, icon:'🗺️'}]},  // 500
-                { startAmount: 400,  events: [{ type:'income', name:'家庭分工獎勵', amount:600, icon:'🏡'}, { type:'expense', name:'買洗衣機', amount:700, icon:'🌀'}, { type:'income', name:'二手拍賣', amount:250, icon:'♻️'}, { type:'expense', name:'買清潔用品', amount:80, icon:'🧼'}, { type:'income', name:'爸爸零用', amount:100, icon:'👨'}]},  // 570
+                { startAmount: 500,  events: [{ type:'income', name:'爸爸給生活費', amount:800, icon:'👨'}, { type:'expense', name:'全家聚餐費',   amount:450, icon:'🍜'}, { type:'expense', name:'買媽媽禮物', amount:380, icon:'🎁'}, { type:'income', name:'媽媽零用錢', amount:200, icon:'💰'}, { type:'expense', name:'買家用日常品', amount:120, icon:'🧴'}]},  // 550
+                { startAmount: 800,  events: [{ type:'income', name:'年終家庭獎金', amount:500, icon:'💵'}, { type:'expense', name:'全家出遊費',   amount:650, icon:'🚌'}, { type:'income',  name:'舊物義賣',   amount:200, icon:'♻️'}, { type:'expense', name:'買伴手禮', amount:180, icon:'🎁'}, { type:'expense', name:'景點門票費', amount:90, icon:'🎟️'}]},  // 580
+                { startAmount: 1000, events: [{ type:'expense',name:'全家旅遊費',   amount:800, icon:'✈️'}, { type:'income',  name:'打工薪資',   amount:350, icon:'💼'}, { type:'expense', name:'買旅行用品', amount:200, icon:'🧳'}, { type:'income', name:'爺爺補貼',  amount:300, icon:'👴'}, { type:'expense', name:'景點紀念品', amount:150, icon:'🗺️'}]},  // 500
+                { startAmount: 400,  events: [{ type:'income', name:'家庭分工獎勵', amount:500, icon:'🏡'}, { type:'expense', name:'全家外食費',   amount:380, icon:'🍜'}, { type:'income',  name:'奶奶給零用', amount:200, icon:'👵'}, { type:'expense', name:'買清潔用品組', amount:80, icon:'🧼'}, { type:'income', name:'爸爸補貼',  amount:100, icon:'👨'}]},  // 740
+                { startAmount: 500,  events: [{ type:'income', name:'春節打工薪資', amount:700, icon:'💼'}, { type:'expense', name:'全家旅遊零花', amount:600, icon:'🚌'}, { type:'income',  name:'阿公阿嬤補貼', amount:400, icon:'👴'}, { type:'expense', name:'家庭聚餐費', amount:200, icon:'🍜'}, { type:'expense', name:'添購日用品', amount:100, icon:'🛒'}]},  // 700
             ],
         },
     },
@@ -606,12 +621,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 看每週的收入和支出，計算最後剩下多少錢<br>
-                                簡單：選擇答案；普通/困難：數字輸入
+                                簡單：2個事件，點擊/拖曳；普通：4個事件，選擇題；困難：5個事件，數字輸入
                             </label>
                         </div>
                     </div>
                     <div class="game-buttons">
-                        <button class="back-btn" onclick="Game.backToMenu()">← 返回主選單</button>
+                        <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
                         <button class="start-btn" id="start-btn" disabled>開始練習</button>
                     </div>
                 </div>
@@ -619,9 +634,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _diffDescriptions: {
-            easy:   '簡單：從選項中選出正確的餘額，每題只有一項收入或支出',
-            normal: '普通：用數字鍵盤輸入餘額，題目包含收入和支出',
-            hard:   '困難：複雜的多項收支計算，需正確加減所有項目',
+            easy:   '簡單：每次會有2個事件（含收入/支出混合），視覺提示下點擊或拖曳金錢圖示完成。',
+            normal: '普通：每次會有4個事件，作答方式為選擇題。',
+            hard:   '困難：每次會有5個事件，輸入正確金額。',
         },
 
         _bindSettingsEvents() {
@@ -1063,31 +1078,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 rem -= cnt * d;
             }
 
-            // 手機版：分組顯示（不可點擊，僅參考）
-            const groups = [];
-            let rem2 = amount;
-            for (const d of denoms) {
-                if (rem2 <= 0) break;
-                const cnt = Math.floor(rem2 / d);
-                if (cnt > 0) groups.push({ denom: d, count: cnt, face: rf(d) });
-                rem2 -= cnt * d;
-                if (groups.length >= 4) break;
-            }
-            const mobileHTML = groups.map(g => {
-                const isBill = g.denom >= 100;
-                const w = isBill ? 34 : 24;
-                const badge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
-                return `<span class="b2-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_${g.face}.png" alt="${g.denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
-                         onerror="this.style.display='none'" draggable="false">${badge}
-                </span>`;
-            }).join('');
-
-            // 桌面版：逐枚可點擊按鈕
-            const desktopHTML = items.map(item => {
+            // 逐枚可點擊按鈕（手機/桌面統一顯示個別圖示）
+            const html = items.map(item => {
                 const isBill = item.denom >= 100;
-                const w = isBill ? 72 : 50;
+                const w = isBill ? 68 : 44;
                 return `<button class="b2-coin-clickable"
                     data-event-idx="${eventIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
                     aria-label="${item.denom}元" style="position:relative;">
@@ -1097,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>`;
             }).join('');
 
-            return `<span class="b2-mic-desktop">${desktopHTML}</span><span class="b2-mic-mobile">${mobileHTML}</span>`;
+            return `<span class="b2-mic-wrap">${html}</span>`;
         },
 
         // ── 共用數字鍵盤（困難模式 Phase 1）──────────────────────────
@@ -1125,45 +1119,29 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderChoiceMoneyIcons(amount, maxGroups = 4) {
+        _renderChoiceMoneyIcons(amount) {
             const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
-            const groups = [];
+            const items = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
-                const count = Math.floor(rem / d);
-                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
-                if (groups.length >= maxGroups) break;
+                const cnt = Math.floor(rem / d);
+                for (let i = 0; i < cnt && items.length < 12; i++) items.push(d);
+                rem -= cnt * d;
             }
-            if (groups.length === 0) return '';
+            if (items.length === 0) return '';
 
-            // 手機版：分組 ×N
-            const mobileHTML = groups.map(g => {
-                const isBill = g.denom >= 100;
-                const w = isBill ? 34 : 24;
-                const countBadge = g.count > 1 ? `<span class="b2-cic-count">×${g.count}</span>` : '';
-                return `<span class="b2-cic-item">
-                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
-                         onerror="this.style.display='none'" draggable="false">${countBadge}
-                </span>`;
-            }).join('');
-
-            // 桌面版：逐枚（最多10枚）
-            const items = [];
-            for (const g of groups) {
-                for (let i = 0; i < g.count && items.length < 10; i++) items.push(g.denom);
-            }
-            const desktopHTML = items.map(d => {
+            // 逐枚顯示（手機/桌面統一，紙鈔大於硬幣）
+            const html = items.map(d => {
                 const isBill = d >= 100;
-                const w = isBill ? 36 : 26;
-                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元"
+                const w = isBill ? 40 : 28;
+                return `<img src="../images/money/${d}_yuan_${rf()}.png" alt="${d}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
 
-            return `<span class="b2-cic-desktop">${desktopHTML}</span><span class="b2-cic-mobile">${mobileHTML}</span>`;
+            return `<span class="b2-cic-wrap">${html}</span>`;
         },
 
         _renderB2TotalInput(isHard) {
@@ -1255,46 +1233,29 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        // ── 金額→金幣圖示組（桌面：逐枚；手機：分組×N）─────────────
-        _renderMoneyIconsGrouped(amount, maxGroups = 4) {
+        // ── 金額→金幣圖示（逐枚顯示，紙鈔大於硬幣，手機/桌面統一）──
+        _renderMoneyIconsGrouped(amount) {
             const rf = () => Math.random() < 0.5 ? 'back' : 'front';
             const denoms = [1000, 500, 100, 50, 10, 5, 1];
             let rem = amount;
-            const groups = [];
+            const items = [];
             for (const d of denoms) {
                 if (rem <= 0) break;
-                const count = Math.floor(rem / d);
-                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
-                if (groups.length >= maxGroups) break;
+                const cnt = Math.floor(rem / d);
+                for (let i = 0; i < cnt && items.length < 12; i++) items.push(d);
+                rem -= cnt * d;
             }
-            if (groups.length === 0) return '';
+            if (items.length === 0) return '';
 
-            // 手機版：分組 ×N（原樣）
-            const mobileHTML = groups.map(g => {
-                const isBill = g.denom >= 100;
-                const w = isBill ? 34 : 24;
-                const countBadge = g.count > 1 ? `<span class="b2-mic-count">×${g.count}</span>` : '';
-                return `<span class="b2-mic-item">
-                    <img src="../images/money/${g.denom}_yuan_${rf(g.denom)}.png" alt="${g.denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:3px' : 'border-radius:50%'};display:block;"
-                         onerror="this.style.display='none'" draggable="false">${countBadge}
-                </span>`;
-            }).join('');
-
-            // 桌面版：逐枚顯示（最多10枚），尺寸參考 Phase 2
-            const items = [];
-            for (const g of groups) {
-                for (let i = 0; i < g.count && items.length < 10; i++) items.push(g.denom);
-            }
-            const desktopHTML = items.map(d => {
+            const html = items.map(d => {
                 const isBill = d >= 100;
-                const w = isBill ? 72 : 50;
-                return `<img src="../images/money/${d}_yuan_${rf(d)}.png" alt="${d}元"
+                const w = isBill ? 68 : 44;
+                return `<img src="../images/money/${d}_yuan_${rf()}.png" alt="${d}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;flex-shrink:0;"
                      onerror="this.style.display='none'" draggable="false">`;
             }).join('');
 
-            return `<span class="b2-mic-desktop">${desktopHTML}</span><span class="b2-mic-mobile">${mobileHTML}</span>`;
+            return `<span class="b2-mic-wrap">${html}</span>`;
         },
 
         // ── 自訂事件數字鍵盤（普通模式用，取代3選1彈窗）───────────────
@@ -1307,11 +1268,11 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.id = 'b2-cep-numpad-overlay';
             overlay.className = 'b2-nchoice-modal-overlay';
             overlay.innerHTML = `
-                <div class="b2-nchoice-modal" style="max-width:280px;">
-                    <div class="b2-nchoice-modal-title">${isIncome ? '📥 收入' : '📤 支出'}金額是多少？</div>
-                    <div id="b2-cep-np-disp" style="font-size:1.6rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin:8px 0;">___</div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b2-nchoice-btn ${isIncome ? 'income' : 'expense'}" data-cepnp="${k}" style="padding:10px;">${k}</button>`).join('')}
+                <div class="b2-nchoice-modal" style="width:300px;max-width:92vw;padding:20px 16px;box-sizing:border-box;">
+                    <div class="b2-nchoice-modal-title" style="margin-bottom:10px;">${isIncome ? '📥 收入' : '📤 支出'}金額是多少？</div>
+                    <div id="b2-cep-np-disp" style="font-size:1.5rem;font-weight:bold;text-align:center;padding:8px 10px;background:#f3f4f6;border-radius:10px;margin:0 0 10px;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;box-sizing:border-box;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b2-nchoice-btn ${isIncome ? 'income' : 'expense'}" data-cepnp="${k}" style="padding:10px 4px;font-size:1.1rem;min-width:0;">${k}</button>`).join('')}
                     </div>
                 </div>`;
             document.body.appendChild(overlay);
@@ -1368,6 +1329,49 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
+        // ── 新增自訂事件時「金額」欄位的數字鍵盤彈窗 ──────────────────
+        _showB2AddAmtNumpad(onConfirm) {
+            document.getElementById('b2-add-amt-numpad-overlay')?.remove();
+            let inputVal = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b2-add-amt-numpad-overlay';
+            overlay.className = 'b2-nchoice-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b2-nchoice-modal" style="width:300px;max-width:92vw;padding:20px 16px;box-sizing:border-box;">
+                    <div class="b2-nchoice-modal-title" style="margin-bottom:10px;">💰 請輸入金額（元）</div>
+                    <div id="b2-add-amt-disp" style="font-size:1.5rem;font-weight:bold;text-align:center;padding:8px 10px;background:#f3f4f6;border-radius:10px;margin:0 0 10px;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;box-sizing:border-box;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b2-nchoice-btn income" data-addamt="${k}" style="padding:10px 4px;font-size:1.1rem;min-width:0;">${k}</button>`).join('')}
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b2-add-amt-disp');
+            const update = () => { disp.textContent = inputVal || '___'; };
+            overlay.querySelectorAll('[data-addamt]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.addamt;
+                    if (k === '⌫') { inputVal = inputVal.slice(0, -1); }
+                    else if (k === '✓') {
+                        const val = parseInt(inputVal);
+                        if (val >= 1) {
+                            overlay.remove();
+                            onConfirm(val);
+                        } else {
+                            disp.style.color = '#ef4444';
+                            Game.TimerManager.setTimeout(() => { disp.style.color = ''; }, 500, 'ui');
+                        }
+                        return;
+                    } else {
+                        const next = inputVal + k;
+                        if (parseInt(next, 10) <= 99999) inputVal = next;
+                    }
+                    this.audio.play('click');
+                    update();
+                });
+            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
         _bindCustomEventsPanel(question) {
             // 刪除原有事件
             document.querySelectorAll('#b2-base-event-0, #b2-base-event-1, #b2-base-event-2, #b2-base-event-3').forEach(row => {
@@ -1381,6 +1385,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             });
             // 新增事件
+            // 攔截「金額」輸入框：改用數字鍵盤彈窗，避免原生鍵盤
+            const amtInputEl = document.getElementById('b2-cep-amt-input');
+            if (amtInputEl) {
+                Game.EventManager.on(amtInputEl, 'click', (e) => {
+                    e.preventDefault();
+                    amtInputEl.blur();
+                    this._showB2AddAmtNumpad(val => { amtInputEl.value = val; });
+                }, {}, 'gameUI');
+                Game.EventManager.on(amtInputEl, 'focus', () => { amtInputEl.blur(); }, {}, 'gameUI');
+            }
+
             const addBtn = document.getElementById('b2-cep-add-btn');
             if (!addBtn) return;
             Game.EventManager.on(addBtn, 'click', () => {
@@ -1414,15 +1429,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b2-cost-input b2-cep-cost-input" data-idx="custom-${ci}" data-correct="${amount}">？ 元</div>
                     </div>`;
                 list.appendChild(row);
-                // 綁定 ? 輸入框（自訂事件一律使用數字鍵盤）
+                // 綁定 ? 輸入框（普通→3選1，困難→數字鍵盤）
                 const costInput = row.querySelector('.b2-cep-cost-input');
                 if (costInput) {
                     Game.EventManager.on(costInput, 'click', () => {
                         if (costInput.classList.contains('b2-input-correct')) return;
-                        if (isHard2 && q._openNumpadModal) {
-                            q._openNumpadModal(costInput);
+                        if (isHard2) {
+                            if (q._openNumpadModal) q._openNumpadModal(costInput);
+                            else this._showB2CustomEventNumpad(costInput, amount, type, name, question);
                         } else {
-                            this._showB2CustomEventNumpad(costInput, amount, type, name, question);
+                            this._showB2NormalChoices(costInput, amount, type, question, this._getEffectiveAnswer(question));
                         }
                     }, {}, 'gameUI');
                 }
@@ -1441,6 +1457,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _updateCustomAnswerPreview(question) {
             const ans = this._getEffectiveAnswer(question);
+            const totalInput = document.getElementById('b2-total-input');
+            if (totalInput) totalInput.dataset.correct = ans;
             const prev = document.getElementById('b2-input-preview');
             const val = parseInt(this.state.quiz.currentInput);
             if (prev && !isNaN(val)) {
@@ -1511,22 +1529,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 啟動循序提示模式
                         this.state.quiz.hintSequential = true;
                         this._advanceSequentialHint(question);
-                    } else if (isHard) {
-                        this._showHardModeHintModal(question);
                     } else {
-                        this._showCalcBreakdown(question);
-                        const effEvents = this._getEffectiveEvents(question);
-                        const effAnswer = this._getEffectiveAnswer(question);
-                        const steps = [question.startAmount, ...effEvents.map((e, i) => {
-                            let running = question.startAmount;
-                            for (let j = 0; j <= i; j++) running += effEvents[j].type === 'income' ? effEvents[j].amount : -effEvents[j].amount;
-                            return running;
-                        })];
-                        const parts = effEvents.map((e, i) => {
-                            const verb = e.type === 'income' ? '收入' : '花了';
-                            return `${verb}${e.amount}元，剩下${steps[i + 1]}元`;
-                        });
-                        Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
+                        // 普通/困難：在未答對的 ？框上方顯示金額數字提示
+                        this._showDiaryAmountHints(question);
                     }
                 }, {}, 'gameUI');
             }
@@ -1802,7 +1807,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 inputEl.classList.add('b2-input-active');
                 q.activeInputEl = inputEl;
                 q.hardTotalInput = '';
-                const label = inputEl.dataset.idx === 'total' ? '最後剩下多少元？' : `第${parseInt(inputEl.dataset.idx) + 1}筆金額是多少元？`;
+                const rawIdx = inputEl.dataset.idx;
+                const numIdx = parseInt(rawIdx);
+                const label = rawIdx === 'total' ? '最後剩下多少元？'
+                    : !isNaN(numIdx) ? `第${numIdx + 1}筆金額是多少元？`
+                    : `此筆金額是多少元？`;
 
                 document.getElementById('b2-ht-modal')?.remove();
                 const overlay = document.createElement('div');
@@ -2244,6 +2253,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 bar.classList.add('b2-tg-fade');
                 Game.TimerManager.setTimeout(() => { if (bar.parentNode) bar.remove(); }, 500, 'ui');
             }, 2000, 'ui');
+        },
+
+        // ── 普通/困難 Phase 1 提示：在未答對的 ？框上方顯示正確金額數字 ──
+        _showDiaryAmountHints(question) {
+            document.querySelectorAll('.b2-cost-hint-tip').forEach(el => el.remove());
+            let shown = 0;
+            document.querySelectorAll('.b2-cost-input:not(.b2-input-correct)').forEach(el => {
+                const correct = parseInt(el.dataset.correct);
+                if (isNaN(correct)) return;
+                const tip = document.createElement('span');
+                tip.className = 'b2-cost-hint-tip';
+                tip.textContent = `${correct} 元`;
+                el.appendChild(tip);
+                shown++;
+            });
+            if (shown === 0) return;
+            Game.TimerManager.setTimeout(() => {
+                document.querySelectorAll('.b2-cost-hint-tip').forEach(el => el.remove());
+            }, 5000, 'ui');
         },
 
         // ── 計算過程提示（答錯後顯示逐步算式）─────────────────
@@ -2757,12 +2785,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
                     const isBanknote = slot.denom >= 100;
-                    const imgW = isBanknote ? '100px' : '60px';
+                    const imgW = isBanknote ? '68px' : '60px';
                     const ghostClass = slot.filled ? '' : ' b2-wallet-ghost-slot';
                     const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                     return `<div class="b2-wallet-coin${ghostClass}" data-b2-hint-idx="${idx}">
                         <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
-                             style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                             style="width:${imgW};height:${imgW};object-fit:contain;"
                              draggable="false" onerror="this.style.display:'none'">
                     </div>`;
                 }).join('');
@@ -2770,12 +2798,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinsEl.innerHTML = '<span class="b2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
             } else {
                 coinsEl.innerHTML = this.state.wallet.map(coin => {
-                    const imgW = coin.isBanknote ? '100px' : '60px';
+                    const imgW = coin.isBanknote ? '68px' : '60px';
                     const coinFace = coin.face || 'front';
                     return `
                     <div class="b2-wallet-coin b2-wc-removable" draggable="true" data-uid="${coin.uid}">
                         <img src="../images/money/${coin.denom}_yuan_${coinFace}.png" alt="${coin.denom}元"
-                             style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                             style="width:${imgW};height:${imgW};object-fit:contain;"
                              onerror="this.style.display:'none'" draggable="false">
                         <button class="b2-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>
                     </div>`;
@@ -3161,29 +3189,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 const themeInfo = B2_THEMES[theme];
                 const themeTitle = themeInfo ? `${themeInfo.icon} ${themeInfo.name}日記清單` : '📋 日記清單';
                 const mkMoneyIcons = (amt) => {
+                    const rf = () => Math.random() < 0.5 ? 'back' : 'front';
                     const denoms = [1000, 500, 100, 50, 10, 5, 1];
-                    let rem = amt; const parts = [];
+                    let rem = amt; const imgs = [];
                     for (const d of denoms) {
                         if (rem <= 0) break;
                         const cnt = Math.floor(rem / d);
-                        if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
+                        for (let i = 0; i < cnt; i++) imgs.push({ d, face: rf() });
+                        rem -= cnt * d;
                     }
-                    return parts.map(p =>
-                        `<span style="display:inline-flex;align-items:center;gap:2px;margin:2px 4px 2px 0;">
-                            <img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
-                                style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'" draggable="false">
-                            ${p.cnt > 1 ? `<span style="font-size:16px;font-weight:bold;color:#374151;">×${p.cnt}</span>` : ''}
-                        </span>`
-                    ).join('');
+                    return imgs.map(({ d, face }) => {
+                        const isBill = d >= 100;
+                        const w = isBill ? 68 : 44;
+                        return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                            style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};margin:2px 2px;" onerror="this.style.display='none'" draggable="false">`;
+                    }).join('');
                 };
+                const mkItemRow = (cls, label, amtLabel, amtCls, amt) =>
+                    `<div class="b2-ds-item-row ${cls}">
+                        <div class="b2-ds-item-label-row">
+                            <span class="b2-ds-item-name">${label}</span>
+                            <span class="b2-ds-amt ${amtCls}">${amtLabel}</span>
+                        </div>
+                        <div class="b2-ds-money-icons">${mkMoneyIcons(amt)}</div>
+                    </div>`;
                 const rowsArr = hist.map((h, i) => {
                     const entryTheme = B2_THEMES[h._theme || theme];
                     const entryIcon = entryTheme ? entryTheme.icon : '📒';
                     const eventsHtml = h.events.map(e =>
-                        `<div class="b2-ds-item-row ${e.type}" style="font-size:16px;padding:4px 0;">
-                            <span>${e.icon || (e.type === 'income' ? '📥' : '📤')} ${e.name}：<span class="b2-ds-amt ${e.type}">${e.type === 'income' ? '+' : '-'}${e.amount}元</span></span>
-                            <div class="b2-ds-money-icons" style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(e.amount)}</div>
-                        </div>`
+                        mkItemRow(e.type,
+                            `${e.icon || (e.type === 'income' ? '📥' : '📤')} ${e.name}`,
+                            `${e.type === 'income' ? '+' : '-'}${e.amount}元`,
+                            e.type, e.amount)
                     ).join('');
                     const resultTag = h.correct !== false
                         ? `<span class="b2-ds-tag correct">✅</span>`
@@ -3193,14 +3230,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b2-ds-detail">
                             <div class="b2-ds-label" style="font-size:16px;">第 ${i + 1} 題 ${resultTag}</div>
                             <div class="b2-ds-items">
-                                <div class="b2-ds-item-row start" style="font-size:16px;padding:4px 0;">
-                                    <span>💼 開始：${h.startAmount}元</span>
-                                    <div class="b2-ds-money-icons" style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(h.startAmount)}</div>
-                                </div>
+                                ${mkItemRow('start', '💼 開始', `${h.startAmount}元`, 'start', h.startAmount)}
                                 ${eventsHtml}
-                                <div class="b2-ds-item-total" style="font-size:17px;font-weight:700;padding-top:6px;margin-top:4px;">
-                                    <span>結餘：${h.answer}元</span>
-                                    <div style="display:flex;flex-wrap:wrap;align-items:center;margin-top:4px;">${mkMoneyIcons(h.answer)}</div>
+                                <div class="b2-ds-item-total">
+                                    <div class="b2-ds-item-label-row">
+                                        <span class="b2-ds-item-name">結餘</span>
+                                        <span class="b2-ds-amt total">${h.answer}元</span>
+                                    </div>
+                                    <div class="b2-ds-money-icons">${mkMoneyIcons(h.answer)}</div>
                                 </div>
                             </div>
                         </div>

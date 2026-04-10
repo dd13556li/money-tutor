@@ -10,7 +10,7 @@
 const B1_SCENARIOS = {
     easy: [
         { icon:'🏫', label:'去學校',    cat:'school',        imageFile:'icon-b1-easy-go-to-school.png',              items:[{ name:'午餐費',   min:40,  max:65  }, { name:'公車票',  min:15, max:30 }] },
-        { icon:'🏪', label:'去超商',    cat:'shopping',      imageFile:'icon-b1-easy-go-to-convenience-store.png',   items:[{ name:'飲料費',   min:20,  max:35  }, { name:'零食費',  min:10, max:25 }] },
+        { icon:'🏪', label:'去超商',    cat:'shopping',      imageFile:'icon-b1-easy-go-to-convenience-store.png',   items:[{ name:'飲料費',   min:25,  max:40  }, { name:'零食費',  min:15, max:30 }] },
         { icon:'📚', label:'圖書館',    cat:'school',        imageFile:'icon-b1-easy-library.png',                   items:[{ name:'影印費',   min:5,   max:20  }, { name:'文具費',  min:5,  max:15 }] },
         { icon:'🎭', label:'看表演',    cat:'entertainment', imageFile:'icon-b1-easy-watch-performance.png',         items:[{ name:'表演票',   min:80,  max:150 }, { name:'零食費',  min:15, max:25 }] },
         { icon:'🏊', label:'游泳課',    cat:'outdoor',       imageFile:'icon-b1-easy-swimming-class.png',            items:[{ name:'入場費',   min:60,  max:100 }, { name:'飲料費',  min:10, max:20 }] },
@@ -18,63 +18,85 @@ const B1_SCENARIOS = {
         { icon:'🚌', label:'搭公車',    cat:'school',        imageFile:'icon-b1-easy-take-bus.png',                  items:[{ name:'公車票',   min:15,  max:30  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🌿', label:'逛公園',    cat:'outdoor',       imageFile:'icon-b1-easy-visit-park.png',                items:[{ name:'停車費',   min:15,  max:30  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'☕', label:'買早餐',    cat:'food',          imageFile:'icon-b1-easy-buy-breakfast.png',             items:[{ name:'早餐費',   min:25,  max:55  }, { name:'飲料費',  min:10, max:20 }] },
-        { icon:'🐟', label:'買魚飼料',  cat:'shopping',      imageFile:'icon-b1-easy-buy-fish-food.png',             items:[{ name:'飼料費',   min:35,  max:65  }, { name:'魚缸砂',  min:15, max:25 }] },
         { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-easy-watch-movie.png',               items:[{ name:'電影票',   min:100, max:160 }, { name:'爆米花',  min:25, max:45 }] },
         { icon:'🍜', label:'吃點心',    cat:'food',          imageFile:'icon-b1-easy-buy-snack.png',                 items:[{ name:'點心費',   min:30,  max:60  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🛒', label:'買文具',    cat:'shopping',      imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'文具費',   min:40,  max:75  }, { name:'橡皮擦',  min:5,  max:10 }] },
         { icon:'⛺', label:'踏青',      cat:'outdoor',       imageFile:'icon-b1-easy-outing.png',                    items:[{ name:'門票費',   min:50,  max:80  }, { name:'飲料費',  min:10, max:20 }] },
         { icon:'🍦', label:'買冰淇淋',  cat:'food',          imageFile:'icon-b1-hard-eat-ice-cream.png',             items:[{ name:'冰淇淋費', min:20,  max:50  }, { name:'飲料費',  min:10, max:20 }] },
-        { icon:'🎮', label:'電玩體驗',  cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',              items:[{ name:'遊戲費',   min:30,  max:60  }, { name:'零食費',  min:10, max:20 }] },
+        { icon:'🎮', label:'電玩體驗',  cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',               items:[{ name:'遊戲費',   min:30,  max:60  }, { name:'零食費',  min:10, max:20 }] },
         { icon:'🌸', label:'賞花展',    cat:'outdoor',       imageFile:'icon-b1-easy-flower-show.png',               items:[{ name:'門票費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
-        { icon:'🐾', label:'寵物店',    cat:'shopping',      imageFile:'icon-b1-easy-pet-shop.png',                  items:[{ name:'零食費',   min:30,  max:60  }, { name:'玩具費',  min:15, max:25 }] },
+        // ── 國高中生常見場景 ──
+        { icon:'🧋', label:'買手搖飲',  cat:'food',          imageFile:'icon-b1-easy-buy-bubble-tea.png',            items:[{ name:'飲料費',   min:40,  max:70  }, { name:'零食費',  min:15, max:30 }] },
+        { icon:'📓', label:'買筆記本',  cat:'shopping',      imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'筆記本費', min:25,  max:45  }, { name:'鉛筆費',  min:10, max:20 }] },
+        { icon:'🍳', label:'早餐店',    cat:'food',          imageFile:'icon-b1-easy-buy-breakfast.png',             items:[{ name:'早餐費',   min:35,  max:60  }, { name:'公車票',  min:15, max:30 }] },
+        { icon:'🎮', label:'買遊戲點數', cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',              items:[{ name:'點數費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
+        { icon:'🏀', label:'打球',      cat:'outdoor',       imageFile:'icon-b1-easy-swimming-class.png',            items:[{ name:'飲料費',   min:20,  max:35  }, { name:'零食費',  min:10, max:20 }] },
+        { icon:'📱', label:'買手機貼紙', cat:'shopping',     imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'貼紙費',   min:20,  max:40  }, { name:'飲料費',  min:10, max:20 }] },
+        { icon:'🌙', label:'逛夜市',    cat:'food',          imageFile:'icon-b1-easy-outing.png',                    items:[{ name:'小吃費',   min:40,  max:80  }, { name:'飲料費',  min:15, max:30 }] },
+        { icon:'📝', label:'繳班費',    cat:'school',        imageFile:'icon-b1-easy-go-to-school.png',              items:[{ name:'班費',     min:50,  max:100 }, { name:'飲料費',  min:10, max:20 }] },
     ],
     normal: [
-        { icon:'🏫', label:'上學日',    cat:'school',        imageFile:'icon-b1-normal-school-day.png',              items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }] },
-        { icon:'🎨', label:'才藝課',    cat:'school',        imageFile:'icon-b1-normal-talent-class.png',            items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }] },
-        { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-normal-see-doctor.png',              items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }] },
-        { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-normal-watch-movie.png',             items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }] },
-        { icon:'🚂', label:'搭火車',    cat:'outdoor',       imageFile:'icon-b1-normal-take-train.png',              items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }] },
-        { icon:'🏊', label:'去游泳',    cat:'outdoor',       imageFile:'icon-b1-normal-go-swimming.png',             items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }] },
-        { icon:'📖', label:'買書',      cat:'shopping',      imageFile:'icon-b1-normal-buy-books.png',               items:[{ name:'故事書',  min:150, max:260 }, { name:'文具費',  min:20,  max:50  }] },
-        { icon:'🌄', label:'爬山',      cat:'outdoor',       imageFile:'icon-b1-normal-mountain-climbing.png',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }] },
-        { icon:'🎮', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'門票費',  min:150, max:260 }, { name:'零食費',  min:40,  max:80  }] },
-        { icon:'🍜', label:'吃午飯',    cat:'food',          imageFile:'icon-b1-normal-have-lunch.png',              items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🏫', label:'補習班',    cat:'school',        imageFile:'icon-b1-normal-cram-school.png',             items:[{ name:'課程費',  min:150, max:300 }, { name:'文具費',  min:20,  max:55  }] },
-        { icon:'🍰', label:'下午茶',    cat:'food',          imageFile:'icon-b1-normal-afternoon-tea.png',           items:[{ name:'飲料費',  min:45,  max:80  }, { name:'點心費',  min:50,  max:95  }] },
-        { icon:'🛒', label:'買玩具',    cat:'shopping',      imageFile:'icon-b1-normal-buy-toys.png',                items:[{ name:'玩具費',  min:200, max:400 }, { name:'電池費',  min:35,  max:65  }] },
-        { icon:'🎡', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'入場費',  min:120, max:210 }, { name:'零食費',  min:45,  max:85  }] },
-        { icon:'🍣', label:'吃壽司',    cat:'food',          imageFile:'icon-b1-hard-eat-sushi.png',                 items:[{ name:'壽司費',  min:150, max:300 }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🥐', label:'買麵包',    cat:'food',          imageFile:'icon-b1-hard-buy-bread.png',                 items:[{ name:'麵包費',  min:40,  max:75  }, { name:'咖啡費',  min:45,  max:80  }] },
-        { icon:'💇', label:'去剪髮',    cat:'shopping',      imageFile:'icon-b1-hard-get-haircut.png',               items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }] },
-        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }] },
-        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }] },
-        { icon:'🐠', label:'水族館',    cat:'outdoor',       imageFile:'icon-b1-normal-aquarium.png',                items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }] },
+        { icon:'🏫', label:'上學日',    cat:'school',        imageFile:'icon-b1-normal-school-day.png',              items:[{ name:'午餐費',  min:50,  max:85  }, { name:'公車票',  min:15,  max:35  }, { name:'文具費',  min:10,  max:25  }] },
+        { icon:'🎨', label:'才藝課',    cat:'school',        imageFile:'icon-b1-normal-talent-class.png',            items:[{ name:'課程費',  min:120, max:220 }, { name:'材料費',  min:40,  max:80  }, { name:'飲料費',  min:15,  max:30  }] },
+        { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-normal-see-doctor.png',              items:[{ name:'掛號費',  min:100, max:200 }, { name:'藥費',    min:60,  max:130 }, { name:'公車票',  min:15,  max:30  }] },
+        { icon:'🎬', label:'看電影',    cat:'entertainment', imageFile:'icon-b1-normal-watch-movie.png',             items:[{ name:'電影票',  min:200, max:330 }, { name:'爆米花',  min:60,  max:120 }, { name:'飲料費',  min:25,  max:45  }] },
+        { icon:'🚂', label:'搭火車',    cat:'outdoor',       imageFile:'icon-b1-normal-take-train.png',              items:[{ name:'火車票',  min:180, max:360 }, { name:'便當費',  min:60,  max:110 }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🏊', label:'去游泳',    cat:'outdoor',       imageFile:'icon-b1-normal-go-swimming.png',             items:[{ name:'入場費',  min:70,  max:130 }, { name:'飲料費',  min:20,  max:45  }, { name:'零食費',  min:15,  max:30  }] },
+        { icon:'📖', label:'買參考書',  cat:'shopping',      imageFile:'icon-b1-normal-buy-books.png',               items:[{ name:'參考書費', min:150, max:260 }, { name:'文具費',  min:20,  max:50  }, { name:'飲料費',  min:15,  max:30  }] },
+        { icon:'🌄', label:'爬山',      cat:'outdoor',       imageFile:'icon-b1-normal-mountain-climbing.png',       items:[{ name:'門票費',  min:80,  max:160 }, { name:'食物費',  min:80,  max:160 }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🍜', label:'吃午飯',    cat:'food',          imageFile:'icon-b1-normal-have-lunch.png',              items:[{ name:'午餐費',  min:70,  max:130 }, { name:'飲料費',  min:25,  max:50  }, { name:'甜點費',  min:30,  max:60  }] },
+        { icon:'🏫', label:'補習班',    cat:'school',        imageFile:'icon-b1-normal-cram-school.png',             items:[{ name:'課程費',  min:150, max:300 }, { name:'文具費',  min:20,  max:55  }, { name:'飲料費',  min:15,  max:30  }] },
+        { icon:'🍰', label:'下午茶',    cat:'food',          imageFile:'icon-b1-normal-afternoon-tea.png',           items:[{ name:'飲料費',  min:45,  max:80  }, { name:'點心費',  min:50,  max:95  }, { name:'甜點費',  min:30,  max:60  }] },
+        { icon:'🎡', label:'遊樂場',    cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'入場費',  min:120, max:210 }, { name:'零食費',  min:45,  max:85  }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🍣', label:'吃壽司',    cat:'food',          imageFile:'icon-b1-hard-eat-sushi.png',                 items:[{ name:'壽司費',  min:150, max:300 }, { name:'飲料費',  min:25,  max:50  }, { name:'甜點費',  min:30,  max:60  }] },
+        { icon:'🥐', label:'買麵包',    cat:'food',          imageFile:'icon-b1-hard-buy-bread.png',                 items:[{ name:'麵包費',  min:40,  max:75  }, { name:'咖啡費',  min:45,  max:80  }, { name:'果汁費',  min:20,  max:40  }] },
+        { icon:'💇', label:'去剪髮',    cat:'shopping',      imageFile:'icon-b1-hard-get-haircut.png',               items:[{ name:'剪髮費',  min:150, max:300 }, { name:'洗髮費',  min:50,  max:100 }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'入場費',  min:150, max:300 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費',  min:20,  max:40  }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費',  min:120, max:210 }, { name:'租鞋費',  min:40,  max:70  }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🐠', label:'水族館',    cat:'outdoor',       imageFile:'icon-b1-normal-aquarium.png',                items:[{ name:'門票費',  min:150, max:280 }, { name:'紀念品',  min:50,  max:100 }, { name:'飲料費',  min:20,  max:40  }] },
         { icon:'⛺', label:'踏青',      cat:'outdoor',       imageFile:'icon-b1-normal-outing.png',                  items:[{ name:'門票費',  min:80,  max:150 }, { name:'飲料費',  min:20,  max:45  }, { name:'零食費',  min:25,  max:50  }] },
+        // ── 國高中生常見場景 ──
+        { icon:'🧋', label:'珍奶聚會',  cat:'food',          imageFile:'icon-b1-normal-afternoon-tea.png',           items:[{ name:'飲料費',  min:50,  max:85  }, { name:'點心費',  min:45,  max:80  }, { name:'甜點費',  min:30,  max:60  }] },
+        { icon:'🎧', label:'買耳機',    cat:'shopping',      imageFile:'icon-b1-hard-buy-phone-case.png',            items:[{ name:'耳機費',  min:250, max:420 }, { name:'耳機套',  min:25,  max:50  }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🏀', label:'打籃球',    cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'場地費',  min:80,  max:150 }, { name:'飲料費',  min:30,  max:60  }, { name:'零食費',  min:15,  max:30  }] },
+        { icon:'🌙', label:'夜市出遊',  cat:'food',          imageFile:'icon-b1-normal-outing.png',                  items:[{ name:'小吃費',  min:80,  max:150 }, { name:'夾娃娃費', min:40,  max:80  }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'👟', label:'買運動服',  cat:'shopping',      imageFile:'icon-b1-hard-big-shopping.png',              items:[{ name:'運動衣費', min:150, max:280 }, { name:'運動褲費', min:120, max:220 }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'🎮', label:'逛電玩店',  cat:'entertainment', imageFile:'icon-b1-normal-playground.png',              items:[{ name:'二手遊戲', min:150, max:280 }, { name:'飲料費',  min:25,  max:50  }, { name:'零食費',  min:20,  max:40  }] },
+        { icon:'🍱', label:'訂外賣',    cat:'food',          imageFile:'icon-b1-normal-have-lunch.png',              items:[{ name:'餐費',    min:80,  max:150 }, { name:'外送費',  min:30,  max:60  }, { name:'飲料費',  min:20,  max:40  }] },
+        { icon:'📱', label:'買手機殼',  cat:'shopping',      imageFile:'icon-b1-hard-buy-phone-case.png',            items:[{ name:'手機殼',  min:100, max:200 }, { name:'保護貼',  min:30,  max:60  }, { name:'充電線',  min:30,  max:60  }] },
+        { icon:'🏫', label:'社團活動',  cat:'school',        imageFile:'icon-b1-normal-talent-class.png',            items:[{ name:'社費',    min:100, max:180 }, { name:'材料費',  min:50,  max:100 }, { name:'飲料費',  min:15,  max:30  }] },
     ],
     hard: [
         { icon:'🛒', label:'大採購',    cat:'shopping',      imageFile:'icon-b1-hard-big-shopping.png',              items:[{ name:'衣服費',  min:280, max:480 }, { name:'鞋子費',  min:380, max:620 }, { name:'書費',    min:150, max:230 }] },
         { icon:'🎂', label:'買禮物',    cat:'shopping',      imageFile:'icon-b1-hard-buy-gift.png',                  items:[{ name:'禮物費',  min:200, max:400 }, { name:'蛋糕費',  min:350, max:520 }, { name:'卡片費',  min:25,  max:55  }] },
-        { icon:'🌿', label:'出遊',      cat:'outdoor',       imageFile:'icon-b1-normal-trip.png',                    items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費', min:80,  max:160 }, { name:'飲料費', min:25,  max:50 }] },
+        { icon:'🌿', label:'出遊',      cat:'outdoor',       imageFile:'icon-b1-normal-trip.png',                    items:[{ name:'公車票',  min:15,  max:35  }, { name:'冰淇淋費', min:35,  max:65  }, { name:'門票費',  min:80,  max:160 }, { name:'飲料費',  min:25,  max:50  }] },
         { icon:'🏕️', label:'露營',     cat:'outdoor',       imageFile:'icon-b1-normal-camping.png',                 items:[{ name:'食材費',  min:280, max:440 }, { name:'裝備費',  min:150, max:300 }, { name:'入場費',  min:120, max:210 }] },
         { icon:'🎡', label:'遊樂園',    cat:'entertainment', imageFile:'icon-b1-hard-amusement-park.png',            items:[{ name:'門票費',  min:450, max:720 }, { name:'餐費',    min:200, max:340 }, { name:'紀念品費', min:150, max:260 }] },
-        { icon:'🌍', label:'校外教學',  cat:'school',        imageFile:'icon-b1-hard-field-trip.png',                items:[{ name:'交通費',  min:60,  max:130 }, { name:'午餐費',  min:90,  max:160 }, { name:'門票費',  min:150, max:300 }, { name:'零用錢', min:80,  max:160 }] },
+        { icon:'🌍', label:'校外教學',  cat:'school',        imageFile:'icon-b1-hard-field-trip.png',                items:[{ name:'交通費',  min:60,  max:130 }, { name:'午餐費',  min:90,  max:160 }, { name:'門票費',  min:150, max:300 }, { name:'零用錢',  min:80,  max:160 }] },
         { icon:'🎓', label:'畢業典禮',  cat:'school',        imageFile:'icon-b1-hard-graduation-ceremony.png',       items:[{ name:'服裝費',  min:380, max:580 }, { name:'花束費',  min:200, max:400 }, { name:'聚餐費',  min:280, max:450 }] },
-        { icon:'🏖️', label:'去海邊',   cat:'outdoor',       imageFile:'icon-b1-hard-go-to-beach.png',               items:[{ name:'防曬乳',  min:150, max:260 }, { name:'餐費',    min:250, max:400 }, { name:'停車費',  min:80,  max:160 }, { name:'飲料費', min:50,  max:90 }] },
+        { icon:'🏖️', label:'去海邊',   cat:'outdoor',       imageFile:'icon-b1-hard-go-to-beach.png',               items:[{ name:'防曬乳',  min:150, max:260 }, { name:'餐費',    min:250, max:400 }, { name:'停車費',  min:80,  max:160 }, { name:'飲料費',  min:50,  max:90  }] },
         { icon:'🍱', label:'聚餐',      cat:'food',          imageFile:'icon-b1-hard-banquet.png',                   items:[{ name:'餐費',    min:380, max:580 }, { name:'飲料費',  min:100, max:180 }, { name:'甜點費',  min:120, max:210 }] },
         { icon:'🏫', label:'暑期課程',  cat:'school',        imageFile:'icon-b1-hard-summer-course.png',             items:[{ name:'課程費',  min:400, max:680 }, { name:'教材費',  min:150, max:260 }, { name:'午餐費',  min:80,  max:160 }] },
         { icon:'🛍️', label:'換季採購',  cat:'shopping',      imageFile:'icon-b1-hard-seasonal-shopping.png',         items:[{ name:'外套費',  min:550, max:850 }, { name:'褲子費',  min:280, max:450 }, { name:'包包費',  min:350, max:580 }] },
         { icon:'🎤', label:'KTV 歡唱',  cat:'entertainment', imageFile:'icon-b1-hard-sing-ktv.png',                  items:[{ name:'包廂費',  min:320, max:530 }, { name:'飲料費',  min:100, max:190 }, { name:'小食費',  min:60,  max:130 }] },
-        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費', min:120, max:210 }, { name:'租鞋費',  min:40,  max:75  }, { name:'飲料費',  min:25,  max:50  }] },
-        { icon:'🧸', label:'逛玩具展',  cat:'entertainment', imageFile:'icon-b1-hard-visit-toy-exhibition.png',      items:[{ name:'門票費',  min:150, max:300 }, { name:'紀念品費', min:120, max:220 }, { name:'餐費',   min:100, max:180 }] },
+        { icon:'🎳', label:'去打保齡球', cat:'entertainment', imageFile:'icon-b1-hard-play-bowling.png',             items:[{ name:'場地費',  min:120, max:210 }, { name:'租鞋費',  min:40,  max:75  }, { name:'飲料費',  min:25,  max:50  }] },
         { icon:'📱', label:'買手機殼',  cat:'shopping',      imageFile:'icon-b1-hard-buy-phone-case.png',            items:[{ name:'手機殼',  min:150, max:260 }, { name:'保護貼',  min:40,  max:75  }, { name:'充電線',  min:80,  max:160 }] },
-        { icon:'🎻', label:'音樂課',    cat:'school',        imageFile:'icon-b1-hard-music-class.png',               items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費', min:80,  max:160 }] },
+        { icon:'🎻', label:'音樂課',    cat:'school',        imageFile:'icon-b1-hard-music-class.png',               items:[{ name:'課程費',  min:320, max:530 }, { name:'樂器耗材', min:60,  max:130 }, { name:'教材費',  min:80,  max:160 }] },
         { icon:'🍕', label:'吃披薩',    cat:'food',          imageFile:'icon-b1-hard-eat-pizza.png',                 items:[{ name:'披薩費',  min:280, max:440 }, { name:'飲料費',  min:50,  max:90  }, { name:'甜點費',  min:60,  max:110 }] },
-        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費', min:30,  max:60  }] },
-        { icon:'🐠', label:'海生館',    cat:'outdoor',       imageFile:'icon-b1-hard-marine-museum.png',             items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',   min:150, max:280 }] },
-        { icon:'🎠', label:'親子遊',    cat:'entertainment', imageFile:'icon-b1-hard-family-outing.png',             items:[{ name:'樂園票',  min:380, max:600 }, { name:'餐費',    min:200, max:350 }, { name:'玩具費',  min:100, max:200 }, { name:'飲料費', min:50, max:90 }] },
+        { icon:'🏋️', label:'健身房',   cat:'outdoor',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'月費',    min:280, max:460 }, { name:'運動飲料', min:25,  max:50  }, { name:'毛巾費',  min:30,  max:60  }] },
+        { icon:'🐠', label:'海生館',    cat:'outdoor',       imageFile:'icon-b1-hard-marine-museum.png',             items:[{ name:'門票費',  min:300, max:480 }, { name:'紀念品費', min:100, max:200 }, { name:'餐費',    min:150, max:280 }] },
         { icon:'🕹️', label:'夾娃娃機', cat:'entertainment', imageFile:'icon-b1-hard-claw-machine.png',              items:[{ name:'遊戲幣費', min:150, max:280 }, { name:'飲料費',  min:25,  max:50  }, { name:'零食費',  min:40,  max:80  }] },
         { icon:'🏥', label:'看醫生',    cat:'school',        imageFile:'icon-b1-hard-see-doctor.png',                items:[{ name:'掛號費',  min:150, max:300 }, { name:'檢查費',  min:200, max:400 }, { name:'藥費',    min:120, max:250 }] },
         { icon:'🚂', label:'搭火車出遊', cat:'outdoor',      imageFile:'icon-b1-hard-take-train.png',                items:[{ name:'火車票',  min:350, max:680 }, { name:'便當費',  min:80,  max:150 }, { name:'飲料費',  min:35,  max:65  }, { name:'紀念品費', min:100, max:200 }] },
+        // ── 國高中生常見場景 ──
+        { icon:'🎪', label:'動漫展',    cat:'entertainment', imageFile:'icon-b1-hard-visit-toy-exhibition.png',      items:[{ name:'門票費',  min:250, max:420 }, { name:'周邊費',  min:300, max:550 }, { name:'餐費',    min:100, max:180 }] },
+        { icon:'👟', label:'買球鞋',    cat:'shopping',      imageFile:'icon-b1-hard-big-shopping.png',              items:[{ name:'球鞋費',  min:700, max:1200}, { name:'鞋墊費',  min:80,  max:160 }, { name:'運動襪',  min:50,  max:100 }] },
+        { icon:'🎮', label:'同學聚會',  cat:'entertainment', imageFile:'icon-b1-hard-sing-ktv.png',                  items:[{ name:'餐費',    min:250, max:420 }, { name:'KTV費',  min:180, max:320 }, { name:'交通費',  min:50,  max:100 }] },
+        { icon:'📚', label:'補習班月費', cat:'school',       imageFile:'icon-b1-hard-summer-course.png',             items:[{ name:'補習費',  min:500, max:850 }, { name:'教材費',  min:120, max:230 }, { name:'文具費',  min:60,  max:120 }] },
+        { icon:'🎸', label:'音樂社演出', cat:'school',       imageFile:'icon-b1-hard-music-class.png',               items:[{ name:'表演服費', min:280, max:460 }, { name:'道具費',  min:100, max:200 }, { name:'餐費',    min:120, max:220 }, { name:'交通費',  min:50,  max:100 }] },
+        { icon:'🌙', label:'夜市班遊',  cat:'food',          imageFile:'icon-b1-hard-banquet.png',                   items:[{ name:'小吃費',  min:180, max:320 }, { name:'遊戲費',  min:120, max:220 }, { name:'飲料費',  min:80,  max:160 }, { name:'交通費',  min:50,  max:100 }] },
+        { icon:'🎧', label:'買3C配件',  cat:'shopping',      imageFile:'icon-b1-hard-buy-phone-case.png',            items:[{ name:'耳機費',  min:500, max:850 }, { name:'充電器費', min:150, max:280 }, { name:'手機殼費', min:80,  max:160 }] },
+        { icon:'🏃', label:'校際運動會', cat:'school',       imageFile:'icon-b1-hard-gym.png',                       items:[{ name:'報名費',  min:100, max:200 }, { name:'服裝費',  min:180, max:320 }, { name:'餐費',    min:120, max:200 }, { name:'飲料費',  min:50,  max:100 }] },
     ]
 };
 
@@ -381,12 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
                                 ✨ 看行程清單，準備好正確的錢幣，出發！<br>
-                                簡單：硬幣；普通：硬幣+紙鈔；困難：自行加總所有費用
+                                簡單：2項費用；普通：3項費用；困難：3~4項費用，需自行加總
                             </label>
                         </div>
                     </div>
                     <div class="game-buttons">
-                        <button class="back-btn" onclick="Game.backToMenu()">← 返回主選單</button>
+                        <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
                         <button class="start-btn" id="start-btn" disabled>▶ 開始練習</button>
                     </div>
                 </div>
@@ -396,9 +418,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _diffDescriptions: {
-            easy:   '簡單：每次只有1項費用，總金額會顯示，可使用硬幣（1、5、10、50元）',
-            normal: '普通：2~3項費用，總金額會顯示，可使用硬幣和紙鈔',
-            hard:   '困難：3~5項費用，需要自己加總，使用所有面額，必須準備足夠的錢'
+            easy:   '簡單：每次會有2項費用，視覺提示下，拖曳放置完成。',
+            normal: '普通：每次會有3項費用，作答方式為選擇題及依提示準備正確的錢幣。',
+            hard:   '困難：每次會有3~4項費用，自行輸入正確金額。'
         },
 
         _bindSettingsEvents() {
@@ -1125,8 +1147,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => {
-                    // 普通/困難：逐項朗讀費用
-                    this._speakItemsOneByOneHard(curr);
+                    // 普通/困難：在未答對的 ？框上方顯示金額數字提示
+                    this._showPhase1AmountHints(curr);
                 }, {}, 'gameUI');
             }
             if (diff === 'easy') {
@@ -1415,11 +1437,11 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.id = 'b1-cip-numpad-overlay';
             overlay.className = 'b1-nchoice-modal-overlay';
             overlay.innerHTML = `
-                <div class="b1-nchoice-modal">
+                <div class="b1-nchoice-modal" style="width:300px;max-width:92vw;padding:20px 16px;box-sizing:border-box;">
                     <div class="b1-nchoice-title">📌 這個項目需要幾元？</div>
-                    <div id="b1-cip-np-disp" style="font-size:1.8rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin:8px 0;">___</div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b1-nchoice-btn" data-cipnp="${k}" style="padding:10px;">${k}</button>`).join('')}
+                    <div id="b1-cip-np-disp" style="font-size:1.5rem;font-weight:bold;text-align:center;padding:8px 10px;background:#f3f4f6;border-radius:10px;margin:0 0 10px;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;box-sizing:border-box;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b1-nchoice-btn" data-cipnp="${k}" style="padding:10px 4px;font-size:1.1rem;min-width:0;display:block;width:100%;">${k}</button>`).join('')}
                     </div>
                     <div id="b1-cip-np-err" style="color:#ef4444;font-size:13px;text-align:center;margin-top:4px;display:none;"></div>
                 </div>`;
@@ -1466,8 +1488,93 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Speech.speak('這個項目需要幾元？');
         },
 
+        // ── 自訂項目：普通模式 3選1 彈窗（答題用）──────────────────
+        _showB1CustomItemChoices(btn, cost, curr) {
+            document.getElementById('b1-cip-choices-overlay')?.remove();
+            const choices = this._generateChoices(cost).sort(() => Math.random() - 0.5);
+            const overlay = document.createElement('div');
+            overlay.id = 'b1-cip-choices-overlay';
+            overlay.className = 'b1-nchoice-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b1-nchoice-modal">
+                    <div class="b1-nchoice-title">📌 這個項目需要幾元？</div>
+                    <div class="b1-nchoice-btns">
+                        ${choices.map(amt => `<button class="b1-nchoice-btn" data-amount="${amt}">${amt} 元</button>`).join('')}
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            const q = this.state.quiz;
+            overlay.querySelectorAll('.b1-nchoice-btn').forEach(choiceBtn => {
+                choiceBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chosen = parseInt(choiceBtn.dataset.amount);
+                    if (chosen === cost) {
+                        overlay.remove();
+                        this.audio.play('correct');
+                        btn.textContent = `${cost} 元`;
+                        btn.classList.add('b1-item-cost-revealed');
+                        btn.disabled = true;
+                        q.customItemsPendingCount = Math.max(0, (q.customItemsPendingCount || 0) - 1);
+                        Game.Speech.speak(`${cost}元，答對了！`, () => {
+                            this._checkB1AllItemsCorrect(curr, this._getEffectiveItems(curr));
+                        });
+                    } else {
+                        this.audio.play('error');
+                        choiceBtn.classList.add('b1-nchoice-wrong');
+                        Game.TimerManager.setTimeout(() => choiceBtn.classList.remove('b1-nchoice-wrong'), 600, 'ui');
+                        Game.Speech.speak('不對喔，請再試一次');
+                    }
+                });
+            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
+        // ── 新增自訂項目時「金額」欄位的數字鍵盤彈窗 ──────────────────
+        _showB1AddCostNumpad(onConfirm) {
+            document.getElementById('b1-add-cost-numpad-overlay')?.remove();
+            let inputVal = '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b1-add-cost-numpad-overlay';
+            overlay.className = 'b1-nchoice-modal-overlay';
+            overlay.innerHTML = `
+                <div class="b1-nchoice-modal" style="width:300px;max-width:92vw;padding:20px 16px;box-sizing:border-box;">
+                    <div class="b1-nchoice-title">💰 請輸入金額（元）</div>
+                    <div id="b1-add-cost-disp" style="font-size:1.5rem;font-weight:bold;text-align:center;padding:8px 10px;background:#f3f4f6;border-radius:10px;margin:0 0 10px;">___</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;box-sizing:border-box;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button class="b1-nchoice-btn" data-addcost="${k}" style="padding:10px 4px;font-size:1.1rem;min-width:0;display:block;width:100%;">${k}</button>`).join('')}
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b1-add-cost-disp');
+            const update = () => { disp.textContent = inputVal || '___'; };
+            overlay.querySelectorAll('[data-addcost]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.addcost;
+                    if (k === '⌫') { inputVal = inputVal.slice(0, -1); }
+                    else if (k === '✓') {
+                        const val = parseInt(inputVal);
+                        if (val >= 1) {
+                            overlay.remove();
+                            onConfirm(val);
+                        } else {
+                            disp.style.color = '#ef4444';
+                            Game.TimerManager.setTimeout(() => { disp.style.color = ''; }, 500, 'ui');
+                        }
+                        return;
+                    } else {
+                        const next = inputVal + k;
+                        if (parseInt(next, 10) <= 99999) inputVal = next;
+                    }
+                    this.audio.play('click');
+                    update();
+                });
+            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
         // ── 自訂項目面板事件繫結 ──────────────────────────────────
         _bindCustomItemsPanel(curr) {
+            const diff = this.state.settings.difficulty;
             // 刪除/還原原有項目（✕ 按鈕現在直接在 b1-schedule-item 裡）
             document.querySelectorAll('[data-base-idx]').forEach(delBtn => {
                 Game.EventManager.on(delBtn, 'click', () => {
@@ -1479,6 +1586,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('click');
                 }, {}, 'gameUI');
             });
+
+            // 攔截「金額」輸入框：改用數字鍵盤彈窗，避免原生鍵盤
+            const costInputEl = document.getElementById('b1-cip-cost-input');
+            if (costInputEl) {
+                Game.EventManager.on(costInputEl, 'click', (e) => {
+                    e.preventDefault();
+                    costInputEl.blur();
+                    this._showB1AddCostNumpad(val => { costInputEl.value = val; });
+                }, {}, 'gameUI');
+                Game.EventManager.on(costInputEl, 'focus', () => { costInputEl.blur(); }, {}, 'gameUI');
+            }
 
             // 新增項目
             const addBtn = document.getElementById('b1-cip-add-btn');
@@ -1509,12 +1627,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b1-cip-cost-btn" id="b1-cip-cost-btn-${customIdx}">？元</button>
                             </div>`;
                         list.appendChild(row);
-                        // 綁定 ? 框 → 數字鍵盤
+                        // 綁定 ? 框（普通→3選1，困難→數字鍵盤）
                         const costBtn = row.querySelector('.b1-cip-cost-btn');
                         if (costBtn) {
                             Game.EventManager.on(costBtn, 'click', () => {
                                 if (costBtn.classList.contains('b1-item-cost-revealed')) return;
-                                this._showB1CustomItemNumpad(costBtn, cost, curr);
+                                if (diff === 'normal') {
+                                    this._showB1CustomItemChoices(costBtn, cost, curr);
+                                } else {
+                                    this._showB1CustomItemNumpad(costBtn, cost, curr);
+                                }
                             }, {}, 'gameUI');
                         }
                         // 刪除自訂項目
@@ -2022,12 +2144,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
                         const isBanknote = slot.denom >= 100;
-                        const imgW = isBanknote ? '100px' : '60px';
+                        const imgW = isBanknote ? '68px' : '60px';
                         const ghostClass = slot.filled ? '' : ' b1-wallet-ghost-slot';
                         const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                         return `<div class="b1-wallet-coin${ghostClass}" data-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
-                                 style="width:${imgW};${isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                                 style="width:${imgW};height:${imgW};object-fit:contain;"
                                  draggable="false" onerror="this.style.display='none'">
                         </div>`;
                     }).join('');
@@ -2039,13 +2161,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         const coinFace = coin.face || 'front';
                         const imgSrc   = `../images/money/${coin.denom}_yuan_${coinFace}.png`;
                         const imgClass = coin.isBanknote ? 'banknote-img' : 'coin-img';
-                        const imgW     = coin.isBanknote ? '100px' : '60px';
+                        const imgW     = coin.isBanknote ? '68px' : '60px';
                         const removableAttrs = removable ? `draggable="true" data-denom="${coin.denom}" class="b1-wallet-coin b1-wc-removable"` : `class="b1-wallet-coin"`;
                         const removeBtn = removable ? `<button class="b1-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>` : '';
                         return `
                         <div ${removableAttrs} data-uid="${coin.uid}">
                             <img src="${imgSrc}" alt="${coin.denom}元" class="${imgClass}"
-                                 style="width:${imgW};${coin.isBanknote ? 'border-radius:4px' : 'border-radius:50%'}"
+                                 style="width:${imgW};height:${imgW};object-fit:contain;"
                                  onerror="this.style.display='none'" draggable="false">
                             ${removeBtn}
                         </div>`;
@@ -2489,6 +2611,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return result;
         },
 
+        // ── Phase 1 提示：在未答對的 ？框上方顯示正確金額數字 ──────
+        _showPhase1AmountHints(curr) {
+            // 清除舊提示
+            document.querySelectorAll('.b1-cost-hint-tip').forEach(el => el.remove());
+            let shown = 0;
+            // 基本項目
+            document.querySelectorAll('.b1-item-box-btn:not(.b1-item-cost-revealed)').forEach(btn => {
+                const cost = parseInt(btn.dataset.cost);
+                if (isNaN(cost)) return;
+                const tip = document.createElement('span');
+                tip.className = 'b1-cost-hint-tip';
+                tip.textContent = `${cost} 元`;
+                btn.appendChild(tip);
+                shown++;
+            });
+            // 自訂項目
+            document.querySelectorAll('.b1-cip-cost-btn:not(.b1-item-cost-revealed)').forEach(btn => {
+                const cost = parseInt(btn.dataset.cost);
+                if (isNaN(cost)) return;
+                const tip = document.createElement('span');
+                tip.className = 'b1-cost-hint-tip';
+                tip.textContent = `${cost} 元`;
+                btn.appendChild(tip);
+                shown++;
+            });
+            if (shown === 0) return;
+            // 5 秒後自動移除
+            Game.TimerManager.setTimeout(() => {
+                document.querySelectorAll('.b1-cost-hint-tip').forEach(el => el.remove());
+            }, 5000, 'ui');
+        },
+
         _showCoinHint() {
             const curr = this.state.quiz.questions[this.state.quiz.currentQuestion];
             if (!curr) return;
@@ -2613,22 +2767,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!q.solvedSchedules || q.solvedSchedules.length === 0) return '';
                 const maxTotal = Math.max(...q.solvedSchedules.map(s => s.total));
                 const minTotal = Math.min(...q.solvedSchedules.map(s => s.total));
-                // 44×44 金錢圖示（全面額，實際數量）
+                // 金錢圖示（實際數量，紙鈔68px，硬幣44px，隨機正反面）
                 const mkMoneyIcons44 = (amt) => {
+                    const rf = () => Math.random() < 0.5 ? 'back' : 'front';
+                    const banknotes = new Set([100, 500, 1000]);
                     const denoms = [1000, 500, 100, 50, 10, 5, 1];
-                    let rem = amt; const parts = [];
+                    let rem = amt; const imgs = [];
                     for (const d of denoms) {
                         if (rem <= 0) break;
                         const cnt = Math.floor(rem / d);
-                        if (cnt > 0) { parts.push({ d, cnt }); rem -= cnt * d; }
+                        for (let i = 0; i < cnt; i++) imgs.push({ d, face: rf() });
+                        rem -= cnt * d;
                     }
-                    return parts.map(p =>
-                        `<span style="display:inline-flex;align-items:center;gap:2px;margin:2px 4px 2px 0;">
-                            <img src="../images/money/${p.d}_yuan_front.png" alt="${p.d}元"
-                                style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'" draggable="false">
-                            ${p.cnt > 1 ? `<span style="font-size:16px;font-weight:bold;color:#374151;">×${p.cnt}</span>` : ''}
-                        </span>`
-                    ).join('');
+                    return imgs.map(({ d, face }) => {
+                        const size = banknotes.has(d) ? '68px' : '44px';
+                        return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                            style="width:${size};height:${size};object-fit:contain;margin:2px 2px;" onerror="this.style.display='none'" draggable="false">`;
+                    }).join('');
                 };
                 const rowsArr = q.solvedSchedules.map(s => {
                     const tag = s.total === maxTotal && q.solvedSchedules.length > 1

@@ -5945,6 +5945,27 @@
 
             VendingMachine.Debug.log('flow', ' 商品:', product.name, '價格:', product.price, '已付:', insertedAmount, '找零:', change);
 
+            const mkMoneyIcons = (amount) => {
+                if (!amount || amount <= 0) return '';
+                const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                const imgs = [];
+                let rem = amount;
+                for (const d of denoms) {
+                    const cnt = Math.floor(rem / d);
+                    for (let i = 0; i < cnt; i++) {
+                        const face = Math.random() < 0.5 ? 'back' : 'front';
+                        imgs.push({ d, face });
+                    }
+                    rem -= cnt * d;
+                }
+                return imgs.map(({ d, face }) => {
+                    const isBill = d >= 100;
+                    const w = isBill ? 68 : 44;
+                    return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                        style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};margin:3px;" draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+            };
+
             app.innerHTML = `
                 <div class="transaction-summary-screen">
                     <div class="summary-content">
@@ -5973,14 +5994,17 @@
                                     <span>商品價格：</span>
                                     <span>${product.price} 元</span>
                                 </div>
+                                <div class="a1-money-icons-row">${mkMoneyIcons(product.price)}</div>
                                 <div class="summary-item">
                                     <span>已付金額：</span>
                                     <span>${insertedAmount} 元</span>
                                 </div>
+                                <div class="a1-money-icons-row">${mkMoneyIcons(insertedAmount)}</div>
                                 <div class="summary-item">
                                     <span>找零金額：</span>
                                     <span>${change} 元</span>
                                 </div>
+                                ${change > 0 ? `<div class="a1-money-icons-row">${mkMoneyIcons(change)}</div>` : ''}
                             </div>
                         </div>
 
@@ -6003,15 +6027,18 @@
                         top: 0;
                         left: 0;
                         width: 100vw;
+                        overflow-y: auto;
                     }
 
                     .summary-content {
-                        max-width: 600px;
+                        max-width: 800px;
+                        width: 92%;
                         padding: 2rem;
                         background: rgba(255, 255, 255, 0.1);
                         border-radius: 20px;
                         backdrop-filter: blur(10px);
                         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                        margin: auto;
                     }
 
                     .summary-header h1 {
@@ -6045,13 +6072,22 @@
                     .summary-item {
                         display: flex;
                         justify-content: space-between;
-                        padding: 1rem 0;
-                        border-bottom: 1px solid #f0f0f0;
+                        padding: 1rem 0 0.4rem;
+                        border-bottom: none;
                         font-size: 1.3rem;
                     }
 
-                    .summary-item:last-child {
-                        border-bottom: none;
+                    .a1-money-icons-row {
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 2px;
+                        padding: 0.4rem 0 0.8rem;
+                        border-bottom: 1px solid #f0f0f0;
+                        min-height: 20px;
+                    }
+
+                    .summary-item:last-of-type {
                         font-weight: bold;
                         color: var(--vm-primary);
                     }
