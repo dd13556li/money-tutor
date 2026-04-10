@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">📝 作業單：</label>
                             <div class="b-btn-group">
-                                <a href="#" id="settings-worksheet-link" class="b-sel-btn"
+                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
                                    style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
                                     產生作業單
                                 </a>
@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🎁 獎勵系統：</label>
                             <div class="b-btn-group">
-                                <a href="#" id="settings-reward-link" class="b-sel-btn"
+                                <a href="#" id="settings-reward-link" class="b-sel-btn active"
                                    style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
                                     開啟獎勵系統
                                 </a>
