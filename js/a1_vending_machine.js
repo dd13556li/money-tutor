@@ -6031,7 +6031,7 @@
                     }
 
                     .summary-content {
-                        max-width: 800px;
+                        max-width: 480px;
                         width: 92%;
                         padding: 2rem;
                         background: rgba(255, 255, 255, 0.1);

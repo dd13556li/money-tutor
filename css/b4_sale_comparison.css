@@ -447,46 +447,50 @@
 
 /* ── 數字鍵盤（困難模式）────────────────────────────────────── */
 .b4-input-display {
-    background: #1f2937;
-    color: #f59e0b;
+    background: #f3f4f6;
+    color: #1f2937;
     font-size: 2rem;
     font-weight: bold;
-    text-align: right;
-    padding: 12px 16px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
     border-radius: 10px;
     margin-bottom: 12px;
-    min-height: 60px;
-    letter-spacing: 2px;
+    min-height: 56px;
+    width: 100%;
+    box-sizing: border-box;
 }
 .b4-input-display .b4-unit-text {
     font-size: 1rem;
-    color: #9ca3af;
+    color: #6b7280;
     margin-left: 4px;
 }
 
 .b4-numpad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 6px;
 }
 
 .b4-numpad-btn {
-    padding: 14px 8px;
+    padding: 12px 8px;
     background: #f9fafb;
     border: 2px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 20px;
-    font-weight: bold;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: #374151;
     cursor: pointer;
     transition: all 0.15s;
     text-align: center;
     user-select: none;
 }
-.b4-numpad-btn:hover  { background: #fef3c7; border-color: #f59e0b; }
+.b4-numpad-btn:hover  { background: #e5e7eb; border-color: #d1d5db; }
 .b4-numpad-btn:active { transform: scale(0.93); }
 .b4-numpad-btn.btn-del  { color: #ef4444; }
-.b4-numpad-btn.btn-ok   { background: #10b981; border-color: #10b981; color:#fff; font-size:18px; }
+.b4-numpad-btn.btn-ok   { background: #10b981; border-color: #10b981; color:#fff; font-size:1rem; }
 .b4-numpad-btn.btn-ok:hover { background: #059669; }
 
 /* ── 動畫 ─────────────────────────────────────────────────────── */
@@ -622,7 +626,7 @@
     .b4-item-icon    { font-size: 44px; }
     .b4-item-name    { font-size: 18px; }
     .b4-diff-opt     { padding: 10px 16px; font-size: 18px; }
-    .b4-numpad-btn   { padding: 12px 4px; font-size: 18px; }
+    .b4-numpad-btn   { padding: 10px 4px; font-size: 1rem; }
 }
 
 /* ── 困難模式差額提示按鈕 ────────────────────────────────── */
@@ -1570,7 +1574,19 @@
 .b4-sl-page {
     min-height: calc(100vh - 64px);
     background: linear-gradient(160deg, #ecfdf5 0%, #f0fdf4 60%, #d1fae5 100%);
-    padding: 0 0 48px;
+    padding: 16px 16px 48px;
+}
+
+/* ── 省錢清單大外框 ── */
+.b4-sl-frame {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.15), 0 1px 4px rgba(0,0,0,0.08);
+    border: 2px solid #a7f3d0;
+    padding: 20px 16px 16px;
+    max-width: 680px;
+    margin: 0 auto 20px;
+    overflow: hidden;
 }
 
 /* ── 摘要橫條 ── */
@@ -1620,8 +1636,9 @@
 
 /* ── 卡片容器 ── */
 .b4-sl-cards2 {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 14px;
     padding: 20px 20px 0;
     max-width: 900px;
@@ -1637,6 +1654,7 @@
     border: 2px solid transparent;
     animation: slCardIn 0.4s ease both;
     position: relative;
+    width: 280px;
 }
 .b4-sl-card2-gold {
     border-color: #f59e0b;
@@ -1653,6 +1671,7 @@
 .b4-sl2-top {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 14px 16px;
     border-bottom: 1.5px solid;
@@ -1666,6 +1685,7 @@
     font-size: 16px;
     font-weight: 800;
     color: #1f2937;
+    text-align: center;
 }
 .b4-sl2-body {
     padding: 14px 16px;
@@ -1673,6 +1693,7 @@
 .b4-sl2-formula {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     flex-wrap: wrap;
 }
@@ -1680,9 +1701,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
     padding: 8px 12px;
     border-radius: 10px;
-    flex: 1;
+    flex: 0 0 auto;
     min-width: 70px;
 }
 .b4-sl2-exp {
@@ -1733,7 +1755,8 @@
 }
 
 @media (max-width: 480px) {
-    .b4-sl-cards2 { grid-template-columns: 1fr; padding: 16px 12px 0; }
+    .b4-sl-cards2 { padding: 16px 12px 0; }
+    .b4-sl-card2 { width: 100%; max-width: 400px; }
     .b4-sl-summary-bar { padding: 16px 16px; }
     .b4-sl-summary-trophy { font-size: 36px; }
     .b4-sl-summary-title { font-size: 20px; }
@@ -1888,20 +1911,21 @@
 /* ── 困難模式差額彈窗數字輸入器 ─────────────────────────────── */
 .b4-hnp-card, .b4-pi-modal-card {
     background: #fff;
-    border-radius: 20px;
-    padding: 24px;
-    min-width: 280px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 260px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    align-items: stretch;
+    gap: 10px;
     animation: bFadeIn 0.25s ease;
 }
 .b4-hnp-title, .b4-pi-modal-title {
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 700;
     color: #374151;
+    text-align: center;
 }
 .b4-hnp-cancel {
     margin-top: 4px;
@@ -1948,6 +1972,8 @@
     font-size: 13px;
     color: #9ca3af;
     margin-top: -4px;
+    text-align: center;
+    width: 100%;
 }
 .b4-pi-input-box { cursor: pointer; }
 .b4-pi-input-box:hover { background: #f0fdf4; }
@@ -1990,3 +2016,153 @@
 .b4-sl-page { display: flex; flex-direction: column; align-items: center; }
 .b4-sl-page .b4-sl-cards2 { width: 100%; }
 .b4-sl-page .b4-sl-actions { width: 100%; display: flex; justify-content: center; }
+
+/* ── 省錢清單卡片翻頁導覽列 ────────────────────────────────── */
+.b4-sl-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 0 4px;
+    width: 100%;
+}
+.b4-sl-nav-btn {
+    padding: 8px 20px;
+    border: 2px solid #fde68a;
+    border-radius: 24px;
+    background: #fffbeb;
+    color: #d97706;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.b4-sl-nav-btn:hover:not(:disabled) {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    transform: translateY(-1px);
+}
+.b4-sl-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+.b4-sl-nav-info {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 600;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* ── 第一頁答對：便宜商品顯示省了多少 ──────────────────────── */
+.b4-card-savings-amount {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 4px 10px;
+    margin-top: 4px;
+    animation: b4DeltaIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    letter-spacing: 0.3px;
+}
+
+/* ── 三商店金額輸入框 ────────────────────────────────────────── */
+.b4-triple-pi-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px 20px 12px;
+    margin: 12px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1.5px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.b4-triple-pi-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    text-align: center;
+    margin-bottom: 14px;
+}
+.b4-triple-pi-boxes {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.b4-triple-pi-box-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 90px;
+    max-width: 150px;
+}
+.b4-triple-pi-box-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    text-align: center;
+}
+.b4-triple-pi-box-wrap:nth-child(1) .b4-triple-pi-box-label { color: #059669; }
+.b4-triple-pi-box-wrap:nth-child(3) .b4-triple-pi-box-label { color: #dc2626; }
+.b4-triple-pi-box {
+    width: 100%;
+    min-height: 52px;
+    background: #f9fafb;
+    border: 2.5px solid #d1d5db;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #374151;
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+}
+.b4-triple-pi-box:hover {
+    border-color: #a78bfa;
+    background: #faf5ff;
+    transform: translateY(-2px);
+}
+.b4-triple-pi-box.b4-tpi-filled {
+    border-color: #10b981;
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+/* ── 差額選項響應式排列 ──────────────────────────────────────── */
+@media (min-width: 601px) {
+    .b4-diff-options {
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+    .b4-diff-opt {
+        flex: 1;
+        min-width: 160px;
+        max-width: 300px;
+    }
+    .b4-diff-options-easy .b4-diff-opt-solo {
+        flex: 0 0 auto;
+    }
+}
+@media (max-width: 600px) {
+    .b4-diff-options:not(.b4-diff-options-easy) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .b4-diff-options:not(.b4-diff-options-easy) .b4-diff-opt {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* ── 完成所有測驗彈窗動畫 ─────────────────────────────────────── */
+@keyframes b4CmIn {
+    from { transform: scale(0.5) translateY(40px); opacity: 0; }
+    to   { transform: scale(1) translateY(0);      opacity: 1; }
+}
