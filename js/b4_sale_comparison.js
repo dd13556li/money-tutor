@@ -1986,22 +1986,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     } else {
                         this.audio.play('error');
-                        // 找到第一個錯誤給提示
+                        // 找到第一個錯誤，播放對應語音
                         let errMsg;
                         if (entered[0] !== sortedPrices[0]) {
-                            errMsg = `不對喔，最便宜的不是${entered[0]}元，請再想想`;
+                            errMsg = `最便宜的價格不是${entered[0]}元，請再試一次`;
                         } else if (entered[1] !== sortedPrices[1]) {
-                            errMsg = `不對喔，中間的不是${entered[1]}元，請再想想`;
+                            errMsg = `普通的價格不是${entered[1]}元，請再試一次`;
                         } else {
-                            errMsg = `不對喔，最貴的不是${entered[2]}元，請再想想`;
+                            errMsg = `最貴的價格不是${entered[2]}元，請再試一次`;
                         }
                         Game.Speech.speak(errMsg, () => {
                             Game.TimerManager.setTimeout(() => {
                                 this.state.isProcessing = false;
-                                // 清空所有輸入框重試
-                                boxKeys.forEach(key => {
-                                    userValues[key] = '';
-                                    updateBoxDisplay(key);
+                                // 只清除輸入錯誤的欄位，正確的保留
+                                boxKeys.forEach((key, i) => {
+                                    if (entered[i] !== sortedPrices[i]) {
+                                        userValues[key] = '';
+                                        updateBoxDisplay(key);
+                                    }
                                 });
                             }, 400, 'ui');
                         });
@@ -2609,6 +2611,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-diff-ref-cheap">✅ ${cheapOpt.storeIcon} ${cheapOpt.store} 比較便宜</div>
             </div>`;
 
+            // 兩商店折疊長條圖（預設隱藏）
+            const collapsibleBarsHTML = `
+            <button class="b4-tsp-toggle" id="b4-tsp-toggle">📋 查看各家價格</button>
+            <div id="b4-tsp-panel" style="display:none;">${barsHTML}</div>`;
+
             const app = document.getElementById('app');
 
             if (diff === 'easy') {
@@ -2620,6 +2627,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${refCardHTML}
                     </div>
                     <div class="b4-diff-section b4-diff-normal-card">
+                        ${collapsibleBarsHTML}
                         ${formulaHTML}
                         <div class="b4-diff-question b4-diff-question-below">
                             ${diffQuestion}
@@ -2690,6 +2698,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-section b4-diff-normal-card">
+                        ${collapsibleBarsHTML}
                         ${formulaHTML}
                         <div class="b4-diff-question b4-diff-question-below">
                             ${diffQuestion}
@@ -2738,6 +2747,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="b4-diff-hard-outer">
                         <div class="b4-diff-section b4-diff-normal-card" id="b4-hard-diff-card">
+                            ${collapsibleBarsHTML}
                             ${hardFormulaHTML}
                         </div>
                         <div class="b4-calc-side-col">
@@ -2764,6 +2774,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 計算機
                 this._bindB4Calculator();
+            }
+
+            // 兩商店折疊長條圖（三模式共用）
+            const tspToggle2 = document.getElementById('b4-tsp-toggle');
+            const tspPanel2  = document.getElementById('b4-tsp-panel');
+            if (tspToggle2 && tspPanel2) {
+                Game.EventManager.on(tspToggle2, 'click', () => {
+                    const open = tspPanel2.style.display === 'none';
+                    tspPanel2.style.display = open ? '' : 'none';
+                    tspToggle2.classList.toggle('b4-tsp-open', open);
+                }, {}, 'diffUI');
             }
 
             // 提示鈕（diff 頁面）
