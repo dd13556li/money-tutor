@@ -2969,15 +2969,36 @@ document.addEventListener('DOMContentLoaded', () => {
             if (outer) outer.appendChild(card);
             else document.querySelector('.b-game-wrap')?.appendChild(card);
 
+            // 顯示單一選項金額，3秒後隱藏（同普通模式 showOptLabel pattern）
+            const showOptLabel = (targetBtn, autoHide) => {
+                const val = parseInt(targetBtn.dataset.val);
+                const label = targetBtn.querySelector('.b4-diff-opt-label');
+                if (label) { label.textContent = `${val} ${diffUnit}`; label.style.visibility = 'visible'; }
+                targetBtn.classList.remove('b4-diff-opt-masked');
+                if (autoHide) {
+                    Game.TimerManager.setTimeout(() => {
+                        if (label) { label.textContent = '？？？'; label.style.visibility = ''; }
+                        targetBtn.classList.add('b4-diff-opt-masked');
+                    }, 3000, 'ui');
+                }
+            };
+
             card.querySelectorAll('.b4-diff-opt').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     if (this.state.isProcessing) return;
                     this.state.isProcessing = true;
                     const chosen = parseInt(btn.dataset.val);
                     const isCorrect = (chosen === correctDiff);
+                    // 只顯示被點選的選項金額，3秒後消失（錯誤時）
+                    showOptLabel(btn, !isCorrect);
                     btn.classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
                     if (!isCorrect) {
                         this.audio.play('error');
+                        // 錯誤時也短暫顯示正確答案
+                        const correctBtn = card.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                        if (correctBtn) {
+                            Game.TimerManager.setTimeout(() => showOptLabel(correctBtn, true), 400, 'ui');
+                        }
                     } else {
                         if (typeof confetti === 'function') {
                             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
