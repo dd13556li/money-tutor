@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 .b4-triple-card {
                     flex: 1; min-width: 100px; max-width: 200px;
-                    position: relative;
+                    position: relative; padding-bottom: 36px;
                 }
                 .b4-price-hidden { color: #94a3b8; font-size: 1.1em; }
                 .b4-rank-badge {
