@@ -3361,8 +3361,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
             document.body.appendChild(overlay);
 
-            // 煙火 + 音效
-            document.getElementById('success-sound')?.play();
+            // 音效 + 煙火（一次）
+            this.audio.play('correct');
             if (typeof confetti === 'function') {
                 confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
             }
@@ -3477,12 +3477,21 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>`;
 
+            // 建立省錢語音文字
+            const buildSLSpeech = (h) => {
+                if (!h) return '';
+                if (h.isUnit) {
+                    return `${h.name}，${h.expStore}每${h.unit}${h.expPrice}元，${h.cheapStore}每${h.unit}${h.cheapPrice}元，省了${h.saved}元`;
+                }
+                return `${h.name}，${h.expStore}${h.expPrice}元，${h.cheapStore}${h.cheapPrice}元，省了${h.saved}元`;
+            };
+
             // 卡片切換導覽
             if (hist.length > 1) {
                 let cardIdx = 0;
-                const display   = document.getElementById('b4-sl-card-display');
-                const navInfo   = document.getElementById('b4-sl-nav-info');
-                const prevBtn   = document.getElementById('b4-sl-prev-btn');
+                const display    = document.getElementById('b4-sl-card-display');
+                const navInfo    = document.getElementById('b4-sl-nav-info');
+                const prevBtn    = document.getElementById('b4-sl-prev-btn');
                 const navNextBtn = document.getElementById('b4-sl-nav-next-btn');
 
                 const updateNav = () => {
@@ -3490,6 +3499,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     navInfo.textContent = `第 ${cardIdx + 1} / ${hist.length} 題`;
                     prevBtn.disabled    = cardIdx === 0;
                     navNextBtn.disabled = cardIdx === hist.length - 1;
+                    Game.Speech.speak(buildSLSpeech(hist[cardIdx]));
                 };
 
                 Game.EventManager.on(prevBtn, 'click', () => { cardIdx--; updateNav(); }, {}, 'gameUI');
@@ -3507,17 +3517,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.showSettings();
             }, {}, 'gameUI');
 
-            // 音效 + 煙火
-            Game.TimerManager.setTimeout(() => {
-                document.getElementById('success-sound')?.play();
-                this._fireConfetti();
-            }, 150, 'confetti');
-
-            // 語音
-            if (q.totalSaved > 0) {
+            // 播放第一題語音（延遲讓頁面先渲染完）
+            if (hist.length > 0) {
                 Game.TimerManager.setTimeout(() => {
-                    Game.Speech.speak(`恭喜！這次比價總共省了${q.totalSaved}元！`);
-                }, 600, 'speech');
+                    Game.Speech.speak(buildSLSpeech(hist[0]));
+                }, 400, 'speech');
             }
         },
 
