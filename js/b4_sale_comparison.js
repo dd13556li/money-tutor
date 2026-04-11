@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🏷️ 商品類別</label>
                             <div class="b-btn-group" id="cat-group">
-                                <button class="b-sel-btn active" data-cat="all">全部</button>
+                                <button class="b-sel-btn active" data-cat="all">隨機</button>
                                 <button class="b-sel-btn" data-cat="food">食品飲料</button>
                                 <button class="b-sel-btn" data-cat="stationery">文具書籍</button>
                                 <button class="b-sel-btn" data-cat="daily">生活用品</button>
@@ -503,9 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _diffDescriptions: {
-            easy:   '簡單：點選最划算的那家商店，答對就過關！',
-            normal: '普通：選出最划算的之後，再回答差了多少（三選一）',
-            hard:   '困難（兩/三家店）：選最划算的後自己輸入差額；（三家店）由便宜到貴依序點選'
+            easy:   '簡單：依提示點擊金額圖示，自動完成作答。',
+            normal: '普通：有金額數字的提示，輸入正確的答案。',
+            hard:   '困難：自行判斷金額，輸入正確的答案。'
         },
 
         _bindSettingsEvents() {
@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const speechMap = {
                     easy:   `${intro}，請問哪一個商店賣的比較便宜？`,
                     normal: `${intro}，請問哪一個商店賣的比較便宜？`,
-                    hard:   `${intro}，請問哪一個商店賣的比較便宜？`,
+                    hard:   `${s1}跟${s2}，請問哪一個商店賣的比較便宜？`,
                 };
                 speechText = speechMap[diff] || `哪個地方比較便宜？`;
             }
