@@ -1296,7 +1296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>
 <div class="b3-cal-layout">
-    <div class="b3-cal-center-col">
+    <div class="b3-cal-item-col">
         <div class="b3-cal-info-card">
             <button class="b-inline-replay b3-cal-replay-btn" id="replay-speech-btn" title="重播語音">🔊</button>
             <div class="b3-cal-item-section">
@@ -1323,6 +1323,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         </div>
+    </div>
+    <div class="b3-cal-center-col">
         <div class="b3-cal-card" id="b3-calendar">${this._renderCalendarHTML()}</div>
     </div>
     <div class="b3-pig-col" id="b3-pig-col">

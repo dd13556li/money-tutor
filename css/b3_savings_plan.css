@@ -468,7 +468,7 @@
     flex-direction: row;
     gap: 14px;
     padding: 14px 14px 24px;
-    max-width: 860px;
+    max-width: 1100px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
@@ -476,13 +476,16 @@
     justify-content: flex-start;
 }
 
-/* ── 中間欄：訊息卡 + 月曆 ──────────────────────────────────── */
+/* ── 左欄：商品卡片 ─────────────────────────────────────────── */
+.b3-cal-item-col {
+    flex: 0 0 220px;
+    min-width: 200px;
+}
+
+/* ── 中間欄：日曆 ────────────────────────────────────────────── */
 .b3-cal-center-col {
-    flex: 1;
+    flex: 1.5;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
 }
 
 /* ── 撲滿卡片 ────────────────────────────────────────────────── */
@@ -888,7 +891,8 @@
 
 @media (max-width: 600px) {
     .b3-cal-layout      { flex-direction: column; align-items: center; }
-    .b3-cal-center-col  { width: 100%; }
+    .b3-cal-item-col    { flex: none; width: 100%; min-width: 0; }
+    .b3-cal-center-col  { flex: none; width: 100%; }
     .b3-pig-col         { flex: none; width: 100%; }
     .b3-pig-col .b3-pig-card { flex: none; }
     .b3-pig-card        { flex: none; width: 100%; }
