@@ -2295,19 +2295,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-diff-ref-cheap">✅ ${curr.sortedAsc[0].storeIcon} ${curr.sortedAsc[0].store} 最便宜</div>
             </div>`;
 
-            // 三商店折疊參考面板（普通/困難差額頁用）
-            const tripleStorePanelHTML = `
-            <div class="b4-tsp-wrap">
-                <button class="b4-tsp-toggle" id="b4-tsp-toggle">📋 查看各家價格</button>
-                <div class="b4-tsp-panel" id="b4-tsp-panel" style="display:none;">
-                    ${curr.sortedAsc.map(s => `
-                    <div class="b4-tsp-row">
-                        <span class="b4-tsp-icon">${s.storeIcon}</span>
-                        <span class="b4-tsp-name">${s.store}</span>
-                        <span class="b4-tsp-price">${s.price} 元</span>
-                    </div>`).join('')}
-                </div>
-            </div>`;
+            // 三商店折疊長條圖（普通/困難差額頁用）— 預設隱藏，按鈕展開
+            const collapsibleBarsHTML = `
+            <button class="b4-tsp-toggle" id="b4-tsp-toggle">📋 查看各家價格</button>
+            <div id="b4-tsp-panel" style="display:none;">${barsHTML}</div>`;
 
             const app = document.getElementById('app');
 
@@ -2372,11 +2363,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        ${tripleStorePanelHTML}
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-section b4-diff-normal-card">
-                        ${barsHTML}
+                        ${collapsibleBarsHTML}
                         ${formulaHTML}
                         <div class="b4-diff-question b4-diff-question-below">
                             便宜了${correctDiff}元
@@ -2456,12 +2446,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
-                        ${tripleStorePanelHTML}
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-hard-outer">
                         <div class="b4-diff-section b4-diff-normal-card" id="b4-hard-diff-card">
-                            ${barsHTML}
+                            ${collapsibleBarsHTML}
                             ${hardFormulaHTML}
                         </div>
                         <div class="b4-calc-side-col">
