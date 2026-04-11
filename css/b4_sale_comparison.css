@@ -1158,19 +1158,36 @@
 .b4-mem-replay-btn:disabled { opacity: 0.5; cursor: default; }
 
 /* ── 自訂價格面板 ──────────────────────────────────────────── */
-.b4-custom-price-panel {
+/* ── 自訂價格：卡片內折疊面板 ─────────────────────────────────── */
+.b4-cpp-inline {
+    margin-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    width: 100%;
+}
+.b4-cpp-toggle-btn {
+    background: none;
+    border: 1.5px solid #d1d5db;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 auto;
+    transition: border-color 0.2s, color 0.2s;
+}
+.b4-cpp-toggle-btn:hover { border-color: #10b981; color: #059669; }
+.b4-cpp-toggle-btn.b4-cpp-toggle-open { border-color: #10b981; color: #059669; background: #f0fdf4; }
+.b4-cpp-body {
+    margin-top: 8px;
     background: #f0fdf4;
     border: 1.5px solid #bbf7d0;
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin: 8px auto;
-    max-width: 340px;
-}
-.b4-cpp-header {
-    font-size: 13px;
-    font-weight: 700;
-    color: #166534;
-    margin-bottom: 8px;
+    border-radius: 10px;
+    padding: 10px 10px 6px;
+    animation: b4FadeIn 0.2s ease;
 }
 .b4-cpp-row {
     display: flex;
@@ -1179,17 +1196,31 @@
     margin-bottom: 6px;
 }
 .b4-cpp-label {
-    font-size: 13px;
+    font-size: 12px;
     color: #374151;
-    min-width: 60px;
+    min-width: 56px;
+    flex-shrink: 0;
 }
-.b4-cpp-input {
+.b4-cpp-box {
+    flex: 1;
+    min-width: 60px;
+    background: #fff;
     border: 1.5px solid #d1d5db;
     border-radius: 8px;
     padding: 4px 8px;
     font-size: 14px;
-    width: 80px;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
 }
+.b4-cpp-box:hover { border-color: #10b981; background: #f0fdf4; }
+.b4-cpp-box-unit { font-size: 11px; color: #6b7280; font-weight: 400; }
 .b4-cpp-apply-btn {
     background: #10b981;
     color: #fff;
@@ -1201,6 +1232,7 @@
     margin-top: 4px;
     width: 100%;
 }
+.b4-cpp-apply-btn:hover { background: #059669; }
 
 /* ══════════════════════════════════════════════════════════════
    省錢清單頁面（showSavingsList）

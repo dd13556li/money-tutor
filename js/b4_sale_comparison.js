@@ -455,6 +455,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                 <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在題目頁面修改兩間商店的價格，系統重新計算比較結果（兩家店模式）</div>
                             </div>
+                            <div id="b4-triple-custom-price-toggle-row" style="display:none;margin-top:8px;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂價格</label>
+                                <div class="b-btn-group" id="b4-triple-custom-price-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-triple-custom="off">關閉</button>
+                                    <button class="b-sel-btn" data-triple-custom="on">開啟</button>
+                                </div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在題目頁面修改三間商店的價格，系統重新計算排序結果（三家店模式）</div>
+                            </div>
                         </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">📝 作業單</label>
@@ -503,14 +511,20 @@ document.addEventListener('DOMContentLoaded', () => {
         _bindSettingsEvents() {
             Game.EventManager.removeByCategory('settings');
             const _updateCustomPriceToggle = () => {
-                const toggle = document.getElementById('b4-custom-price-toggle-row');
-                if (!toggle) return;
                 const s = this.state.settings;
-                const show = s.difficulty !== 'easy' && s.compareStores === 'two';
-                toggle.style.display = show ? '' : 'none';
-                if (!show) {
+                // 兩家店
+                const toggle = document.getElementById('b4-custom-price-toggle-row');
+                const showTwo = s.difficulty !== 'easy' && s.compareStores === 'two';
+                if (toggle) toggle.style.display = showTwo ? '' : 'none';
+                // 三家店
+                const tripleToggle = document.getElementById('b4-triple-custom-price-toggle-row');
+                const showTriple = s.difficulty !== 'easy' && s.compareStores === 'triple';
+                if (tripleToggle) tripleToggle.style.display = showTriple ? '' : 'none';
+                // 若兩者皆不顯示 → 重置 customItemsEnabled
+                if (!showTwo && !showTriple) {
                     this.state.settings.customItemsEnabled = false;
                     document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
+                    document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(b => b.classList.toggle('active', b.dataset.tripleCustom === 'off'));
                 }
             };
             const _updateUnitBtnVisibility = () => {
@@ -594,6 +608,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
+                }, {}, 'settings');
+            });
+
+            document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.tripleCustom === 'on';
                 }, {}, 'settings');
             });
 
@@ -800,27 +822,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>` : ''}
+                    ${this.state.settings.customItemsEnabled && !curr.isUnit && diff !== 'easy'
+                        ? this._cppInlineHTML([{ id:'left', store: left.store, price: left.price }, { id:'right', store: right.store, price: right.price }])
+                        : ''}
                 </div>
                 <div class="b4-compare-grid" id="compare-grid">
                     ${this._renderOptionCard('left', left, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
                     <div class="b4-vs-divider">VS</div>
                     ${this._renderOptionCard('right', right, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
                 </div>
-                ${this.state.settings.customItemsEnabled && !curr.isTriple && !curr.isUnit && diff !== 'easy' ? `
-                <div class="b4-custom-price-panel" id="b4-cpp-panel">
-                    <div class="b4-cpp-header">🛠️ 自訂價格</div>
-                    <div class="b4-cpp-row">
-                        <label class="b4-cpp-label">${left.store}：</label>
-                        <input type="number" id="b4-cpp-left" class="b4-cpp-input" value="${left.price}" min="1" max="99999">
-                        <span>元</span>
-                    </div>
-                    <div class="b4-cpp-row">
-                        <label class="b4-cpp-label">${right.store}：</label>
-                        <input type="number" id="b4-cpp-right" class="b4-cpp-input" value="${right.price}" min="1" max="99999">
-                        <span>元</span>
-                    </div>
-                    <button class="b4-cpp-apply-btn" id="b4-cpp-apply-btn">套用自訂價格</button>
-                </div>` : ''}
                 <div id="diff-section"></div>
             </div>`;
 
@@ -988,9 +998,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderOptionCard(side, opt, cheaperPer, correctSide, unitCurr = null) {
+        _renderOptionCard(side, opt, cheaperPer, correctSide, unitCurr = null, extraHTML = '') {
             if (unitCurr) {
-                // 單位比價模式：顯示數量/總價 + 每單位價格
                 const per = opt.price / opt.qty;
                 return `
                 <div class="b4-option-card b4-unit-card" id="card-${side}" data-side="${side}">
@@ -999,6 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b4-store-name">${opt.store}</div>
                     <div class="b4-unit-qty">${opt.qty}${unitCurr.unit} / ${opt.price}元</div>
                     <div class="b4-unit-per">每${unitCurr.unit} <span class="b4-unit-per-val">${per}</span>元</div>
+                    ${extraHTML}
                 </div>`;
             }
             return `
@@ -1008,6 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-store-name">${opt.store}</div>
                 <div class="b4-price b4-price-hidden">? <span class="b4-price-unit">元</span></div>
                 <div class="b4-price-coins b4-price-coins-hidden"></div>
+                ${extraHTML}
             </div>`;
         },
 
@@ -1439,16 +1450,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
-            // 自訂價格套用
-            const applyBtn = document.getElementById('b4-cpp-apply-btn');
-            if (applyBtn) {
-                Game.EventManager.on(applyBtn, 'click', () => {
-                    const leftPrice  = parseInt(document.getElementById('b4-cpp-left')?.value);
-                    const rightPrice = parseInt(document.getElementById('b4-cpp-right')?.value);
-                    if (!leftPrice || !rightPrice || leftPrice < 1 || rightPrice < 1 || leftPrice === rightPrice) return;
-                    this._applyCustomPrices(curr, leftPrice, rightPrice);
+            // 自訂價格（折疊面板 + 數字鍵盤）
+            if (this.state.settings.customItemsEnabled && !curr.isUnit && diff !== 'easy') {
+                this._bindCppEvents(() => {
+                    const boxes = document.querySelectorAll('.b4-cpp-box');
+                    const vals = {};
+                    boxes.forEach(b => { vals[b.dataset.cppId] = parseInt(b.dataset.cppVal) || 0; });
+                    if (!vals.left || !vals.right || vals.left < 1 || vals.right < 1 || vals.left === vals.right) {
+                        Game.Speech.speak('請輸入兩個不同的有效價格'); return;
+                    }
+                    this._applyCustomPrices(curr, vals.left, vals.right);
                     this.renderQuestion();
-                }, {}, 'gameUI');
+                });
             }
         },
 
@@ -1582,6 +1595,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? '哪家商店最便宜？'
                 : '從最便宜到最貴，依序輸入各家商品金額';
 
+            const showTripleCpp = this.state.settings.customItemsEnabled && diff !== 'easy';
             const cardsHTML = curr.stores.map((store, idx) => {
                 const priceDisplay = `<div class="b4-price b4-price-hidden" data-price="${store.price}">? <span class="b4-price-unit">元</span></div>
                        <div class="b4-price-coins b4-price-coins-hidden"></div>`;
@@ -1608,6 +1622,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>` : ''}
+                    ${showTripleCpp ? this._cppInlineHTML(curr.stores.map((s, i) => ({ id: i, store: s.store, price: s.price }))) : ''}
                 </div>
                 <div class="b4-triple-grid" id="triple-grid">
                     ${cardsHTML}
@@ -1705,6 +1720,131 @@ document.addEventListener('DOMContentLoaded', () => {
                 const text = this.state.quiz.lastSpeechText;
                 if (text) Game.Speech.speak(text);
             }, {}, 'gameUI');
+
+            // 自訂價格（折疊面板 + 數字鍵盤）
+            if (this.state.settings.customItemsEnabled && diff !== 'easy') {
+                this._bindCppEvents(() => {
+                    const boxes = document.querySelectorAll('.b4-cpp-box');
+                    const prices = Array.from(boxes).map(b => parseInt(b.dataset.cppVal) || 0);
+                    if (prices.some(p => p <= 0) || new Set(prices).size < prices.length) {
+                        Game.Speech.speak('請輸入三個不同的有效價格'); return;
+                    }
+                    this._applyTripleCustomPrices(curr, prices);
+                    this._renderTripleQuestion(curr, diff, document.getElementById('app'));
+                });
+            }
+        },
+
+        // ── 三商店自訂價格套用 ─────────────────────────────────────────
+        _applyTripleCustomPrices(curr, prices) {
+            curr.stores.forEach((store, i) => { store.price = prices[i]; });
+            const sorted = [...curr.stores].sort((a, b) => a.price - b.price);
+            curr.sortedAsc = sorted;
+            curr.cheapestIdx = curr.stores.findIndex(s => s === sorted[0]);
+            curr.middleIdx   = curr.stores.findIndex(s => s === sorted[1]);
+            curr.mostExpIdx  = curr.stores.findIndex(s => s === sorted[2]);
+            curr.diff = sorted[2].price - sorted[0].price;
+        },
+
+        // ── 自訂價格：內嵌可折疊卡片 HTML ─────────────────────────────
+        // entries: [{ id, store, price }, ...] — id 用於 data-cpp-id attr
+        _cppInlineHTML(entries) {
+            const rows = entries.map(e => `
+            <div class="b4-cpp-row">
+                <span class="b4-cpp-label">${e.store}：</span>
+                <div class="b4-cpp-box" data-cpp-id="${e.id}" data-cpp-val="${e.price}" style="cursor:pointer;">
+                    <span class="b4-cpp-box-val">${e.price}</span><span class="b4-cpp-box-unit"> 元</span>
+                </div>
+            </div>`).join('');
+            return `
+            <div class="b4-cpp-inline">
+                <button class="b4-cpp-toggle-btn" id="b4-cpp-toggle-btn">⚙️ 自訂價格</button>
+                <div class="b4-cpp-body" id="b4-cpp-body" style="display:none;">
+                    ${rows}
+                    <button class="b4-cpp-apply-btn" id="b4-cpp-apply-btn">✓ 套用</button>
+                </div>
+            </div>`;
+        },
+
+        // ── 自訂價格：數字鍵盤彈窗 ─────────────────────────────────────
+        _openCppNumpad(label, currentVal, onConfirm) {
+            const prev = document.getElementById('b4-cpp-np-modal');
+            if (prev) prev.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'b4-cpp-np-modal';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);';
+            overlay.innerHTML = `
+            <div class="b4-pi-modal-card">
+                <button class="b4-modal-close-x" id="b4-cpp-np-x">✕</button>
+                <div class="b4-pi-modal-title">${label}</div>
+                <div class="b4-input-display" id="b4-cpp-np-display">
+                    <span id="b4-cpp-np-val">${currentVal || '0'}</span><span class="b4-unit-text"> 元</span>
+                </div>
+                <div class="b4-numpad">
+                    ${[7,8,9,4,5,6,1,2,3].map(n => `<button class="b4-numpad-btn" data-cpp-n="${n}">${n}</button>`).join('')}
+                    <button class="b4-numpad-btn btn-del" id="b4-cpp-np-del">⌫</button>
+                    <button class="b4-numpad-btn" data-cpp-n="0">0</button>
+                    <button class="b4-numpad-btn btn-ok" id="b4-cpp-np-ok">✓</button>
+                </div>
+            </div>`;
+            document.body.appendChild(overlay);
+
+            let val = String(currentVal || '');
+            const updateDisp = () => {
+                const el = document.getElementById('b4-cpp-np-val');
+                if (el) el.textContent = val || '0';
+            };
+            overlay.querySelectorAll('[data-cpp-n]').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (val.length >= 6) return;
+                    val += btn.dataset.cppN;
+                    updateDisp();
+                });
+            });
+            document.getElementById('b4-cpp-np-del').addEventListener('click', e => {
+                e.stopPropagation(); val = val.slice(0, -1); updateDisp();
+            });
+            document.getElementById('b4-cpp-np-ok').addEventListener('click', e => {
+                e.stopPropagation();
+                const n = parseInt(val);
+                if (!n || n < 1) return;
+                overlay.remove();
+                onConfirm(n);
+            });
+            document.getElementById('b4-cpp-np-x').addEventListener('click', () => overlay.remove());
+        },
+
+        // ── 自訂價格：绑定折疊按鈕 + 數字鍵盤（兩家店 or 三家店）────────
+        _bindCppEvents(applyFn) {
+            const toggleBtn = document.getElementById('b4-cpp-toggle-btn');
+            const body      = document.getElementById('b4-cpp-body');
+            if (toggleBtn && body) {
+                Game.EventManager.on(toggleBtn, 'click', () => {
+                    const open = body.style.display === 'none';
+                    body.style.display = open ? '' : 'none';
+                    toggleBtn.classList.toggle('b4-cpp-toggle-open', open);
+                }, {}, 'gameUI');
+            }
+            // 每個輸入框點擊 → 數字鍵盤
+            document.querySelectorAll('.b4-cpp-box').forEach(box => {
+                Game.EventManager.on(box, 'click', () => {
+                    const id  = box.dataset.cppId;
+                    const cur = parseInt(box.dataset.cppVal) || 0;
+                    this._openCppNumpad(`輸入${box.querySelector('.b4-cpp-label') ? '' : ''}價格`, cur, (n) => {
+                        box.dataset.cppVal = n;
+                        const valEl = box.querySelector('.b4-cpp-box-val');
+                        if (valEl) valEl.textContent = n;
+                    });
+                }, {}, 'gameUI');
+            });
+            // 套用按鈕
+            const applyBtn = document.getElementById('b4-cpp-apply-btn');
+            if (applyBtn) {
+                Game.EventManager.on(applyBtn, 'click', () => {
+                    applyFn();
+                }, {}, 'gameUI');
+            }
         },
 
         // ── 三商店普通模式：點幣後輸入三個金額 ────────────────────────
@@ -1800,9 +1940,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const updateBoxDisplay = (key) => {
                 const el = document.getElementById(`b4-tpi-val-${key}`);
-                if (el) el.textContent = userValues[key] || '？';
+                if (el) {
+                    el.textContent = userValues[key] || '？';
+                    el.style.color = ''; // 清除橙色提示樣式
+                }
                 const boxEl = document.getElementById(`b4-tpi-${key}`);
-                if (boxEl) boxEl.classList.toggle('b4-tpi-filled', !!userValues[key]);
+                if (boxEl) {
+                    boxEl.classList.toggle('b4-tpi-filled', !!userValues[key]);
+                    boxEl.style.borderColor = '';
+                    boxEl.style.background = '';
+                }
             };
 
             const tryValidate = () => {
@@ -1862,14 +2009,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            // 提示鈕：填入正確答案並自動驗證
+            // 提示鈕：以橙色顯示正確答案，但不自動送出——學生仍需自行輸入
             const fillHint = () => {
-                this.state.isProcessing = false;
                 boxKeys.forEach((key, i) => {
-                    userValues[key] = String(sortedPrices[i]);
-                    updateBoxDisplay(key);
+                    if (userValues[key]) return; // 已正確填入的跳過
+                    const valEl = document.getElementById(`b4-tpi-val-${key}`);
+                    const boxEl = document.getElementById(`b4-tpi-${key}`);
+                    if (valEl) {
+                        valEl.textContent = sortedPrices[i];
+                        valEl.style.color = '#f59e0b';
+                    }
+                    if (boxEl) {
+                        boxEl.style.borderColor = '#f59e0b';
+                        boxEl.style.background = '#fffbeb';
+                    }
                 });
-                tryValidate();
+                Game.Speech.speak('看看提示，再自己輸入每家商店的金額');
             };
             this.state._tripleHintFill = fillHint;
 

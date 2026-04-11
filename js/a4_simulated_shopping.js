@@ -13140,6 +13140,27 @@ document.addEventListener('DOMContentLoaded', () => {
         showTransactionSummaryScreenWithData(selectedItem, transaction, callback) {
             const app = document.getElementById('app');
 
+            const mkMoneyIcons = (amount) => {
+                if (!amount || amount <= 0) return '';
+                const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                const imgs = [];
+                let rem = amount;
+                for (const d of denoms) {
+                    const cnt = Math.floor(rem / d);
+                    for (let i = 0; i < cnt; i++) {
+                        const face = Math.random() < 0.5 ? 'back' : 'front';
+                        imgs.push({ d, face });
+                    }
+                    rem -= cnt * d;
+                }
+                return imgs.map(({ d, face }) => {
+                    const isBill = d >= 100;
+                    const w = isBill ? 68 : 44;
+                    return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                        style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};margin:3px;" draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+            };
+
             // 創建交易摘要畫面
             app.innerHTML = `
                 <div class="transaction-summary-screen">
@@ -13170,14 +13191,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <span>商品價格：</span>
                                     <span>${transaction.totalCost}元</span>
                                 </div>
+                                <div class="a4-money-icons-row">${mkMoneyIcons(transaction.totalCost)}</div>
                                 <div class="summary-item">
                                     <span>已付金額：</span>
                                     <span>${transaction.amountPaid}元</span>
                                 </div>
+                                <div class="a4-money-icons-row">${mkMoneyIcons(transaction.amountPaid)}</div>
                                 <div class="summary-item">
                                     <span>應找零錢：</span>
                                     <span>${transaction.changeExpected}元</span>
                                 </div>
+                                ${transaction.changeExpected > 0 ? `<div class="a4-money-icons-row">${mkMoneyIcons(transaction.changeExpected)}</div>` : ''}
                             </div>
                         </div>
 
@@ -13199,12 +13223,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     .summary-content {
-                        max-width: 600px;
+                        max-width: 480px;
                         padding: 2rem;
                         background: rgba(255, 255, 255, 0.1);
                         border-radius: 20px;
                         backdrop-filter: blur(10px);
                         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    }
+
+                    .a4-money-icons-row {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 4px;
+                        justify-content: flex-start;
+                        align-items: center;
+                        padding: 6px 0 10px;
                     }
 
                     .summary-header h1 {
