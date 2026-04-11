@@ -899,6 +899,17 @@
     to   { transform: scale(1);   opacity: 1; }
 }
 
+/* 三家商店卡片中的最貴/最便宜標籤固定在卡片底部 */
+.b4-triple-card .b4-cheaper-tag,
+.b4-triple-card .b4-exp-delta {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    margin-top: 0;
+}
+
 /* ── B4 Diff 算式閃現 (Round 28) ── */
 .b4-calc-flash {
     position: fixed;
@@ -2121,14 +2132,15 @@
 .b4-triple-pi-boxes {
     display: flex;
     gap: 12px;
-    justify-content: center;
+    justify-content: space-between;
     align-items: flex-end;
-    flex-wrap: wrap;
+    width: 100%;
 }
 .b4-triple-pi-box-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
     gap: 6px;
     flex: 1;
     min-width: 90px;

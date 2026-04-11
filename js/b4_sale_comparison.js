@@ -2009,7 +2009,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            // 提示鈕：以橙色顯示正確答案，但不自動送出——學生仍需自行輸入
+            // 提示鈕：以橙色顯示正確答案，3秒後消失，語音只播一次
+            let hintSpoken = false;
             const fillHint = () => {
                 boxKeys.forEach((key, i) => {
                     if (userValues[key]) return; // 已正確填入的跳過
@@ -2024,7 +2025,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         boxEl.style.background = '#fffbeb';
                     }
                 });
-                Game.Speech.speak('看看提示，再自己輸入每家商店的金額');
+                if (!hintSpoken) {
+                    hintSpoken = true;
+                    Game.Speech.speak('看看提示，再自己輸入每家商店的金額');
+                }
+                // 3秒後清除橙色提示
+                Game.TimerManager.setTimeout(() => {
+                    boxKeys.forEach((key, i) => {
+                        if (userValues[key]) return;
+                        const valEl = document.getElementById(`b4-tpi-val-${key}`);
+                        const boxEl = document.getElementById(`b4-tpi-${key}`);
+                        if (valEl) { valEl.textContent = '？'; valEl.style.color = ''; }
+                        if (boxEl) { boxEl.style.borderColor = ''; boxEl.style.background = ''; }
+                    });
+                }, 3000, 'ui');
             };
             this.state._tripleHintFill = fillHint;
 
@@ -2370,16 +2384,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>`;
 
+                // 顯示單一選項金額，3秒後隱藏
+                const showOptLabel = (targetBtn, autoHide) => {
+                    const val = parseInt(targetBtn.dataset.val);
+                    const label = targetBtn.querySelector('.b4-diff-opt-label');
+                    if (label) { label.textContent = `${val} ${diffUnit}`; label.style.visibility = 'visible'; }
+                    targetBtn.classList.remove('b4-diff-opt-masked');
+                    if (autoHide) {
+                        Game.TimerManager.setTimeout(() => {
+                            if (label) { label.textContent = '？？？'; label.style.visibility = ''; }
+                            targetBtn.classList.add('b4-diff-opt-masked');
+                        }, 3000, 'ui');
+                    }
+                };
+
                 document.querySelectorAll('.b4-diff-opt').forEach(btn => {
                     Game.EventManager.on(btn, 'click', () => {
                         if (this.state.isProcessing) return;
-                        this._revealNormalDiffOptions(options, correctDiff, false, diffUnit);
                         this.state.isProcessing = true;
                         const chosen    = parseInt(btn.dataset.val);
                         const isCorrect = (chosen === correctDiff);
+                        // 只顯示被點選的選項金額，3秒後消失
+                        showOptLabel(btn, !isCorrect);
                         btn.classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
                         if (!isCorrect) {
-                            document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`)?.classList.add('correct-ans');
+                            // 錯誤時同時短暫顯示正確答案
+                            const correctBtn = document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                            if (correctBtn) {
+                                Game.TimerManager.setTimeout(() => showOptLabel(correctBtn, true), 400, 'ui');
+                            }
                         }
                         this.handleDiffAnswer(isCorrect, correctDiff);
                     }, {}, 'diffUI');
@@ -2399,7 +2432,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'diffUI');
                 }
 
-                Game.Speech.speak(`例如${tripleExpOpt.store}最貴，${tripleCheapOpt.store}最便宜，差了${correctDiff}元，請選擇正確的答案。`);
+                Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，便宜了${correctDiff}元，請選擇正確的答案`);
 
             } else {
                 // 困難：??? formula + numpad modal → money icon options（同二商店 hard）
@@ -2869,6 +2902,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         unknownCell.textContent = `${correctDiff} 元`;
                         unknownCell.style.color = '#059669';
                     }
+                    this.audio.play('correct');
+                    if (typeof confetti === 'function') {
+                        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+                    }
                 }
                 Game.TimerManager.setTimeout(() => {
                     overlay.remove();
@@ -2949,10 +2986,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-hfh-title">💡 算式提示</div>
                 <div class="b4-hfh-formula">
                     <span class="b4-hfh-store">${expStore}</span>
-                    <span class="b4-hfh-num">${expPrice}</span>
+                    <span class="b4-hfh-num">${expPrice}元</span>
                     <span class="b4-hfh-op">－</span>
                     <span class="b4-hfh-store">${cheapStore}</span>
-                    <span class="b4-hfh-num">${cheapPrice}</span>
+                    <span class="b4-hfh-num">${cheapPrice}元</span>
                     <span class="b4-hfh-op">＝</span>
                     <span class="b4-hfh-ans">${correctDiff} ${diffUnit}</span>
                 </div>
@@ -3279,23 +3316,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const prev = document.getElementById('b4-completion-modal');
             if (prev) prev.remove();
 
-            const q = this.state.quiz;
-            const accuracy = q.totalQuestions > 0
-                ? Math.round((q.correctCount / q.totalQuestions) * 100) : 0;
-            let badge, msg;
-            if (accuracy === 100)    { badge = '🏆'; msg = '完美！全對！'; }
-            else if (accuracy >= 80) { badge = '🥇'; msg = '太棒了！'; }
-            else if (accuracy >= 60) { badge = '🥈'; msg = '做得很好！'; }
-            else                     { badge = '🥉'; msg = '繼續加油！'; }
-
             const overlay = document.createElement('div');
             overlay.id = 'b4-completion-modal';
             overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);';
             overlay.innerHTML = `
             <div style="background:linear-gradient(135deg,#fef9c3,#fde68a);border-radius:24px;padding:36px 32px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.25);max-width:320px;width:90%;animation:b4CmIn 0.4s cubic-bezier(0.34,1.56,0.64,1);">
-                <div style="font-size:3.5rem;line-height:1;margin-bottom:8px;">${badge}</div>
-                <div style="font-size:1.5rem;font-weight:900;color:#92400e;margin-bottom:6px;">恭喜你完成所有測驗！</div>
-                <div style="font-size:1.1rem;color:#78350f;margin-bottom:20px;">${msg} 正確率 ${accuracy}%</div>
+                <div style="font-size:3.5rem;line-height:1;margin-bottom:12px;">🏆</div>
+                <div style="font-size:1.5rem;font-weight:900;color:#92400e;margin-bottom:24px;">恭喜你完成所有測驗！</div>
                 <button id="b4-cm-continue-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:14px;padding:14px 36px;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(217,119,6,0.4);">
                     查看省錢清單 →
                 </button>
