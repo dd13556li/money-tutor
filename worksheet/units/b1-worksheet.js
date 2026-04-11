@@ -13,9 +13,12 @@ WorksheetRegistry.register('b1', {
             label: '📝 題型',
             type: 'dropdown',
             options: [
-                { label: '數字填空', value: 'fill' },
-                { label: '圖示選擇', value: 'coin-select' },
-                { label: '提示完成', value: 'hint-complete' },
+                { label: '數字填空',   value: 'fill' },
+                { label: '看圖填空',   value: 'img-fill' },
+                { label: '填空與選擇', value: 'fill-select' },
+                { label: '圖示選擇',   value: 'coin-select' },
+                { label: '提示選擇',   value: 'hint-select' },
+                { label: '提示完成',   value: 'hint-complete' },
             ],
             getCurrentValue: (p) => p.questionType || 'fill',
             onChange: (v, app) => { app.params.questionType = v; app.generate(); }
@@ -72,6 +75,14 @@ WorksheetRegistry.register('b1', {
         ],
     },
 
+    // 將金額分解為金幣圖示（最多顯示 6 枚，避免版面過長）
+    _coinsDisplay(amount) {
+        const coins = walletToCoins(amount);
+        const displayed = coins.slice(0, 6);
+        const more = coins.length > 6 ? `<span style="font-size:11px;color:#888;">…</span>` : '';
+        return displayed.map(c => coinImgRandom(c)).join('') + more;
+    },
+
     generate(options) {
         const diff = options.difficulty || 'easy';
         const questionType = options.questionType || 'fill';
@@ -79,7 +90,7 @@ WorksheetRegistry.register('b1', {
         const usedLabels = options._usedValues || new Set();
         const src = this._scenarios[diff];
         const pool = shuffle(src.filter(s => !usedLabels.has(`b1_${s.label}`)));
-        if (pool.length < 2) src.forEach(s => pool.push(s)); // fallback: allow repeats
+        if (pool.length < 2) src.forEach(s => pool.push(s));
         const chosen = pool.slice(0, options.count || 20);
         chosen.forEach(s => usedLabels.add(`b1_${s.label}`));
         const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
@@ -87,41 +98,123 @@ WorksheetRegistry.register('b1', {
         return chosen.map(scenario => {
             const total = scenario.items.reduce((s, it) => s + it.cost, 0);
             const itemsText = scenario.items.map(it => `${it.name} <strong>${it.cost}</strong> 元`).join('、');
+            const basePrompt = `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}`;
 
             if (questionType === 'fill') {
+                // 數字填空：列出項目金額，填入合計
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${total}</span>`
                     : blankLine();
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}`,
+                    prompt: basePrompt,
                     visual: '',
                     answerArea: `至少要帶：${ans} 元`,
                     answerDisplay: ''
                 };
+
+            } else if (questionType === 'img-fill') {
+                // 看圖填空：每個項目旁顯示金幣圖示，填入合計
+                const itemsWithCoins = scenario.items.map(it => {
+                    const coinRow = this._coinsDisplay(it.cost);
+                    return `${it.name}（<strong>${it.cost}</strong> 元）<span class="price-coins" style="vertical-align:middle;">${coinRow}</span>`;
+                }).join('&emsp;');
+                const ans = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${total}</span>`
+                    : blankLine();
+                return {
+                    _key: `b1_${scenario.label}`,
+                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：`,
+                    visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
+                    answerArea: `至少要帶：${ans} 元`,
+                    answerDisplay: ''
+                };
+
+            } else if (questionType === 'fill-select') {
+                // 填空與選擇：填入合計 + 選出正確錢幣組合
+                const opts = this._coinOptions(total);
+                const fillArea = showAnswers
+                    ? `至少要帶：<span style="color:red;font-weight:bold;">${total}</span> 元`
+                    : `至少要帶：${blankLine()} 元`;
+                const choicesHtml = opts.map((opt, i) => {
+                    const label = String.fromCharCode(9312 + i);
+                    const isCorrect = opt.total === total;
+                    const style = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const answerTag = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span>` : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>${answerTag}
+                    </div>`;
+                }).join('');
+                return {
+                    _key: `b1_${scenario.label}`,
+                    prompt: basePrompt,
+                    visual: `<div style="margin-bottom:6px;">${fillArea}</div>
+                             <div style="margin-bottom:4px;">請選出正確的錢幣組合：</div>
+                             <div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
             } else if (questionType === 'coin-select') {
+                // 圖示選擇：告知合計，選出正確錢幣組合
                 const opts = this._coinOptions(total);
                 const choicesHtml = opts.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
                     const isCorrect = opt.total === total;
                     const style = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
                     return `<div class="coin-choice-option" style="${style}">
-                        <span style="font-weight:bold;min-width:20px;">${label}</span>${checkbox}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgFront(c)).join('')}</div>
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
                     </div>`;
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}<br>共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
                 };
+
+            } else if (questionType === 'hint-select') {
+                // 提示選擇：告知合計，選項旁顯示灰色金額提示
+                const opts = this._coinOptions(total);
+                const choicesHtml = opts.map((opt, i) => {
+                    const label = String.fromCharCode(9312 + i);
+                    const isCorrect = opt.total === total;
+                    const style = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const answerTag = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span>` : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
+                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total} 元</span>${answerTag}
+                    </div>`;
+                }).join('');
+                return {
+                    _key: `b1_${scenario.label}`,
+                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
             } else { // hint-complete
+                // 提示完成：顯示金幣圖示，填入各面額數量
                 const combo = this._findCombo(total);
                 if (!combo) return null;
                 const partsHtml = combo.map(c => {
-                    const icons = Array(Math.min(c.count, 5)).fill(coinImgFront(c.denom)).join('');
+                    const icons = Array(Math.min(c.count, 5)).fill(coinImgRandom(c.denom)).join('');
                     const ansNum = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
                     const unit = c.denom >= 100 ? '張' : '個';
@@ -130,7 +223,7 @@ WorksheetRegistry.register('b1', {
                 const totalHint = `<span style="margin-left:8px;">共 <span style="color:#ccc;font-weight:bold;">${total}</span> 元</span>`;
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}`,
+                    prompt: basePrompt,
                     visual: `<div style="margin:4px 0;">需帶：${partsHtml}${totalHint}</div>`,
                     answerArea: '',
                     answerDisplay: ''
