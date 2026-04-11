@@ -2009,8 +2009,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            // 提示鈕：以橙色顯示正確答案，3秒後消失，語音只播一次
-            let hintSpoken = false;
+            // 提示鈕：以橙色顯示正確答案，3秒後消失
             const fillHint = () => {
                 boxKeys.forEach((key, i) => {
                     if (userValues[key]) return; // 已正確填入的跳過
@@ -2025,10 +2024,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         boxEl.style.background = '#fffbeb';
                     }
                 });
-                if (!hintSpoken) {
-                    hintSpoken = true;
-                    Game.Speech.speak('看看提示，再自己輸入每家商店的金額');
-                }
                 // 3秒後清除橙色提示
                 Game.TimerManager.setTimeout(() => {
                     boxKeys.forEach((key, i) => {
@@ -2300,6 +2295,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-diff-ref-cheap">✅ ${curr.sortedAsc[0].storeIcon} ${curr.sortedAsc[0].store} 最便宜</div>
             </div>`;
 
+            // 三商店折疊參考面板（普通/困難差額頁用）
+            const tripleStorePanelHTML = `
+            <div class="b4-tsp-wrap">
+                <button class="b4-tsp-toggle" id="b4-tsp-toggle">📋 查看各家價格</button>
+                <div class="b4-tsp-panel" id="b4-tsp-panel" style="display:none;">
+                    ${curr.sortedAsc.map(s => `
+                    <div class="b4-tsp-row">
+                        <span class="b4-tsp-icon">${s.storeIcon}</span>
+                        <span class="b4-tsp-name">${s.store}</span>
+                        <span class="b4-tsp-price">${s.price} 元</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+
             const app = document.getElementById('app');
 
             if (diff === 'easy') {
@@ -2363,13 +2372,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
+                        ${tripleStorePanelHTML}
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-section b4-diff-normal-card">
                         ${barsHTML}
                         ${formulaHTML}
                         <div class="b4-diff-question b4-diff-question-below">
-                            最貴比最便宜貴多少元？
+                            便宜了${correctDiff}元
                             <div class="b4-diff-sub">點選正確的差額</div>
                         </div>
                     </div>
@@ -2428,7 +2438,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             correctBtn.classList.add('b4-select-hint');
                             Game.TimerManager.setTimeout(() => correctBtn.classList.remove('b4-select-hint'), 2400, 'ui');
                         }
-                        Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，兩者差多少元？`);
+                        Game.Speech.speak('請依提示選擇正確的答案');
                     }, {}, 'diffUI');
                 }
 
@@ -2446,6 +2456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
+                        ${tripleStorePanelHTML}
                         ${hintWrap}
                     </div>
                     <div class="b4-diff-hard-outer">
@@ -2504,6 +2515,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，點擊問號輸入差額`);
+            }
+
+            // 三商店參考面板折疊按鈕
+            const tspToggle = document.getElementById('b4-tsp-toggle');
+            const tspPanel  = document.getElementById('b4-tsp-panel');
+            if (tspToggle && tspPanel) {
+                Game.EventManager.on(tspToggle, 'click', () => {
+                    const open = tspPanel.style.display === 'none';
+                    tspPanel.style.display = open ? '' : 'none';
+                    tspToggle.classList.toggle('b4-tsp-open', open);
+                }, {}, 'diffUI');
             }
 
             // 導覽按鈕（共用）
