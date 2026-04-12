@@ -1268,8 +1268,14 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Speech.speak(`存錢目標，${c.item.name}，需要 ${c.item.price} 元`);
             document.getElementById('b3-task-start').addEventListener('click', () => {
                 overlay.remove();
+                AssistClick.deactivate();
                 Game.Speech.speak('開始存錢');
             });
+
+            // 輔助點擊：高亮「開始存錢」按鈕
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(null), 400, 'ui');
+            }
         },
 
         renderCalendar() {
@@ -2597,7 +2603,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 存錢目標開題彈窗（B2 _showTaskIntroModal pattern）─────
-        _showSavingsGoalModal(question) {
+        _showSavingsGoalModal(question, afterClose = null) {
             document.getElementById('b3-goal-modal')?.remove();
             const modal = document.createElement('div');
             modal.id = 'b3-goal-modal';
@@ -2610,11 +2616,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b3-goal-modal-tap">點任意處繼續</div>
                 </div>`;
             document.body.appendChild(modal);
+            let closed = false;
+            const close = () => {
+                if (closed) return;
+                closed = true;
+                modal.remove();
+                afterClose?.();
+            };
             Game.Speech.speak(`存錢目標：${question.item.name}，${question.item.price}元`);
-            modal.addEventListener('click', () => modal.remove());
-            Game.TimerManager.setTimeout(() => {
-                if (document.body.contains(modal)) modal.remove();
-            }, 2500, 'ui');
+            modal.addEventListener('click', close);
+            Game.TimerManager.setTimeout(() => close(), 2500, 'ui');
         },
 
         // ── 11. 題目渲染 ──────────────────────────────────────
@@ -2632,25 +2643,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 開題存錢目標彈窗（B2 _showTaskIntroModal pattern）
             const question = this.state.quiz.questions[this.state.quiz.currentQuestion];
-            this._showSavingsGoalModal(question);
-
-            // 語音引導
             const diff = this.state.settings.difficulty;
-            Game.TimerManager.setTimeout(() => {
-                const price = question.item.price;
-                const weekly = question.weekly;
-                const speechMap = {
-                    easy:   `${question.item.name}要${toTWD(price)}，每週存${weekly}元，需要幾週？`,
-                    normal: `${question.item.name}要${toTWD(price)}，每週存${weekly}元，輸入需要幾週。`,
-                    hard:   `${question.item.name}要${toTWD(price)}，每週存${weekly}元，輸入正確週數。`,
-                };
-                this.state.quiz.lastSpeechText = speechMap[diff];
-                Game.Speech.speak(speechMap[diff]);
-            }, 500, 'speech');
+            this._showSavingsGoalModal(question, () => {
+                // 語音引導（彈窗關閉後才播）
+                Game.TimerManager.setTimeout(() => {
+                    const price = question.item.price;
+                    const weekly = question.weekly;
+                    const speechMap = {
+                        easy:   `${question.item.name}要${toTWD(price)}，每週存${weekly}元，需要幾週？`,
+                        normal: `${question.item.name}要${toTWD(price)}，每週存${weekly}元，輸入需要幾週。`,
+                        hard:   `${question.item.name}要${toTWD(price)}，每週存${weekly}元，輸入正確週數。`,
+                    };
+                    this.state.quiz.lastSpeechText = speechMap[diff];
+                    Game.Speech.speak(speechMap[diff]);
+                }, 300, 'speech');
 
-            // 輔助點擊啟動（quiz 數字鍵盤用）
+                // 輔助點擊：彈窗關閉後重啟，改為高亮題目操作元件
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => {
+                        AssistClick.deactivate();
+                        AssistClick.activate(question);
+                    }, 300, 'ui');
+                }
+            });
+
+            // 輔助點擊：彈窗顯示期間先高亮彈窗本身（點任意處繼續）
             if (this.state.settings.clickMode === 'on') {
-                Game.TimerManager.setTimeout(() => AssistClick.activate(question), 700, 'ui');
+                Game.TimerManager.setTimeout(() => AssistClick.activate(null), 400, 'ui');
             }
         },
 
@@ -3393,19 +3412,49 @@ document.addEventListener('DOMContentLoaded', () => {
             this._clearHighlight();
             this._queue = [];
 
-            const q = question || Game.state.quiz.questions[Game.state.quiz.currentQuestion];
-            if (!q) return;
-
-            // numpad mode（B3 hard mode always uses numpad）
-            const steps = [];
-            const digits = String(q.answer).split('');
-            for (const d of digits) {
-                const btn = document.querySelector(`.b3-numpad-btn[data-digit="${d}"]`);
-                if (btn) steps.push({ el: btn, action: () => btn.click() });
+            // 開題目標彈窗：優先偵測（點任意處繼續）
+            // 高亮內層卡片而非外層 fixed overlay，避免 assist-click-hint 的 position:relative
+            // 覆蓋 position:fixed 導致彈窗版面崩潰
+            const goalModal = document.getElementById('b3-goal-modal');
+            if (goalModal) {
+                const inner = goalModal.querySelector('.b3-goal-modal-inner') || goalModal;
+                this._queue = [{ el: inner, action: () => goalModal.click() }];
+                this._highlight(this._queue[0].el);
+                return;
             }
-            const okBtn = document.querySelector('.b3-numpad-btn[data-action="ok"]');
-            if (okBtn) steps.push({ el: okBtn, action: () => okBtn.click() });
-            this._queue = steps;
+
+            // 月曆開場彈窗：優先偵測「開始存錢」按鈕
+            const taskStartBtn = document.getElementById('b3-task-start');
+            if (taskStartBtn) {
+                this._queue = [{ el: taskStartBtn, action: () => taskStartBtn.click() }];
+                this._highlight(this._queue[0].el);
+                return;
+            }
+
+            const q    = question || Game.state.quiz.questions[Game.state.quiz.currentQuestion];
+            if (!q) return;
+            const diff = Game.state.settings.difficulty;
+
+            if (diff === 'easy') {
+                // Easy：選擇題模式 — 直接高亮正確答案的選項按鈕
+                // buildQueue 原本只找 .b3-numpad-btn，easy 模式不存在 numpad
+                // 導致 queue 永遠為空、輔助點擊完全無效，故加此分支
+                const correctBtn = document.querySelector(`.b3-choice-btn[data-val="${q.answer}"]`);
+                if (correctBtn) {
+                    this._queue = [{ el: correctBtn, action: () => correctBtn.click() }];
+                }
+            } else {
+                // Normal/Hard：數字鍵盤模式
+                const steps = [];
+                const digits = String(q.answer).split('');
+                for (const d of digits) {
+                    const btn = document.querySelector(`.b3-numpad-btn[data-digit="${d}"]`);
+                    if (btn) steps.push({ el: btn, action: () => btn.click() });
+                }
+                const okBtn = document.querySelector('.b3-numpad-btn[data-action="ok"]');
+                if (okBtn) steps.push({ el: okBtn, action: () => okBtn.click() });
+                this._queue = steps;
+            }
 
             if (this._queue.length > 0) this._highlight(this._queue[0].el);
         },

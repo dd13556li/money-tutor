@@ -901,6 +901,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.animateSequentialCancelled = false;
             this.state.quiz.hintSequential = false;
             this.state.quiz.activeInputEl = null;
+            this.state.quiz.walletPhaseActive = false;
+            this.state.quiz.p2RequiredTotal = 0;
 
             const q   = this.state.quiz;
             // 重置自訂事件狀態
@@ -927,6 +929,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 主題語音結束後才啟動 Easy 動畫或輔助點擊，避免語音互相中斷
                         if (diff === 'easy') {
                             this._animateEasyEntriesSequential(currentQ);
+                            // 簡單模式：動畫 + 金幣綁定（~400ms）完成後才啟動，
+                            // 不能用 else if——否則 easy 模式永遠不會啟動
+                            if (this.state.settings.clickMode === 'on') {
+                                Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 600, 'ui');
+                            }
                         } else if (this.state.settings.clickMode === 'on') {
                             Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 300, 'ui');
                         }
@@ -2166,6 +2173,11 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => {
                 Game.Speech.speak(ev.name);
             }, 150, 'ui');
+            // 輔助點擊：_startObserver 只監聽 childList，無法偵測 style.display 的屬性變更。
+            // 新列顯示後主動重建 queue，讓 AssistClick 繼續高亮下一列的金幣。
+            if (this.state.settings.clickMode === 'on' && AssistClick._enabled) {
+                Game.TimerManager.setTimeout(() => AssistClick.buildQueue(question), 250, 'ui');
+            }
         },
 
         // ── 循序提示：逐項顯示提示動畫 ─────────────────────────────
@@ -2497,6 +2509,8 @@ document.addEventListener('DOMContentLoaded', () => {
             q.hintSlots = [];
             q.walletRevealed = false;
             q.p2ErrorCount = 0;
+            q.walletPhaseActive = true;
+            q.p2RequiredTotal = effectiveAnswer;
 
             const themeInfo = B2_THEMES[this.state.settings.diaryTheme];
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
@@ -3167,6 +3181,9 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
+            const _reactivateForSummary = this.state.settings.difficulty === 'easy'
+                && this.state.settings.clickMode === 'on';
+
             const q        = this.state.quiz;
             const elapsed  = q.startTime ? (Date.now() - q.startTime) : 0;
             const mins     = Math.floor(elapsed / 60000);
@@ -3490,7 +3507,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak('完成了！來看看記帳回顧吧！');
             }, 600, 'speech');
 
+            // 簡單輔助點擊：重啟以高亮「查看測驗總結」按鈕
+            if (_reactivateForSummary) {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(null), 400, 'ui');
+            }
+
             Game.EventManager.on(document.getElementById('b2-view-summary-btn'), 'click', () => {
+                AssistClick.deactivate();
                 Game.EventManager.removeByCategory('gameUI');
 
                 // ── 第二頁：測驗總結 ──
@@ -3641,14 +3664,42 @@ document.addEventListener('DOMContentLoaded', () => {
             this._clearHighlight();
             this._queue = [];
 
+            // 結果頁：優先偵測「查看測驗總結」按鈕
+            const viewSummaryBtn = document.getElementById('b2-view-summary-btn');
+            if (viewSummaryBtn) {
+                this._queue = [{ el: viewSummaryBtn, action: () => viewSummaryBtn.click() }];
+                this._highlight(this._queue[0].el);
+                return;
+            }
+
             const diff = Game.state.settings.difficulty;
             const q    = question || Game.state.quiz.questions[Game.state.quiz.currentQuestion];
             if (!q) return;
 
             if (diff === 'easy') {
-                // Easy：依序點擊各事件的金幣按鈕
-                const coins = Array.from(document.querySelectorAll('.b2-coin-clickable:not(.b2-coin-clicked):not(:disabled)'));
-                this._queue = coins.map(btn => ({ el: btn, action: () => btn.click() }));
+                const qState = Game.state.quiz;
+                if (qState.walletPhaseActive) {
+                    // Phase 2：依序點擊零錢盤對應 ghost slot 面額
+                    const requiredTotal = qState.p2RequiredTotal;
+                    const walletTotal = Game.state.wallet.reduce((s, c) => s + c.denom, 0);
+                    const remaining = requiredTotal - walletTotal;
+                    if (remaining <= 0) { this._queue = []; return; }
+                    const nextSlot = qState.hintSlots?.find(s => !s.filled);
+                    if (nextSlot) {
+                        const coinEl = document.querySelector(`.b2-coin-draggable[data-denom="${nextSlot.denom}"]`);
+                        if (coinEl) {
+                            this._queue = [{ el: coinEl, action: () => Game._b2AddCoin(nextSlot.denom, requiredTotal) }];
+                        }
+                    }
+                } else {
+                    // Phase 1：依序點擊各事件的金幣按鈕
+                    // 只取「已顯示列」的金幣；隱藏列的 click 會被 _bindB2EasyModeCoins 的
+                    // `evIdx > easyRevealedUpTo` guard 無聲拒絕，必須排除以免佔住 queue
+                    const revealedUpTo = qState.easyRevealedUpTo ?? 0;
+                    const coins = Array.from(document.querySelectorAll('.b2-coin-clickable:not(.b2-coin-clicked):not(:disabled)'))
+                        .filter(btn => parseInt(btn.dataset.eventIdx) <= revealedUpTo);
+                    this._queue = coins.map(btn => ({ el: btn, action: () => btn.click() }));
+                }
             } else if (diff === 'normal') {
                 // Normal：點擊各輸入框 → 正確選項 → 總計輸入框 → 正確選項
                 const steps = [];

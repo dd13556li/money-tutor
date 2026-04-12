@@ -115,7 +115,16 @@ const WorksheetApp = {
             return;
         }
 
-        // 產生並儲存 seed
+        // 只有圖示類型（coinStyle）改變時：重用舊 seed，保留原本題目，不重新隨機選題
+        const snap = JSON.stringify({ ...this.params, coinStyle: null });
+        if (this._seed && !this._forceRegenerate && this._paramSnap === snap) {
+            this._generateWithSeed(this._seed, this.showAnswers);
+            return;
+        }
+
+        // 其他參數改變或首次產生：使用新 seed
+        this._forceRegenerate = false;
+        this._paramSnap = snap;
         this._seed = Date.now() ^ (Math.random() * 0xffffffff);
         this._generateWithSeed(this._seed, false);
     },
@@ -187,6 +196,7 @@ const WorksheetApp = {
     },
 
     regenerate() {
+        this._forceRegenerate = true;
         this.generate();
     },
 
@@ -616,7 +626,7 @@ const WorksheetApp = {
 
     // Predefined button label priority order
     _buttonLabelOrder: [
-        '測驗題型', '數字範圍與數量', '排序方式', '排序數列', '排列方式', '提示', '題數', '數量範圍',
+        '測驗題型', '題型', '難度', '數字範圍與數量', '排序方式', '排序數列', '排列方式', '提示', '題數', '數量範圍',
         '錢包金額', '目標金額', '兌換類別', '兌換方向', '面額選擇',
         '圖示數量', '圖示類型', '主題選擇', '數字範圍', '數數範圍',
         '顯示模式', '字體大小', '版面'

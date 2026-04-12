@@ -696,6 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
             q.easyRevealedUpTo = 0;
             q.itemsCorrect = [];
             q.customItemsPendingCount = 0;
+            q.phase = 1;
 
             // showTotal：normal/hard 均不顯示總計（逐項輸入後自動算出）
             const showTotal  = false;
@@ -1154,6 +1155,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'easy') {
                 // 簡單模式：綁定可點擊金幣，逐項揭露後自動進入 Phase 2
                 this._bindB1EasyModeCoins(curr);
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
+                }
             } else if (diff === 'normal') {
                 // 普通模式：逐項點選金額（3選1 中央彈窗）
                 this._bindB1NormalItemChoices(curr);
@@ -2747,6 +2751,9 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
+            const _reactivateForSummary = this.state.settings.difficulty === 'easy'
+                && this.state.settings.clickMode === 'on';
+
             const q       = this.state.quiz;
             const endTime = Date.now();
             const elapsed = q.startTime ? (endTime - q.startTime) : 0;
@@ -2886,6 +2893,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak('完成了！來看看今日行程總覽吧！');
             }, 600, 'speech');
 
+            // 簡單輔助點擊：重啟以高亮「查看測驗總結」按鈕
+            if (_reactivateForSummary) {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(null), 400, 'ui');
+            }
+
             Game.EventManager.on(document.getElementById('b1-review-reward-btn'), 'click', () => {
                 if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
@@ -2910,6 +2922,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             Game.EventManager.on(document.getElementById('b1-view-summary-btn'), 'click', () => {
+                AssistClick.deactivate();
                 Game.EventManager.removeByCategory('gameUI');
 
                 // ── 第二頁：測驗總結 ──
@@ -3071,15 +3084,40 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!this._enabled) return;
             this._clearHighlight();
 
+            // 結果頁：優先偵測「查看測驗總結」按鈕
+            const viewSummaryBtn = document.getElementById('b1-view-summary-btn');
+            if (viewSummaryBtn) {
+                this._highlight(viewSummaryBtn, () => viewSummaryBtn.click());
+                return;
+            }
+
             const curr = this._curr;
             if (!curr) return;
+
+            // Phase 1：簡單模式逐項點擊金幣
+            const phase = Game.state.quiz.phase || 2;
+            if (phase === 1 && Game.state.settings.difficulty === 'easy') {
+                const rev = Game.state.quiz.easyRevealedUpTo ?? 0;
+                const coin = document.querySelector(
+                    `.b1-coin-clickable[data-item-idx="${rev}"]:not(.b1-coin-clicked):not([disabled])`
+                );
+                if (coin) this._highlight(coin, () => coin.click());
+                return;
+            }
 
             // 計算錢包中已有金額
             const walletTotal = Game.state.wallet.reduce((s, c) => s + c.denom, 0);
             const remaining   = Game._getEffectiveTotal(curr) - walletTotal;
 
             if (remaining <= 0) {
-                // 已足夠 → 高亮確認按鈕
+                // 簡單模式：Ghost slot が全て埋まると addCoin() が auto-confirm する。
+                // confirm-btn は easy モードに存在しないため、overlay を即座に停用して
+                // 「何もハイライトされない死んだ状態」を防ぐ。
+                if (Game.state.settings.difficulty === 'easy') {
+                    this.deactivate();
+                    return;
+                }
+                // 普通/困難モード → 高亮確認按鈕
                 const btn = document.getElementById('confirm-btn');
                 if (btn && !btn.disabled) this._highlight(btn, () => btn.click());
             } else {

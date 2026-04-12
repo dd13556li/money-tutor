@@ -45,7 +45,21 @@ WorksheetRegistry.register('b2', {
             onChange: (v, app) => { app.params.difficulty = v; app.generate(); }
         },
         orientationButton: null,
-        extraButtons: [],
+        extraButtons: [
+            {
+                id: 'coin-style-btn',
+                label: '📊 圖示類型',
+                type: 'dropdown',
+                options: [
+                    { label: '真實金錢(正面)',     value: 'real' },
+                    { label: '真實金錢(反面)',     value: 'real-back' },
+                    { label: '真實金錢(正、反面)', value: 'real-both' },
+                    { label: '金錢符號',           value: 'symbol' },
+                ],
+                getCurrentValue: (params) => params.coinStyle || 'real',
+                onChange: (val, app) => { app.params.coinStyle = val; app.generate(); }
+            }
+        ],
     },
 
     _templates: {
@@ -150,18 +164,26 @@ WorksheetRegistry.register('b2', {
     },
 
     // 將金額分解為金幣圖示（最多顯示 5 枚）
-    _coinsDisplay(amount) {
+    _coinsDisplay(amount, renderCoin) {
         const coins = walletToCoins(amount);
         const displayed = coins.slice(0, 5);
         const more = coins.length > 5 ? `<span style="font-size:11px;color:#888;">…</span>` : '';
-        return displayed.map(c => coinImgRandom(c)).join('') + more;
+        return displayed.map(c => renderCoin(c)).join('') + more;
     },
 
     generate(options) {
         const diff = options.difficulty || 'easy';
         const type = options.questionType || 'fill';
+        const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const usedKeys = options._usedValues || new Set();
+
+        const renderCoin = (value) => {
+            if (coinStyle === 'symbol')    return coinSymbol(value);
+            if (coinStyle === 'real-back') return coinImgBack(value);
+            if (coinStyle === 'real-both') return coinImgRandom(value);
+            return coinImgFront(value);
+        };
         const pool = this._templates[diff];
         const available = pool.map((_, i) => i).filter(i => !usedKeys.has(`b2_${diff}_${i}`));
         const idxList = shuffle(available.length >= 2 ? available : pool.map((_, i) => i))
@@ -230,13 +252,13 @@ WorksheetRegistry.register('b2', {
                 const eventsWithCoins = events.map(e => {
                     const sign = e.type === 'income' ? '+' : '−';
                     const color = e.type === 'income' ? '#059669' : '#dc2626';
-                    const coinRow = this._coinsDisplay(e.amount);
+                    const coinRow = this._coinsDisplay(e.amount, renderCoin);
                     return `<div style="color:${color};display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:3px;">
                         <span>${e.icon} ${sign}${e.amount} 元（${e.name}）</span>
                         <span class="price-coins">${coinRow}</span>
                     </div>`;
                 }).join('');
-                const startCoinRow = this._coinsDisplay(startAmount);
+                const startCoinRow = this._coinsDisplay(startAmount, renderCoin);
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${finalBalance}</span>`
                     : blankLine();
@@ -266,7 +288,7 @@ WorksheetRegistry.register('b2', {
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${finalBalance} 元</span>` : '';
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>${answerTag}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
                     </div>`;
                 }).join('');
                 return {
@@ -293,7 +315,7 @@ WorksheetRegistry.register('b2', {
                         : checkbox;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
                     </div>`;
                 }).join('');
                 return {
@@ -321,7 +343,7 @@ WorksheetRegistry.register('b2', {
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${finalBalance} 元</span>` : '';
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
                         <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total} 元</span>${answerTag}
                     </div>`;
                 }).join('');
@@ -341,7 +363,7 @@ WorksheetRegistry.register('b2', {
                 const combo = this._findCombo(finalBalance);
                 if (!combo) return null;
                 const partsHtml = combo.map(c => {
-                    const icons = Array(Math.min(c.count, 5)).fill(coinImgRandom(c.denom)).join('');
+                    const icons = Array(Math.min(c.count, 5)).fill(renderCoin(c.denom)).join('');
                     const ansNum = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
                     const unit = c.denom >= 100 ? '張' : '個';

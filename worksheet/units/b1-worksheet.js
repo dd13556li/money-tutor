@@ -35,7 +35,21 @@ WorksheetRegistry.register('b1', {
             onChange: (v, app) => { app.params.difficulty = v; app.generate(); }
         },
         orientationButton: null,
-        extraButtons: [],
+        extraButtons: [
+            {
+                id: 'coin-style-btn',
+                label: '📊 圖示類型',
+                type: 'dropdown',
+                options: [
+                    { label: '真實金錢(正面)',     value: 'real' },
+                    { label: '真實金錢(反面)',     value: 'real-back' },
+                    { label: '真實金錢(正、反面)', value: 'real-both' },
+                    { label: '金錢符號',           value: 'symbol' },
+                ],
+                getCurrentValue: (params) => params.coinStyle || 'real',
+                onChange: (val, app) => { app.params.coinStyle = val; app.generate(); }
+            }
+        ],
     },
 
     _scenarios: {
@@ -76,18 +90,27 @@ WorksheetRegistry.register('b1', {
     },
 
     // 將金額分解為金幣圖示（最多顯示 6 枚，避免版面過長）
-    _coinsDisplay(amount) {
+    _coinsDisplay(amount, renderCoin) {
         const coins = walletToCoins(amount);
         const displayed = coins.slice(0, 6);
         const more = coins.length > 6 ? `<span style="font-size:11px;color:#888;">…</span>` : '';
-        return displayed.map(c => coinImgRandom(c)).join('') + more;
+        return displayed.map(c => renderCoin(c)).join('') + more;
     },
 
     generate(options) {
         const diff = options.difficulty || 'easy';
         const questionType = options.questionType || 'fill';
+        const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const usedLabels = options._usedValues || new Set();
+
+        const renderCoin = (value) => {
+            if (coinStyle === 'symbol')    return coinSymbol(value);
+            if (coinStyle === 'real-back') return coinImgBack(value);
+            if (coinStyle === 'real-both') return coinImgRandom(value);
+            return coinImgFront(value);
+        };
+
         const src = this._scenarios[diff];
         const pool = shuffle(src.filter(s => !usedLabels.has(`b1_${s.label}`)));
         if (pool.length < 2) src.forEach(s => pool.push(s));
@@ -98,7 +121,7 @@ WorksheetRegistry.register('b1', {
         return chosen.map(scenario => {
             const total = scenario.items.reduce((s, it) => s + it.cost, 0);
             const itemsText = scenario.items.map(it => `${it.name} <strong>${it.cost}</strong> 元`).join('、');
-            const basePrompt = `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}`;
+            const basePrompt = `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}`;
 
             if (questionType === 'fill') {
                 // 數字填空：列出項目金額，填入合計
@@ -116,7 +139,7 @@ WorksheetRegistry.register('b1', {
             } else if (questionType === 'img-fill') {
                 // 看圖填空：每個項目旁顯示金幣圖示，填入合計
                 const itemsWithCoins = scenario.items.map(it => {
-                    const coinRow = this._coinsDisplay(it.cost);
+                    const coinRow = this._coinsDisplay(it.cost, renderCoin);
                     return `${it.name}（<strong>${it.cost}</strong> 元）<span class="price-coins" style="vertical-align:middle;">${coinRow}</span>`;
                 }).join('&emsp;');
                 const ans = showAnswers
@@ -124,7 +147,7 @@ WorksheetRegistry.register('b1', {
                     : blankLine();
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：`,
+                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：`,
                     visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
                     answerArea: `至少要帶：${ans} 元`,
                     answerDisplay: ''
@@ -147,7 +170,7 @@ WorksheetRegistry.register('b1', {
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span>` : '';
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>${answerTag}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
                     </div>`;
                 }).join('');
                 return {
@@ -172,12 +195,12 @@ WorksheetRegistry.register('b1', {
                         : checkbox;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
                     </div>`;
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -197,13 +220,13 @@ WorksheetRegistry.register('b1', {
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span>` : '';
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => coinImgRandom(c)).join('')}</div>
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
                         <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total} 元</span>${answerTag}
                     </div>`;
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `${scenario.icon} 要去<strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -214,7 +237,7 @@ WorksheetRegistry.register('b1', {
                 const combo = this._findCombo(total);
                 if (!combo) return null;
                 const partsHtml = combo.map(c => {
-                    const icons = Array(Math.min(c.count, 5)).fill(coinImgRandom(c.denom)).join('');
+                    const icons = Array(Math.min(c.count, 5)).fill(renderCoin(c.denom)).join('');
                     const ansNum = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
                     const unit = c.denom >= 100 ? '張' : '個';

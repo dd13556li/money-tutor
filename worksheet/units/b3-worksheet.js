@@ -22,7 +22,37 @@ WorksheetRegistry.register('b3', {
             onChange: (v, app) => { app.params.difficulty = v; app.generate(); }
         },
         orientationButton: null,
-        extraButtons: [],
+        extraButtons: [
+            {
+                id: 'coin-style-btn',
+                label: '📊 圖示類型',
+                type: 'dropdown',
+                options: [
+                    { label: '真實金錢(正面)', value: 'real' },
+                    { label: '真實金錢(反面)', value: 'real-back' },
+                    { label: '真實金錢(正、反面)', value: 'real-both' },
+                    { label: '金錢符號', value: 'symbol' },
+                ],
+                getCurrentValue: (params) => params.coinStyle || 'real',
+                onChange: (val, app) => { app.params.coinStyle = val; app.generate(); }
+            },
+            {
+                id: 'question-type-btn',
+                label: '📝 測驗題型',
+                type: 'dropdown',
+                options: [
+                    { label: '數字填空（存幾週）',      value: 'fill' },
+                    { label: '填空與選擇（存幾週＋金額組合）', value: 'fill-select' },
+                    { label: '圖示選擇（選出正確金額）', value: 'coin-select' },
+                    { label: '提示選擇（有金額提示）',  value: 'hint-select' },
+                    { label: '提示完成（填入幣值數量）', value: 'hint-complete' },
+                    { label: '月曆模式（提示圈選）',  value: 'calendar-hint' },
+                    { label: '月曆模式（數字填寫）',  value: 'calendar-fill' },
+                ],
+                getCurrentValue: (params) => params.questionType || 'fill',
+                onChange: (val, app) => { app.params.questionType = val; app.generate(); }
+            }
+        ],
     },
 
     _items: {
@@ -30,6 +60,10 @@ WorksheetRegistry.register('b3', {
             { name: '繪畫工具組', price: 280, icon: '🎨' },
             { name: '玩具機器人', price: 300, icon: '🤖' },
             { name: '望遠鏡',    price: 350, icon: '🔭' },
+            { name: '故事書',    price: 200, icon: '📕' },
+            { name: '漫畫書',    price: 180, icon: '📚' },
+            { name: '玩具車',    price: 300, icon: '🚗' },
+            { name: '娃娃',      price: 350, icon: '🪆' },
         ],
         normal: [
             { name: '繪畫工具組', price: 280, icon: '🎨' },
@@ -59,35 +93,338 @@ WorksheetRegistry.register('b3', {
         hard:   [25, 35, 50, 65, 80, 100, 125, 150, 175, 200],
     },
 
+    // 月曆模式：含每日存款金額的題目資料
+    // daysNeeded = ceil(price/daily)；設計使所有題目皆 ≤ 21 天（3 週內完成）
+    _calItems: {
+        easy: [
+            { name: '繪畫工具組', price: 300, icon: '🎨', daily:  50 }, //  6天
+            { name: '故事書',    price: 200, icon: '📕', daily:  50 }, //  4天
+            { name: '玩具車',    price: 300, icon: '🚗', daily: 100 }, //  3天
+            { name: '玩具機器人', price: 200, icon: '🤖', daily:  40 }, //  5天
+            { name: '漫畫書',    price: 180, icon: '📚', daily:  30 }, //  6天
+            { name: '望遠鏡',    price: 350, icon: '🔭', daily:  50 }, //  7天
+            { name: '娃娃',      price: 280, icon: '🪆', daily:  40 }, //  7天
+        ],
+        normal: [
+            { name: '烹飪玩具組', price: 500, icon: '🍳', daily:  50 }, // 10天
+            { name: '故事書套組', price: 450, icon: '📚', daily:  50 }, //  9天
+            { name: '科學實驗組', price: 480, icon: '🔬', daily:  60 }, //  8天
+            { name: '遊樂園門票', price: 500, icon: '🎡', daily: 100 }, //  5天
+            { name: '魔術道具組', price: 550, icon: '🎩', daily:  50 }, // 11天
+            { name: '運動鞋',    price: 800, icon: '👟', daily: 100 }, //  8天
+            { name: '生日蛋糕',  price: 600, icon: '🎂', daily:  50 }, // 12天
+            { name: '望遠鏡',    price: 700, icon: '🔭', daily: 100 }, //  7天
+        ],
+        hard: [
+            { name: '音樂盒',     price:  650, icon: '🎵', daily:  50 }, // 13天
+            { name: '運動鞋',     price:  800, icon: '👟', daily:  50 }, // 16天
+            { name: '水族箱',     price: 1200, icon: '🐠', daily: 100 }, // 12天
+            { name: '電動遊戲機',  price: 1500, icon: '🎮', daily: 100 }, // 15天
+            { name: '腳踏車',     price: 2400, icon: '🚴', daily: 200 }, // 12天
+            { name: '魔術道具組',  price: 1050, icon: '🎩', daily: 150 }, //  7天
+            { name: '生日套餐',   price: 1200, icon: '🎂', daily: 100 }, // 12天
+        ],
+    },
+
     generate(options) {
-        const diff = options.difficulty || 'easy';
-        const showAnswers = options._showAnswers || false;
-        const count = options.count || 20;
-        const items = this._items[diff];
+        const diff        = options.difficulty   || 'easy';
+        const questionType = options.questionType || 'fill';
+        const coinStyle   = options.coinStyle     || 'real';
+        const showAnswers = options._showAnswers  || false;
+        const count       = options.count         || 20;
+
+        const renderCoin = (value) => {
+            if (coinStyle === 'symbol')    return coinSymbol(value);
+            if (coinStyle === 'real-back') return coinImgBack(value);
+            if (coinStyle === 'real-both') return coinImgRandom(value);
+            return coinImgFront(value);
+        };
+
+        const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
+
+        const items      = this._items[diff];
         const weeklyOpts = this._weekly[diff];
-        const usedKeys = options._usedValues || new Set();
-        const questions = [];
+        const usedKeys   = options._usedValues || new Set();
+        const questions  = [];
+
+        // ── 月曆模式：直接回傳，不走下方 while 迴圈 ───────────────
+        if (questionType === 'calendar-hint' || questionType === 'calendar-fill') {
+            const calItems  = this._calItems[diff];
+            const isHint    = questionType === 'calendar-hint';
+            const calCount  = Math.min(count, 4);
+            const calQs     = [];
+            let calTries    = 0;
+            const CAL_YEAR  = 2025;
+            const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+            while (calQs.length < calCount && calTries < calCount * 12) {
+                calTries++;
+                const item = calItems[Math.floor(Math.random() * calItems.length)];
+                const key  = `b3cal_${item.name}_${diff}`;
+                if (usedKeys.has(key) && usedKeys.size < calItems.length) continue;
+                usedKeys.add(key);
+
+                const daysNeeded = Math.ceil(item.price / item.daily);
+
+                // 隨機選月份（確保存錢天數能在月內完成）
+                let month, daysInMonth, firstDayOfWeek;
+                let mTries = 0;
+                do {
+                    month = Math.floor(Math.random() * 12) + 1;          // 1~12
+                    daysInMonth   = new Date(CAL_YEAR, month, 0).getDate();
+                    firstDayOfWeek = new Date(CAL_YEAR, month - 1, 1).getDay(); // 0=日
+                    mTries++;
+                } while (daysNeeded > daysInMonth && mTries < 12);
+                if (daysNeeded > daysInMonth) continue;
+
+                // 隨機存錢起始日（確保期間不超出月份）
+                const maxStart = daysInMonth - daysNeeded + 1;
+                const startDay = Math.floor(Math.random() * maxStart) + 1;
+                const endDay   = startDay + daysNeeded - 1;
+
+                // 月曆格子（含星期對齊）
+                const numRows = Math.ceil((firstDayOfWeek + daysInMonth) / 7);
+                const DAY_LABELS = ['日','一','二','三','四','五','六'];
+                const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:5px 2px;font-size:10pt;font-weight:bold;border:1px solid #bcd;';
+                const tdBase  = 'text-align:center;border:1px solid #ccc;padding:3px 2px;vertical-align:top;height:44px;width:14.28%;';
+                const tdEmpty = 'background:#f0f0f0;border:1px solid #ddd;';
+
+                const headerRow = DAY_LABELS.map(d => `<th style="${thStyle}">${d}</th>`).join('');
+
+                let bodyRows = '';
+                for (let row = 0; row < numRows; row++) {
+                    let cells = '';
+                    for (let col = 0; col < 7; col++) {
+                        const cellIdx = row * 7 + col;
+                        const dayNum  = cellIdx - firstDayOfWeek + 1;
+                        if (dayNum < 1 || dayNum > daysInMonth) {
+                            // 月份前後的空格
+                            cells += `<td style="${tdBase}${tdEmpty}"></td>`;
+                        } else {
+                            const isSaving  = dayNum >= startDay && dayNum <= endDay;
+                            const periodDay = dayNum - startDay + 1; // 存錢週期第幾天
+
+                            if (isHint) {
+                                // 提示圈選：存錢日顯示累積金額（hint），答案模式圈起日期
+                                const daySpan = (showAnswers && isSaving)
+                                    ? `<span style="display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%;border:2.5px solid red;color:red;font-weight:bold;font-size:10pt;">${dayNum}</span>`
+                                    : `<span style="font-size:10pt;font-weight:bold;">${dayNum}</span>`;
+                                const hintDiv = isSaving
+                                    ? `<div style="color:#999;font-size:8pt;margin-top:1px;">${periodDay * item.daily}元</div>`
+                                    : `<div style="font-size:8pt;margin-top:1px;">&nbsp;</div>`;
+                                cells += `<td style="${tdBase}">${daySpan}${hintDiv}</td>`;
+                            } else {
+                                // 數字填寫：存錢日有填寫框，答案模式顯示累積金額
+                                const dayDiv = `<div style="font-size:10pt;font-weight:bold;">${dayNum}</div>`;
+                                let writeArea;
+                                if (isSaving) {
+                                    writeArea = showAnswers
+                                        ? `<div style="color:red;font-weight:bold;font-size:8pt;margin-top:1px;">${periodDay * item.daily}元</div>`
+                                        : `<div style="border-bottom:1px solid #999;margin:2px 4px 0;min-height:14px;"></div>`;
+                                } else {
+                                    writeArea = `<div style="min-height:14px;margin-top:2px;"></div>`;
+                                }
+                                cells += `<td style="${tdBase}">${dayDiv}${writeArea}</td>`;
+                            }
+                        }
+                    }
+                    bodyRows += `<tr>${cells}</tr>`;
+                }
+
+                const calHtml = `
+<div style="font-weight:bold;font-size:11pt;margin-bottom:4px;color:#4a90d9;">${MONTH_NAMES[month - 1]}</div>
+<table style="width:100%;border-collapse:collapse;margin:0 0 4px;table-layout:fixed;">
+    <thead><tr>${headerRow}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+</table>`;
+
+                const answerFill = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${daysNeeded}</span>`
+                    : blankLine();
+
+                const prompt = isHint
+                    ? `想買「<strong>${item.icon}${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請在月曆上圈出需要存錢的日期：`
+                    : `想買「<strong>${item.icon}${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請在月曆上填寫每天的累計存款金額：`;
+
+                calQs.push({
+                    _key: key,
+                    prompt,
+                    visual: calHtml,
+                    answerArea: `共需存：${answerFill} 天才能買到`,
+                    answerDisplay: ''
+                });
+            }
+            return calQs;
+        }
+
         let attempts = 0;
 
         while (questions.length < count && attempts < count * 4) {
             attempts++;
-            const item = items[Math.floor(Math.random() * items.length)];
+            const item   = items[Math.floor(Math.random() * items.length)];
             const weekly = weeklyOpts[Math.floor(Math.random() * weeklyOpts.length)];
-            const key = `b3_${item.name}_${weekly}`;
+            const key    = `b3_${item.name}_${weekly}`;
             if (usedKeys.has(key) && usedKeys.size < items.length * weeklyOpts.length) continue;
             usedKeys.add(key);
+
             const weeks = Math.ceil(item.price / weekly);
-            const ans = showAnswers
-                ? `<span style="color:red;font-weight:bold;">${weeks}</span>`
-                : blankLine();
-            questions.push({
-                _key: `b3_${item.name}_${weekly}`,
-                prompt: `${item.icon} 想買「<strong>${item.name}</strong>」要 ${item.price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
-                visual: '',
-                answerArea: `需要存：${ans} 週`,
-                answerDisplay: ''
-            });
+            const price = item.price;
+
+            // ── 1. 數字填空：填入需要存幾週 ──────────────────────────
+            if (questionType === 'fill') {
+                const ans = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${weeks}</span>`
+                    : blankLine();
+                questions.push({
+                    _key: key,
+                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
+                    visual: '',
+                    answerArea: `需要存：${ans} 週`,
+                    answerDisplay: ''
+                });
+
+            // ── 2. 填空與選擇：填入週數 ＋ 選出總價的金額組合 ──────────
+            } else if (questionType === 'fill-select') {
+                const weeksAns = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${weeks}</span>`
+                    : blankLine();
+                const correctCoins = walletToCoins(price);
+                const opts = this._generateCoinOptions(price, correctCoins);
+                const choicesHtml = opts.map((opt, idx) => {
+                    const label     = String.fromCharCode(9312 + idx);
+                    const isCorrect = opt.total === price;
+                    const style     = showAnswers && isCorrect ? 'border-color: red; border-width: 3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const answerTag = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${price} 元</span>`
+                        : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
+                    </div>`;
+                }).join('');
+                questions.push({
+                    _key: key,
+                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
+                    visual: `<div style="margin-bottom:6px;">需要存：${weeksAns} 週</div>
+                             <div style="margin-bottom:4px;">請選出 <strong>${price} 元</strong> 的正確金額組合：</div>
+                             <div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                });
+
+            // ── 3. 圖示選擇：給出總價，從選項中選出正確金額組合 ────────
+            } else if (questionType === 'coin-select') {
+                const correctCoins = walletToCoins(price);
+                const opts = this._generateCoinOptions(price, correctCoins);
+                const choicesHtml = opts.map((opt, idx) => {
+                    const label     = String.fromCharCode(9312 + idx);
+                    const isCorrect = opt.total === price;
+                    const style     = showAnswers && isCorrect ? 'border-color: red; border-width: 3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const answerTag = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${price} 元</span>`
+                        : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
+                    </div>`;
+                }).join('');
+                questions.push({
+                    _key: key,
+                    prompt: `「<strong>${item.icon}${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
+                    visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                });
+
+            // ── 4. 提示選擇：同圖示選擇，但選項旁附上灰色金額提示 ──────
+            } else if (questionType === 'hint-select') {
+                const correctCoins = walletToCoins(price);
+                const opts = this._generateCoinOptions(price, correctCoins);
+                const choicesHtml = opts.map((opt, idx) => {
+                    const label     = String.fromCharCode(9312 + idx);
+                    const isCorrect = opt.total === price;
+                    const style     = showAnswers && isCorrect ? 'border-color: red; border-width: 3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const answerTag = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${price} 元</span>`
+                        : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total}元</span>${answerTag}
+                    </div>`;
+                }).join('');
+                questions.push({
+                    _key: key,
+                    prompt: `「<strong>${item.icon}${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
+                    visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                });
+
+            // ── 5. 提示完成：顯示幣值圖示，填入各幣值的數量 ────────────
+            } else if (questionType === 'hint-complete') {
+                const combo = this._findCombo(price);
+                if (!combo) continue;
+                const partsHtml = combo.map(c => {
+                    const icons     = Array(c.count).fill(renderCoin(c.denom)).join('');
+                    const answerNum = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
+                    const qty       = c.denom >= 100 ? '張' : '個';
+                    return `${answerNum}${qty} ${icons}`;
+                }).join('&nbsp;&nbsp;');
+                const totalColor = showAnswers ? 'color:red' : 'color:#ccc';
+                const totalHint  = `<span style="font-size:14pt;font-weight:bold;margin-left:6px;">共 <span style="${totalColor};font-weight:bold;">${price}</span> 元</span>`;
+                questions.push({
+                    _key: key,
+                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」，填入正確的幣值數量，湊出 ${price} 元：`,
+                    visual: `<div style="margin:4px 0;">${partsHtml} ${totalHint}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                });
+            }
         }
         return questions;
     },
+
+    _findCombo(amount) {
+        const denoms = [1000, 500, 100, 50, 10, 5, 1];
+        const result = [];
+        let remaining = amount;
+        for (const d of denoms) {
+            if (remaining >= d) {
+                const c = Math.floor(remaining / d);
+                result.push({ denom: d, count: c });
+                remaining -= c * d;
+            }
+        }
+        if (remaining > 0) return null;
+        return result;
+    },
+
+    _generateCoinOptions(correctAmount, correctCoins) {
+        const options = [{ coins: [...correctCoins], total: correctAmount }];
+        for (let attempt = 0; attempt < 20 && options.length < 3; attempt++) {
+            const offset      = randomInt(1, Math.max(5, Math.floor(correctAmount * 0.3)));
+            const wrongAmount = Math.random() < 0.5
+                ? correctAmount + offset
+                : Math.max(1, correctAmount - offset);
+            if (options.some(o => o.total === wrongAmount)) continue;
+            const wrongCoins = walletToCoins(wrongAmount);
+            options.push({ coins: wrongCoins, total: wrongAmount });
+        }
+        while (options.length < 3) {
+            const wrongAmount = correctAmount + options.length * 3;
+            options.push({ coins: walletToCoins(wrongAmount), total: wrongAmount });
+        }
+        return shuffle(options);
+    }
 });

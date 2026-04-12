@@ -839,6 +839,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 依難度揭露卡片
             if (diff === 'easy') {
                 this._setupEasyModeCoins(curr, left, right, correctSide);
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr, correctSide), 300, 'ui');
+                }
             } else if (diff === 'normal') {
                 this._setupNormalModeCoins(curr, left, right, correctSide);
             } else {
@@ -1635,6 +1638,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 依難度揭露卡片
             if (diff === 'easy') {
                 this._revealTripleCardPrices(curr);
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr, null), 300, 'ui');
+                }
             } else if (diff === 'normal') {
                 // 普通：金幣可點擊（同二商店 normal 模式）
                 this._setupTripleNormalCoins(curr);
@@ -3393,6 +3399,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlay.remove();
                 onContinue?.();
             });
+
+            // 輔助點擊：提升 overlay z-index 使其覆蓋完成彈窗，並重建 queue
+            if (this.state.settings.clickMode === 'on' && AssistClick._enabled) {
+                Game.TimerManager.setTimeout(() => {
+                    if (AssistClick._overlay) AssistClick._overlay.style.zIndex = '10400';
+                    AssistClick.buildQueue();
+                }, 200, 'ui');
+            }
         },
 
         // ── 省錢清單（測驗結束後先顯示，再進總結頁）──────────────
@@ -3401,6 +3415,9 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
             Game.EventManager.removeByCategory('diffUI');
+
+            const _reactivateForSummary = this.state.settings.difficulty === 'easy'
+                && this.state.settings.clickMode === 'on';
 
             const q      = this.state.quiz;
             const hist   = q.comparisonHistory || [];
@@ -3543,6 +3560,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.TimerManager.setTimeout(() => {
                     Game.Speech.speak(buildSLSpeech(hist[0]));
                 }, 400, 'speech');
+            }
+
+            // 簡單輔助點擊：重啟以高亮「查看完整成績」按鈕
+            if (_reactivateForSummary) {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(null), 400, 'ui');
             }
         },
 
@@ -3821,6 +3843,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildQueue() {
             if (!this._enabled) return;
+
+            // 完成彈窗／省錢清單頁：優先偵測，不受 isProcessing 限制
+            // （isProcessing 在最後一題答對後仍為 true，若晚於此檢查會導致完成彈窗無法被高亮）
+            const cmBtn = document.getElementById('b4-cm-continue-btn');
+            if (cmBtn) {
+                this._clearHighlight();
+                this._queue = [{ el: cmBtn, action: () => cmBtn.click() }];
+                this._highlight(this._queue[0].el);
+                return;
+            }
+            const slNextBtn = document.getElementById('b4-sl-next-btn');
+            if (slNextBtn) {
+                this._clearHighlight();
+                this._queue = [{ el: slNextBtn, action: () => slNextBtn.click() }];
+                this._highlight(this._queue[0].el);
+                return;
+            }
+
+            // 處理中（答案回饋、語音播放）時跳過，避免重複高亮已點擊的元件
+            if (Game.state.isProcessing) return;
             this._clearHighlight();
             this._queue = [];
 
@@ -3851,26 +3893,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             this._queue = [{ el: card, action: () => card.click() }];
                         }
                     } else if (phase === 'diff') {
-                        // normal 三商店差額（three options）
-                        const diffSection = document.getElementById('diff-section');
-                        if (!diffSection) return;
                         const correctDiff = curr.diff;
-                        const opt = diffSection.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
-                        if (opt && !opt.disabled) {
-                            this._queue = [{ el: opt, action: () => opt.click() }];
+                        if (diff === 'easy') {
+                            // 簡單：三商店單一差額按鈕
+                            const btn = document.getElementById('b4-easy-tdiff-btn');
+                            if (btn) this._queue = [{ el: btn, action: () => btn.click() }];
+                        } else {
+                            // normal/hard 三商店差額選項
+                            const opt = document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
+                            if (opt && !opt.disabled) {
+                                this._queue = [{ el: opt, action: () => opt.click() }];
+                            }
                         }
                     }
                 }
             } else {
                 // ── 兩家店模式 ────────────────────────────────
                 if (phase === 'select') {
-                    const card = document.getElementById(`card-${correctSide}`);
-                    if (card && !card.classList.contains('selected-correct')) {
-                        this._queue = [{ el: card, action: () => card.click() }];
+                    if (diff === 'easy') {
+                        // 簡單：逐枚點幣
+                        const coins = Array.from(document.querySelectorAll('.b4-easy-coin:not([data-clicked])'));
+                        this._queue = coins.map(coin => ({ el: coin, action: () => coin.click() }));
+                    } else {
+                        const card = document.getElementById(`card-${correctSide}`);
+                        if (card && !card.classList.contains('selected-correct')) {
+                            this._queue = [{ el: card, action: () => card.click() }];
+                        }
                     }
                 } else if (phase === 'diff') {
                     const correctDiff = curr.diff;
-                    if (diff === 'normal') {
+                    if (diff === 'easy') {
+                        // 簡單：單一答案按鈕
+                        const btn = document.getElementById('b4-easy-diff-btn');
+                        if (btn) this._queue = [{ el: btn, action: () => btn.click() }];
+                    } else if (diff === 'normal') {
                         const opt = document.querySelector(`.b4-diff-opt[data-val="${correctDiff}"]`);
                         if (opt && !opt.disabled) {
                             this._queue = [{ el: opt, action: () => opt.click() }];
