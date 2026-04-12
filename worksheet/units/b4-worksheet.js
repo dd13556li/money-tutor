@@ -8,7 +8,7 @@ WorksheetRegistry.register('b4', {
             cheaper:        '找便宜(2家)',
             'cheaper-3':    '找便宜(3家)',
             both:           '綜合題',
-            fill:           '差額填空',
+            fill:           '計算差額',
             'fill-select':  '填空與選擇',
             'coin-select':  '圖示選擇',
             'hint-select':  '提示選擇',
@@ -43,7 +43,7 @@ WorksheetRegistry.register('b4', {
                     { label: '找便宜(2家店比較)',          value: 'cheaper'       },
                     { label: '找便宜(3家店比較)',          value: 'cheaper-3'     },
                     { label: '綜合題（找便宜＋差多少）',  value: 'both'          },
-                    { label: '數字填空（計算差額）',       value: 'fill'          },
+                    { label: '計算差額',                   value: 'fill'          },
                     { label: '填空與選擇（差額＋金額組合）',value: 'fill-select'  },
                     { label: '圖示選擇（選出便宜金額）',  value: 'coin-select'   },
                     { label: '提示選擇（有金額提示）',    value: 'hint-select'   },
@@ -57,9 +57,9 @@ WorksheetRegistry.register('b4', {
                 label: '💰 金額呈現',
                 type: 'dropdown',
                 options: [
-                    { label: '金額只有數字',             value: 'num-only'  },
-                    { label: '金錢圖示在前＋數字在後',   value: 'coin-num'  },
-                    { label: '只有金錢圖示＋底線填寫',   value: 'coin-blank'},
+                    { label: '數字填空',   value: 'num-only'  },
+                    { label: '看圖填空',   value: 'coin-blank'},
+                    { label: '提示完成',   value: 'coin-num'  },
                 ],
                 getCurrentValue: (params) => params.priceStyle || 'num-only',
                 onChange: (val, app) => { app.params.priceStyle = val; app.generate(); }
@@ -207,8 +207,74 @@ WorksheetRegistry.register('b4', {
                 };
             }
 
-            // ── 1. 數字填空：計算兩家差額 ────────────────────────────
+            // ── 1. 計算差額（原數字填空）────────────────────────────
             if (questionType === 'fill') {
+                // 看圖填空（coin-blank）：商店格用金錢圖示顯示；差額區也顯示差額金錢圖示讓學生填數字
+                if (priceStyle === 'coin-blank') {
+                    const diffCoins = walletToCoins(diff);
+                    const diffCoinImgs = `<span style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;margin:0 3px;vertical-align:middle;">${diffCoins.map(c => renderCoin(c)).join('')}</span>`;
+                    return {
+                        _key: `b4_${idx}`,
+                        prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
+                        visual: priceRow,
+                        answerArea: `兩家差了多少元？${diffCoinImgs}${blankLine()} 元`,
+                        answerDisplay: ''
+                    };
+                }
+
+                // 提示完成（coin-num）：商店格與差額均用 hint-complete 格式（___個X元[圖示] 共N元）
+                if (priceStyle === 'coin-num') {
+                    const mkHintComplete = (price, hideTotalNum) => {
+                        const combo = this._findCombo(price);
+                        if (!combo) return `<strong>${price}</strong> 元`;
+                        const partsHtml = combo.map(c => {
+                            const icons  = Array(c.count).fill(renderCoin(c.denom)).join('');
+                            const ansNum = showAnswers
+                                ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
+                            const qty    = c.denom >= 100 ? '張' : '個';
+                            return `${ansNum}${qty}&nbsp;${icons}`;
+                        }).join('&ensp;');
+                        const totalColor = showAnswers ? 'color:red' : (hideTotalNum ? 'color:#ccc' : '');
+                        return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;margin:3px 0;">${partsHtml}&ensp;<span style="${totalColor};font-weight:bold;">共 ${price} 元</span></div>`;
+                    };
+
+                    const priceRowHC = `<div style="display:flex;gap:18px;margin:6px 0;font-size:12pt;">
+                        <span style="flex:1;text-align:center;background:#fef9c3;border-radius:8px;padding:4px 8px;">
+                            🏪 ${left.store}<br>${mkHintComplete(left.price, false)}
+                        </span>
+                        <span style="flex:1;text-align:center;background:#dbeafe;border-radius:8px;padding:4px 8px;">
+                            🏬 ${right.store}<br>${mkHintComplete(right.price, false)}
+                        </span>
+                    </div>`;
+
+                    const diffCombo = this._findCombo(diff);
+                    let diffArea;
+                    if (diffCombo) {
+                        const partsHtml = diffCombo.map(c => {
+                            const icons  = Array(c.count).fill(renderCoin(c.denom)).join('');
+                            const ansNum = showAnswers
+                                ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
+                            const qty    = c.denom >= 100 ? '張' : '個';
+                            return `${ansNum}${qty}&nbsp;${icons}`;
+                        }).join('&ensp;');
+                        const totalColor = showAnswers ? 'color:red' : 'color:#ccc';
+                        diffArea = `兩家差了多少元？${partsHtml}&ensp;<span style="${totalColor};font-weight:bold;">共 ${diff} 元</span>`;
+                    } else {
+                        const ans = showAnswers
+                            ? `<span style="color:red;font-weight:bold;">${diff}</span>` : blankLine();
+                        diffArea = `兩家差了多少元？${ans} 元`;
+                    }
+
+                    return {
+                        _key: `b4_${idx}`,
+                        prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
+                        visual: priceRowHC,
+                        answerArea: diffArea,
+                        answerDisplay: ''
+                    };
+                }
+
+                // 數字填空（num-only）：純文字
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${diff}</span>`
                     : blankLine();
