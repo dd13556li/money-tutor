@@ -96,10 +96,10 @@ WorksheetRegistry.register('b5', {
 
             // Build the items table
             const mustRows = mustItems.map(it =>
-                `<tr><td>${it.icon} ${it.name}</td><td style="color:#dc2626;font-weight:600;">必買</td><td style="text-align:right;">${it.price} 元</td></tr>`
+                `<tr><td><span class="ws-emoji-icon">${it.icon}</span> ${it.name}</td><td style="color:#dc2626;font-weight:600;">必買</td><td style="text-align:right;">${it.price} 元</td></tr>`
             ).join('');
             const optRows = optItems.map(it =>
-                `<tr><td>${it.icon} ${it.name}</td><td style="color:#2563eb;">選購</td><td style="text-align:right;">${it.price} 元</td></tr>`
+                `<tr><td><span class="ws-emoji-icon">${it.icon}</span> ${it.name}</td><td style="color:#2563eb;">選購</td><td style="text-align:right;">${it.price} 元</td></tr>`
             ).join('');
 
             const mustAns = showAnswers
@@ -111,7 +111,7 @@ WorksheetRegistry.register('b5', {
 
             return {
                 _key: `b5_${diff}_${idx}`,
-                prompt: `🎉 預算：<strong>${budget}</strong> 元，必買商品一定要買，用剩下的錢選購。`,
+                prompt: `<span class="ws-emoji-icon">🎉</span> 預算：<strong>${budget}</strong> 元，必買商品一定要買，用剩下的錢選購。`,
                 visual: `<table style="border-collapse:collapse;font-size:12pt;width:100%;margin:6px 0;">
                     <tr style="background:#f3f4f6;font-size:11pt;">
                         <th style="padding:3px 6px;text-align:left;border-bottom:1.5px solid #9ca3af;">商品</th>

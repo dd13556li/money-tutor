@@ -200,7 +200,7 @@ WorksheetRegistry.register('b2', {
             const eventsHtml = events.map(e => {
                 const sign = e.type === 'income' ? '+' : '−';
                 const color = e.type === 'income' ? '#059669' : '#dc2626';
-                return `<div style="color:${color};">${e.icon} ${sign}${e.amount} 元（${e.name}）</div>`;
+                return `<div style="color:${color};"><span class="ws-emoji-icon">${e.icon}</span> ${sign}${e.amount} 元（${e.name}）</div>`;
             }).join('');
 
             if (type === 'fill') {
@@ -227,7 +227,7 @@ WorksheetRegistry.register('b2', {
                         ? `<span style="color:red;font-weight:bold;">${running}</span>`
                         : blankLine(true);
                     return `<tr>
-                        <td style="padding:3px 6px;">${e.icon} ${e.name}</td>
+                        <td style="padding:3px 6px;"><span class="ws-emoji-icon">${e.icon}</span> ${e.name}</td>
                         <td style="text-align:center;padding:3px 6px;color:${color};">${sign}${e.amount}</td>
                         <td style="text-align:center;padding:3px 8px;">${runAns}</td>
                     </tr>`;
@@ -254,7 +254,7 @@ WorksheetRegistry.register('b2', {
                     const color = e.type === 'income' ? '#059669' : '#dc2626';
                     const coinRow = this._coinsDisplay(e.amount, renderCoin);
                     return `<div style="color:${color};display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:3px;">
-                        <span>${e.icon} ${sign}${e.amount} 元（${e.name}）</span>
+                        <span><span class="ws-emoji-icon">${e.icon}</span> ${sign}${e.amount} 元（${e.name}）</span>
                         <span class="price-coins">${coinRow}</span>
                     </div>`;
                 }).join('');

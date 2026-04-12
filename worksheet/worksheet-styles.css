@@ -672,13 +672,22 @@ body {
 }
 
 .worksheet-container .question-answer {
-    font-size: calc(var(--ws-font-scale) * 12pt);
+    font-size: calc(var(--ws-font-scale) * 13pt);
 }
 
 .worksheet-container .shopping-item,
 .worksheet-container .shopping-total,
 .worksheet-container .shopping-list {
     font-size: calc(var(--ws-font-scale) * 11pt);
+}
+
+/* B 系列 Emoji 圖示：使用圖示比例縮放，不隨文字比例縮放
+   1em / ws-font-scale 可消除父層文字縮放影響，再乘以 ws-icon-scale 即為純圖示縮放 */
+.worksheet-container .ws-emoji-icon {
+    font-size: calc(1em * var(--ws-icon-scale, 1) / var(--ws-font-scale, 1));
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
 }
 
 .worksheet-container .coin-img {

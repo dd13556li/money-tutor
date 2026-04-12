@@ -157,100 +157,123 @@ WorksheetRegistry.register('b3', {
             const CAL_YEAR  = 2025;
             const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
-            while (calQs.length < calCount && calTries < calCount * 12) {
-                calTries++;
-                const item = calItems[Math.floor(Math.random() * calItems.length)];
-                const key  = `b3cal_${item.name}_${diff}`;
-                if (usedKeys.has(key) && usedKeys.size < calItems.length) continue;
-                usedKeys.add(key);
+            // ── 產生單一月曆 block（供兩題並排使用）──
+            const genOne = () => {
+                let gTries = 0;
+                while (gTries++ < 20) {
+                    const item = calItems[Math.floor(Math.random() * calItems.length)];
+                    const key  = `b3cal_${item.name}_${diff}`;
+                    if (usedKeys.has(key) && usedKeys.size < calItems.length) continue;
+                    usedKeys.add(key);
 
-                const daysNeeded = Math.ceil(item.price / item.daily);
+                    const daysNeeded = Math.ceil(item.price / item.daily);
 
-                // 隨機選月份（確保存錢天數能在月內完成）
-                let month, daysInMonth, firstDayOfWeek;
-                let mTries = 0;
-                do {
-                    month = Math.floor(Math.random() * 12) + 1;          // 1~12
-                    daysInMonth   = new Date(CAL_YEAR, month, 0).getDate();
-                    firstDayOfWeek = new Date(CAL_YEAR, month - 1, 1).getDay(); // 0=日
-                    mTries++;
-                } while (daysNeeded > daysInMonth && mTries < 12);
-                if (daysNeeded > daysInMonth) continue;
+                    let month, daysInMonth, firstDayOfWeek;
+                    let mTries = 0;
+                    do {
+                        month = Math.floor(Math.random() * 12) + 1;
+                        daysInMonth    = new Date(CAL_YEAR, month, 0).getDate();
+                        firstDayOfWeek = new Date(CAL_YEAR, month - 1, 1).getDay();
+                        mTries++;
+                    } while (daysNeeded > daysInMonth && mTries < 12);
+                    if (daysNeeded > daysInMonth) continue;
 
-                // 隨機存錢起始日（確保期間不超出月份）
-                const maxStart = daysInMonth - daysNeeded + 1;
-                const startDay = Math.floor(Math.random() * maxStart) + 1;
-                const endDay   = startDay + daysNeeded - 1;
+                    const maxStart = daysInMonth - daysNeeded + 1;
+                    const startDay = Math.floor(Math.random() * maxStart) + 1;
+                    const endDay   = startDay + daysNeeded - 1;
 
-                // 月曆格子（含星期對齊）
-                const numRows = Math.ceil((firstDayOfWeek + daysInMonth) / 7);
-                const DAY_LABELS = ['日','一','二','三','四','五','六'];
-                const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:5px 2px;font-size:10pt;font-weight:bold;border:1px solid #bcd;';
-                const tdBase  = 'text-align:center;border:1px solid #ccc;padding:3px 2px;vertical-align:top;height:44px;width:14.28%;';
-                const tdEmpty = 'background:#f0f0f0;border:1px solid #ddd;';
+                    const numRows = Math.ceil((firstDayOfWeek + daysInMonth) / 7);
+                    const DAY_LABELS = ['日','一','二','三','四','五','六'];
+                    // 並排模式縮小字體與格高，確保兩欄都能完整顯示
+                    const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:3px 1px;font-size:8.5pt;font-weight:bold;border:1px solid #bcd;';
+                    const tdBase  = 'text-align:center;border:1px solid #ccc;padding:2px 1px;vertical-align:top;height:34px;width:14.28%;';
+                    const tdEmpty = 'background:#f0f0f0;border:1px solid #ddd;';
 
-                const headerRow = DAY_LABELS.map(d => `<th style="${thStyle}">${d}</th>`).join('');
+                    const headerRow = DAY_LABELS.map(d => `<th style="${thStyle}">${d}</th>`).join('');
 
-                let bodyRows = '';
-                for (let row = 0; row < numRows; row++) {
-                    let cells = '';
-                    for (let col = 0; col < 7; col++) {
-                        const cellIdx = row * 7 + col;
-                        const dayNum  = cellIdx - firstDayOfWeek + 1;
-                        if (dayNum < 1 || dayNum > daysInMonth) {
-                            // 月份前後的空格
-                            cells += `<td style="${tdBase}${tdEmpty}"></td>`;
-                        } else {
-                            const isSaving  = dayNum >= startDay && dayNum <= endDay;
-                            const periodDay = dayNum - startDay + 1; // 存錢週期第幾天
-
-                            if (isHint) {
-                                // 提示圈選：存錢日顯示累積金額（hint），答案模式圈起日期
-                                const daySpan = (showAnswers && isSaving)
-                                    ? `<span style="display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%;border:2.5px solid red;color:red;font-weight:bold;font-size:10pt;">${dayNum}</span>`
-                                    : `<span style="font-size:10pt;font-weight:bold;">${dayNum}</span>`;
-                                const hintDiv = isSaving
-                                    ? `<div style="color:#999;font-size:8pt;margin-top:1px;">${periodDay * item.daily}元</div>`
-                                    : `<div style="font-size:8pt;margin-top:1px;">&nbsp;</div>`;
-                                cells += `<td style="${tdBase}">${daySpan}${hintDiv}</td>`;
+                    let bodyRows = '';
+                    for (let row = 0; row < numRows; row++) {
+                        let cells = '';
+                        for (let col = 0; col < 7; col++) {
+                            const cellIdx = row * 7 + col;
+                            const dayNum  = cellIdx - firstDayOfWeek + 1;
+                            if (dayNum < 1 || dayNum > daysInMonth) {
+                                cells += `<td style="${tdBase}${tdEmpty}"></td>`;
                             } else {
-                                // 數字填寫：存錢日有填寫框，答案模式顯示累積金額
-                                const dayDiv = `<div style="font-size:10pt;font-weight:bold;">${dayNum}</div>`;
-                                let writeArea;
-                                if (isSaving) {
-                                    writeArea = showAnswers
-                                        ? `<div style="color:red;font-weight:bold;font-size:8pt;margin-top:1px;">${periodDay * item.daily}元</div>`
-                                        : `<div style="border-bottom:1px solid #999;margin:2px 4px 0;min-height:14px;"></div>`;
+                                const isSaving  = dayNum >= startDay && dayNum <= endDay;
+                                const periodDay = dayNum - startDay + 1;
+
+                                if (isHint) {
+                                    const daySpan = (showAnswers && isSaving)
+                                        ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;border:2px solid red;color:red;font-weight:bold;font-size:9pt;">${dayNum}</span>`
+                                        : `<span style="font-size:9pt;font-weight:bold;">${dayNum}</span>`;
+                                    const hintDiv = isSaving
+                                        ? `<div style="color:#999;font-size:7pt;margin-top:0;">${periodDay * item.daily}元</div>`
+                                        : `<div style="font-size:7pt;">&nbsp;</div>`;
+                                    cells += `<td style="${tdBase}">${daySpan}${hintDiv}</td>`;
                                 } else {
-                                    writeArea = `<div style="min-height:14px;margin-top:2px;"></div>`;
+                                    const dayDiv = `<div style="font-size:9pt;font-weight:bold;">${dayNum}</div>`;
+                                    let writeArea;
+                                    if (isSaving) {
+                                        writeArea = showAnswers
+                                            ? `<div style="color:red;font-weight:bold;font-size:7pt;">${periodDay * item.daily}元</div>`
+                                            : `<div style="border-bottom:1px solid #999;margin:1px 3px 0;min-height:12px;"></div>`;
+                                    } else {
+                                        writeArea = `<div style="min-height:12px;"></div>`;
+                                    }
+                                    cells += `<td style="${tdBase}">${dayDiv}${writeArea}</td>`;
                                 }
-                                cells += `<td style="${tdBase}">${dayDiv}${writeArea}</td>`;
                             }
                         }
+                        bodyRows += `<tr>${cells}</tr>`;
                     }
-                    bodyRows += `<tr>${cells}</tr>`;
-                }
 
-                const calHtml = `
-<div style="font-weight:bold;font-size:11pt;margin-bottom:4px;color:#4a90d9;">${MONTH_NAMES[month - 1]}</div>
-<table style="width:100%;border-collapse:collapse;margin:0 0 4px;table-layout:fixed;">
+                    const answerFill = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${daysNeeded}</span>`
+                        : blankLine();
+
+                    const subPrompt = isHint
+                        ? `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請圈出存錢的日期：`
+                        : `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請填寫每天的累計存款：`;
+
+                    const calHtml = `
+<div style="font-weight:bold;font-size:10pt;margin-bottom:3px;color:#4a90d9;text-align:center;">${MONTH_NAMES[month - 1]}</div>
+<table style="width:100%;border-collapse:collapse;margin:0 0 3px;table-layout:fixed;">
     <thead><tr>${headerRow}</tr></thead>
     <tbody>${bodyRows}</tbody>
 </table>`;
 
-                const answerFill = showAnswers
-                    ? `<span style="color:red;font-weight:bold;">${daysNeeded}</span>`
-                    : blankLine();
+                    return { key, subPrompt, calHtml, answerFill };
+                }
+                return null;
+            };
 
-                const prompt = isHint
-                    ? `想買「<strong>${item.icon}${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請在月曆上圈出需要存錢的日期：`
-                    : `想買「<strong>${item.icon}${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請在月曆上填寫每天的累計存款金額：`;
+            while (calQs.length < calCount && calTries < calCount * 12) {
+                calTries++;
+                const a = genOne();
+                if (!a) continue;
+                const b = genOne();
+                if (!b) continue;
 
+                // 兩題月曆左右並排，中間加分隔線
                 calQs.push({
-                    _key: key,
-                    prompt,
-                    visual: calHtml,
-                    answerArea: `共需存：${answerFill} 天才能買到`,
+                    _key: `${a.key}+${b.key}`,
+                    prompt: '',
+                    visual: `
+<div style="display:flex;gap:10px;align-items:flex-start;">
+    <div style="flex:1;min-width:0;">
+        <div style="font-size:8.5pt;margin-bottom:4px;">(1) ${a.subPrompt}</div>
+        ${a.calHtml}
+        <div style="font-size:8.5pt;margin-top:1px;">共需存：${a.answerFill} 天才能買到</div>
+    </div>
+    <div style="width:1px;background:#ccc;align-self:stretch;flex-shrink:0;"></div>
+    <div style="flex:1;min-width:0;">
+        <div style="font-size:8.5pt;margin-bottom:4px;">(2) ${b.subPrompt}</div>
+        ${b.calHtml}
+        <div style="font-size:8.5pt;margin-top:1px;">共需存：${b.answerFill} 天才能買到</div>
+    </div>
+</div>`,
+                    answerArea: '',
                     answerDisplay: ''
                 });
             }
@@ -277,7 +300,7 @@ WorksheetRegistry.register('b3', {
                     : blankLine();
                 questions.push({
                     _key: key,
-                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
+                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
                     visual: '',
                     answerArea: `需要存：${ans} 週`,
                     answerDisplay: ''
@@ -307,7 +330,7 @@ WorksheetRegistry.register('b3', {
                 }).join('');
                 questions.push({
                     _key: key,
-                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
+                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
                     visual: `<div style="margin-bottom:6px;">需要存：${weeksAns} 週</div>
                              <div style="margin-bottom:4px;">請選出 <strong>${price} 元</strong> 的正確金額組合：</div>
                              <div class="coin-choice-options">${choicesHtml}</div>`,
@@ -336,7 +359,7 @@ WorksheetRegistry.register('b3', {
                 }).join('');
                 questions.push({
                     _key: key,
-                    prompt: `「<strong>${item.icon}${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
+                    prompt: `「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -364,7 +387,7 @@ WorksheetRegistry.register('b3', {
                 }).join('');
                 questions.push({
                     _key: key,
-                    prompt: `「<strong>${item.icon}${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
+                    prompt: `「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 <span style="color:red;font-weight:bold;">${price}</span> 元，請選出正確的金額組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -385,7 +408,7 @@ WorksheetRegistry.register('b3', {
                 const totalHint  = `<span style="font-size:14pt;font-weight:bold;margin-left:6px;">共 <span style="${totalColor};font-weight:bold;">${price}</span> 元</span>`;
                 questions.push({
                     _key: key,
-                    prompt: `想買「<strong>${item.icon}${item.name}</strong>」，填入正確的幣值數量，湊出 ${price} 元：`,
+                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」，填入正確的幣值數量，湊出 ${price} 元：`,
                     visual: `<div style="margin:4px 0;">${partsHtml} ${totalHint}</div>`,
                     answerArea: '',
                     answerDisplay: ''

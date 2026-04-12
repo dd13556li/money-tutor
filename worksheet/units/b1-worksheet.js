@@ -121,7 +121,7 @@ WorksheetRegistry.register('b1', {
         return chosen.map(scenario => {
             const total = scenario.items.reduce((s, it) => s + it.cost, 0);
             const itemsText = scenario.items.map(it => `${it.name} <strong>${it.cost}</strong> 元`).join('、');
-            const basePrompt = `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}`;
+            const basePrompt = `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：${itemsText}`;
 
             if (questionType === 'fill') {
                 // 數字填空：列出項目金額，填入合計
@@ -147,7 +147,7 @@ WorksheetRegistry.register('b1', {
                     : blankLine();
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：`,
                     visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
                     answerArea: `至少要帶：${ans} 元`,
                     answerDisplay: ''
@@ -200,7 +200,7 @@ WorksheetRegistry.register('b1', {
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -226,7 +226,7 @@ WorksheetRegistry.register('b1', {
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<strong>${scenario.icon}${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''

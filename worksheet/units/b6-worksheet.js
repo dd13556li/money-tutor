@@ -101,7 +101,7 @@ WorksheetRegistry.register('b6', {
 
             const rows = resolved.map(it =>
                 `<tr>
-                    <td style="padding:3px 6px;">${it.icon} ${it.name}（1${it.unit}）</td>
+                    <td style="padding:3px 6px;"><span class="ws-emoji-icon">${it.icon}</span> ${it.name}（1${it.unit}）</td>
                     <td style="text-align:right;padding:3px 8px;">${it.price} 元</td>
                 </tr>`
             ).join('');
@@ -115,7 +115,7 @@ WorksheetRegistry.register('b6', {
 
             return {
                 _key: `b6_${diff}_${idx}`,
-                prompt: `🛒 帶了 <strong>${budget}</strong> 元去買菜，購買以下商品：`,
+                prompt: `<span class="ws-emoji-icon">🛒</span> 帶了 <strong>${budget}</strong> 元去買菜，購買以下商品：`,
                 visual: `<table style="border-collapse:collapse;font-size:12pt;width:100%;margin:6px 0;">
                     <tr style="background:#f3f4f6;font-size:11pt;">
                         <th style="padding:3px 6px;text-align:left;border-bottom:1.5px solid #9ca3af;">商品</th>
