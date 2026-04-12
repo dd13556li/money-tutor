@@ -1270,6 +1270,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlay.remove();
                 AssistClick.deactivate();
                 Game.Speech.speak('開始存錢');
+                // 輔助點擊：開場彈窗關閉後，重新啟動以接管月曆操作
+                if (Game.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(null), 600, 'ui');
+                }
             });
 
             // 輔助點擊：高亮「開始存錢」按鈕
@@ -2473,8 +2477,17 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>`;
 
+            // 輔助點擊：目標達成畫面渲染後主動呼叫 buildQueue
+            // （不依賴 MutationObserver，避免 queue 仍有舊步驟時 observer 跳過偵測）
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => {
+                    if (AssistClick._enabled) AssistClick.buildQueue();
+                }, 300, 'ui');
+            }
+
             Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
                 Game.EventManager.removeByCategory('gameUI');
+                AssistClick.deactivate(); // 測驗總結畫面讓使用者自行操作
                 // ── 第二畫面：測驗總結 ──
                 app.innerHTML = `
 <div class="b-res-wrapper">
@@ -3431,14 +3444,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const q    = question || Game.state.quiz.questions[Game.state.quiz.currentQuestion];
-            if (!q) return;
+            // 達成存錢目標畫面：高亮「查看測驗總結」按鈕
+            const viewSummaryBtn = document.getElementById('b3-view-summary-btn');
+            if (viewSummaryBtn) {
+                this._queue = [{ el: viewSummaryBtn, action: () => viewSummaryBtn.click() }];
+                this._highlight(viewSummaryBtn);
+                return;
+            }
+
             const diff = Game.state.settings.difficulty;
+            const c    = Game.state.calendar;
+
+            // ── 月曆模式：簡單模式拖曳工作階段（逐一放置金錢）──────────
+            // c.drag 存在且無 mode 屬性 = easy mode drag session
+            if (diff === 'easy' && c.drag && !c.drag.mode) {
+                const firstCoin = document.querySelector('.b3-drag-coin:not(.b3-coin-placed)');
+                if (firstCoin) {
+                    const denom   = parseInt(firstCoin.dataset.denom);
+                    const slotIdx = parseInt(firstCoin.dataset.slotIdx);
+                    // 動態查找 slot，避免 DOM 重建後參照失效
+                    this._queue = [{ el: firstCoin, action: () => {
+                        const slot = document.querySelector(`.b3-drop-slot[data-slot-idx="${slotIdx}"]:not(.b3-slot-filled)`);
+                        if (slot) Game._handleCoinDrop(denom, slotIdx, slot);
+                    }}];
+                    this._highlight(firstCoin);
+                }
+                return;
+            }
+
+            // ── 月曆模式：普通／困難模式拖曳工作階段（點面額 → 確認）──
+            if ((diff === 'normal' || diff === 'hard') && c.drag?.mode === 'normal') {
+                const remaining = c.drag.targetAmount - c.drag.placedTotal;
+                if (remaining > 0) {
+                    // 貪婪找出下一個可點擊的最大面額
+                    const ALL_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+                    const d = ALL_DENOMS.find(d => d <= remaining && document.querySelector(`.b3-ndrag-denom[data-denom="${d}"]`));
+                    if (d) {
+                        const tile = document.querySelector(`.b3-ndrag-denom[data-denom="${d}"]`);
+                        this._queue = [{ el: tile, action: () => tile.click() }];
+                        this._highlight(tile);
+                    }
+                } else if (c.drag.placedTotal === c.drag.targetAmount) {
+                    // 金額剛好達標，高亮確認按鈕
+                    const confirmBtn = document.getElementById('b3-normal-confirm-btn');
+                    if (confirmBtn && !confirmBtn.disabled) {
+                        this._queue = [{ el: confirmBtn, action: () => {
+                            const btn = document.getElementById('b3-normal-confirm-btn');
+                            if (btn && !btn.disabled) btn.click();
+                        }}];
+                        this._highlight(confirmBtn);
+                    }
+                }
+                return;
+            }
+
+            // ── 月曆模式：兌換按鈕（無拖曳工作階段時優先於日期點擊）──
+            // c.drag === null（drag session 已結束或尚未開始），偵測可兌換面額
+            const exchBtn = document.querySelector('.b3-pig-exch-btn');
+            if (exchBtn) {
+                this._queue = [{ el: exchBtn, action: () => exchBtn.click() }];
+                this._highlight(exchBtn);
+                return;
+            }
+
+            // ── 月曆模式：等待點擊日期格 ─────────────────────────────
+            const activeDay = document.querySelector('.b3-cal-active');
+            if (activeDay) {
+                this._queue = [{ el: activeDay, action: () => activeDay.click() }];
+                this._highlight(activeDay);
+                return;
+            }
+
+            // ── 測驗模式（Quiz）────────────────────────────────────────
+            const q = question || Game.state.quiz.questions?.[Game.state.quiz.currentQuestion];
+            if (!q) return;
 
             if (diff === 'easy') {
                 // Easy：選擇題模式 — 直接高亮正確答案的選項按鈕
-                // buildQueue 原本只找 .b3-numpad-btn，easy 模式不存在 numpad
-                // 導致 queue 永遠為空、輔助點擊完全無效，故加此分支
                 const correctBtn = document.querySelector(`.b3-choice-btn[data-val="${q.answer}"]`);
                 if (correctBtn) {
                     this._queue = [{ el: correctBtn, action: () => correctBtn.click() }];
