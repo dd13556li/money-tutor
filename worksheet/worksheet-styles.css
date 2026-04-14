@@ -675,6 +675,16 @@ body {
     font-size: calc(var(--ws-font-scale) * 13pt);
 }
 
+/* B 系列：題目第一行（prompt）與答案區同字級；emoji 由 ws-emoji-icon 獨立縮放 */
+.worksheet-container .worksheet-page[data-unit="b1"] .question-number,
+.worksheet-container .worksheet-page[data-unit="b2"] .question-number,
+.worksheet-container .worksheet-page[data-unit="b3"] .question-number,
+.worksheet-container .worksheet-page[data-unit="b4"] .question-number,
+.worksheet-container .worksheet-page[data-unit="b5"] .question-number,
+.worksheet-container .worksheet-page[data-unit="b6"] .question-number {
+    font-size: calc(var(--ws-font-scale) * 13pt);
+}
+
 .worksheet-container .shopping-item,
 .worksheet-container .shopping-total,
 .worksheet-container .shopping-list {

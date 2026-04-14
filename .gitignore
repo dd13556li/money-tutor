@@ -20,6 +20,11 @@ pdf/
 # 日誌
 *.log
 
+# API 金鑰與環境變數
+.env
+.env.*
+!.env.example
+
 # 內部報告（不上傳 GitHub）
 report/
 

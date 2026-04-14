@@ -320,10 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
     <div class="unit-welcome">
         <div class="welcome-content">
-            <div class="settings-title-row">
+            <div class="settings-title-row b-settings-title-row">
+                <h1>單元B3：存錢計畫</h1>
                 <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                      class="settings-mascot-img" onerror="this.style.display='none'">
-                <h1>單元B3：存錢計畫</h1>
             </div>
             <div class="game-settings">
                 <div class="b-setting-group">
@@ -1298,7 +1298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${modeLabel}</div>
     <div class="b-header-right">
         <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
@@ -2694,7 +2694,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">🐷 存錢計畫</span>
+                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}</div>
                 <div class="b-header-right">
@@ -3209,7 +3209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── 第一頁：省錢清單 ──
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${diffLabel}${catLabel} · 省錢清單</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b3-res1-reward-btn">🎁 獎勵</button>
@@ -3253,7 +3253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ── 第二頁：測驗總結 ──
                 app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${diffLabel} · 測驗總結</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b3-res2-reward-btn">🎁 獎勵</button>

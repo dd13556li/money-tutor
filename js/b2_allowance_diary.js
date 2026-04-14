@@ -547,10 +547,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row">
+                    <div class="settings-title-row b-settings-title-row">
+                        <h1>單元B2：零用錢日記</h1>
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
-                        <h1>單元B2：零用錢日記</h1>
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
@@ -1038,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
             <div class="b-header">
-                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${diffLabel}${themeText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
@@ -2457,7 +2457,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
@@ -2519,7 +2519,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>

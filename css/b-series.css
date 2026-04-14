@@ -110,6 +110,14 @@
     white-space: nowrap;
 }
 
+.b-header-mascot {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 6px;
+}
+
 /* ── 設定頁：unit-welcome / welcome-content 覆寫 ─────────────────── */
 .b-series .unit-welcome {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #10b981 100%);

@@ -391,10 +391,10 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row">
+                    <div class="settings-title-row b-settings-title-row">
+                        <h1>單元B4：特賣比一比</h1>
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
-                        <h1>單元B4：特賣比一比</h1>
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
@@ -989,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">🏷️ 特賣比一比</span>
+                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🏷️ 特賣比一比</span>
                 </div>
                 <div class="b-header-center">${centerTxt}</div>
                 <div class="b-header-right">
@@ -3480,7 +3480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><span class="b-header-unit">🏷️ 特賣比一比</span></div>
+    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🏷️ 特賣比一比</span></div>
     <div class="b-header-center">${diffLabel}模式 · 省錢清單</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b4-sl-reward-btn">🎁 獎勵</button>

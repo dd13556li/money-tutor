@@ -1143,3 +1143,532 @@
     background: #047857; color: #fff; border: none; border-radius: 8px;
     padding: 8px; font-size: 14px; cursor: pointer;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   B6 Phase 2：拖曳付款頁面（b6p2- 前綴，B5 pattern）
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 參考卡（市場 + 採購清單 + 合計）── */
+.b6p2-ref-card {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    padding: 14px 16px 12px;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.15);
+    animation: bFadeIn 0.35s ease;
+}
+.b6p2-ref-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.b6p2-ref-icon  { font-size: 28px; line-height: 1; }
+.b6p2-ref-title { font-size: 17px; font-weight: 700; color: #065f46; }
+.b6p2-ref-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+.b6p2-ref-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #374151;
+    padding: 3px 0;
+    border-bottom: 1px dashed #a7f3d0;
+}
+.b6p2-ref-item:last-child { border-bottom: none; }
+.b6p2-ref-price { font-weight: 600; color: #047857; }
+.b6p2-ref-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #10b981;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+.b6p2-ref-total-label { font-size: 14px; font-weight: 700; color: #065f46; }
+.b6p2-ref-total-val   { font-size: 22px; font-weight: 900; color: #047857; }
+
+/* ── 錢包區（drop zone）── */
+.b6p2-wallet-area {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2.5px dashed #93c5fd;
+    border-radius: 16px;
+    padding: 14px 16px;
+    min-height: 120px;
+    box-shadow: inset 0 2px 8px rgba(59,130,246,0.08);
+    transition: border-color 0.25s, background 0.25s;
+}
+.b6p2-wallet-area.enough {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #34d399;
+}
+.b6p2-wallet-area.over-budget {
+    background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
+    border-color: #fca5a5;
+}
+/* "需要付款" 大標題 */
+.b6p2-wallet-coins-label {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1d4ed8;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.b6p2-wallet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.b6p2-wallet-need {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1d4ed8;
+    letter-spacing: 0.5px;
+}
+.b6p2-wallet-placed-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #374151;
+}
+.b6p2-wallet-placed-lbl { font-weight: 600; }
+.b6p2-wallet-total-val  { font-size: 15px; font-weight: 700; color: #1d4ed8; transition: color 0.25s; }
+.b6p2-wallet-total-val.enough    { color: #059669; }
+.b6p2-wallet-total-val.not-enough { color: #dc2626; }
+.b6p2-wallet-sep  { color: #9ca3af; margin: 0 2px; }
+.b6p2-wallet-goal { font-size: 13px; color: #6b7280; font-weight: 600; }
+/* 提示按鈕包裝 */
+.b6p2-hint-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+/* 進度條 */
+.b6p2-progress-wrap { padding: 4px 0 0; margin-bottom: 8px; }
+.b6p2-progress { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+.b6p2-progress-fill {
+    height: 100%; width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.35s ease, background 0.3s;
+}
+.b6p2-progress-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b6p2-progress-fill.full { background: linear-gradient(90deg, #10b981, #34d399); }
+/* 放置區 */
+.b6p2-wallet-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 64px;
+    align-items: center;
+    padding: 8px 12px;
+    background: #ffffff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    margin-top: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: border-color 0.2s, background 0.2s;
+}
+.b6p2-drop-zone.b6p2-drop-active {
+    border-color: #3b82f6 !important;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    box-shadow: inset 0 0 12px rgba(59,130,246,0.2);
+}
+.b6p2-wallet-empty {
+    width: 100%; text-align: center;
+    color: #93c5fd; font-size: 14px;
+    padding: 12px 0; user-select: none;
+}
+/* 錢包幣 */
+.b6p2-wallet-coin {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease;
+}
+.b6p2-coin-new { animation: bCoinIn 0.25s ease; }
+/* Ghost slot */
+.b6p2-ghost-slot {
+    animation: b6p2GhostIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    opacity: 0.35;
+}
+@keyframes b6p2GhostIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.7); }
+    to   { opacity: 0.35; transform: translateY(0) scale(1); }
+}
+.b6p2-wc-removable { cursor: grab; }
+.b6p2-wc-removable:active { cursor: grabbing; }
+.b6p2-wc-remove {
+    position: absolute; top: -6px; right: -6px;
+    width: 20px; height: 20px;
+    background: #ef4444; color: #fff;
+    border: none; border-radius: 50%;
+    font-size: 11px; font-weight: bold;
+    line-height: 20px; text-align: center;
+    cursor: pointer; padding: 0;
+    opacity: 0; transition: opacity 0.15s ease; z-index: 2;
+}
+.b6p2-wc-removable:hover .b6p2-wc-remove { opacity: 1; }
+.b6p2-dragging { opacity: 0.4; transform: scale(0.92); }
+
+/* ── 拖曳盤 ── */
+.b6p2-tray {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.b6p2-tray-title {
+    font-size: 14px; font-weight: 600;
+    color: #374151; margin-bottom: 12px; text-align: center;
+}
+.b6p2-tray-coins {
+    display: flex; flex-wrap: wrap;
+    gap: 10px; justify-content: center; align-items: flex-end;
+}
+.b6p2-coin-drag {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; background: transparent; border: 2px solid transparent;
+    border-radius: 12px; padding: 8px 6px 4px;
+    cursor: grab; transition: all 0.18s; user-select: none; touch-action: none;
+}
+.b6p2-coin-drag:hover {
+    border-color: rgba(16,185,129,0.5);
+    background: rgba(16,185,129,0.07);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(16,185,129,0.2);
+}
+.b6p2-coin-drag:active { cursor: grabbing; }
+.b6p2-coin-drag.b6p2-dragging { opacity: 0.4; transform: scale(0.92); }
+.b6p2-coin-drag .coin-img     { width: 60px;  height: 60px; }
+.b6p2-coin-drag .banknote-img { width: 100px; height: auto; }
+
+/* ── 震動動畫 ── */
+@keyframes b6p2Shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+}
+
+/* ── RWD ── */
+@media (max-width: 480px) {
+    .b6p2-ref-title          { font-size: 15px; }
+    .b6p2-ref-total-val      { font-size: 18px; }
+    .b6p2-wallet-need        { font-size: 18px; }
+    .b6p2-wallet-coins-label { font-size: 18px; }
+    .b6p2-coin-drag .coin-img     { width: 48px; height: 48px; }
+    .b6p2-coin-drag .banknote-img { width: 80px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   B6 Phase 1 重設計：任務卡 + 市場卡 + 結帳列
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 任務卡（B1 schedule-card pattern，綠色主題）── */
+.b6-task-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid #86efac;
+    border-top: 4px solid #10b981;
+    border-radius: 16px;
+    padding: 14px 16px 10px;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.12);
+    animation: bFadeIn 0.4s ease;
+}
+
+/* 任務卡標題列 */
+.b6-task-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.b6-task-hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.b6-task-mascot {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+.b6-task-hdr-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.b6-task-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #065f46;
+    white-space: nowrap;
+}
+.b6-task-budget {
+    font-size: 13px;
+    color: #374151;
+}
+.b6-task-budget strong {
+    font-size: 15px;
+    color: #d97706;
+    font-weight: 800;
+}
+
+/* 任務清單項目（覆蓋舊 .b6-list-card 的 border-bottom 細節） */
+.b6-task-items {
+    background: rgba(255,255,255,0.65);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.b6-task-items .b6-list-item { border-bottom: 1px dashed #bbf7d0; }
+.b6-task-items .b6-list-item:last-child { border-bottom: none; }
+
+/* 每列增加價格欄 */
+.b6-list-price {
+    font-size: 12px;
+    font-weight: 600;
+    color: #059669;
+    margin-left: auto;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+.b6-list-item.checked .b6-list-price { color: #6b7280; }
+
+/* ── 市場卡（白底+綠邊，包住攤位區）── */
+.b6-market-card {
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.1);
+    animation: bFadeIn 0.4s ease 0.05s both;
+}
+.b6-market-card .b6-stall-tabs {
+    padding: 10px 10px 0;
+    animation: none;
+}
+.b6-market-card .b6-stall-panel {
+    border: none;
+    border-radius: 0;
+    animation: none;
+}
+.b6-market-card .b6-stall-panel-header {
+    background: #f0fdf4;
+    border-bottom: 2px solid #bbf7d0;
+}
+
+/* 清單中項目在市場中：highlight */
+.b6-product-btn.in-list {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+.b6-product-btn.in-list:hover:not(.collected) {
+    border-color: #059669;
+    background: #dcfce7;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+}
+.b6-product-collected-mark {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ── 結帳列（取代深色 .b6-basket-bar）── */
+.b6-checkout-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    padding: 10px 14px;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.12);
+    animation: bFadeIn 0.4s ease 0.1s both;
+}
+.b6-cstrip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.b6-cstrip-count {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 600;
+}
+.b6-cstrip-count strong {
+    color: #059669;
+    font-size: 15px;
+}
+.b6-cstrip-total {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+}
+.b6-cstrip-total .b6-basket-total {
+    color: #d97706;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+/* Checkout button — larger in strip context */
+.b6-checkout-strip .b6-checkout-btn {
+    flex-shrink: 0;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 10px;
+}
+
+@media (max-width: 480px) {
+    .b6-task-mascot  { width: 36px; height: 36px; }
+    .b6-task-title   { font-size: 14px; }
+    .b6-cstrip-total .b6-basket-total { font-size: 15px; }
+    .b6-checkout-strip .b6-checkout-btn { padding: 8px 14px; font-size: 14px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   B6 卡片式佈局 — max-width（同 B5 pattern）
+   ══════════════════════════════════════════════════════════════ */
+.b6-unit .game-container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 12px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* ── 攤位左右導航（取代 tabs）── */
+.b6-stall-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 8px;
+    background: #f0fdf4;
+    border-bottom: 2px solid #bbf7d0;
+    border-radius: 14px 14px 0 0;
+}
+
+.b6-snav-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    color: #059669;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    user-select: none;
+}
+.b6-snav-btn:hover:not(:disabled) {
+    background: #d1fae5;
+    transform: scale(1.1);
+}
+.b6-snav-btn:disabled {
+    border-color: #d1d5db;
+    color: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.b6-snav-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.b6-snav-label {
+    font-size: 17px;
+    font-weight: 800;
+    color: #065f46;
+    text-align: center;
+}
+
+.b6-snav-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.b6-snav-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: all 0.2s;
+    cursor: default;
+}
+.b6-snav-dot.active {
+    background: #059669;
+    width: 14px;
+    border-radius: 7px;
+    box-shadow: 0 0 6px rgba(5,150,105,0.5);
+}
+.b6-snav-dot.has-items {
+    background: #f59e0b;
+}
+.b6-snav-dot.done {
+    background: #10b981;
+}
+
+/* 去掉 stall-panel 上方邊框（由 nav 提供） */
+.b6-market-card .b6-stall-panel {
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+}
+
+/* ── Phase 2 我的金錢區 標籤 ── */
+.b6p2-my-money-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin: 8px 0 4px;
+    padding: 4px 10px;
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 8px;
+    display: inline-block;
+    align-self: flex-start;
+}
+
+/* ── Phase 2 金錢拖曳區 副標題 ── */
+.b6p2-tray-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 480px) {
+    .b6-snav-btn    { width: 34px; height: 34px; font-size: 14px; }
+    .b6-snav-label  { font-size: 15px; }
+}

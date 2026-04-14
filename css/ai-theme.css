@@ -2066,6 +2066,21 @@ a:not(.selection-btn):not(.choice-btn):hover {
     .settings-title-row::after { width: 48px; height: 48px; }
 }
 
+/* B 系列：吉祥物在標題右側（h1 在前、img 在後） */
+.b-settings-title-row::before {
+    content: '';
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    visibility: hidden;
+}
+.b-settings-title-row::after {
+    display: none;
+}
+@media (max-width: 600px) {
+    .b-settings-title-row::before { width: 48px; height: 48px; }
+}
+
 /* 完成畫面 — 吉祥物標題列（圖片在左，標題真正置中） */
 .results-title-row {
     display: flex;

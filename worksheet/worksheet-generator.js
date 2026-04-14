@@ -128,7 +128,7 @@ class WorksheetGenerator {
     }
 
     renderPage(config, questions) {
-        let html = `<div class="worksheet-page">`;
+        let html = `<div class="worksheet-page" data-unit="${this.unitId}">`;
 
         // 標題（含姓名日期在分隔線上方）
         html += `<div class="worksheet-header">

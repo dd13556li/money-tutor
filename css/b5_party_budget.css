@@ -2,6 +2,18 @@
    FILE: css/b5_party_budget.css — B5 生日派對預算 專屬樣式
    ================================================================= */
 
+/* ── 頁面容器：卡片不滿版，置中，統一最大寬度 ──────────────────── */
+.b5-unit .game-container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 12px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
 /* ── 預算橫幅 ────────────────────────────────────────────────── */
 .b5-budget-banner {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
@@ -59,34 +71,31 @@
 .b5-total-amount { font-size: 1.3rem; }
 .b5-remaining    { font-size: 14px; opacity: 0.8; }
 
-/* ── 商品清單 ────────────────────────────────────────────────── */
-.b5-items-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+/* ── 商品條列（B1 schedule-items pattern）────────────────────── */
+.b5-schedule-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
     animation: bFadeIn 0.4s ease 0.1s both;
 }
 
 .b5-item-card {
     background: #fff;
-    border: 3px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 14px 12px;
+    border: 1.5px solid #fde68a;
+    border-radius: 10px;
+    padding: 10px 14px;
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
-    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 6px;
-    text-align: center;
 }
 
 .b5-item-card:hover:not(.locked):not(.disabled) {
+    background: #fffbeb;
     border-color: #f59e0b;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(245,158,11,0.2);
 }
 
 .b5-item-card.selected {
@@ -95,7 +104,7 @@
 }
 
 .b5-item-card.locked {
-    border-color: #6366f1;
+    border-color: #a5b4fc;
     background: #ede9fe;
     cursor: default;
 }
@@ -105,25 +114,61 @@
     cursor: not-allowed;
 }
 
-.b5-item-icon { font-size: 32px; }
+/* B1-style 條列內容 */
+.b5-item-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.b5-item-bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.b5-item-money-icons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    min-height: 28px;
+}
+
+/* 桌面：逐枚；手機：分組×N */
+.b5-mic-desktop { display: none; }
+.b5-mic-mobile  { display: contents; }
+.b5-mic-item {
+    display: inline-flex; align-items: center; gap: 2px;
+    vertical-align: middle;
+}
+.b5-mic-count {
+    font-size: 12px; font-weight: bold; color: #374151;
+}
+
+@media (min-width: 480px) {
+    .b5-mic-desktop { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .b5-mic-mobile  { display: none; }
+}
 
 .b5-item-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     color: #374151;
+    flex: 1;
 }
 
 .b5-item-price {
     font-size: 1.1rem;
     font-weight: bold;
     color: #d97706;
+    white-space: nowrap;
+    text-align: right;
 }
 
 /* 必買標記 */
 .b5-must-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
     background: #6366f1;
     color: #fff;
     font-size: 11px;
@@ -131,26 +176,50 @@
     padding: 2px 7px;
     border-radius: 20px;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
-/* 勾選標記 */
+/* 勾選標記（行內顯示，未選時隱藏） */
 .b5-check-mark {
-    position: absolute;
-    top: 6px;
-    left: 8px;
-    font-size: 20px;
+    font-size: 18px;
     display: none;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
-.b5-item-card.selected .b5-check-mark,
-.b5-item-card.locked .b5-check-mark {
-    display: block;
+.b5-item-card.selected .b5-check-mark {
+    display: inline;
+}
+
+/* ✕ 取消選擇按鈕（已選時顯示） */
+.b5-deselect-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.15s;
+}
+
+.b5-deselect-btn:hover { background: #dc2626; }
+
+.b5-item-card.selected .b5-deselect-btn {
+    display: inline-flex;
 }
 
 /* ── 確認按鈕 ─────────────────────────────────────────────── */
 .b5-confirm-btn {
-    width: 100%;
-    padding: 16px;
+    padding: 12px 32px;
     background: linear-gradient(135deg, #10b981, #059669);
     color: #fff;
     font-size: 18px;
@@ -159,6 +228,7 @@
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .b5-confirm-btn:hover:not(:disabled) {
@@ -240,17 +310,15 @@
 
 /* ── 預算提示按鈕（B1 hint pattern）──────────────────────────── */
 .b5-hint-btn {
-    width: 100%;
-    padding: 10px;
+    padding: 8px 14px;
     background: #fff;
     color: #92400e;
     border: 2px solid #fbbf24;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
-    margin-bottom: 8px;
 }
 .b5-hint-btn:hover { background: #fef9c3; border-color: #f59e0b; }
 
@@ -687,13 +755,26 @@
 }
 
 /* ── Round 42：必買/選購分組佈局（A4 商品分類 pattern）── */
-.b5-section-group { margin-bottom: 10px; }
+/* ── 選購商品區：卡片呈現 ─────────────────────────────────────── */
+.b5-section-group {
+    background: #fff;
+    border: 1.5px solid #d1fae5;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+}
+
+.b5-section-group .b5-schedule-items {
+    padding: 10px 12px 12px;
+    margin-bottom: 0;
+}
+
 .b5-section-hd {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 14px;
-    border-radius: 10px 10px 0 0;
+    padding: 8px 14px;
+    border-radius: 0;
     font-weight: 700;
     font-size: 14px;
     letter-spacing: 0.3px;
@@ -709,6 +790,33 @@
     border-left: 5px solid #10b981;
 }
 .b5-section-sub { font-size: 13px; font-weight: 600; }
+
+/* ── 分頁按鈕 ────────────────────────────────────────────────── */
+.b5-page-btn {
+    background: #fff;
+    border: 1.5px solid #10b981;
+    color: #065f46;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    white-space: nowrap;
+}
+.b5-page-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+.b5-page-btn:not(:disabled):active {
+    background: #d1fae5;
+}
+.b5-section-title-center {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+}
 
 /* ── Round 43：困難模式翻牌動畫 ── */
 @keyframes b5FlipReveal {
@@ -833,3 +941,410 @@
     70%  { opacity: 1; transform: translateY(-20px); }
     100% { opacity: 0; transform: translateY(-30px); }
 }
+
+/* ── 新版行程卡式標題區 ──────────────────────────────────────── */
+.b5-schedule-card {
+    background: linear-gradient(135deg, #fef3c7, #fde68a 120%);
+    border-radius: 16px;
+    padding: 14px 16px 12px;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.25);
+    animation: bFadeIn 0.35s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ① 標題列：水平置中 */
+.b5-sch-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.b5-sch-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* ② 操作列：朗讀已選（左）/ 提示卡（右） */
+.b5-sch-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+/* 提示按鈕以卡片呈現，靠右 */
+.b5-hint-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1.5px solid #fbbf24;
+    border-radius: 20px;
+    padding: 4px 12px 4px 8px;
+    box-shadow: 0 2px 6px rgba(245,158,11,0.15);
+}
+
+.b5-hint-card .b5-hint-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* ③ 預算資訊卡：金錢圖示（左）+ 已選/預算（右） */
+.b5-budget-info-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.b5-budget-info-card.ok  { border-color: #10b981; background: #f0fdf4; }
+.b5-budget-info-card.near { border-color: #f59e0b; background: #fffbeb; }
+.b5-budget-info-card.over { border-color: #ef4444; background: #fef2f2; }
+
+.b5-bic-icons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.b5-bic-amount {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.b5-bic-selected {
+    font-size: 17px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.b5-budget-info-card.near .b5-bic-selected { color: #d97706; }
+.b5-budget-info-card.over .b5-bic-selected { color: #dc2626; }
+
+.b5-bic-sep {
+    color: #9ca3af;
+    margin: 0 2px;
+}
+
+.b5-bic-total {
+    color: #6b7280;
+}
+
+/* ⑤ 確認購買：auto-fit 寬度 */
+.b5-confirm-area {
+    display: flex;
+    justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   B5 Phase 2：付款頁面（b5p2- 前綴）
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 參考卡（派對主題 + 已選商品 + 合計）── */
+.b5p2-ref-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    padding: 14px 16px 12px;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.20);
+    animation: bFadeIn 0.35s ease;
+}
+.b5p2-ref-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.b5p2-ref-icon  { font-size: 28px; line-height: 1; }
+.b5p2-ref-title { font-size: 17px; font-weight: 700; color: #92400e; }
+.b5p2-ref-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+.b5p2-ref-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #374151;
+    padding: 2px 0;
+    border-bottom: 1px dashed #fcd34d;
+}
+.b5p2-ref-item:last-child { border-bottom: none; }
+.b5p2-ref-price { font-weight: 600; color: #92400e; }
+.b5p2-ref-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #f59e0b;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+.b5p2-ref-total-label { font-size: 14px; font-weight: 700; color: #78350f; }
+.b5p2-ref-total-val   { font-size: 22px; font-weight: 900; color: #d97706; }
+
+/* ── 錢包區（drop zone）── */
+.b5p2-wallet-area {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2.5px dashed #93c5fd;
+    border-radius: 16px;
+    padding: 14px 16px;
+    min-height: 120px;
+    box-shadow: inset 0 2px 8px rgba(59,130,246,0.08);
+    transition: border-color 0.25s, background 0.25s;
+}
+.b5p2-wallet-area.enough {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #34d399;
+}
+.b5p2-wallet-area.over-budget {
+    background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
+    border-color: #fca5a5;
+}
+
+/* 錢包標題列 */
+.b5p2-wallet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+/* "需要 X 元" 大標題（取代 "👛 我的錢包"）*/
+.b5p2-wallet-need {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1d4ed8;
+    letter-spacing: 0.5px;
+}
+.b5p2-wallet-placed-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #374151;
+}
+.b5p2-wallet-placed-lbl { font-weight: 600; }
+.b5p2-wallet-total-val  {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1d4ed8;
+    transition: color 0.25s;
+}
+.b5p2-wallet-total-val.enough    { color: #059669; }
+.b5p2-wallet-total-val.not-enough { color: #dc2626; }
+.b5p2-wallet-sep  { color: #9ca3af; margin: 0 2px; }
+.b5p2-wallet-goal { font-size: 13px; color: #6b7280; font-weight: 600; }
+
+/* 進度條 */
+.b5p2-progress-wrap {
+    padding: 4px 0 0;
+    margin-bottom: 8px;
+}
+.b5p2-progress {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.b5p2-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.35s ease, background 0.3s;
+}
+.b5p2-progress-fill.near { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b5p2-progress-fill.full { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* "預算金額" 標籤（卡片最上方，字號同 b5p2-wallet-need）*/
+.b5p2-wallet-coins-label {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1d4ed8;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+/* 錢包放置區（幣格）*/
+.b5p2-wallet-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 64px;
+    align-items: center;
+    padding: 8px 12px;
+    background: #ffffff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    margin-top: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: border-color 0.2s, background 0.2s;
+}
+.b5p2-drop-zone.b5p2-drop-active {
+    border-color: #3b82f6 !important;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    box-shadow: inset 0 0 12px rgba(59,130,246,0.2);
+}
+.b5p2-wallet-empty {
+    width: 100%;
+    text-align: center;
+    color: #93c5fd;
+    font-size: 14px;
+    padding: 12px 0;
+    user-select: none;
+}
+
+/* 錢包幣（放入後）*/
+.b5p2-wallet-coin {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease;
+}
+/* 新放入的幣才播入場動畫（避免全區重繪時閃爍）*/
+.b5p2-coin-new {
+    animation: bCoinIn 0.25s ease;
+}
+/* Ghost slot（easy 提示）*/
+.b5p2-ghost-slot {
+    animation: b5p2GhostIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    opacity: 0.35;
+}
+@keyframes b5p2GhostIn {
+    from { opacity: 0;    transform: translateY(-12px) scale(0.7); }
+    to   { opacity: 0.35; transform: translateY(0) scale(1); }
+}
+/* 可拖回的幣 */
+.b5p2-wc-removable { cursor: grab; }
+.b5p2-wc-removable:active { cursor: grabbing; }
+.b5p2-wc-remove {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 20px; height: 20px;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 2;
+}
+.b5p2-wc-removable:hover .b5p2-wc-remove { opacity: 1; }
+
+/* 正在拖曳中的幣（from wallet back to tray）*/
+.b5p2-dragging { opacity: 0.4; transform: scale(0.92); }
+
+/* 錢包幣圖示尺寸（與拖曳盤一致）*/
+.b5p2-wallet-coin .coin-img     { width: 60px;  height: 60px; }
+.b5p2-wallet-coin .banknote-img { width: 100px; height: auto; }
+
+/* ── 錢幣托盤 ── */
+.b5p2-tray {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.b5p2-tray-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+    text-align: center;
+}
+.b5p2-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* 拖曳幣按鈕 */
+.b5p2-coin-drag {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 8px 6px 4px;
+    cursor: grab;
+    transition: all 0.18s;
+    user-select: none;
+    touch-action: none;
+}
+.b5p2-coin-drag:hover {
+    border-color: rgba(245,158,11,0.5);
+    background: rgba(245,158,11,0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(245,158,11,0.2);
+}
+.b5p2-coin-drag:active { cursor: grabbing; }
+.b5p2-coin-drag.b5p2-dragging { opacity: 0.4; transform: scale(0.92); }
+.b5p2-coin-drag .coin-img     { width: 60px;  height: 60px; }
+.b5p2-coin-drag .banknote-img { width: 100px; height: auto; }
+.b5p2-denom-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #6b7280;
+}
+
+/* ── 震動動畫（答錯時）── */
+@keyframes b5p2Shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+}
+.b5p2-shake { animation: b5p2Shake 0.5s ease; }
+
+/* ── RWD ── */
+@media (max-width: 480px) {
+    .b5p2-ref-title         { font-size: 15px; }
+    .b5p2-ref-total-val     { font-size: 18px; }
+    .b5p2-wallet-need       { font-size: 18px; }
+    .b5p2-coin-drag .coin-img     { width: 48px; height: 48px; }
+    .b5p2-coin-drag .banknote-img { width: 80px; }
+    .b5p2-wallet-coin .coin-img     { width: 48px; height: 48px; }
+    .b5p2-wallet-coin .banknote-img { width: 80px; }
+}
+

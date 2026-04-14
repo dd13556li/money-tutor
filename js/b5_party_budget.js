@@ -5,19 +5,21 @@
 
 // ── 所有可選商品 ─────────────────────────────────────────────
 const B5_ALL_ITEMS = [
-    { id: 'cake',      name: '生日蛋糕',  price: 380, icon: '🎂', must: true  },
-    { id: 'drink',     name: '果汁飲料',  price: 120, icon: '🧃', must: true  },
-    { id: 'balloon',   name: '彩色氣球',  price: 50,  icon: '🎈', must: false },
-    { id: 'gift',      name: '小禮物',    price: 200, icon: '🎁', must: false },
-    { id: 'plate',     name: '派對紙盤',  price: 45,  icon: '🍽️', must: false },
-    { id: 'candle',    name: '生日蠟燭',  price: 30,  icon: '🕯️', must: false },
-    { id: 'ribbon',    name: '彩帶裝飾',  price: 65,  icon: '🎊', must: false },
-    { id: 'hat',       name: '派對帽',    price: 80,  icon: '🎉', must: false },
-    { id: 'candy',     name: '糖果禮包',  price: 90,  icon: '🍬', must: false },
-    { id: 'photo',     name: '拍立得相機',price: 150, icon: '📸', must: false },
-    { id: 'popper',    name: '噴彩拉炮',  price: 55,  icon: '🎆', must: false },
-    { id: 'banner',    name: '生日橫幅',  price: 70,  icon: '🏷️', must: false },
+    { id: 'cake',      name: '生日蛋糕',  price: 380, icon: '🎂' },
+    { id: 'drink',     name: '果汁飲料',  price: 120, icon: '🧃' },
+    { id: 'balloon',   name: '彩色氣球',  price: 50,  icon: '🎈' },
+    { id: 'gift',      name: '小禮物',    price: 200, icon: '🎁' },
+    { id: 'plate',     name: '派對紙盤',  price: 45,  icon: '🍽️' },
+    { id: 'candle',    name: '生日蠟燭',  price: 30,  icon: '🕯️' },
+    { id: 'ribbon',    name: '彩帶裝飾',  price: 65,  icon: '🎊' },
+    { id: 'hat',       name: '派對帽',    price: 80,  icon: '🎉' },
+    { id: 'candy',     name: '糖果禮包',  price: 90,  icon: '🍬' },
+    { id: 'photo',     name: '拍立得相機',price: 150, icon: '📸' },
+    { id: 'popper',    name: '噴彩拉炮',  price: 55,  icon: '🎆' },
+    { id: 'banner',    name: '生日橫幅',  price: 70,  icon: '🏷️' },
 ];
+
+const ITEMS_PER_PAGE = 5; // 每頁顯示商品數
 
 // ── 關卡設定（依難度，每關有預算和可用商品清單）──────────────
 const B5_SCENARIOS = {
@@ -74,16 +76,16 @@ const B5_THEMES = {
     halloween: {
         name: '萬聖節派對', icon: '🎃',
         allItems: [
-            { id:'pumpkin',  name:'南瓜燈',    price:150, icon:'🎃', must:true  },
-            { id:'costume',  name:'萬聖節服裝', price:250, icon:'👻', must:true  },
-            { id:'candy_bag',name:'糖果袋',     price:80,  icon:'🍬', must:false },
-            { id:'witch_hat',name:'巫師帽',     price:60,  icon:'🧙', must:false },
-            { id:'spider',   name:'蜘蛛網裝飾', price:45,  icon:'🕸️', must:false },
-            { id:'skull',    name:'骷髏擺件',   price:70,  icon:'💀', must:false },
-            { id:'glow',     name:'螢光棒',     price:25,  icon:'🌟', must:false },
-            { id:'ghost',    name:'鬼臉面具',   price:90,  icon:'😱', must:false },
-            { id:'treat',    name:'糖果包裝袋', price:40,  icon:'🛍️', must:false },
-            { id:'fangs',    name:'吸血鬼牙齒', price:30,  icon:'🦷', must:false },
+            { id:'pumpkin',  name:'南瓜燈',    price:150, icon:'🎃' },
+            { id:'costume',  name:'萬聖節服裝', price:250, icon:'👻' },
+            { id:'candy_bag',name:'糖果袋',     price:80,  icon:'🍬' },
+            { id:'witch_hat',name:'巫師帽',     price:60,  icon:'🧙' },
+            { id:'spider',   name:'蜘蛛網裝飾', price:45,  icon:'🕸️' },
+            { id:'skull',    name:'骷髏擺件',   price:70,  icon:'💀' },
+            { id:'glow',     name:'螢光棒',     price:25,  icon:'🌟' },
+            { id:'ghost',    name:'鬼臉面具',   price:90,  icon:'😱' },
+            { id:'treat',    name:'糖果包裝袋', price:40,  icon:'🛍️' },
+            { id:'fangs',    name:'吸血鬼牙齒', price:30,  icon:'🦷' },
         ],
         scenarios: {
             easy: [
@@ -119,16 +121,16 @@ const B5_THEMES = {
     picnic: {
         name: '春日野餐', icon: '🌸',
         allItems: [
-            { id:'sandwich', name:'三明治',    price:120, icon:'🥪', must:true  },
-            { id:'blanket',  name:'野餐墊',    price:180, icon:'🧺', must:true  },
-            { id:'fruit',    name:'水果盒',    price:95,  icon:'🍓', must:false },
-            { id:'juice',    name:'果汁飲料',  price:60,  icon:'🧃', must:false },
-            { id:'cookies',  name:'餅乾點心',  price:75,  icon:'🍪', must:false },
-            { id:'sunhat',   name:'遮陽帽',    price:150, icon:'👒', must:false },
-            { id:'frisbee',  name:'飛盤',      price:85,  icon:'🥏', must:false },
-            { id:'bubble',   name:'泡泡水',    price:30,  icon:'🫧', must:false },
-            { id:'balloon',  name:'彩色汽球',  price:50,  icon:'🎈', must:false },
-            { id:'kite',     name:'風箏',      price:160, icon:'🪁', must:false },
+            { id:'sandwich', name:'三明治',    price:120, icon:'🥪' },
+            { id:'blanket',  name:'野餐墊',    price:180, icon:'🧺' },
+            { id:'fruit',    name:'水果盒',    price:95,  icon:'🍓' },
+            { id:'juice',    name:'果汁飲料',  price:60,  icon:'🧃' },
+            { id:'cookies',  name:'餅乾點心',  price:75,  icon:'🍪' },
+            { id:'sunhat',   name:'遮陽帽',    price:150, icon:'👒' },
+            { id:'frisbee',  name:'飛盤',      price:85,  icon:'🥏' },
+            { id:'bubble',   name:'泡泡水',    price:30,  icon:'🫧' },
+            { id:'balloon',  name:'彩色汽球',  price:50,  icon:'🎈' },
+            { id:'kite',     name:'風箏',      price:160, icon:'🪁' },
         ],
         scenarios: {
             easy: [
@@ -361,10 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row">
+                    <div class="settings-title-row b-settings-title-row">
+                        <h1>單元B5：生日派對預算</h1>
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
-                        <h1>單元B5：生日派對預算</h1>
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
@@ -652,10 +654,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const effectiveThemeKey = scenario._themeKey || this.state.settings.partyTheme;
             const themeData = B5_THEMES[effectiveThemeKey] || B5_THEMES.birthday;
             g.items        = scenario.availableIds.map(id => themeData.allItems.find(i => i.id === id)).filter(Boolean);
-            g.selectedIds  = new Set(g.items.filter(i => i.must).map(i => i.id));
+            // 確保所有商品總額 > 預算（讓選擇有挑戰性）
+            const itemsTotal = g.items.reduce((s, i) => s + i.price, 0);
+            if (itemsTotal <= g.budget) {
+                const usedIds = new Set(g.items.map(i => i.id));
+                const extras = themeData.allItems.filter(i => !usedIds.has(i.id))
+                    .sort((a, b) => b.price - a.price);
+                for (const extra of extras) {
+                    g.items.push(extra);
+                    if (g.items.reduce((s, i) => s + i.price, 0) > g.budget) break;
+                }
+            }
+            g.selectedIds  = new Set(); // 進度條從 0 開始
             g.submitted    = false;
             g.roundErrors  = 0; // 每關重置錯誤計數（B4 autoHint pattern）
             g.customItems  = []; // 自訂商品
+            g.itemPage     = 0;  // 商品分頁，從第一頁開始
 
             const app = document.getElementById('app');
             app.innerHTML = this._renderRoundHTML();
@@ -750,29 +764,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const g        = this.state.game;
             const pct      = Math.round((g.currentRound / g.totalRounds) * 100);
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || '';
+            const themeIcon = (B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday).icon;
 
             const isHardPriceHide = this.state.settings.difficulty === 'hard';
 
-            // 必買/選購分組（A4 商品分類 pattern，Round 42）
-            const renderCard = item => `
-                <div class="b5-item-card ${item.must ? 'locked' : ''}${isHardPriceHide && !item.must ? ' b5-price-hidden' : ''}" data-id="${item.id}">
-                    <span class="b5-check-mark">✅</span>
-                    ${item.must ? '<span class="b5-must-badge">🔒 必買</span>' : ''}
-                    <span class="b5-item-icon">${item.icon}</span>
-                    <span class="b5-item-name">${item.name}</span>
-                    <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide && !item.must ? '??? 元' : item.price + ' 元'}</span>
+            // 第一頁商品（分頁顯示）
+            const renderCard = item => {
+                const moneyHTML = this._renderB5MoneyIcons(item.price);
+                return `
+                <div class="b5-item-card${isHardPriceHide ? ' b5-price-hidden' : ''}" data-id="${item.id}">
+                    <div class="b5-item-top">
+                        <span class="b5-item-name">${item.icon} ${item.name}</span>
+                        <span class="b5-check-mark">✅</span>
+                        <button class="b5-deselect-btn" data-id="${item.id}" title="取消選擇">✕</button>
+                    </div>
+                    <div class="b5-item-bottom">
+                        <div class="b5-item-money-icons">${moneyHTML}</div>
+                        <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide ? '??? 元' : item.price + ' 元'}</span>
+                    </div>
                 </div>`;
-            const mustItems   = g.items.filter(i => i.must);
-            const optItems    = g.items.filter(i => !i.must);
-            const mustTotal   = mustItems.reduce((s, i) => s + i.price, 0);
-            const optBudget   = Math.max(0, g.budget - mustTotal);
-            const mustItemsHTML = mustItems.map(renderCard).join('');
-            const optItemsHTML  = optItems.map(renderCard).join('');
+            };
+            const pageItems    = g.items.slice(0, ITEMS_PER_PAGE); // 第一頁
+            const totalPages   = Math.ceil(g.items.length / ITEMS_PER_PAGE);
+            const optItemsHTML = pageItems.map(renderCard).join('');
 
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">🎂 生日派對預算</span>
+                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
+                    <span class="b-header-unit">${themeIcon} 生日派對預算</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
@@ -785,54 +805,133 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="progress-bar-wrap">
                     <div class="progress-bar-fill" style="width:${pct}%"></div>
                 </div>
-                <div class="b5-round-info">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</div>
 
-                <div class="b5-budget-banner">
-                    <div class="b5-budget-label">
-                        🎉 今天辦派對的預算
+                <div class="b5-schedule-card">
+                    <!-- ① 標題列（水平置中）-->
+                    <div class="b5-sch-title-row">
+                        <span class="b5-sch-title">${themeIcon} 生日派對預算</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
-                    <div class="b5-budget-amount">${g.budget} 元</div>
-                </div>
 
-                <div class="b5-total-bar ok" id="b5-total-bar">
-                    <span>已選：<span class="b5-total-amount" id="b5-total-amount">0</span> 元</span>
-                    <span class="b5-sel-count" id="b5-sel-count">0 件</span>
-                    <span class="b5-remaining" id="b5-remaining">還剩 ${g.budget} 元</span>
-                </div>
-                <div class="b5-budget-meter" style="position:relative">
-                    <div class="b5-budget-meter-fill ok" id="b5-budget-meter-fill" style="width:0%"></div>
-                    <div class="b5-must-marker" id="b5-must-marker" title="必買"></div>
-                    <span class="b5-meter-label" id="b5-meter-label">0%</span>
-                </div>
-
-                ${mustItems.length > 0 ? `
-                <div class="b5-section-group">
-                    <div class="b5-section-hd b5-section-hd-must">
-                        <span>🔒 必買商品</span>
-                        <span class="b5-section-sub">${mustTotal} 元（固定）</span>
+                    <!-- ② 操作列：朗讀已選（左） + 提示卡（右）-->
+                    <div class="b5-sch-actions-row">
+                        <button class="b5-read-selected-btn" id="b5-read-selected-btn">🔊 朗讀已選</button>
+                        <div class="b5-hint-card">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+                            <button class="b5-hint-btn" id="b5-hint-btn">💡 提示</button>
+                        </div>
                     </div>
-                    <div class="b5-items-grid">${mustItemsHTML}</div>
-                </div>` : ''}
+
+                    <!-- ③ 預算資訊卡：金錢圖示（左）+ 已選/總預算（右）-->
+                    <div class="b5-budget-info-card ok" id="b5-budget-info-card">
+                        <div class="b5-bic-icons">${this._renderB5MoneyIcons(g.budget)}</div>
+                        <div class="b5-bic-amount">
+                            已選 <span id="b5-total-amount" class="b5-bic-selected">0</span>元
+                            <span class="b5-bic-sep">/</span>
+                            <span class="b5-bic-total">${g.budget}</span>元
+                        </div>
+                    </div>
+
+                    <!-- ④ 進度條 -->
+                    <div class="b5-budget-meter" style="position:relative;margin-top:6px;">
+                        <div class="b5-budget-meter-fill ok" id="b5-budget-meter-fill" style="width:0%"></div>
+                        <span class="b5-meter-label" id="b5-meter-label">0%</span>
+                    </div>
+
+                    <!-- ⑤ 確認購買（auto-fit 寬度）-->
+                    <div class="b5-confirm-area">
+                        <button class="b5-confirm-btn" id="b5-confirm-btn">確認購買</button>
+                    </div>
+                </div>
+
                 <div class="b5-section-group">
                     <div class="b5-section-hd b5-section-hd-opt">
-                        <span>✨ 選購商品</span>
-                        <span class="b5-section-sub" id="b5-opt-budget">可用 ${optBudget} 元</span>
+                        <button class="b5-page-btn" id="b5-prev-page-btn" ${g.itemPage === 0 ? 'disabled' : ''}>◀ 上一頁</button>
+                        <span class="b5-section-title-center">✨ 選購商品</span>
+                        <button class="b5-page-btn" id="b5-next-page-btn" ${totalPages <= 1 ? 'disabled' : ''}>下一頁 ▶</button>
                     </div>
-                    <div class="b5-items-grid" id="b5-items-grid">${optItemsHTML}</div>
+                    <div class="b5-schedule-items" id="b5-items-grid">${optItemsHTML}</div>
                 </div>
 
                 <div id="b5-result-area"></div>
                 <div id="b5-custom-items-list"></div>
                 ${this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy' ? this._renderCustomItemsPanel() : ''}
-
-                <span style="display:inline-flex;align-items:center;gap:4px;">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
-                    <button class="b5-hint-btn" id="b5-hint-btn">💡 還能選什麼？</button>
-                </span>
-                <button class="b5-read-selected-btn" id="b5-read-selected-btn">🔊 朗讀已選</button>
-                <button class="b5-confirm-btn" id="b5-confirm-btn">✅ 確認購買！</button>
             </div>`;
+        },
+
+        // ── B1-style 金錢圖示（貪婪分解面額，桌面逐枚 / 手機分組×N）────
+        _renderB5MoneyIcons(amount) {
+            const rf = () => Math.random() < 0.5 ? 'back' : 'front';
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = amount;
+            const groups = [];
+            for (const d of denoms) {
+                if (rem <= 0) break;
+                const count = Math.floor(rem / d);
+                if (count > 0) { groups.push({ denom: d, count }); rem -= count * d; }
+                if (groups.length >= 4) break;
+            }
+            if (groups.length === 0) return '';
+            // 手機版：分組 ×N
+            const mobileHTML = groups.map(grp => {
+                const isBill = grp.denom >= 100;
+                const w = isBill ? 34 : 24;
+                const badge = grp.count > 1 ? `<span class="b5-mic-count">×${grp.count}</span>` : '';
+                return `<span class="b5-mic-item">
+                    <img src="../images/money/${grp.denom}_yuan_${rf()}.png" alt="${grp.denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">${badge}
+                </span>`;
+            }).join('');
+            // 桌面版：逐枚（最多10枚）
+            const coins = [];
+            for (const grp of groups) {
+                for (let i = 0; i < grp.count && coins.length < 10; i++) coins.push(grp.denom);
+            }
+            const desktopHTML = coins.map(d => {
+                const isBill = d >= 100;
+                const w = isBill ? 68 : 44;
+                return `<img src="../images/money/${d}_yuan_${rf()}.png" alt="${d}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;flex-shrink:0;border-radius:${isBill ? '4px' : '50%'}"
+                     onerror="this.style.display='none'" draggable="false">`;
+            }).join('');
+            return `<span class="b5-mic-desktop">${desktopHTML}</span><span class="b5-mic-mobile">${mobileHTML}</span>`;
+        },
+
+        // ── 分頁渲染當前頁商品（pagination）────────────────────────
+        _renderItemsPage() {
+            const g = this.state.game;
+            const isHardPriceHide = this.state.settings.difficulty === 'hard';
+            const start = g.itemPage * ITEMS_PER_PAGE;
+            const pageItems = g.items.slice(start, start + ITEMS_PER_PAGE);
+            const totalPages = Math.ceil(g.items.length / ITEMS_PER_PAGE);
+
+            const renderCard = item => {
+                const moneyHTML = this._renderB5MoneyIcons(item.price);
+                const isSelected = g.selectedIds.has(item.id);
+                return `
+                <div class="b5-item-card${isHardPriceHide ? ' b5-price-hidden' : ''}${isSelected ? ' selected' : ''}" data-id="${item.id}">
+                    <div class="b5-item-top">
+                        <span class="b5-item-name">${item.icon} ${item.name}</span>
+                        <span class="b5-check-mark">✅</span>
+                        <button class="b5-deselect-btn" data-id="${item.id}" title="取消選擇">✕</button>
+                    </div>
+                    <div class="b5-item-bottom">
+                        <div class="b5-item-money-icons">${moneyHTML}</div>
+                        <span class="b5-item-price" data-price="${item.price}">${isHardPriceHide ? '??? 元' : item.price + ' 元'}</span>
+                    </div>
+                </div>`;
+            };
+
+            const grid = document.getElementById('b5-items-grid');
+            if (grid) grid.innerHTML = pageItems.map(renderCard).join('');
+
+            const prevBtn = document.getElementById('b5-prev-page-btn');
+            const nextBtn = document.getElementById('b5-next-page-btn');
+            if (prevBtn) prevBtn.disabled = g.itemPage === 0;
+            if (nextBtn) nextBtn.disabled = g.itemPage >= totalPages - 1;
+
+            this._updateTotalBar();
         },
 
         _renderCustomItemsPanel() {
@@ -864,7 +963,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = 'b5-item-card b5-cip-custom-card selected';
                 card.id = `b5-custom-item-${ci}`;
-                card.innerHTML = `<span class="b5-check-mark">✅</span><span class="b5-item-icon">${newItem.icon}</span><span class="b5-item-name">${name}</span><span class="b5-item-price">${price} 元</span><button class="b5-cip-del-btn" data-custom-idx="${ci}">✕</button>`;
+                const cipMoneyHTML = this._renderB5MoneyIcons(price);
+                card.innerHTML = `
+                    <div class="b5-item-top">
+                        <span class="b5-item-name">${newItem.icon} ${name}</span>
+                        <span class="b5-check-mark">✅</span>
+                        <button class="b5-cip-del-btn" data-custom-idx="${ci}">✕</button>
+                    </div>
+                    <div class="b5-item-bottom">
+                        <div class="b5-item-money-icons">${cipMoneyHTML}</div>
+                        <span class="b5-item-price">${price} 元</span>
+                    </div>`;
                 list.appendChild(card);
                 const delBtn = card.querySelector('[data-custom-idx]');
                 Game.EventManager.on(delBtn, 'click', (e) => {
@@ -883,13 +992,30 @@ document.addEventListener('DOMContentLoaded', () => {
         _bindRoundEvents() {
             const g = this.state.game;
 
-            // 商品卡片點擊
-            document.querySelectorAll('.b5-item-card:not(.locked)').forEach(card => {
-                Game.EventManager.on(card, 'click', () => {
+            // 商品格事件委派（deselect + card click，適用於分頁換頁後不需重綁）
+            const grid = document.getElementById('b5-items-grid');
+            if (grid) {
+                Game.EventManager.on(grid, 'click', (e) => {
                     if (g.submitted) return;
+                    const deselectBtn = e.target.closest('.b5-deselect-btn');
+                    if (deselectBtn) {
+                        e.stopPropagation();
+                        const id = deselectBtn.dataset.id;
+                        const card = deselectBtn.closest('.b5-item-card');
+                        if (!id || !card) return;
+                        g.selectedIds.delete(id);
+                        card.classList.remove('selected');
+                        const item = g.items.find(i => i.id === id);
+                        if (item) Game.Speech.speak(`取消${item.name}`);
+                        this.audio.play('click');
+                        this._updateTotalBar();
+                        return;
+                    }
+                    const card = e.target.closest('.b5-item-card');
+                    if (!card) return;
                     const id = card.dataset.id;
                     const item = g.items.find(i => i.id === id);
-                    // 困難模式：首次點擊先揭示價格（翻牌動畫 Round 43）
+                    // 困難模式：首次點擊先揭示價格（翻牌動畫）
                     if (card.classList.contains('b5-price-hidden')) {
                         card.classList.add('b5-flip-reveal');
                         Game.TimerManager.setTimeout(() => {
@@ -917,7 +1043,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('click');
                     this._updateTotalBar();
                 }, {}, 'gameUI');
-            });
+            }
+
+            // 分頁按鈕
+            const prevBtn = document.getElementById('b5-prev-page-btn');
+            const nextBtn = document.getElementById('b5-next-page-btn');
+            if (prevBtn) {
+                Game.EventManager.on(prevBtn, 'click', () => {
+                    if (g.itemPage > 0) { g.itemPage--; this._renderItemsPage(); this.audio.play('click'); }
+                }, {}, 'gameUI');
+            }
+            if (nextBtn) {
+                Game.EventManager.on(nextBtn, 'click', () => {
+                    const totalPages = Math.ceil(g.items.length / ITEMS_PER_PAGE);
+                    if (g.itemPage < totalPages - 1) { g.itemPage++; this._renderItemsPage(); this.audio.play('click'); }
+                }, {}, 'gameUI');
+            }
 
             // 確認按鈕
             Game.EventManager.on(document.getElementById('b5-confirm-btn'), 'click', () => {
@@ -932,11 +1073,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     else this._showBudgetHint();
                 }, {}, 'gameUI');
             }
-            // 已選清單語音朗讀按鈕（Round 45）
+            // 已選清單語音朗讀按鈕
             const readBtn = document.getElementById('b5-read-selected-btn');
             if (readBtn) {
                 Game.EventManager.on(readBtn, 'click', () => {
-                    const selected = g.items.filter(i => i.must || (g.selectedIds && g.selectedIds.has(i.id)));
+                    const selected = g.items.filter(i => g.selectedIds && g.selectedIds.has(i.id));
                     if (!selected.length) { Game.Speech.speak('還沒有選任何商品'); return; }
                     const total = selected.reduce((s, i) => s + i.price, 0);
                     const parts = selected.map(i => `${i.name}${i.price}元`).join('，');
@@ -963,10 +1104,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (g.submitted) return;
             const remaining = g.budget - this._getTotal();
             const affordable = g.items.filter(i =>
-                !i.must && !g.selectedIds.has(i.id) && i.price <= remaining
+                !g.selectedIds.has(i.id) && i.price <= remaining
             );
             // 高亮可選商品
-            document.querySelectorAll('.b5-item-card:not(.locked):not(.selected)').forEach(card => {
+            document.querySelectorAll('.b5-item-card:not(.selected)').forEach(card => {
                 const id = card.dataset.id;
                 if (affordable.some(a => a.id === id)) {
                     card.classList.add('b5-hint-glow');
@@ -987,12 +1128,12 @@ document.addEventListener('DOMContentLoaded', () => {
         _showHardModeHintModal() {
             const g = this.state.game;
             const budget = g.budget;
-            const mustItems = g.items.filter(i => i.must);
-            const mustTotal = mustItems.reduce((s, i) => s + i.price, 0);
+            const total = this._getTotal();
             const customTotal = (g.customItems || []).filter(i => !i._deleted).reduce((s, i) => s + i.price, 0);
-            const remaining = budget - mustTotal - customTotal;
-            const affordable = g.items.filter(i => !i.must && i.price <= remaining);
-            const mustHTML = mustItems.map(i =>
+            const remaining = budget - total;
+            const affordable = g.items.filter(i => !g.selectedIds.has(i.id) && i.price <= remaining);
+            const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
+            const selectedHTML = selectedItems.map(i =>
                 `<div class="b5-hm-row"><span class="b5-hm-icon">${i.icon}</span><span class="b5-hm-name">${i.name}</span><span class="b5-hm-price">${i.price}元</span></div>`
             ).join('');
             const optHTML = affordable.map(i =>
@@ -1007,11 +1148,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b5-hint-modal">
                     <div class="b5-hm-header">💡 預算分析</div>
                     <div class="b5-hm-budget-row"><span class="b5-hm-label">派對預算</span><span class="b5-hm-budget-val">${budget}元</span></div>
+                    ${selectedItems.length > 0 ? `
                     <div class="b5-hm-section">
-                        <div class="b5-hm-sec-title">🎂 必買商品</div>
-                        ${mustHTML}
-                        <div class="b5-hm-row b5-hm-total"><span>必買合計</span><span>${mustTotal}元</span></div>
-                    </div>
+                        <div class="b5-hm-sec-title">✅ 已選商品</div>
+                        ${selectedHTML}
+                        <div class="b5-hm-row b5-hm-total"><span>已選合計</span><span>${total}元</span></div>
+                    </div>` : ''}
                     ${affordable.length > 0 ? `
                     <div class="b5-hm-section">
                         <div class="b5-hm-sec-title">✨ 可加選（還剩${remaining}元）</div>
@@ -1025,8 +1167,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) close(); }, {}, 'gameUI');
             const parts = affordable.map(i => `${i.name}${toTWD(i.price)}`);
             const speech = affordable.length > 0
-                ? `派對預算${toTWD(budget)}，必買要${toTWD(mustTotal)}，還剩${toTWD(remaining)}，可以選${parts.join('或')}`
-                : `派對預算${toTWD(budget)}，必買要${toTWD(mustTotal)}，還剩${toTWD(remaining)}，沒有可加選的商品了`;
+                ? `派對預算${toTWD(budget)}，已選${toTWD(total)}，還剩${toTWD(remaining)}，可以選${parts.join('或')}`
+                : `派對預算${toTWD(budget)}，已選${toTWD(total)}，還剩${toTWD(remaining)}，沒有可加選的商品了`;
             Game.Speech.speak(speech);
         },
 
@@ -1059,29 +1201,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const total = this._getTotal();
             const rem   = g.budget - total;
 
-            const bar     = document.getElementById('b5-total-bar');
+            const bar     = document.getElementById('b5-budget-info-card');
             const totalEl = document.getElementById('b5-total-amount');
-            const remEl   = document.getElementById('b5-remaining');
             const btn     = document.getElementById('b5-confirm-btn');
 
             if (totalEl) totalEl.textContent = total;
-            if (remEl)   remEl.textContent = rem >= 0 ? `還剩 ${rem} 元` : `超出 ${-rem} 元`;
-            // 即時選擇計數（Round 39）
-            const selCountEl = document.getElementById('b5-sel-count');
-            if (selCountEl) {
-                const mustCount = g.items.filter(i => i.must).length;
-                const optCount  = g.selectedIds ? [...g.selectedIds].filter(id => {
-                    const item = g.items.find(i => i.id === id);
-                    return item && !item.must;
-                }).length : 0;
-                selCountEl.textContent = mustCount > 0
-                    ? `必買${mustCount}件${optCount > 0 ? `+選購${optCount}件` : ''}`
-                    : `已選 ${g.selectedIds ? g.selectedIds.size : 0} 件`;
-            }
 
             if (bar) {
                 const wasOver = bar.classList.contains('over');
-                bar.className = 'b5-total-bar';
+                bar.className = 'b5-budget-info-card';
                 if (total > g.budget) {
                     bar.classList.add('over');
                     if (!wasOver) {
@@ -1089,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.TimerManager.setTimeout(() => bar.classList.remove('b5-shake'), 600, 'ui');
                     }
                 } else if (total > g.budget * 0.9) bar.classList.add('near');
-                else                          bar.classList.add('ok');
+                else                               bar.classList.add('ok');
             }
 
             // 預算儀表條（F5 量比較 pattern）
@@ -1103,35 +1231,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (label) label.textContent = `${pct}%`;
             }
 
-            // 選購剩餘預算即時更新（Round 42）
-            const mustTotal  = g.items.filter(i => i.must).reduce((s, i) => s + i.price, 0);
-            const optBudgetEl = document.getElementById('b5-opt-budget');
-            if (optBudgetEl) {
-                const optBudget = Math.max(0, g.budget - mustTotal);
-                const optSpent  = total - mustTotal;
-                const optRem    = optBudget - Math.max(0, optSpent);
-                optBudgetEl.textContent = optRem >= 0 ? `可用 ${optBudget} 元（剩 ${optRem}）` : `超出 ${-optRem} 元`;
-                optBudgetEl.style.color = optRem < 0 ? '#dc2626' : '';
-            }
-            // 必買/選購分隔視覺（Round 36）
-            const mustPct    = g.budget > 0 ? Math.min(100, Math.round(mustTotal / g.budget * 100)) : 0;
-            const mustMarker = document.getElementById('b5-must-marker');
-            if (mustMarker) {
-                mustMarker.style.left = mustPct + '%';
-                mustMarker.title = `必買 ${mustTotal} 元（${mustPct}%）`;
-            }
-
             const canConfirm = total > 0 && total <= g.budget;
             if (btn) {
                 btn.disabled = !canConfirm;
                 btn.classList.toggle('ready', canConfirm);
             }
 
-            // 可負擔商品高亮（Round 38）：未選的選購商品中，標示仍買得起的
+            // 可負擔商品高亮：未選的商品中，標示仍買得起的
             const remBudget = g.budget - total;
-            document.querySelectorAll('.b5-item-card:not(.locked)').forEach(card => {
+            document.querySelectorAll('.b5-item-card').forEach(card => {
                 const item = g.items.find(i => i.id === card.dataset.id);
-                if (!item || item.must) return;
+                if (!item) return;
                 const isSelected = g.selectedIds.has(item.id);
                 card.classList.toggle('b5-affordable', !isSelected && item.price <= remBudget);
             });
@@ -1154,9 +1264,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const g         = this.state.game;
             g.submitted     = true;
             const total     = this._getTotal();
-            const mustOk    = g.items.filter(i => i.must).every(i => g.selectedIds.has(i.id));
             const budgetOk  = total <= g.budget;
-            const isCorrect = mustOk && budgetOk && total > 0;
+            const isCorrect = budgetOk && total > 0;
 
             // Disable all cards and confirm button
             document.querySelectorAll('.b5-item-card').forEach(c => c.classList.add('disabled'));
@@ -1186,17 +1295,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${effBadge}
                         ${savingsBadge}`;
-                } else if (!mustOk) {
-                    resultArea.innerHTML = `
-                        <div class="b5-result-banner fail">
-                            😅 記得要選所有必買的商品喔！
-                            <div class="b5-result-sub">必買商品：蛋糕🎂 和 飲料🧃</div>
-                        </div>`;
                 } else {
                     // 計算建議移除的選購商品（最貴的、移除後不超支）
                     const overBy = total - g.budget;
                     const selectedOptionals = g.items
-                        .filter(i => !i.must && g.selectedIds.has(i.id))
+                        .filter(i => g.selectedIds.has(i.id))
                         .sort((a, b) => b.price - a.price);
                     const suggestion = selectedOptionals.find(i => total - i.price <= g.budget);
                     const suggestionHTML = suggestion
@@ -1247,9 +1350,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(g.streak), 200, 'ui');
                 }
                 // 記錄各關預算使用（B6 receipts pattern）
-                const mustSpent = g.items.filter(i => i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
-                const optSpent  = g.items.filter(i => !i.must && g.selectedIds.has(i.id)).reduce((s, i) => s + i.price, 0);
-                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total, mustSpent, optSpent });
+                g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
                 // 記錄本關選購物品（A4 交易摘要模式）
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
@@ -1268,13 +1369,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 g.streak = 0;
                 g.roundErrors = (g.roundErrors || 0) + 1;
                 this.audio.play('error');
-                if (!mustOk) {
-                    this._showCenterFeedback('❌', '必買商品未選！');
-                    Game.Speech.speak('不對喔，記得要選所有必買的商品喔！');
-                } else {
-                    this._showCenterFeedback('❌', '超出預算！');
-                    Game.Speech.speak(`不對喔，超出預算了，多了${toTWD(total - g.budget)}，請再試一次！`);
-                }
+                this._showCenterFeedback('❌', '超出預算！');
+                Game.Speech.speak(`不對喔，超出預算了，多了${toTWD(total - g.budget)}，請再試一次！`);
                 // 3次錯誤後自動觸發提示（B4 autoHint pattern）
                 if (g.roundErrors >= 3) {
                     Game.TimerManager.setTimeout(() => {
@@ -1284,16 +1380,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Show action button (retry on wrong, next on correct)
+            // 正確 → Phase 2 付款；錯誤 → 重試/跳過按鈕
             Game.TimerManager.setTimeout(() => {
                 const resultArea2 = document.getElementById('b5-result-area');
                 if (resultArea2) {
                     if (isCorrect) {
-                        const nextBtn = document.createElement('button');
-                        nextBtn.className = 'b5-next-btn';
-                        nextBtn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
-                        Game.EventManager.on(nextBtn, 'click', () => this.nextRound(), {}, 'gameUI');
-                        resultArea2.appendChild(nextBtn);
+                        // 進入 Phase 2 付款
+                        const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
+                        this._renderB5Phase2(selectedItems, total);
+                        return;
                     } else {
                         // Retry: re-render same round
                         const retryBtn = document.createElement('button');
@@ -1314,7 +1409,486 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1400, 'turnTransition');
         },
 
-        // ── 12. 下一關 ────────────────────────────────────────
+        // ════════════════════════════════════════════════════════
+        // ── 12. B5 Phase 2：付款操作（B1 _renderPhase2 pattern）──
+        // ════════════════════════════════════════════════════════
+        _renderB5Phase2(selectedItems, total) {
+            Game.TimerManager.clearAll();
+            Game.EventManager.removeByCategory('gameUI');
+            const g = this.state.game;
+            g.p2Wallet     = [];
+            g.p2UidCtr     = 0;
+            g.p2ErrorCount = 0;
+            g.p2Total      = total;
+
+            const diff      = this.state.settings.difficulty;
+            const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
+            const themeKey  = this.state.settings.partyTheme;
+            const themeData = B5_THEMES[themeKey] || B5_THEMES.birthday;
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            <div class="b-header">
+                <div class="b-header-left">
+                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
+                    <span class="b-header-unit">${themeData.icon} 生日派對預算</span>
+                </div>
+                <div class="b-header-center">${diffLabel}</div>
+                <div class="b-header-right">
+                    <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
+                    <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                    <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
+                </div>
+            </div>
+            <div class="game-container">
+                ${this._renderB5P2RefCard(selectedItems, total, themeData)}
+                ${this._renderB5P2WalletArea(total)}
+                ${diff !== 'easy' ? `<div style="display:flex;justify-content:center;margin:8px 0;">
+                    <button class="b5-confirm-btn" id="b5-p2-confirm-btn" disabled>✅ 確認付款</button>
+                </div>` : ''}
+                ${this._renderB5P2CoinTray(diff)}
+            </div>`;
+
+            this._bindB5P2Events(total);
+            Game.Speech.speak(`請準備${toTWD(total)}`);
+
+            if (diff === 'easy') {
+                Game.TimerManager.setTimeout(() => this._b5P2AutoSetGhostSlots(), 300, 'ui');
+            }
+        },
+
+        _renderB5P2RefCard(selectedItems, total, themeData) {
+            const itemsList = selectedItems.map(it =>
+                `<div class="b5p2-ref-item"><span>${it.icon} ${it.name}</span><span class="b5p2-ref-price">${it.price}元</span></div>`
+            ).join('');
+            return `
+            <div class="b5p2-ref-card">
+                <div class="b5p2-ref-header">
+                    <span class="b5p2-ref-icon">${themeData.icon}</span>
+                    <span class="b5p2-ref-title">${themeData.name}</span>
+                </div>
+                <div class="b5p2-ref-items">${itemsList}</div>
+                <div class="b5p2-ref-total-row">
+                    <span class="b5p2-ref-total-label">合計</span>
+                    <span class="b5p2-ref-total-val">${total} 元</span>
+                </div>
+            </div>`;
+        },
+
+        _renderB5P2WalletArea(total) {
+            return `
+            <div class="b5p2-wallet-area" id="b5p2-wallet-area">
+                <div class="b5p2-wallet-coins-label">預算金額</div>
+                <div class="b5p2-wallet-header">
+                    <div class="b5p2-wallet-need">${total} 元</div>
+                    <div class="b5p2-wallet-placed-row">
+                        <span class="b5p2-wallet-placed-lbl">已放</span>
+                        <span class="b5p2-wallet-total-val" id="b5p2-wallet-total">0 元</span>
+                        <span class="b5p2-wallet-sep">/</span>
+                        <span class="b5p2-wallet-goal">${total} 元</span>
+                    </div>
+                </div>
+                <div class="b5p2-progress-wrap">
+                    <div class="b5p2-progress" id="b5p2-progress">
+                        <div class="b5p2-progress-fill" id="b5p2-progress-fill"></div>
+                    </div>
+                </div>
+                <div class="b5p2-wallet-coins b5p2-drop-zone" id="b5p2-wallet-coins">
+                    <span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>
+                </div>
+            </div>`;
+        },
+
+        _renderB5P2CoinTray(diff) {
+            const denomMap = {
+                easy:   [1, 5, 10, 50, 100],
+                normal: [1, 5, 10, 50, 100, 500],
+                hard:   [1, 5, 10, 50, 100, 500, 1000]
+            };
+            const denoms = denomMap[diff] || denomMap.easy;
+            const trayFaces = {};
+            denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            this.state.game.p2TrayFaces = trayFaces;
+            const coinsHtml = denoms.map(d => {
+                const isBill = d >= 100;
+                const face = trayFaces[d];
+                return `
+                <div class="b5p2-coin-drag" draggable="true" data-denom="${d}" title="${d}元">
+                    <img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                         class="${isBill ? 'banknote-img' : 'coin-img'}" draggable="false"
+                         onerror="this.style.display='none'">
+                    <span class="b1-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+            return `
+            <div class="b5p2-tray">
+                <div class="b5p2-tray-title">💰 拖曳放正確的金錢圖示（可重複拖曳）</div>
+                <div class="b5p2-tray-coins" id="b5p2-tray-coins">${coinsHtml}</div>
+            </div>`;
+        },
+
+        _bindB5P2Events(total) {
+            this._b5P2SetupDragDrop();
+
+            // 確認付款按鈕（普通/困難）
+            const confirmBtn = document.getElementById('b5-p2-confirm-btn');
+            if (confirmBtn) {
+                Game.EventManager.on(confirmBtn, 'click', () => {
+                    this._b5P2HandleConfirm(total);
+                }, {}, 'gameUI');
+            }
+
+            // 移除錢包幣（點 ✕）
+            const walletCoinsEl = document.getElementById('b5p2-wallet-coins');
+            if (walletCoinsEl) {
+                Game.EventManager.on(walletCoinsEl, 'click', (e) => {
+                    const btn = e.target.closest('.b5p2-wc-remove');
+                    if (btn) {
+                        const uid = parseInt(btn.dataset.uid);
+                        if (!isNaN(uid)) this._b5P2RemoveCoin(uid);
+                    }
+                }, {}, 'gameUI');
+                // 從錢包拖回托盤
+                Game.EventManager.on(walletCoinsEl, 'dragstart', (e) => {
+                    const coinEl = e.target.closest('.b5p2-wc-removable');
+                    if (!coinEl) return;
+                    const uid = parseInt(coinEl.dataset.uid);
+                    if (isNaN(uid)) return;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', 'remove:' + uid);
+                    coinEl.classList.add('b5p2-dragging');
+                }, {}, 'gameUI');
+                Game.EventManager.on(walletCoinsEl, 'dragend', (e) => {
+                    e.target.closest('.b5p2-wc-removable')?.classList.remove('b5p2-dragging');
+                }, {}, 'gameUI');
+            }
+            const tray = document.getElementById('b5p2-tray-coins');
+            if (tray) {
+                Game.EventManager.on(tray, 'dragover', (e) => {
+                    if (e.dataTransfer.types.includes('text/plain')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+                }, {}, 'gameUI');
+                Game.EventManager.on(tray, 'drop', (e) => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    if (data?.startsWith('remove:')) {
+                        const uid = parseInt(data.slice(7));
+                        if (!isNaN(uid)) this._b5P2RemoveCoin(uid);
+                    }
+                }, {}, 'gameUI');
+            }
+
+            Game.EventManager.on(document.getElementById('back-to-settings') || document.querySelector('.b-back-btn'), 'click', () => {
+                this.showSettings();
+            }, {}, 'gameUI');
+        },
+
+        _b5P2SetupDragDrop() {
+            const walletCoins = document.getElementById('b5p2-wallet-coins');
+            if (!walletCoins) return;
+            document.querySelectorAll('.b5p2-coin-drag').forEach(dragEl => {
+                Game.EventManager.on(dragEl, 'dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('text/plain', dragEl.dataset.denom);
+                    dragEl.classList.add('b5p2-dragging');
+                    try {
+                        const img = dragEl.querySelector('img');
+                        const ghost = document.createElement('img');
+                        ghost.src = img ? img.src : '';
+                        ghost.style.cssText = 'position:fixed;top:-200px;left:-200px;width:56px;height:56px;object-fit:contain;';
+                        document.body.appendChild(ghost);
+                        e.dataTransfer.setDragImage(ghost, 28, 28);
+                        Game.TimerManager.setTimeout(() => ghost.remove(), 100, 'ui');
+                    } catch(ex) {}
+                }, {}, 'gameUI');
+                Game.EventManager.on(dragEl, 'dragend', () => dragEl.classList.remove('b5p2-dragging'), {}, 'gameUI');
+            });
+            Game.EventManager.on(walletCoins, 'dragover', (e) => {
+                e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+                walletCoins.classList.add('b5p2-drop-active');
+            }, {}, 'gameUI');
+            Game.EventManager.on(walletCoins, 'dragleave', (e) => {
+                if (!walletCoins.contains(e.relatedTarget)) walletCoins.classList.remove('b5p2-drop-active');
+            }, {}, 'gameUI');
+            Game.EventManager.on(walletCoins, 'drop', (e) => {
+                e.preventDefault();
+                walletCoins.classList.remove('b5p2-drop-active');
+                const denom = parseInt(e.dataTransfer.getData('text/plain'));
+                if (denom && !isNaN(denom)) this._b5P2AddCoin(denom);
+            }, {}, 'gameUI');
+            // Touch drag
+            let touchDenom = null, ghost = null;
+            document.querySelectorAll('.b5p2-coin-drag').forEach(dragEl => {
+                Game.EventManager.on(dragEl, 'touchstart', (e) => {
+                    if (e.touches.length > 1) return;
+                    touchDenom = parseInt(dragEl.dataset.denom);
+                    const rect = dragEl.getBoundingClientRect();
+                    ghost = dragEl.cloneNode(true);
+                    ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;opacity:0.85;pointer-events:none;z-index:9999;transform:scale(1.15);transition:none;`;
+                    document.body.appendChild(ghost);
+                }, { passive: true }, 'gameUI');
+                Game.EventManager.on(dragEl, 'touchmove', (e) => {
+                    if (!ghost) return;
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    ghost.style.left = (t.clientX - ghost.offsetWidth  / 2) + 'px';
+                    ghost.style.top  = (t.clientY - ghost.offsetHeight / 2) + 'px';
+                    const wc = document.getElementById('b5p2-wallet-coins');
+                    if (wc) {
+                        const r = wc.getBoundingClientRect();
+                        wc.classList.toggle('b5p2-drop-active',
+                            t.clientX >= r.left && t.clientX <= r.right &&
+                            t.clientY >= r.top  && t.clientY <= r.bottom);
+                    }
+                }, { passive: false }, 'gameUI');
+                Game.EventManager.on(dragEl, 'touchend', (e) => {
+                    if (!ghost || touchDenom === null) return;
+                    const t = e.changedTouches[0];
+                    const wc = document.getElementById('b5p2-wallet-coins');
+                    if (wc) {
+                        const r = wc.getBoundingClientRect();
+                        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+                            this._b5P2AddCoin(touchDenom);
+                        }
+                        wc.classList.remove('b5p2-drop-active');
+                    }
+                    ghost.remove(); ghost = null; touchDenom = null;
+                }, { passive: true }, 'gameUI');
+            });
+        },
+
+        _b5P2AddCoin(denom) {
+            const g = this.state.game;
+            const q = g;
+            const diff = this.state.settings.difficulty;
+            if (q.p2ShowHint && q.p2HintSlots?.length) {
+                const slotIdx = q.p2HintSlots.findIndex(s => s.denom === denom && !s.filled);
+                if (slotIdx === -1) { this.audio.play('error'); return; }
+                q.p2HintSlots[slotIdx].filled = true;
+                this.audio.play('coin');
+                const uid = ++q.p2UidCtr;
+                const face = q.p2TrayFaces?.[denom] || 'front';
+                q.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
+                // 只更新該 ghost slot：移除淡化 class，讓 opacity transition 顯示正常
+                const slotEl = document.querySelector(`[data-p2-hint-idx="${slotIdx}"]`);
+                if (slotEl) slotEl.classList.remove('b5p2-ghost-slot');
+                this._b5P2UpdateStatusOnly();
+                // Easy: 全部填滿後自動確認
+                if (diff === 'easy' && q.p2HintSlots.every(s => s.filled)) {
+                    Game.TimerManager.setTimeout(() => this._b5P2HandleConfirm(q.p2Total), 600, 'ui');
+                }
+            } else {
+                this.audio.play('coin');
+                const uid = ++q.p2UidCtr;
+                const face = q.p2TrayFaces?.[denom] || 'front';
+                q.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
+                // 直接 append 新幣元素，避免整區重新渲染閃爍
+                const coinsEl = document.getElementById('b5p2-wallet-coins');
+                if (coinsEl) {
+                    const emptyHint = coinsEl.querySelector('.b5p2-wallet-empty');
+                    if (emptyHint) emptyHint.remove();
+                    const canRemove = diff !== 'easy';
+                    const isBill = denom >= 100;
+                    const w = isBill ? 100 : 60;
+                    const div = document.createElement('div');
+                    div.className = 'b5p2-wallet-coin b5p2-coin-new' + (canRemove ? ' b5p2-wc-removable' : '');
+                    if (canRemove) { div.setAttribute('draggable', 'true'); div.dataset.uid = String(uid); }
+                    div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
+                         onerror="this.style.display='none'" draggable="false">
+                    ${canRemove ? `<button class="b5p2-wc-remove" data-uid="${uid}" title="移除">✕</button>` : ''}`;
+                    coinsEl.appendChild(div);
+                }
+                this._b5P2UpdateStatusOnly();
+            }
+            if (this.state.settings.difficulty !== 'hard') {
+                const walletNow = this._b5P2GetWalletTotal();
+                Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
+            }
+        },
+
+        _b5P2RemoveCoin(uid) {
+            const g = this.state.game;
+            g.p2Wallet = g.p2Wallet.filter(c => c.uid !== uid);
+            this._b5P2UpdateWalletDisplay();
+        },
+
+        _b5P2GetWalletTotal() {
+            return this.state.game.p2Wallet.reduce((s, c) => s + c.denom, 0);
+        },
+
+        // 只更新數字/進度條/確認按鈕，不重繪幣元素（避免全區閃爍）
+        _b5P2UpdateStatusOnly() {
+            const g      = this.state.game;
+            const total  = this._b5P2GetWalletTotal();
+            const req    = g.p2Total;
+            const enough = total >= req;
+            const diff   = this.state.settings.difficulty;
+
+            const totalEl = document.getElementById('b5p2-wallet-total');
+            if (totalEl) {
+                totalEl.textContent = total + ' 元';
+                totalEl.className = 'b5p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
+            }
+            const fillEl = document.getElementById('b5p2-progress-fill');
+            const wrapEl = document.getElementById('b5p2-progress');
+            if (fillEl && wrapEl && req > 0) {
+                const pct = Math.min(Math.round(total / req * 100), 100);
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b5p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
+            }
+            const confirmBtn = document.getElementById('b5-p2-confirm-btn');
+            if (confirmBtn) {
+                const canConfirm = diff === 'easy' ? total >= req : total === req;
+                confirmBtn.disabled = !canConfirm;
+                confirmBtn.classList.toggle('ready', canConfirm);
+            }
+        },
+
+        _b5P2UpdateWalletDisplay() {
+            const g      = this.state.game;
+            const total  = this._b5P2GetWalletTotal();
+            const req    = g.p2Total;
+            const enough = total >= req;
+            const diff   = this.state.settings.difficulty;
+
+            const totalEl = document.getElementById('b5p2-wallet-total');
+            if (totalEl) {
+                totalEl.textContent = total + ' 元';
+                totalEl.className = 'b5p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
+            }
+            const fillEl  = document.getElementById('b5p2-progress-fill');
+            const wrapEl  = document.getElementById('b5p2-progress');
+            if (fillEl && wrapEl && req > 0) {
+                const pct = Math.min(Math.round(total / req * 100), 100);
+                fillEl.style.width = pct + '%';
+                fillEl.className = 'b5p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
+            }
+
+            // Confirm button state (普通/困難)
+            const confirmBtn = document.getElementById('b5-p2-confirm-btn');
+            if (confirmBtn) {
+                const canConfirm = diff === 'easy' ? total >= req : total === req;
+                confirmBtn.disabled = !canConfirm;
+                confirmBtn.classList.toggle('ready', canConfirm);
+            }
+
+            // Re-render wallet coins
+            const coinsEl = document.getElementById('b5p2-wallet-coins');
+            if (!coinsEl) return;
+            if (g.p2ShowHint && g.p2HintSlots?.length) {
+                const canRemove = diff !== 'easy';
+                coinsEl.innerHTML = g.p2HintSlots.map((slot, idx) => {
+                    if (!slot.filled) {
+                        const isBill = slot.denom >= 100;
+                        const w = isBill ? 100 : 60;
+                        const face = slot.face || 'front';
+                        return `<div class="b5p2-wallet-coin b5p2-ghost-slot" data-p2-hint-idx="${idx}">
+                            <img src="../images/money/${slot.denom}_yuan_${face}.png" alt="${slot.denom}元"
+                                 style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
+                                 onerror="this.style.display='none'" draggable="false">
+                        </div>`;
+                    }
+                    const coin = g.p2Wallet[idx] || g.p2Wallet.find((c, ci) => {
+                        let filledCount = g.p2HintSlots.slice(0, idx).filter(s => s.filled).length;
+                        return ci === filledCount;
+                    });
+                    if (!coin) return '';
+                    const isBill = coin.denom >= 100;
+                    const w = isBill ? 100 : 60;
+                    return `<div class="b5p2-wallet-coin" data-p2-hint-idx="${idx}">
+                        <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                             style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
+                             onerror="this.style.display='none'" draggable="false">
+                    </div>`;
+                }).join('');
+            } else if (g.p2Wallet.length === 0) {
+                coinsEl.innerHTML = '<span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
+            } else {
+                const canRemove = diff !== 'easy';
+                coinsEl.innerHTML = g.p2Wallet.map(coin => {
+                    const isBill = coin.denom >= 100;
+                    const w = isBill ? 100 : 60;
+                    const removable = canRemove ? `draggable="true" data-uid="${coin.uid}" class="b5p2-wallet-coin b5p2-wc-removable"` : `class="b5p2-wallet-coin"`;
+                    const removeBtn = canRemove ? `<button class="b5p2-wc-remove" data-uid="${coin.uid}" title="移除">✕</button>` : '';
+                    return `<div ${removable}>
+                        <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                             style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
+                             onerror="this.style.display='none'" draggable="false">
+                        ${removeBtn}
+                    </div>`;
+                }).join('');
+            }
+        },
+
+        _b5P2AutoSetGhostSlots() {
+            const g = this.state.game;
+            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            const total = g.p2Total;
+            const coins = [];
+            let rem = total;
+            for (const d of denoms) {
+                const cnt = Math.floor(rem / d);
+                for (let i = 0; i < cnt; i++) coins.push(d);
+                rem -= cnt * d;
+                if (rem <= 0) break;
+            }
+            const trayFaces = g.p2TrayFaces || {};
+            g.p2ShowHint  = true;
+            g.p2HintSlots = coins.map(d => ({ denom: d, filled: false, face: trayFaces[d] || 'front' }));
+            this._b5P2UpdateWalletDisplay();
+        },
+
+        _b5P2HandleConfirm(total) {
+            if (this.state.isProcessing) return;
+            this.state.isProcessing = true;
+            const g        = this.state.game;
+            const wTotal   = this._b5P2GetWalletTotal();
+            const diff     = this.state.settings.difficulty;
+            const isCorrect = diff === 'easy' ? wTotal >= total : wTotal === total;
+
+            if (isCorrect) {
+                this.audio.play('correct');
+                this._showCenterFeedback('💯', '付款成功！');
+                const change = wTotal - total;
+                const msg = change > 0 ? `付款成功！找回${toTWD(change)}` : `付款成功！剛好${toTWD(total)}`;
+                Game.Speech.speak(msg, () => {
+                    Game.TimerManager.setTimeout(() => {
+                        const area = document.getElementById('b5p2-wallet-area');
+                        if (area) {
+                            const btn = document.createElement('button');
+                            btn.className = 'b5-next-btn';
+                            btn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
+                            Game.EventManager.on(btn, 'click', () => this.nextRound(), {}, 'gameUI');
+                            area.after(btn);
+                        }
+                    }, 400, 'turnTransition');
+                });
+            } else {
+                this.state.isProcessing = false;
+                this.audio.play('error');
+                g.p2ErrorCount = (g.p2ErrorCount || 0) + 1;
+                this._showCenterFeedback('❌', '再試一次！');
+                const isOver = wTotal > total;
+                Game.Speech.speak(isOver ? `拿了太多的錢，請再試一次` : `拿了太少的錢，請再試一次`);
+                // 清空錢包重試
+                g.p2Wallet    = [];
+                g.p2ShowHint  = false;
+                g.p2HintSlots = [];
+                const walletArea = document.getElementById('b5p2-wallet-area');
+                if (walletArea) {
+                    walletArea.style.animation = 'b5p2Shake 0.4s ease';
+                    Game.TimerManager.setTimeout(() => {
+                        walletArea.style.animation = '';
+                        this._b5P2UpdateWalletDisplay();
+                    }, 500, 'ui');
+                }
+                // 3次錯誤後自動 ghost slot 提示
+                if (g.p2ErrorCount >= 3) {
+                    Game.TimerManager.setTimeout(() => this._b5P2AutoSetGhostSlots(), 700, 'ui');
+                }
+            }
+        },
+
+        // ── 13. 下一關 ────────────────────────────────────────
         nextRound() {
             this.state.game.currentRound++;
             if (this.state.game.currentRound >= this.state.game.totalRounds) {
