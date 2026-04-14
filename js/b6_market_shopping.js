@@ -8,34 +8,52 @@ const B6_STALLS = {
     vegetable: {
         name: '蔬菜攤', icon: '🥦',
         items: [
-            { id: 'cabbage',  name: '高麗菜', price: 30,  unit: '顆', icon: '🥬' },
-            { id: 'tomato',   name: '番茄',   price: 45,  unit: '斤', icon: '🍅' },
-            { id: 'scallion', name: '青蔥',   price: 20,  unit: '把', icon: '🌿' },
-            { id: 'sweetpot', name: '地瓜',   price: 35,  unit: '斤', icon: '🍠' },
-            { id: 'spinach',  name: '菠菜',   price: 25,  unit: '把', icon: '🥗' },
-            { id: 'carrot',   name: '紅蘿蔔', price: 40,  unit: '斤', icon: '🥕' },
+            { id: 'cabbage',    name: '高麗菜', price: 30,  unit: '顆', icon: '🥬' },
+            { id: 'tomato',     name: '番茄',   price: 45,  unit: '斤', icon: '🍅' },
+            { id: 'scallion',   name: '青蔥',   price: 20,  unit: '把', icon: '🌿' },
+            { id: 'sweetpot',   name: '地瓜',   price: 35,  unit: '斤', icon: '🍠' },
+            { id: 'spinach',    name: '菠菜',   price: 25,  unit: '把', icon: '🥗' },
+            { id: 'carrot',     name: '紅蘿蔔', price: 40,  unit: '斤', icon: '🥕' },
+            { id: 'corn',       name: '玉米',   price: 15,  unit: '根', icon: '🌽' },
+            { id: 'cucumber',   name: '小黃瓜', price: 20,  unit: '條', icon: '🥒' },
+            { id: 'broccoli',   name: '花椰菜', price: 45,  unit: '顆', icon: '🥦' },
+            { id: 'pumpkin',    name: '南瓜',   price: 55,  unit: '顆', icon: '🎃' },
+            { id: 'daikon',     name: '白蘿蔔', price: 30,  unit: '條', icon: '🥬' },
+            { id: 'pakchoi',    name: '青江菜', price: 15,  unit: '把', icon: '🌱' },
         ],
     },
     fruit: {
         name: '水果攤', icon: '🍎',
         items: [
-            { id: 'apple',    name: '蘋果',   price: 50,  unit: '斤', icon: '🍎' },
-            { id: 'banana',   name: '香蕉',   price: 25,  unit: '把', icon: '🍌' },
-            { id: 'grape',    name: '葡萄',   price: 80,  unit: '串', icon: '🍇' },
-            { id: 'orange',   name: '柳橙',   price: 40,  unit: '斤', icon: '🍊' },
-            { id: 'melon',    name: '哈密瓜', price: 120, unit: '顆', icon: '🍈' },
-            { id: 'mango',    name: '芒果',   price: 60,  unit: '斤', icon: '🥭' },
+            { id: 'apple',      name: '蘋果',   price: 50,  unit: '斤', icon: '🍎' },
+            { id: 'banana',     name: '香蕉',   price: 25,  unit: '把', icon: '🍌' },
+            { id: 'grape',      name: '葡萄',   price: 80,  unit: '串', icon: '🍇' },
+            { id: 'orange',     name: '柳橙',   price: 40,  unit: '斤', icon: '🍊' },
+            { id: 'melon',      name: '哈密瓜', price: 120, unit: '顆', icon: '🍈' },
+            { id: 'mango',      name: '芒果',   price: 60,  unit: '斤', icon: '🥭' },
+            { id: 'watermelon', name: '西瓜',   price: 80,  unit: '片', icon: '🍉' },
+            { id: 'pineapple',  name: '鳳梨',   price: 70,  unit: '顆', icon: '🍍' },
+            { id: 'strawberry', name: '草莓',   price: 100, unit: '盒', icon: '🍓' },
+            { id: 'peach',      name: '桃子',   price: 55,  unit: '顆', icon: '🍑' },
+            { id: 'papaya',     name: '木瓜',   price: 45,  unit: '顆', icon: '🧡' },
+            { id: 'guava',      name: '芭樂',   price: 35,  unit: '顆', icon: '🍏' },
         ],
     },
     grocery: {
         name: '雜貨攤', icon: '🛒',
         items: [
-            { id: 'egg',      name: '雞蛋',   price: 65,  unit: '盒', icon: '🥚' },
-            { id: 'tofu',     name: '豆腐',   price: 25,  unit: '塊', icon: '🫙' },
-            { id: 'soy',      name: '醬油',   price: 45,  unit: '瓶', icon: '🍶' },
-            { id: 'rice',     name: '白米',   price: 90,  unit: '包', icon: '🌾' },
-            { id: 'noodle',   name: '麵條',   price: 35,  unit: '包', icon: '🍜' },
-            { id: 'salt',     name: '食鹽',   price: 20,  unit: '包', icon: '🧂' },
+            { id: 'egg',        name: '雞蛋',   price: 65,  unit: '盒', icon: '🥚' },
+            { id: 'tofu',       name: '豆腐',   price: 25,  unit: '塊', icon: '🫙' },
+            { id: 'soy',        name: '醬油',   price: 45,  unit: '瓶', icon: '🍶' },
+            { id: 'rice',       name: '白米',   price: 90,  unit: '包', icon: '🌾' },
+            { id: 'noodle',     name: '麵條',   price: 35,  unit: '包', icon: '🍜' },
+            { id: 'salt',       name: '食鹽',   price: 20,  unit: '包', icon: '🧂' },
+            { id: 'sugar',      name: '砂糖',   price: 30,  unit: '包', icon: '🍬' },
+            { id: 'miso',       name: '味噌',   price: 40,  unit: '包', icon: '🟡' },
+            { id: 'oil',        name: '沙拉油', price: 75,  unit: '瓶', icon: '🫙' },
+            { id: 'canned',     name: '罐頭',   price: 35,  unit: '罐', icon: '🥫' },
+            { id: 'soap',       name: '洗碗精', price: 45,  unit: '瓶', icon: '🧴' },
+            { id: 'tissue',     name: '衛生紙', price: 50,  unit: '包', icon: '🧻' },
         ],
     },
 };
@@ -77,6 +95,23 @@ const B6_MISSIONS = {
             { stall: 'grocery',   id: 'tofu' },
             { stall: 'vegetable', id: 'carrot' },
         ]},  // 總價65，找零135
+        { budget: 100, items: [
+            { stall: 'vegetable', id: 'corn' },
+            { stall: 'vegetable', id: 'cucumber' },
+        ]},  // 總價35，找零65
+        { budget: 150, items: [
+            { stall: 'fruit',     id: 'peach' },
+            { stall: 'vegetable', id: 'corn' },
+        ]},  // 總價70，找零80
+        { budget: 100, items: [
+            { stall: 'fruit',     id: 'guava' },
+            { stall: 'grocery',   id: 'sugar' },
+        ]},  // 總價65，找零35
+        { budget: 150, items: [
+            { stall: 'vegetable', id: 'broccoli' },
+            { stall: 'grocery',   id: 'miso' },
+            { stall: 'vegetable', id: 'cucumber' },
+        ]},  // 總價105，找零45
     ],
     normal: [
         { budget: 200, items: [
@@ -122,6 +157,27 @@ const B6_MISSIONS = {
             { stall: 'grocery',   id: 'noodle' },
             { stall: 'grocery',   id: 'salt' },
         ]},  // 總價170，找零130
+        { budget: 250, items: [
+            { stall: 'fruit',     id: 'pineapple' },
+            { stall: 'vegetable', id: 'daikon' },
+            { stall: 'grocery',   id: 'miso' },
+        ]},  // 總價140，找零110
+        { budget: 300, items: [
+            { stall: 'fruit',     id: 'peach' },
+            { stall: 'vegetable', id: 'broccoli' },
+            { stall: 'grocery',   id: 'oil' },
+            { stall: 'grocery',   id: 'sugar' },
+        ]},  // 總價205，找零95
+        { budget: 200, items: [
+            { stall: 'fruit',     id: 'papaya' },
+            { stall: 'vegetable', id: 'corn' },
+            { stall: 'grocery',   id: 'canned' },
+        ]},  // 總價95，找零105
+        { budget: 250, items: [
+            { stall: 'vegetable', id: 'pumpkin' },
+            { stall: 'grocery',   id: 'tissue' },
+            { stall: 'fruit',     id: 'guava' },
+        ]},  // 總價140，找零110
     ],
     hard: [
         { budget: 500, items: [
@@ -177,6 +233,20 @@ const B6_MISSIONS = {
             { stall: 'grocery',   id: 'tofu' },
             { stall: 'grocery',   id: 'noodle' },
         ]},  // 總價150，找零150
+        { budget: 400, items: [
+            { stall: 'fruit',     id: 'strawberry' },
+            { stall: 'grocery',   id: 'oil' },
+            { stall: 'vegetable', id: 'broccoli' },
+            { stall: 'vegetable', id: 'pumpkin' },
+            { stall: 'grocery',   id: 'sugar' },
+        ]},  // 總價305，找零95
+        { budget: 500, items: [
+            { stall: 'fruit',     id: 'pineapple' },
+            { stall: 'grocery',   id: 'tissue' },
+            { stall: 'grocery',   id: 'soap' },
+            { stall: 'vegetable', id: 'daikon' },
+            { stall: 'fruit',     id: 'papaya' },
+        ]},  // 總價240，找零260
     ],
 };
 
@@ -199,59 +269,81 @@ const B6_MARKETS = {
                     { id: 'muffin',     name: '馬芬',   price: 25,  unit: '個', icon: '🧁' },
                     { id: 'bun',        name: '小餐包', price: 20,  unit: '包', icon: '🥖' },
                     { id: 'cake_slice', name: '蛋糕',   price: 60,  unit: '片', icon: '🎂' },
+                    { id: 'bagel',      name: '貝果',   price: 40,  unit: '個', icon: '🥯' },
+                    { id: 'waffle',     name: '鬆餅',   price: 50,  unit: '片', icon: '🧇' },
+                    { id: 'donut',      name: '甜甜圈', price: 30,  unit: '個', icon: '🍩' },
+                    { id: 'cookie',     name: '餅乾',   price: 45,  unit: '包', icon: '🍪' },
                 ],
             },
             dairy: {
                 name: '乳品區', icon: '🥛',
                 items: [
-                    { id: 'milk',   name: '牛奶',   price: 50,  unit: '瓶', icon: '🥛' },
-                    { id: 'yogurt', name: '優格',   price: 40,  unit: '杯', icon: '🫙' },
-                    { id: 'cheese', name: '起司',   price: 80,  unit: '片', icon: '🧀' },
-                    { id: 'butter', name: '奶油',   price: 65,  unit: '盒', icon: '🧈' },
-                    { id: 'cream',  name: '鮮奶油', price: 45,  unit: '瓶', icon: '🫙' },
-                    { id: 'sm_egg', name: '雞蛋',   price: 55,  unit: '盒', icon: '🥚' },
+                    { id: 'milk',       name: '牛奶',   price: 50,  unit: '瓶', icon: '🥛' },
+                    { id: 'yogurt',     name: '優格',   price: 40,  unit: '杯', icon: '🫙' },
+                    { id: 'cheese',     name: '起司',   price: 80,  unit: '片', icon: '🧀' },
+                    { id: 'butter',     name: '奶油',   price: 65,  unit: '盒', icon: '🧈' },
+                    { id: 'cream',      name: '鮮奶油', price: 45,  unit: '瓶', icon: '🫙' },
+                    { id: 'sm_egg',     name: '雞蛋',   price: 55,  unit: '盒', icon: '🥚' },
+                    { id: 'soy_milk',   name: '豆漿',   price: 35,  unit: '瓶', icon: '🥛' },
+                    { id: 'oat_milk',   name: '燕麥奶', price: 60,  unit: '瓶', icon: '🌾' },
+                    { id: 'pudding',    name: '布丁',   price: 25,  unit: '個', icon: '🍮' },
+                    { id: 'ice_coffee', name: '咖啡凍', price: 30,  unit: '杯', icon: '☕' },
                 ],
             },
             frozen: {
                 name: '冷凍區', icon: '🧊',
                 items: [
-                    { id: 'dumpling',  name: '水餃',   price: 75,  unit: '包', icon: '🥟' },
-                    { id: 'sausage',   name: '香腸',   price: 60,  unit: '包', icon: '🌭' },
-                    { id: 'ice_cream', name: '冰淇淋', price: 45,  unit: '支', icon: '🍦' },
-                    { id: 'nugget',    name: '雞塊',   price: 80,  unit: '包', icon: '🍗' },
-                    { id: 'fish_ball', name: '魚丸',   price: 50,  unit: '包', icon: '🫙' },
-                    { id: 'edamame',   name: '毛豆',   price: 35,  unit: '包', icon: '🫘' },
+                    { id: 'dumpling',   name: '水餃',   price: 75,  unit: '包', icon: '🥟' },
+                    { id: 'sausage',    name: '香腸',   price: 60,  unit: '包', icon: '🌭' },
+                    { id: 'ice_cream',  name: '冰淇淋', price: 45,  unit: '支', icon: '🍦' },
+                    { id: 'nugget',     name: '雞塊',   price: 80,  unit: '包', icon: '🍗' },
+                    { id: 'fish_ball',  name: '魚丸',   price: 50,  unit: '包', icon: '🫙' },
+                    { id: 'edamame',    name: '毛豆',   price: 35,  unit: '包', icon: '🫘' },
+                    { id: 'wonton',     name: '餛飩',   price: 65,  unit: '包', icon: '🥟' },
+                    { id: 'shrimp',     name: '蝦仁',   price: 90,  unit: '包', icon: '🦐' },
+                    { id: 'pizza',      name: '披薩',   price: 55,  unit: '片', icon: '🍕' },
+                    { id: 'corn_dog',   name: '熱狗',   price: 40,  unit: '條', icon: '🌽' },
                 ],
             },
         },
         missions: {
             easy: [
-                { budget: 100, items: [{ stall:'bakery',  id:'bun'    }, { stall:'bakery',  id:'bread'   }]},  // 50元，找零50
-                { budget: 100, items: [{ stall:'dairy',   id:'yogurt' }, { stall:'bakery',  id:'muffin'  }]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'frozen',  id:'ice_cream'},{ stall:'bakery', id:'toast'   }]},  // 80元，找零70
-                { budget: 100, items: [{ stall:'dairy',   id:'cream'  }, { stall:'bakery',  id:'muffin'  }]},  // 70元，找零30
-                { budget: 200, items: [{ stall:'bakery',  id:'bread'  }, { stall:'frozen',  id:'edamame' }]},  // 65元，找零135
-                { budget: 100, items: [{ stall:'frozen',  id:'ice_cream'},{ stall:'bakery', id:'bun'     }]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'dairy',   id:'yogurt' }, { stall:'frozen',  id:'edamame' }, { stall:'bakery', id:'bun' }]},  // 95元，找零55
-                { budget: 200, items: [{ stall:'bakery',  id:'toast'  }, { stall:'frozen',  id:'fish_ball'}]},  // 85元，找零115
+                { budget: 100, items: [{ stall:'bakery',  id:'bun'       }, { stall:'bakery',  id:'bread'      }]},  // 50元，找零50
+                { budget: 100, items: [{ stall:'dairy',   id:'yogurt'    }, { stall:'bakery',  id:'muffin'     }]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'frozen',  id:'ice_cream' }, { stall:'bakery',  id:'toast'      }]},  // 80元，找零70
+                { budget: 100, items: [{ stall:'dairy',   id:'cream'     }, { stall:'bakery',  id:'muffin'     }]},  // 70元，找零30
+                { budget: 200, items: [{ stall:'bakery',  id:'bread'     }, { stall:'frozen',  id:'edamame'    }]},  // 65元，找零135
+                { budget: 100, items: [{ stall:'frozen',  id:'ice_cream' }, { stall:'bakery',  id:'bun'        }]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'dairy',   id:'yogurt'    }, { stall:'frozen',  id:'edamame'    }, { stall:'bakery',  id:'bun'        }]},  // 95元，找零55
+                { budget: 200, items: [{ stall:'bakery',  id:'toast'     }, { stall:'frozen',  id:'fish_ball'  }]},  // 85元，找零115
+                { budget: 100, items: [{ stall:'dairy',   id:'pudding'   }, { stall:'bakery',  id:'donut'      }]},  // 55元，找零45
+                { budget: 150, items: [{ stall:'frozen',  id:'corn_dog'  }, { stall:'bakery',  id:'bun'        }, { stall:'dairy',   id:'pudding'    }]},  // 90元，找零60
+                { budget: 100, items: [{ stall:'dairy',   id:'soy_milk'  }, { stall:'bakery',  id:'muffin'     }]},  // 60元，找零40
+                { budget: 150, items: [{ stall:'bakery',  id:'bagel'     }, { stall:'dairy',   id:'ice_coffee' }]},  // 70元，找零80
             ],
             normal: [
-                { budget: 200, items: [{ stall:'bakery', id:'bread'   }, { stall:'bakery',  id:'croissant'}, { stall:'dairy',  id:'yogurt' }]},  // 115，找零85
-                { budget: 300, items: [{ stall:'dairy',  id:'milk'    }, { stall:'frozen',  id:'dumpling' }, { stall:'bakery', id:'bun'    }]},  // 145，找零155
-                { budget: 250, items: [{ stall:'bakery', id:'cake_slice'},{ stall:'dairy',  id:'cream'   }, { stall:'frozen', id:'ice_cream'},{ stall:'bakery',id:'muffin'}]},  // 170，找零80
-                { budget: 200, items: [{ stall:'frozen', id:'sausage' }, { stall:'dairy',   id:'yogurt'  }, { stall:'bakery', id:'toast'   }]},  // 135，找零65
-                { budget: 300, items: [{ stall:'dairy',  id:'sm_egg'  }, { stall:'frozen',  id:'fish_ball'}, { stall:'bakery', id:'croissant'}]},  // 140，找零160
-                { budget: 250, items: [{ stall:'frozen', id:'nugget'  }, { stall:'dairy',   id:'cream'   }, { stall:'bakery', id:'bread'   }, { stall:'bakery',id:'bun'}]},  // 185，找零65
-                { budget: 250, items: [{ stall:'bakery', id:'cake_slice'},{ stall:'dairy',  id:'butter'  }, { stall:'frozen', id:'edamame' }]},  // 160，找零90
-                { budget: 300, items: [{ stall:'frozen', id:'dumpling' },{ stall:'dairy',   id:'yogurt'  }, { stall:'frozen', id:'edamame' }, { stall:'bakery',id:'toast'}]},  // 185，找零115
+                { budget: 200, items: [{ stall:'bakery',  id:'bread'     }, { stall:'bakery',  id:'croissant'  }, { stall:'dairy',   id:'yogurt'     }]},  // 115，找零85
+                { budget: 300, items: [{ stall:'dairy',   id:'milk'      }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'bun'        }]},  // 145，找零155
+                { budget: 250, items: [{ stall:'bakery',  id:'cake_slice'}, { stall:'dairy',   id:'cream'      }, { stall:'frozen',  id:'ice_cream'  }, { stall:'bakery',  id:'muffin'     }]},  // 170，找零80
+                { budget: 200, items: [{ stall:'frozen',  id:'sausage'   }, { stall:'dairy',   id:'yogurt'     }, { stall:'bakery',  id:'toast'      }]},  // 135，找零65
+                { budget: 300, items: [{ stall:'dairy',   id:'sm_egg'    }, { stall:'frozen',  id:'fish_ball'  }, { stall:'bakery',  id:'croissant'  }]},  // 140，找零160
+                { budget: 250, items: [{ stall:'frozen',  id:'nugget'    }, { stall:'dairy',   id:'cream'      }, { stall:'bakery',  id:'bread'      }, { stall:'bakery',  id:'bun'        }]},  // 185，找零65
+                { budget: 250, items: [{ stall:'bakery',  id:'cake_slice'}, { stall:'dairy',   id:'butter'     }, { stall:'frozen',  id:'edamame'    }]},  // 160，找零90
+                { budget: 300, items: [{ stall:'frozen',  id:'dumpling'  }, { stall:'dairy',   id:'yogurt'     }, { stall:'frozen',  id:'edamame'    }, { stall:'bakery',  id:'toast'      }]},  // 185，找零115
+                { budget: 250, items: [{ stall:'bakery',  id:'waffle'    }, { stall:'dairy',   id:'oat_milk'   }, { stall:'frozen',  id:'corn_dog'   }]},  // 150，找零100
+                { budget: 300, items: [{ stall:'frozen',  id:'wonton'    }, { stall:'dairy',   id:'milk'       }, { stall:'bakery',  id:'cookie'     }, { stall:'bakery',  id:'donut'      }]},  // 205，找零95
+                { budget: 200, items: [{ stall:'frozen',  id:'pizza'     }, { stall:'dairy',   id:'pudding'    }, { stall:'bakery',  id:'bun'        }]},  // 120，找零80
+                { budget: 250, items: [{ stall:'dairy',   id:'oat_milk'  }, { stall:'bakery',  id:'bagel'      }, { stall:'frozen',  id:'fish_ball'  }, { stall:'dairy',   id:'ice_coffee' }]},  // 180，找零70
             ],
             hard: [
-                { budget: 500, items: [{ stall:'dairy',  id:'milk'    }, { stall:'dairy',   id:'cheese'  }, { stall:'frozen', id:'dumpling'}, { stall:'bakery', id:'bread' }, { stall:'bakery', id:'croissant'}]},  // 280，找零220
-                { budget: 300, items: [{ stall:'frozen', id:'nugget'  }, { stall:'frozen',  id:'sausage' }, { stall:'dairy',  id:'yogurt'  }, { stall:'bakery', id:'cake_slice'}]},  // 245，找零55
-                { budget: 400, items: [{ stall:'dairy',  id:'butter'  }, { stall:'frozen',  id:'dumpling'}, { stall:'bakery', id:'toast'   }, { stall:'dairy',  id:'cream'   }]},  // 220，找零180
-                { budget: 500, items: [{ stall:'dairy',  id:'cheese'  }, { stall:'frozen',  id:'nugget'  }, { stall:'bakery', id:'cake_slice'},{ stall:'frozen', id:'sausage' },{ stall:'bakery',id:'bread'}]},  // 295，找零205
-                { budget: 300, items: [{ stall:'frozen', id:'fish_ball'},{ stall:'dairy',   id:'sm_egg'  }, { stall:'bakery', id:'croissant'}, { stall:'frozen', id:'edamame' }]},  // 185，找零115
-                { budget: 400, items: [{ stall:'dairy',  id:'milk'    }, { stall:'bakery',  id:'cake_slice'},{ stall:'frozen', id:'dumpling'}, { stall:'dairy',  id:'butter'  }, { stall:'bakery',id:'muffin'}]},  // 295，找零105
+                { budget: 500, items: [{ stall:'dairy',   id:'milk'      }, { stall:'dairy',   id:'cheese'     }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'bread'      }, { stall:'bakery',  id:'croissant'  }]},  // 280，找零220
+                { budget: 300, items: [{ stall:'frozen',  id:'nugget'    }, { stall:'frozen',  id:'sausage'    }, { stall:'dairy',   id:'yogurt'     }, { stall:'bakery',  id:'cake_slice' }]},  // 245，找零55
+                { budget: 400, items: [{ stall:'dairy',   id:'butter'    }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'toast'      }, { stall:'dairy',   id:'cream'      }]},  // 220，找零180
+                { budget: 500, items: [{ stall:'dairy',   id:'cheese'    }, { stall:'frozen',  id:'nugget'     }, { stall:'bakery',  id:'cake_slice' }, { stall:'frozen',  id:'sausage'    }, { stall:'bakery',  id:'bread'      }]},  // 295，找零205
+                { budget: 300, items: [{ stall:'frozen',  id:'fish_ball' }, { stall:'dairy',   id:'sm_egg'     }, { stall:'bakery',  id:'croissant'  }, { stall:'frozen',  id:'edamame'    }]},  // 185，找零115
+                { budget: 400, items: [{ stall:'dairy',   id:'milk'      }, { stall:'bakery',  id:'cake_slice' }, { stall:'frozen',  id:'dumpling'   }, { stall:'dairy',   id:'butter'     }, { stall:'bakery',  id:'muffin'     }]},  // 295，找零105
+                { budget: 500, items: [{ stall:'frozen',  id:'shrimp'    }, { stall:'frozen',  id:'wonton'     }, { stall:'dairy',   id:'oat_milk'   }, { stall:'bakery',  id:'waffle'     }, { stall:'dairy',   id:'cheese'     }]},  // 355，找零145
+                { budget: 400, items: [{ stall:'bakery',  id:'cookie'    }, { stall:'frozen',  id:'pizza'      }, { stall:'dairy',   id:'butter'     }, { stall:'frozen',  id:'nugget'     }, { stall:'bakery',  id:'bagel'      }]},  // 290，找零110
             ],
         },
     },
@@ -261,65 +353,92 @@ const B6_MARKETS = {
             snack: {
                 name: '小吃攤', icon: '🍜',
                 items: [
-                    { id: 'oysternoodle', name: '蚵仔麵線', price: 50,  unit: '碗', icon: '🍜' },
-                    { id: 'beefnoodle',  name: '牛肉麵',   price: 80,  unit: '碗', icon: '🍲' },
-                    { id: 'pancake',     name: '蔥抓餅',   price: 35,  unit: '份', icon: '🥞' },
-                    { id: 'popcorn_chk', name: '鹹酥雞',   price: 60,  unit: '份', icon: '🍗' },
-                    { id: 'stinky_tofu', name: '臭豆腐',   price: 45,  unit: '份', icon: '🫙' },
-                    { id: 'takoyaki',    name: '章魚燒',   price: 50,  unit: '份', icon: '🐙' },
+                    { id: 'oysternoodle',  name: '蚵仔麵線', price: 50,  unit: '碗', icon: '🍜' },
+                    { id: 'beefnoodle',    name: '牛肉麵',   price: 80,  unit: '碗', icon: '🍲' },
+                    { id: 'pancake',       name: '蔥抓餅',   price: 35,  unit: '份', icon: '🥞' },
+                    { id: 'popcorn_chk',   name: '鹹酥雞',   price: 60,  unit: '份', icon: '🍗' },
+                    { id: 'stinky_tofu',   name: '臭豆腐',   price: 45,  unit: '份', icon: '🫙' },
+                    { id: 'takoyaki',      name: '章魚燒',   price: 50,  unit: '份', icon: '🐙' },
+                    { id: 'chicken_chop',  name: '雞排',     price: 65,  unit: '份', icon: '🍖' },
+                    { id: 'oyster_omelet', name: '蚵仔煎',   price: 60,  unit: '份', icon: '🍳' },
+                    { id: 'sweet_potato_ball', name: '地瓜球', price: 30, unit: '份', icon: '🟠' },
+                    { id: 'fishball_soup', name: '魚丸湯',   price: 40,  unit: '碗', icon: '🍥' },
                 ],
             },
             drink: {
                 name: '飲料攤', icon: '🧋',
                 items: [
-                    { id: 'bubble_tea', name: '珍珠奶茶', price: 55,  unit: '杯', icon: '🧋' },
-                    { id: 'lemon_tea',  name: '檸檬茶',   price: 40,  unit: '杯', icon: '🍋' },
-                    { id: 'sugarcane',  name: '甘蔗汁',   price: 30,  unit: '杯', icon: '🌿' },
-                    { id: 'milk_tea',   name: '奶茶',     price: 45,  unit: '杯', icon: '🍵' },
-                    { id: 'smoothie',   name: '果汁',     price: 50,  unit: '杯', icon: '🍹' },
-                    { id: 'soymilk',    name: '豆花',     price: 35,  unit: '碗', icon: '🥛' },
+                    { id: 'bubble_tea',  name: '珍珠奶茶', price: 55, unit: '杯', icon: '🧋' },
+                    { id: 'lemon_tea',   name: '檸檬茶',   price: 40, unit: '杯', icon: '🍋' },
+                    { id: 'sugarcane',   name: '甘蔗汁',   price: 30, unit: '杯', icon: '🌿' },
+                    { id: 'milk_tea',    name: '奶茶',     price: 45, unit: '杯', icon: '🍵' },
+                    { id: 'smoothie',    name: '果汁',     price: 50, unit: '杯', icon: '🍹' },
+                    { id: 'soymilk',     name: '豆花',     price: 35, unit: '碗', icon: '🥛' },
+                    { id: 'papaya_milk', name: '木瓜牛奶', price: 50, unit: '杯', icon: '🥛' },
+                    { id: 'iced_tea',    name: '紅茶',     price: 30, unit: '杯', icon: '🍶' },
+                    { id: 'taro_milk',   name: '芋頭牛奶', price: 55, unit: '杯', icon: '🫗' },
                 ],
             },
             souvenir: {
                 name: '紀念品攤', icon: '🎁',
                 items: [
-                    { id: 'phone_case', name: '手機殼',   price: 80,  unit: '個', icon: '📱' },
-                    { id: 'keychain',   name: '鑰匙圈',   price: 45,  unit: '個', icon: '🔑' },
-                    { id: 'hairpin',    name: '髮夾',     price: 30,  unit: '個', icon: '💎' },
-                    { id: 'bookmark',   name: '書籤',     price: 20,  unit: '個', icon: '📖' },
-                    { id: 'magnet',     name: '磁鐵',     price: 35,  unit: '個', icon: '🧲' },
-                    { id: 'wristband',  name: '手環',     price: 60,  unit: '個', icon: '⌚' },
+                    { id: 'phone_case',  name: '手機殼',   price: 80,  unit: '個', icon: '📱' },
+                    { id: 'keychain',    name: '鑰匙圈',   price: 45,  unit: '個', icon: '🔑' },
+                    { id: 'hairpin',     name: '髮夾',     price: 30,  unit: '個', icon: '💎' },
+                    { id: 'bookmark',    name: '書籤',     price: 20,  unit: '個', icon: '📖' },
+                    { id: 'magnet',      name: '冰箱磁鐵', price: 35,  unit: '個', icon: '🧲' },
+                    { id: 'wristband',   name: '手環',     price: 60,  unit: '個', icon: '🪬' },
+                    { id: 'postcard',    name: '明信片',   price: 25,  unit: '張', icon: '📮' },
+                    { id: 'sticker',     name: '貼紙組',   price: 20,  unit: '包', icon: '🌟' },
+                    { id: 'charm',       name: '吊飾',     price: 55,  unit: '個', icon: '🔮' },
+                    { id: 'plush',       name: '可愛布偶', price: 90,  unit: '個', icon: '🧸' },
+                    { id: 'badge_pin',   name: '徽章',     price: 30,  unit: '個', icon: '🏅' },
+                    { id: 'fan',         name: '摺扇',     price: 50,  unit: '把', icon: '🪭' },
+                    { id: 'lanyard',     name: '掛繩',     price: 40,  unit: '條', icon: '🎀' },
+                    { id: 'tote_bag',    name: '帆布袋',   price: 75,  unit: '個', icon: '👜' },
                 ],
             },
         },
         missions: {
             easy: [
-                { budget: 100, items: [{ stall:'drink',    id:'sugarcane' }, { stall:'drink',    id:'soymilk'  }]},  // 65元，找零35
-                { budget: 100, items: [{ stall:'snack',    id:'pancake'   }, { stall:'drink',    id:'sugarcane'}]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'souvenir', id:'hairpin'   }, { stall:'souvenir', id:'bookmark' }, { stall:'drink', id:'sugarcane'}]},  // 80元，找零70
-                { budget: 100, items: [{ stall:'drink',    id:'lemon_tea' }, { stall:'drink',    id:'soymilk'  }]},  // 75元，找零25
-                { budget: 200, items: [{ stall:'snack',    id:'pancake'   }, { stall:'souvenir', id:'magnet'   }]},  // 70元，找零130
-                { budget: 100, items: [{ stall:'snack',    id:'stinky_tofu'},{ stall:'drink',    id:'sugarcane'}]},  // 75元，找零25
-                { budget: 150, items: [{ stall:'drink',    id:'milk_tea'  }, { stall:'souvenir', id:'hairpin'  }, { stall:'drink', id:'sugarcane'}]},  // 105元，找零45
-                { budget: 200, items: [{ stall:'souvenir', id:'keychain'  }, { stall:'drink',    id:'lemon_tea'}]},  // 85元，找零115
+                { budget: 100, items: [{ stall:'drink',    id:'sugarcane'    }, { stall:'drink',    id:'soymilk'     }]},  // 65元，找零35
+                { budget: 100, items: [{ stall:'snack',    id:'pancake'      }, { stall:'drink',    id:'sugarcane'   }]},  // 65元，找零35
+                { budget: 150, items: [{ stall:'souvenir', id:'hairpin'      }, { stall:'souvenir', id:'bookmark'    }, { stall:'drink',    id:'sugarcane'   }]},  // 80元，找零70
+                { budget: 100, items: [{ stall:'drink',    id:'lemon_tea'    }, { stall:'drink',    id:'soymilk'     }]},  // 75元，找零25
+                { budget: 200, items: [{ stall:'snack',    id:'pancake'      }, { stall:'souvenir', id:'magnet'      }]},  // 70元，找零130
+                { budget: 100, items: [{ stall:'snack',    id:'stinky_tofu'  }, { stall:'drink',    id:'sugarcane'   }]},  // 75元，找零25
+                { budget: 150, items: [{ stall:'drink',    id:'milk_tea'     }, { stall:'souvenir', id:'hairpin'     }, { stall:'drink',    id:'sugarcane'   }]},  // 105元，找零45
+                { budget: 200, items: [{ stall:'souvenir', id:'keychain'     }, { stall:'drink',    id:'lemon_tea'   }]},  // 85元，找零115
+                { budget: 100, items: [{ stall:'snack',    id:'sweet_potato_ball'},{ stall:'drink',  id:'iced_tea'   }]},  // 60元，找零40
+                { budget: 100, items: [{ stall:'souvenir', id:'postcard'     }, { stall:'souvenir', id:'sticker'     }, { stall:'drink',    id:'iced_tea'    }]},  // 75元，找零25
+                { budget: 150, items: [{ stall:'snack',    id:'oyster_omelet'}, { stall:'souvenir', id:'badge_pin'   }]},  // 90元，找零60
+                { budget: 150, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'souvenir', id:'sticker'     }]},  // 85元，找零65
             ],
             normal: [
-                { budget: 200, items: [{ stall:'snack',    id:'oysternoodle'},{ stall:'drink',   id:'milk_tea'  }, { stall:'souvenir',id:'hairpin'  }]},  // 125，找零75
-                { budget: 300, items: [{ stall:'snack',    id:'beefnoodle' }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'magnet'   }]},  // 170，找零130
-                { budget: 250, items: [{ stall:'snack',    id:'pancake'    }, { stall:'drink',   id:'lemon_tea' }, { stall:'snack',   id:'takoyaki'  },{ stall:'drink',id:'sugarcane'}]},  // 155，找零95
-                { budget: 200, items: [{ stall:'souvenir', id:'keychain'   }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',   id:'milk_tea'  }]},  // 140，找零60
-                { budget: 300, items: [{ stall:'souvenir', id:'wristband'  }, { stall:'snack',   id:'popcorn_chk'},{ stall:'drink',   id:'smoothie'  }]},  // 170，找零130
-                { budget: 250, items: [{ stall:'drink',    id:'bubble_tea' }, { stall:'souvenir',id:'magnet'    }, { stall:'snack',   id:'oysternoodle'},{ stall:'drink',id:'sugarcane'}]},  // 165，找零85
-                { budget: 250, items: [{ stall:'snack',    id:'takoyaki'   }, { stall:'drink',   id:'smoothie'  }, { stall:'souvenir',id:'keychain'  }]},  // 145，找零105
-                { budget: 300, items: [{ stall:'snack',    id:'pancake'    }, { stall:'souvenir',id:'wristband' }, { stall:'drink',   id:'milk_tea'  }, { stall:'drink',id:'lemon_tea'}]},  // 180，找零120
+                { budget: 200, items: [{ stall:'snack',    id:'oysternoodle' }, { stall:'drink',    id:'milk_tea'    }, { stall:'souvenir', id:'hairpin'     }]},  // 125，找零75
+                { budget: 300, items: [{ stall:'snack',    id:'beefnoodle'   }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'magnet'      }]},  // 170，找零130
+                { budget: 250, items: [{ stall:'snack',    id:'pancake'      }, { stall:'drink',    id:'lemon_tea'   }, { stall:'snack',    id:'takoyaki'    }, { stall:'drink', id:'sugarcane'}]},  // 155，找零95
+                { budget: 200, items: [{ stall:'souvenir', id:'keychain'     }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'milk_tea'    }]},  // 140，找零60
+                { budget: 300, items: [{ stall:'souvenir', id:'wristband'    }, { stall:'snack',    id:'popcorn_chk' }, { stall:'drink',    id:'smoothie'    }]},  // 170，找零130
+                { budget: 250, items: [{ stall:'drink',    id:'bubble_tea'   }, { stall:'souvenir', id:'magnet'      }, { stall:'snack',    id:'oysternoodle'}, { stall:'drink', id:'sugarcane'}]},  // 165，找零85
+                { budget: 250, items: [{ stall:'snack',    id:'takoyaki'     }, { stall:'drink',    id:'smoothie'    }, { stall:'souvenir', id:'keychain'    }]},  // 145，找零105
+                { budget: 300, items: [{ stall:'snack',    id:'pancake'      }, { stall:'souvenir', id:'wristband'   }, { stall:'drink',    id:'milk_tea'    }, { stall:'drink', id:'lemon_tea'}]},  // 180，找零120
+                { budget: 200, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'drink',    id:'taro_milk'   }, { stall:'souvenir', id:'postcard'    }]},  // 140，找零60
+                { budget: 250, items: [{ stall:'souvenir', id:'plush'        }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'iced_tea'    }]},  // 180，找零70
+                { budget: 300, items: [{ stall:'souvenir', id:'charm'        }, { stall:'souvenir', id:'fan'         }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink', id:'sugarcane'}]},  // 215，找零85
+                { budget: 200, items: [{ stall:'snack',    id:'fishball_soup'}, { stall:'drink',    id:'papaya_milk' }, { stall:'souvenir', id:'lanyard'     }]},  // 130，找零70
             ],
             hard: [
-                { budget: 500, items: [{ stall:'snack',    id:'beefnoodle' }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'phone_case'}, { stall:'snack',   id:'oysternoodle'},{ stall:'drink',id:'milk_tea'}]},  // 330，找零170
-                { budget: 300, items: [{ stall:'souvenir', id:'phone_case' }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',   id:'smoothie'  }, { stall:'souvenir',id:'magnet'   }]},  // 210，找零90
-                { budget: 400, items: [{ stall:'snack',    id:'popcorn_chk'},{ stall:'drink',   id:'bubble_tea' }, { stall:'souvenir',id:'wristband' }, { stall:'snack',   id:'pancake'   }]},  // 210，找零190
-                { budget: 500, items: [{ stall:'souvenir', id:'phone_case' }, { stall:'souvenir',id:'keychain'  }, { stall:'snack',   id:'beefnoodle'}, { stall:'drink',   id:'smoothie'  },{ stall:'drink',id:'sugarcane'}]},  // 310，找零190
-                { budget: 300, items: [{ stall:'snack',    id:'takoyaki'   }, { stall:'drink',   id:'bubble_tea'}, { stall:'souvenir',id:'keychain'  }, { stall:'drink',   id:'soymilk'   }]},  // 185，找零115
-                { budget: 400, items: [{ stall:'snack',    id:'oysternoodle'},{ stall:'souvenir',id:'phone_case'},{ stall:'drink',   id:'lemon_tea'  }, { stall:'snack',   id:'stinky_tofu'},{ stall:'drink',id:'milk_tea'}]},  // 305，找零95
+                { budget: 500, items: [{ stall:'snack',    id:'beefnoodle'   }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'phone_case'  }, { stall:'snack',    id:'oysternoodle'}, { stall:'drink',    id:'milk_tea'   }]},  // 330，找零170
+                { budget: 300, items: [{ stall:'souvenir', id:'phone_case'   }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'smoothie'    }, { stall:'souvenir', id:'magnet'      }]},  // 210，找零90
+                { budget: 400, items: [{ stall:'snack',    id:'popcorn_chk'  }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'wristband'   }, { stall:'snack',    id:'pancake'     }]},  // 210，找零190
+                { budget: 500, items: [{ stall:'souvenir', id:'phone_case'   }, { stall:'souvenir', id:'keychain'    }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink',    id:'smoothie'    }, { stall:'drink',    id:'sugarcane'  }]},  // 310，找零190
+                { budget: 300, items: [{ stall:'snack',    id:'takoyaki'     }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'keychain'    }, { stall:'drink',    id:'soymilk'     }]},  // 185，找零115
+                { budget: 400, items: [{ stall:'snack',    id:'oysternoodle' }, { stall:'souvenir', id:'phone_case'  }, { stall:'drink',    id:'lemon_tea'   }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'milk_tea'  }]},  // 305，找零95
+                { budget: 400, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'souvenir', id:'plush'       }, { stall:'drink',    id:'taro_milk'   }, { stall:'souvenir', id:'charm'       }, { stall:'snack',    id:'sweet_potato_ball'}]},  // 295，找零105
+                { budget: 300, items: [{ stall:'souvenir', id:'fan'          }, { stall:'souvenir', id:'lanyard'     }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'bubble_tea'  }, { stall:'souvenir', id:'badge_pin'  }]},  // 235，找零65
+                { budget: 500, items: [{ stall:'souvenir', id:'plush'        }, { stall:'souvenir', id:'tote_bag'    }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink',    id:'papaya_milk' }, { stall:'souvenir', id:'charm'      }]},  // 370，找零130
+                { budget: 400, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'taro_milk'   }, { stall:'souvenir', id:'fan'         }, { stall:'souvenir', id:'postcard'   }]},  // 255，找零145
             ],
         },
     },
@@ -1627,9 +1746,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (diff === 'hard') {
                         this._showHardModeHintModal(total);
                     } else {
+                        // 清空已放金錢再套用提示，避免統計錯誤
+                        g.p2Wallet  = [];
+                        g.p2UidCtr  = 0;
                         g.p2ShowHint = true;
                         this._b6P2AutoSetGhostSlots();
                         this._b6P2UpdateWalletDisplay();
+                        Game.Speech.speak('請按照提示放入正確的金錢');
                     }
                 }, {}, 'gameUI');
             }
@@ -1775,7 +1898,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector(`.b6p2-wc-removable[data-uid="${uid}"]`)?.remove();
                 const coinsEl = document.getElementById('b6p2-wallet-coins');
                 if (coinsEl && g.p2Wallet.length === 0)
-                    coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
+                    coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
                 this._b6P2UpdateStatusOnly();
             }
         },
