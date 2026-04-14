@@ -166,6 +166,7 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    position: relative;
 }
 
 .b6-product-btn:hover:not(.collected) {
@@ -1666,6 +1667,143 @@
     color: #6b7280;
     text-align: center;
     margin-bottom: 8px;
+}
+
+/* ── 任務卡攤位需求列 ── */
+.b6-task-stall-reqs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 0 2px;
+}
+
+.b6-stall-req {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    flex-wrap: wrap;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.b6-stall-req.active {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.b6-stall-req.done {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.b6-sr-icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.b6-sr-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
+}
+
+.b6-sr-prog {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.b6-stall-req.done .b6-sr-prog {
+    color: #16a34a;
+    background: #dcfce7;
+}
+
+.b6-sr-items {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding-left: 26px;
+    margin-top: 2px;
+}
+
+.b6-sr-sel-item {
+    font-size: 12px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+/* ── 商品按鈕新狀態 ── */
+.b6-product-btn.selected {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-color: #34d399;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.4);
+}
+
+.b6-product-btn.over-budget {
+    background: #fef9c3;
+    border-color: #fbbf24;
+    opacity: 0.75;
+}
+
+.b6-product-btn.quota-full {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    opacity: 0.6;
+}
+
+.b6-product-over-mark {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 12px;
+}
+
+.b6-product-collected-mark {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 13px;
+}
+
+/* ── 預算顯示 ── */
+.b6-budget-over {
+    color: #dc2626 !important;
+}
+
+.b6-budget-warning {
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.b6-budget-left {
+    font-size: 12px;
+    color: #16a34a;
+    font-weight: 600;
+}
+
+/* ── 結帳列小計超出 ── */
+.b6-cstrip-total.over {
+    color: #dc2626;
+}
+
+/* ── 攤位標題配額顯示 ── */
+.b6-snav-quota {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 @media (max-width: 480px) {

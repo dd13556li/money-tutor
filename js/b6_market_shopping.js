@@ -58,195 +58,38 @@ const B6_STALLS = {
     },
 };
 
-// ── 購物清單任務（依難度）───────────────────────────────────
+// ── 購物清單任務（依難度）── 新格式：指定各攤位選幾樣，不指定具體商品 ──
+// budget = 上限；stalls = [{stall, count}] 表示在該攤位自由選 count 樣
 const B6_MISSIONS = {
     easy: [
-        { budget: 100, items: [
-            { stall: 'vegetable', id: 'cabbage' },
-            { stall: 'vegetable', id: 'scallion' },
-        ]},  // 總價50，找零50
-        { budget: 100, items: [
-            { stall: 'vegetable', id: 'tomato' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價65，找零35
-        { budget: 150, items: [
-            { stall: 'fruit',     id: 'banana' },
-            { stall: 'grocery',   id: 'tofu' },
-            { stall: 'vegetable', id: 'scallion' },
-        ]},  // 總價70，找零80
-        { budget: 100, items: [
-            { stall: 'grocery',   id: 'tofu' },
-            { stall: 'vegetable', id: 'spinach' },
-        ]},  // 總價50，找零50
-        { budget: 200, items: [
-            { stall: 'vegetable', id: 'carrot' },
-            { stall: 'fruit',     id: 'apple' },
-        ]},  // 總價90，找零110
-        { budget: 100, items: [
-            { stall: 'vegetable', id: 'sweetpot' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價55，找零45
-        { budget: 150, items: [
-            { stall: 'fruit',     id: 'apple' },
-            { stall: 'vegetable', id: 'scallion' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價90，找零60
-        { budget: 200, items: [
-            { stall: 'grocery',   id: 'tofu' },
-            { stall: 'vegetable', id: 'carrot' },
-        ]},  // 總價65，找零135
-        { budget: 100, items: [
-            { stall: 'vegetable', id: 'corn' },
-            { stall: 'vegetable', id: 'cucumber' },
-        ]},  // 總價35，找零65
-        { budget: 150, items: [
-            { stall: 'fruit',     id: 'peach' },
-            { stall: 'vegetable', id: 'corn' },
-        ]},  // 總價70，找零80
-        { budget: 100, items: [
-            { stall: 'fruit',     id: 'guava' },
-            { stall: 'grocery',   id: 'sugar' },
-        ]},  // 總價65，找零35
-        { budget: 150, items: [
-            { stall: 'vegetable', id: 'broccoli' },
-            { stall: 'grocery',   id: 'miso' },
-            { stall: 'vegetable', id: 'cucumber' },
-        ]},  // 總價105，找零45
+        { budget:  80, stalls: [{ stall:'vegetable', count:1 }, { stall:'grocery',   count:1 }] },
+        { budget: 100, stalls: [{ stall:'fruit',     count:1 }, { stall:'vegetable', count:1 }] },
+        { budget:  60, stalls: [{ stall:'vegetable', count:2 }] },
+        { budget:  80, stalls: [{ stall:'grocery',   count:1 }, { stall:'fruit',     count:1 }] },
+        { budget: 100, stalls: [{ stall:'fruit',     count:1 }, { stall:'grocery',   count:1 }] },
+        { budget:  70, stalls: [{ stall:'vegetable', count:1 }, { stall:'fruit',     count:1 }] },
+        { budget:  80, stalls: [{ stall:'grocery',   count:2 }] },
+        { budget: 100, stalls: [{ stall:'vegetable', count:1 }, { stall:'fruit',     count:1 }, { stall:'grocery', count:1 }] },
     ],
     normal: [
-        { budget: 200, items: [
-            { stall: 'vegetable', id: 'cabbage' },
-            { stall: 'vegetable', id: 'tomato' },
-            { stall: 'grocery',   id: 'tofu' },
-        ]},  // 總價100，找零100
-        { budget: 300, items: [
-            { stall: 'fruit',     id: 'apple' },
-            { stall: 'grocery',   id: 'egg' },
-            { stall: 'vegetable', id: 'carrot' },
-        ]},  // 總價155，找零145
-        { budget: 250, items: [
-            { stall: 'fruit',     id: 'banana' },
-            { stall: 'vegetable', id: 'tomato' },
-            { stall: 'grocery',   id: 'noodle' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價125，找零125
-        { budget: 200, items: [
-            { stall: 'vegetable', id: 'sweetpot' },
-            { stall: 'fruit',     id: 'orange' },
-            { stall: 'grocery',   id: 'soy' },
-        ]},  // 總價120，找零80
-        { budget: 300, items: [
-            { stall: 'grocery',   id: 'rice' },
-            { stall: 'vegetable', id: 'spinach' },
-            { stall: 'fruit',     id: 'mango' },
-        ]},  // 總價175，找零125
-        { budget: 250, items: [
-            { stall: 'vegetable', id: 'scallion' },
-            { stall: 'vegetable', id: 'carrot' },
-            { stall: 'fruit',     id: 'banana' },
-            { stall: 'grocery',   id: 'tofu' },
-        ]},  // 總價110，找零140
-        { budget: 250, items: [
-            { stall: 'vegetable', id: 'tomato' },
-            { stall: 'fruit',     id: 'banana' },
-            { stall: 'grocery',   id: 'soy' },
-        ]},  // 總價115，找零135
-        { budget: 300, items: [
-            { stall: 'vegetable', id: 'sweetpot' },
-            { stall: 'fruit',     id: 'grape' },
-            { stall: 'grocery',   id: 'noodle' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價170，找零130
-        { budget: 250, items: [
-            { stall: 'fruit',     id: 'pineapple' },
-            { stall: 'vegetable', id: 'daikon' },
-            { stall: 'grocery',   id: 'miso' },
-        ]},  // 總價140，找零110
-        { budget: 300, items: [
-            { stall: 'fruit',     id: 'peach' },
-            { stall: 'vegetable', id: 'broccoli' },
-            { stall: 'grocery',   id: 'oil' },
-            { stall: 'grocery',   id: 'sugar' },
-        ]},  // 總價205，找零95
-        { budget: 200, items: [
-            { stall: 'fruit',     id: 'papaya' },
-            { stall: 'vegetable', id: 'corn' },
-            { stall: 'grocery',   id: 'canned' },
-        ]},  // 總價95，找零105
-        { budget: 250, items: [
-            { stall: 'vegetable', id: 'pumpkin' },
-            { stall: 'grocery',   id: 'tissue' },
-            { stall: 'fruit',     id: 'guava' },
-        ]},  // 總價140，找零110
+        { budget: 120, stalls: [{ stall:'vegetable', count:2 }, { stall:'grocery',   count:1 }] },
+        { budget: 150, stalls: [{ stall:'fruit',     count:1 }, { stall:'grocery',   count:2 }] },
+        { budget: 130, stalls: [{ stall:'vegetable', count:2 }, { stall:'fruit',     count:1 }] },
+        { budget: 180, stalls: [{ stall:'fruit',     count:2 }, { stall:'grocery',   count:1 }] },
+        { budget: 140, stalls: [{ stall:'vegetable', count:1 }, { stall:'fruit',     count:1 }, { stall:'grocery', count:1 }] },
+        { budget: 110, stalls: [{ stall:'vegetable', count:3 }] },
+        { budget: 160, stalls: [{ stall:'fruit',     count:1 }, { stall:'vegetable', count:2 }, { stall:'grocery', count:1 }] },
+        { budget: 170, stalls: [{ stall:'grocery',   count:2 }, { stall:'fruit',     count:1 }] },
     ],
     hard: [
-        { budget: 500, items: [
-            { stall: 'grocery',   id: 'rice' },
-            { stall: 'grocery',   id: 'egg' },
-            { stall: 'vegetable', id: 'cabbage' },
-            { stall: 'vegetable', id: 'tomato' },
-            { stall: 'fruit',     id: 'apple' },
-        ]},  // 總價280，找零220
-        { budget: 300, items: [
-            { stall: 'fruit',     id: 'grape' },
-            { stall: 'grocery',   id: 'egg' },
-            { stall: 'vegetable', id: 'spinach' },
-            { stall: 'grocery',   id: 'noodle' },
-        ]},  // 總價205，找零95
-        { budget: 400, items: [
-            { stall: 'fruit',     id: 'mango' },
-            { stall: 'vegetable', id: 'sweetpot' },
-            { stall: 'grocery',   id: 'rice' },
-            { stall: 'fruit',     id: 'banana' },
-            { stall: 'grocery',   id: 'salt' },
-        ]},  // 總價230，找零170
-        { budget: 500, items: [
-            { stall: 'fruit',     id: 'melon' },
-            { stall: 'grocery',   id: 'egg' },
-            { stall: 'grocery',   id: 'soy' },
-            { stall: 'vegetable', id: 'carrot' },
-            { stall: 'vegetable', id: 'scallion' },
-        ]},  // 總價270，找零230
-        { budget: 300, items: [
-            { stall: 'fruit',     id: 'grape' },
-            { stall: 'fruit',     id: 'orange' },
-            { stall: 'grocery',   id: 'tofu' },
-            { stall: 'vegetable', id: 'cabbage' },
-            { stall: 'grocery',   id: 'noodle' },
-        ]},  // 總價210，找零90
-        { budget: 400, items: [
-            { stall: 'fruit',     id: 'melon' },
-            { stall: 'grocery',   id: 'egg' },
-            { stall: 'vegetable', id: 'spinach' },
-            { stall: 'vegetable', id: 'tomato' },
-        ]},  // 總價255，找零145
-        { budget: 500, items: [
-            { stall: 'grocery',   id: 'rice' },
-            { stall: 'fruit',     id: 'mango' },
-            { stall: 'vegetable', id: 'sweetpot' },
-            { stall: 'vegetable', id: 'cabbage' },
-            { stall: 'grocery',   id: 'soy' },
-        ]},  // 總價260，找零240
-        { budget: 300, items: [
-            { stall: 'fruit',     id: 'apple' },
-            { stall: 'vegetable', id: 'carrot' },
-            { stall: 'grocery',   id: 'tofu' },
-            { stall: 'grocery',   id: 'noodle' },
-        ]},  // 總價150，找零150
-        { budget: 400, items: [
-            { stall: 'fruit',     id: 'strawberry' },
-            { stall: 'grocery',   id: 'oil' },
-            { stall: 'vegetable', id: 'broccoli' },
-            { stall: 'vegetable', id: 'pumpkin' },
-            { stall: 'grocery',   id: 'sugar' },
-        ]},  // 總價305，找零95
-        { budget: 500, items: [
-            { stall: 'fruit',     id: 'pineapple' },
-            { stall: 'grocery',   id: 'tissue' },
-            { stall: 'grocery',   id: 'soap' },
-            { stall: 'vegetable', id: 'daikon' },
-            { stall: 'fruit',     id: 'papaya' },
-        ]},  // 總價240，找零260
+        { budget: 200, stalls: [{ stall:'vegetable', count:2 }, { stall:'fruit',     count:1 }, { stall:'grocery', count:2 }] },
+        { budget: 180, stalls: [{ stall:'vegetable', count:3 }, { stall:'grocery',   count:2 }] },
+        { budget: 220, stalls: [{ stall:'fruit',     count:2 }, { stall:'vegetable', count:2 }, { stall:'grocery', count:1 }] },
+        { budget: 250, stalls: [{ stall:'grocery',   count:3 }, { stall:'fruit',     count:2 }] },
+        { budget: 200, stalls: [{ stall:'vegetable', count:3 }, { stall:'fruit',     count:1 }, { stall:'grocery', count:1 }] },
+        { budget: 230, stalls: [{ stall:'fruit',     count:2 }, { stall:'grocery',   count:2 }, { stall:'vegetable', count:1 }] },
+        { budget: 260, stalls: [{ stall:'vegetable', count:2 }, { stall:'fruit',     count:2 }, { stall:'grocery', count:2 }] },
+        { budget: 200, stalls: [{ stall:'vegetable', count:4 }, { stall:'grocery',   count:2 }] },
     ],
 };
 
@@ -308,42 +151,34 @@ const B6_MARKETS = {
         },
         missions: {
             easy: [
-                { budget: 100, items: [{ stall:'bakery',  id:'bun'       }, { stall:'bakery',  id:'bread'      }]},  // 50元，找零50
-                { budget: 100, items: [{ stall:'dairy',   id:'yogurt'    }, { stall:'bakery',  id:'muffin'     }]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'frozen',  id:'ice_cream' }, { stall:'bakery',  id:'toast'      }]},  // 80元，找零70
-                { budget: 100, items: [{ stall:'dairy',   id:'cream'     }, { stall:'bakery',  id:'muffin'     }]},  // 70元，找零30
-                { budget: 200, items: [{ stall:'bakery',  id:'bread'     }, { stall:'frozen',  id:'edamame'    }]},  // 65元，找零135
-                { budget: 100, items: [{ stall:'frozen',  id:'ice_cream' }, { stall:'bakery',  id:'bun'        }]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'dairy',   id:'yogurt'    }, { stall:'frozen',  id:'edamame'    }, { stall:'bakery',  id:'bun'        }]},  // 95元，找零55
-                { budget: 200, items: [{ stall:'bakery',  id:'toast'     }, { stall:'frozen',  id:'fish_ball'  }]},  // 85元，找零115
-                { budget: 100, items: [{ stall:'dairy',   id:'pudding'   }, { stall:'bakery',  id:'donut'      }]},  // 55元，找零45
-                { budget: 150, items: [{ stall:'frozen',  id:'corn_dog'  }, { stall:'bakery',  id:'bun'        }, { stall:'dairy',   id:'pudding'    }]},  // 90元，找零60
-                { budget: 100, items: [{ stall:'dairy',   id:'soy_milk'  }, { stall:'bakery',  id:'muffin'     }]},  // 60元，找零40
-                { budget: 150, items: [{ stall:'bakery',  id:'bagel'     }, { stall:'dairy',   id:'ice_coffee' }]},  // 70元，找零80
+                { budget:  80, stalls: [{ stall:'bakery', count:1 }, { stall:'dairy',  count:1 }] },
+                { budget: 100, stalls: [{ stall:'frozen', count:1 }, { stall:'bakery', count:1 }] },
+                { budget:  80, stalls: [{ stall:'bakery', count:2 }] },
+                { budget: 100, stalls: [{ stall:'dairy',  count:1 }, { stall:'bakery', count:1 }] },
+                { budget: 100, stalls: [{ stall:'dairy',  count:2 }] },
+                { budget: 100, stalls: [{ stall:'frozen', count:1 }, { stall:'dairy',  count:1 }] },
+                { budget: 100, stalls: [{ stall:'bakery', count:1 }, { stall:'dairy',  count:1 }, { stall:'frozen', count:1 }] },
+                { budget: 100, stalls: [{ stall:'frozen', count:2 }] },
             ],
             normal: [
-                { budget: 200, items: [{ stall:'bakery',  id:'bread'     }, { stall:'bakery',  id:'croissant'  }, { stall:'dairy',   id:'yogurt'     }]},  // 115，找零85
-                { budget: 300, items: [{ stall:'dairy',   id:'milk'      }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'bun'        }]},  // 145，找零155
-                { budget: 250, items: [{ stall:'bakery',  id:'cake_slice'}, { stall:'dairy',   id:'cream'      }, { stall:'frozen',  id:'ice_cream'  }, { stall:'bakery',  id:'muffin'     }]},  // 170，找零80
-                { budget: 200, items: [{ stall:'frozen',  id:'sausage'   }, { stall:'dairy',   id:'yogurt'     }, { stall:'bakery',  id:'toast'      }]},  // 135，找零65
-                { budget: 300, items: [{ stall:'dairy',   id:'sm_egg'    }, { stall:'frozen',  id:'fish_ball'  }, { stall:'bakery',  id:'croissant'  }]},  // 140，找零160
-                { budget: 250, items: [{ stall:'frozen',  id:'nugget'    }, { stall:'dairy',   id:'cream'      }, { stall:'bakery',  id:'bread'      }, { stall:'bakery',  id:'bun'        }]},  // 185，找零65
-                { budget: 250, items: [{ stall:'bakery',  id:'cake_slice'}, { stall:'dairy',   id:'butter'     }, { stall:'frozen',  id:'edamame'    }]},  // 160，找零90
-                { budget: 300, items: [{ stall:'frozen',  id:'dumpling'  }, { stall:'dairy',   id:'yogurt'     }, { stall:'frozen',  id:'edamame'    }, { stall:'bakery',  id:'toast'      }]},  // 185，找零115
-                { budget: 250, items: [{ stall:'bakery',  id:'waffle'    }, { stall:'dairy',   id:'oat_milk'   }, { stall:'frozen',  id:'corn_dog'   }]},  // 150，找零100
-                { budget: 300, items: [{ stall:'frozen',  id:'wonton'    }, { stall:'dairy',   id:'milk'       }, { stall:'bakery',  id:'cookie'     }, { stall:'bakery',  id:'donut'      }]},  // 205，找零95
-                { budget: 200, items: [{ stall:'frozen',  id:'pizza'     }, { stall:'dairy',   id:'pudding'    }, { stall:'bakery',  id:'bun'        }]},  // 120，找零80
-                { budget: 250, items: [{ stall:'dairy',   id:'oat_milk'  }, { stall:'bakery',  id:'bagel'      }, { stall:'frozen',  id:'fish_ball'  }, { stall:'dairy',   id:'ice_coffee' }]},  // 180，找零70
+                { budget: 150, stalls: [{ stall:'bakery', count:2 }, { stall:'dairy',  count:1 }] },
+                { budget: 180, stalls: [{ stall:'dairy',  count:1 }, { stall:'frozen', count:2 }] },
+                { budget: 160, stalls: [{ stall:'bakery', count:2 }, { stall:'frozen', count:1 }] },
+                { budget: 200, stalls: [{ stall:'dairy',  count:2 }, { stall:'bakery', count:1 }] },
+                { budget: 170, stalls: [{ stall:'bakery', count:1 }, { stall:'dairy',  count:1 }, { stall:'frozen', count:1 }] },
+                { budget: 130, stalls: [{ stall:'bakery', count:3 }] },
+                { budget: 190, stalls: [{ stall:'frozen', count:1 }, { stall:'bakery', count:2 }, { stall:'dairy',  count:1 }] },
+                { budget: 200, stalls: [{ stall:'dairy',  count:2 }, { stall:'frozen', count:1 }] },
             ],
             hard: [
-                { budget: 500, items: [{ stall:'dairy',   id:'milk'      }, { stall:'dairy',   id:'cheese'     }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'bread'      }, { stall:'bakery',  id:'croissant'  }]},  // 280，找零220
-                { budget: 300, items: [{ stall:'frozen',  id:'nugget'    }, { stall:'frozen',  id:'sausage'    }, { stall:'dairy',   id:'yogurt'     }, { stall:'bakery',  id:'cake_slice' }]},  // 245，找零55
-                { budget: 400, items: [{ stall:'dairy',   id:'butter'    }, { stall:'frozen',  id:'dumpling'   }, { stall:'bakery',  id:'toast'      }, { stall:'dairy',   id:'cream'      }]},  // 220，找零180
-                { budget: 500, items: [{ stall:'dairy',   id:'cheese'    }, { stall:'frozen',  id:'nugget'     }, { stall:'bakery',  id:'cake_slice' }, { stall:'frozen',  id:'sausage'    }, { stall:'bakery',  id:'bread'      }]},  // 295，找零205
-                { budget: 300, items: [{ stall:'frozen',  id:'fish_ball' }, { stall:'dairy',   id:'sm_egg'     }, { stall:'bakery',  id:'croissant'  }, { stall:'frozen',  id:'edamame'    }]},  // 185，找零115
-                { budget: 400, items: [{ stall:'dairy',   id:'milk'      }, { stall:'bakery',  id:'cake_slice' }, { stall:'frozen',  id:'dumpling'   }, { stall:'dairy',   id:'butter'     }, { stall:'bakery',  id:'muffin'     }]},  // 295，找零105
-                { budget: 500, items: [{ stall:'frozen',  id:'shrimp'    }, { stall:'frozen',  id:'wonton'     }, { stall:'dairy',   id:'oat_milk'   }, { stall:'bakery',  id:'waffle'     }, { stall:'dairy',   id:'cheese'     }]},  // 355，找零145
-                { budget: 400, items: [{ stall:'bakery',  id:'cookie'    }, { stall:'frozen',  id:'pizza'      }, { stall:'dairy',   id:'butter'     }, { stall:'frozen',  id:'nugget'     }, { stall:'bakery',  id:'bagel'      }]},  // 290，找零110
+                { budget: 250, stalls: [{ stall:'bakery', count:2 }, { stall:'dairy',  count:1 }, { stall:'frozen', count:2 }] },
+                { budget: 220, stalls: [{ stall:'bakery', count:3 }, { stall:'dairy',  count:2 }] },
+                { budget: 280, stalls: [{ stall:'dairy',  count:2 }, { stall:'frozen', count:2 }, { stall:'bakery', count:1 }] },
+                { budget: 300, stalls: [{ stall:'frozen', count:3 }, { stall:'dairy',  count:2 }] },
+                { budget: 240, stalls: [{ stall:'bakery', count:3 }, { stall:'frozen', count:1 }, { stall:'dairy',  count:1 }] },
+                { budget: 260, stalls: [{ stall:'dairy',  count:2 }, { stall:'frozen', count:2 }, { stall:'bakery', count:1 }] },
+                { budget: 280, stalls: [{ stall:'bakery', count:2 }, { stall:'dairy',  count:2 }, { stall:'frozen', count:2 }] },
+                { budget: 230, stalls: [{ stall:'bakery', count:4 }, { stall:'dairy',  count:2 }] },
             ],
         },
     },
@@ -401,44 +236,34 @@ const B6_MARKETS = {
         },
         missions: {
             easy: [
-                { budget: 100, items: [{ stall:'drink',    id:'sugarcane'    }, { stall:'drink',    id:'soymilk'     }]},  // 65元，找零35
-                { budget: 100, items: [{ stall:'snack',    id:'pancake'      }, { stall:'drink',    id:'sugarcane'   }]},  // 65元，找零35
-                { budget: 150, items: [{ stall:'souvenir', id:'hairpin'      }, { stall:'souvenir', id:'bookmark'    }, { stall:'drink',    id:'sugarcane'   }]},  // 80元，找零70
-                { budget: 100, items: [{ stall:'drink',    id:'lemon_tea'    }, { stall:'drink',    id:'soymilk'     }]},  // 75元，找零25
-                { budget: 200, items: [{ stall:'snack',    id:'pancake'      }, { stall:'souvenir', id:'magnet'      }]},  // 70元，找零130
-                { budget: 100, items: [{ stall:'snack',    id:'stinky_tofu'  }, { stall:'drink',    id:'sugarcane'   }]},  // 75元，找零25
-                { budget: 150, items: [{ stall:'drink',    id:'milk_tea'     }, { stall:'souvenir', id:'hairpin'     }, { stall:'drink',    id:'sugarcane'   }]},  // 105元，找零45
-                { budget: 200, items: [{ stall:'souvenir', id:'keychain'     }, { stall:'drink',    id:'lemon_tea'   }]},  // 85元，找零115
-                { budget: 100, items: [{ stall:'snack',    id:'sweet_potato_ball'},{ stall:'drink',  id:'iced_tea'   }]},  // 60元，找零40
-                { budget: 100, items: [{ stall:'souvenir', id:'postcard'     }, { stall:'souvenir', id:'sticker'     }, { stall:'drink',    id:'iced_tea'    }]},  // 75元，找零25
-                { budget: 150, items: [{ stall:'snack',    id:'oyster_omelet'}, { stall:'souvenir', id:'badge_pin'   }]},  // 90元，找零60
-                { budget: 150, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'souvenir', id:'sticker'     }]},  // 85元，找零65
+                { budget:  80, stalls: [{ stall:'drink',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget:  80, stalls: [{ stall:'snack',    count:1 }, { stall:'drink',    count:1 }] },
+                { budget: 100, stalls: [{ stall:'souvenir', count:2 }] },
+                { budget:  80, stalls: [{ stall:'snack',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget: 100, stalls: [{ stall:'drink',    count:2 }] },
+                { budget: 100, stalls: [{ stall:'snack',    count:1 }, { stall:'drink',    count:1 }] },
+                { budget: 120, stalls: [{ stall:'snack',    count:1 }, { stall:'drink',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget:  70, stalls: [{ stall:'souvenir', count:1 }, { stall:'drink',    count:1 }] },
             ],
             normal: [
-                { budget: 200, items: [{ stall:'snack',    id:'oysternoodle' }, { stall:'drink',    id:'milk_tea'    }, { stall:'souvenir', id:'hairpin'     }]},  // 125，找零75
-                { budget: 300, items: [{ stall:'snack',    id:'beefnoodle'   }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'magnet'      }]},  // 170，找零130
-                { budget: 250, items: [{ stall:'snack',    id:'pancake'      }, { stall:'drink',    id:'lemon_tea'   }, { stall:'snack',    id:'takoyaki'    }, { stall:'drink', id:'sugarcane'}]},  // 155，找零95
-                { budget: 200, items: [{ stall:'souvenir', id:'keychain'     }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'milk_tea'    }]},  // 140，找零60
-                { budget: 300, items: [{ stall:'souvenir', id:'wristband'    }, { stall:'snack',    id:'popcorn_chk' }, { stall:'drink',    id:'smoothie'    }]},  // 170，找零130
-                { budget: 250, items: [{ stall:'drink',    id:'bubble_tea'   }, { stall:'souvenir', id:'magnet'      }, { stall:'snack',    id:'oysternoodle'}, { stall:'drink', id:'sugarcane'}]},  // 165，找零85
-                { budget: 250, items: [{ stall:'snack',    id:'takoyaki'     }, { stall:'drink',    id:'smoothie'    }, { stall:'souvenir', id:'keychain'    }]},  // 145，找零105
-                { budget: 300, items: [{ stall:'snack',    id:'pancake'      }, { stall:'souvenir', id:'wristband'   }, { stall:'drink',    id:'milk_tea'    }, { stall:'drink', id:'lemon_tea'}]},  // 180，找零120
-                { budget: 200, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'drink',    id:'taro_milk'   }, { stall:'souvenir', id:'postcard'    }]},  // 140，找零60
-                { budget: 250, items: [{ stall:'souvenir', id:'plush'        }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'iced_tea'    }]},  // 180，找零70
-                { budget: 300, items: [{ stall:'souvenir', id:'charm'        }, { stall:'souvenir', id:'fan'         }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink', id:'sugarcane'}]},  // 215，找零85
-                { budget: 200, items: [{ stall:'snack',    id:'fishball_soup'}, { stall:'drink',    id:'papaya_milk' }, { stall:'souvenir', id:'lanyard'     }]},  // 130，找零70
+                { budget: 150, stalls: [{ stall:'snack',    count:1 }, { stall:'drink',    count:2 }] },
+                { budget: 180, stalls: [{ stall:'souvenir', count:2 }, { stall:'drink',    count:1 }] },
+                { budget: 160, stalls: [{ stall:'snack',    count:2 }, { stall:'drink',    count:1 }] },
+                { budget: 200, stalls: [{ stall:'snack',    count:1 }, { stall:'souvenir', count:2 }] },
+                { budget: 170, stalls: [{ stall:'snack',    count:1 }, { stall:'drink',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget: 140, stalls: [{ stall:'snack',    count:3 }] },
+                { budget: 190, stalls: [{ stall:'drink',    count:2 }, { stall:'snack',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget: 200, stalls: [{ stall:'souvenir', count:2 }, { stall:'snack',    count:1 }] },
             ],
             hard: [
-                { budget: 500, items: [{ stall:'snack',    id:'beefnoodle'   }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'phone_case'  }, { stall:'snack',    id:'oysternoodle'}, { stall:'drink',    id:'milk_tea'   }]},  // 330，找零170
-                { budget: 300, items: [{ stall:'souvenir', id:'phone_case'   }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'smoothie'    }, { stall:'souvenir', id:'magnet'      }]},  // 210，找零90
-                { budget: 400, items: [{ stall:'snack',    id:'popcorn_chk'  }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'wristband'   }, { stall:'snack',    id:'pancake'     }]},  // 210，找零190
-                { budget: 500, items: [{ stall:'souvenir', id:'phone_case'   }, { stall:'souvenir', id:'keychain'    }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink',    id:'smoothie'    }, { stall:'drink',    id:'sugarcane'  }]},  // 310，找零190
-                { budget: 300, items: [{ stall:'snack',    id:'takoyaki'     }, { stall:'drink',    id:'bubble_tea'  }, { stall:'souvenir', id:'keychain'    }, { stall:'drink',    id:'soymilk'     }]},  // 185，找零115
-                { budget: 400, items: [{ stall:'snack',    id:'oysternoodle' }, { stall:'souvenir', id:'phone_case'  }, { stall:'drink',    id:'lemon_tea'   }, { stall:'snack',    id:'stinky_tofu' }, { stall:'drink',    id:'milk_tea'  }]},  // 305，找零95
-                { budget: 400, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'souvenir', id:'plush'       }, { stall:'drink',    id:'taro_milk'   }, { stall:'souvenir', id:'charm'       }, { stall:'snack',    id:'sweet_potato_ball'}]},  // 295，找零105
-                { budget: 300, items: [{ stall:'souvenir', id:'fan'          }, { stall:'souvenir', id:'lanyard'     }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'bubble_tea'  }, { stall:'souvenir', id:'badge_pin'  }]},  // 235，找零65
-                { budget: 500, items: [{ stall:'souvenir', id:'plush'        }, { stall:'souvenir', id:'tote_bag'    }, { stall:'snack',    id:'beefnoodle'  }, { stall:'drink',    id:'papaya_milk' }, { stall:'souvenir', id:'charm'      }]},  // 370，找零130
-                { budget: 400, items: [{ stall:'snack',    id:'chicken_chop' }, { stall:'snack',    id:'oyster_omelet'}, { stall:'drink',   id:'taro_milk'   }, { stall:'souvenir', id:'fan'         }, { stall:'souvenir', id:'postcard'   }]},  // 255，找零145
+                { budget: 250, stalls: [{ stall:'snack',    count:2 }, { stall:'drink',    count:1 }, { stall:'souvenir', count:2 }] },
+                { budget: 220, stalls: [{ stall:'snack',    count:3 }, { stall:'souvenir', count:2 }] },
+                { budget: 280, stalls: [{ stall:'souvenir', count:2 }, { stall:'drink',    count:2 }, { stall:'snack',    count:1 }] },
+                { budget: 300, stalls: [{ stall:'drink',    count:3 }, { stall:'souvenir', count:3 }] },
+                { budget: 240, stalls: [{ stall:'snack',    count:3 }, { stall:'drink',    count:1 }, { stall:'souvenir', count:1 }] },
+                { budget: 260, stalls: [{ stall:'souvenir', count:3 }, { stall:'snack',    count:2 }] },
+                { budget: 280, stalls: [{ stall:'snack',    count:2 }, { stall:'drink',    count:2 }, { stall:'souvenir', count:2 }] },
+                { budget: 230, stalls: [{ stall:'drink',    count:4 }, { stall:'souvenir', count:2 }] },
             ],
         },
     },
@@ -588,13 +413,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 startTime: null,
                 // current round state
                 mission: null,
-                collectedIds: new Set(),
+                collectedIds: new Set(),  // Set<itemId> 快速查詢
+                selectedItems: [],        // [{stall, id}] 玩家自由選擇的商品
                 activeStall: Object.keys(_currentStalls)[0],
                 phase: 'shopping', // 'shopping' | 'payment' | 'change'
                 paidAmount: 0,
                 receipts: [],
                 stallStats: {},   // { stallKey: totalSpent }
-                exactPayments: 0, // 精準付款次數（Round 33）
+                exactPayments: 0, // 精準付款次數
             },
             isEndingGame: false,
             isProcessing: false,
@@ -637,6 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.startTime    = null;
             g.mission      = null;
             g.collectedIds = new Set();
+            g.selectedItems = [];
             g.activeStall  = 'vegetable';
             g.phase        = 'shopping';
             g.paidAmount   = 0;
@@ -956,7 +783,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (g.mission._mktKey && B6_MARKETS[g.mission._mktKey]) {
                 _currentStalls = B6_MARKETS[g.mission._mktKey].stalls;
             }
-            g.collectedIds = new Set();
+            g.collectedIds  = new Set();
+            g.selectedItems = [];          // [{stall, id}] 本關自由選擇的商品
             g.activeStall = Object.keys(_currentStalls)[0];
             g.phase       = 'shopping';
             g.paidAmount  = 0;
@@ -979,15 +807,17 @@ document.addEventListener('DOMContentLoaded', () => {
         _showMissionIntroModal(mission, roundNum, afterClose) {
             const existing = document.getElementById('b6-mission-intro');
             if (existing) existing.remove();
-            const g = this.state.game;
-            const items = mission.items.map(({ stall, id }) => {
-                const item = _currentStalls[stall]?.items.find(i => i.id === id);
-                return item ? `<span class="b6-mi-item">${item.icon} ${item.name}</span>` : '';
+
+            // 從 mission.stalls 建立攤位需求 HTML 與語音文字
+            const stallsHTML = (mission.stalls || []).map(({ stall, count }) => {
+                const stallInfo = _currentStalls[stall];
+                if (!stallInfo) return '';
+                return `<span class="b6-mi-item">${stallInfo.icon} ${stallInfo.name} <strong>× ${count}</strong> 樣</span>`;
             }).filter(Boolean).join('');
-            const names = mission.items.map(({ stall, id }) => {
-                const item = _currentStalls[stall]?.items.find(i => i.id === id);
-                return item ? item.name : '';
-            }).filter(Boolean).join('、');
+            const stallsText = (mission.stalls || []).map(({ stall, count }) => {
+                const stallInfo = _currentStalls[stall];
+                return stallInfo ? `${stallInfo.name}選${count}樣` : '';
+            }).filter(Boolean).join('，');
 
             const mktKey = mission._mktKey || this.state.settings.marketType;
             const mkt = B6_MARKETS[mktKey] || B6_MARKETS.traditional;
@@ -1002,8 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b6-mi-card">
                     <div class="b6-mi-round">${roundTitle}</div>
                     <div class="b6-mi-title">🛒 今天的採購任務</div>
-                    <div class="b6-mi-items">${items}</div>
+                    <div class="b6-mi-items">${stallsHTML}</div>
                     <div class="b6-mi-budget">預算：<b>${mission.budget}</b> 元</div>
+                    <div class="b6-mi-hint" style="font-size:12px;color:#6b7280;margin-top:4px;">在預算內，從指定攤位各選指定數量的商品</div>
                     <div class="b6-mi-hint">點任意處開始</div>
                 </div>`;
             document.body.appendChild(modal);
@@ -1021,28 +852,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
             // 語音結束後關閉彈窗（B1 afterClose pattern）
-            Game.Speech.speak(`${welcomePrefix}第${roundNum}關，今天要買：${names}，預算${mission.budget}元。`, dismiss);
+            Game.Speech.speak(`${welcomePrefix}第${roundNum}關，${stallsText}，預算${mission.budget}元。`, dismiss);
             modal.addEventListener('click', dismiss, { once: true });
-            Game.TimerManager.setTimeout(dismiss, 3200, 'turnTransition');
+            Game.TimerManager.setTimeout(dismiss, 3500, 'turnTransition');
         },
 
-        // ── 簡單模式：採購項目逐項朗讀（B1 _speakItemsOneByOne pattern）─
+        // ── 簡單模式：攤位需求逐攤朗讀（B1 _speakItemsOneByOne pattern）─
         _speakMissionItemsOneByOne(mission) {
-            const items = mission.items.map(({ stall, id }) => {
-                const item = _currentStalls[stall]?.items.find(i => i.id === id);
-                return item ? item : null;
+            const reqs = (mission.stalls || []).map(({ stall, count }) => {
+                const stallInfo = _currentStalls[stall];
+                return stallInfo ? { name: stallInfo.name, count } : null;
             }).filter(Boolean);
-            if (!items.length) return;
+            if (!reqs.length) return;
+            const totalCount = reqs.reduce((s, r) => s + r.count, 0);
             let idx = 0;
             const speakNext = () => {
-                if (idx >= items.length) {
+                if (idx >= reqs.length) {
                     Game.TimerManager.setTimeout(() => {
-                        Game.Speech.speak(`共${items.length}樣商品，準備出發！`);
+                        Game.Speech.speak(`共要選${totalCount}樣商品，準備出發！`);
                     }, 300, 'speech');
                     return;
                 }
-                const item = items[idx++];
-                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                const req = reqs[idx++];
+                Game.Speech.speak(`${req.name}，選${req.count}樣`, () => {
                     Game.TimerManager.setTimeout(speakNext, 350, 'speech');
                 });
             };
@@ -1072,16 +904,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const g       = this.state.game;
             const mission = g.mission;
             const total   = this._calcMissionTotal();
+            const budget  = mission.budget;
+            const budgetOver = total > budget;
 
-            const listHTML = mission.items.map(({ stall, id }) => {
-                const item  = _currentStalls[stall].items.find(i => i.id === id);
-                const done  = g.collectedIds.has(id);
+            // 任務卡：顯示每個攤位的選購進度
+            const stallReqsHTML = (mission.stalls || []).map(({ stall, count }) => {
+                const stallInfo = _currentStalls[stall];
+                if (!stallInfo) return '';
+                const selected = (g.selectedItems || []).filter(i => i.stall === stall);
+                const done = selected.length >= count;
+                const active = stall === g.activeStall;
+                // 列出已選商品名稱
+                const selectedNames = selected.map(si => {
+                    const item = stallInfo.items.find(i => i.id === si.id);
+                    return item ? `<span class="b6-sr-sel-item">${item.icon} ${item.name}</span>` : '';
+                }).join('');
                 return `
-                <div class="b6-list-item ${done ? 'checked' : ''}" data-item-id="${id}">
-                    <span class="b6-list-icon">${item.icon}</span>
-                    <span class="b6-list-name">${item.name}</span>
-                    <span class="b6-list-price">${item.price} 元</span>
-                    <span class="b6-list-check">✅</span>
+                <div class="b6-stall-req${done ? ' done' : ''}${active ? ' active' : ''}" data-req-stall="${stall}">
+                    <span class="b6-sr-icon">${stallInfo.icon}</span>
+                    <span class="b6-sr-name">${stallInfo.name}</span>
+                    <span class="b6-sr-prog">${selected.length}/${count}${done ? ' ✅' : ''}</span>
+                    ${selectedNames ? `<div class="b6-sr-items">${selectedNames}</div>` : ''}
                 </div>`;
             }).join('');
 
@@ -1091,33 +934,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLast    = stallIdx >= stallKeys.length - 1;
 
             // 攤位點狀進度指示
-            const stallDotsHTML = stallKeys.map((k, i) => {
-                const stallNeedIds = mission.items.filter(mi => mi.stall === k).map(mi => mi.id);
-                const remaining    = stallNeedIds.filter(id => !g.collectedIds.has(id)).length;
-                const hasItems     = stallNeedIds.length > 0;
-                const done         = hasItems && remaining === 0;
-                const active       = k === g.activeStall;
-                return `<span class="b6-snav-dot${active ? ' active' : ''}${done ? ' done' : ''}${hasItems && !done ? ' has-items' : ''}" title="${_currentStalls[k].name}"></span>`;
+            const stallDotsHTML = stallKeys.map((k) => {
+                const req = (mission.stalls || []).find(r => r.stall === k);
+                const hasReq = !!req;
+                const selCount = (g.selectedItems || []).filter(i => i.stall === k).length;
+                const done = hasReq && selCount >= req.count;
+                const active = k === g.activeStall;
+                return `<span class="b6-snav-dot${active ? ' active' : ''}${done ? ' done' : ''}${hasReq && !done ? ' has-items' : ''}" title="${_currentStalls[k].name}"></span>`;
             }).join('');
 
+            // 商品網格：已選商品可點選取消；超出預算的商品標示警告
+            const activeStallReq = (mission.stalls || []).find(r => r.stall === g.activeStall);
+            const activeQuota = activeStallReq ? activeStallReq.count : 0;
+            const activeSelCount = (g.selectedItems || []).filter(i => i.stall === g.activeStall).length;
+            const stallQuotaFull = activeSelCount >= activeQuota;
+
             const stallItems = _currentStalls[g.activeStall].items;
-            const needIds    = new Set(mission.items.map(i => i.id));
             const productsHTML = stallItems.map(item => {
-                const collected  = g.collectedIds.has(item.id);
-                const inList     = needIds.has(item.id);
+                const isSelected = (g.selectedItems || []).some(si => si.stall === g.activeStall && si.id === item.id);
+                const wouldExceed = !isSelected && (total + item.price) > budget;
+                const isQuotaFull = !isSelected && stallQuotaFull;
+                let extraClass = '';
+                if (isSelected)     extraClass = 'selected';
+                else if (wouldExceed) extraClass = 'over-budget';
+                else if (isQuotaFull) extraClass = 'quota-full';
                 return `
-                <button class="b6-product-btn ${collected ? 'collected' : ''} ${inList ? 'in-list' : 'not-in-list'}"
-                        data-item-id="${item.id}" data-stall="${g.activeStall}" ${collected ? 'disabled' : ''}>
+                <button class="b6-product-btn${extraClass ? ' ' + extraClass : ''}"
+                        data-item-id="${item.id}" data-stall="${g.activeStall}" data-price="${item.price}">
                     <span class="b6-product-icon">${item.icon}</span>
                     <span class="b6-product-name">${item.name}</span>
                     <span class="b6-product-price">${item.price} 元</span>
                     <span class="b6-product-unit">/ ${item.unit}</span>
-                    ${collected ? '<span class="b6-product-collected-mark">✅</span>' : ''}
+                    ${isSelected ? '<span class="b6-product-collected-mark">✅</span>' : ''}
+                    ${wouldExceed ? '<span class="b6-product-over-mark">⚠️</span>' : ''}
                 </button>`;
             }).join('');
 
-            const allDone  = mission.items.every(({ id }) => g.collectedIds.has(id));
-            const collectedCount = g.collectedIds.size;
+            const missionDone = this._isMissionComplete();
+            const totalRequired = this._getTotalRequired();
+            const selectedCount = (g.selectedItems || []).length;
             const mktKey = this.state.settings.marketType;
             const mktInfo = mktKey === 'random' ? { icon: '🎲', name: '隨機市場' } : (B6_MARKETS[mktKey] || { icon: '🛒', name: '菜市場' });
 
@@ -1142,14 +997,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b6-task-hdr-left">
                             <img src="../images/index/educated_money_bag_character.png" class="b6-task-mascot" onerror="this.style.display='none'" alt="">
                             <div class="b6-task-hdr-text">
-                                <div class="b6-task-title">📋 今天要買的東西</div>
-                                <div class="b6-task-budget">預算：<strong>${mission.budget} 元</strong></div>
+                                <div class="b6-task-title">📋 今天的採購任務</div>
+                                <div class="b6-task-budget">預算：<strong class="${budgetOver ? 'b6-budget-over' : ''}">${budget} 元</strong>${budgetOver ? `<span class="b6-budget-warning"> ⚠️ 超出！</span>` : `<span class="b6-budget-left"> 剩 ${budget - total} 元</span>`}</div>
                             </div>
                         </div>
                         <button class="b6-replay-btn" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
-                    <div class="b6-task-items">
-                        ${listHTML}
+                    <div class="b6-task-stall-reqs">
+                        ${stallReqsHTML}
                     </div>
                 </div>
 
@@ -1158,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-stall-nav">
                         <button class="b6-snav-btn" id="b6-stall-prev" ${isFirst ? 'disabled' : ''}>◀</button>
                         <div class="b6-snav-center">
-                            <div class="b6-snav-label">${_currentStalls[g.activeStall].icon} ${_currentStalls[g.activeStall].name}</div>
+                            <div class="b6-snav-label">${_currentStalls[g.activeStall].icon} ${_currentStalls[g.activeStall].name}${activeQuota > 0 ? `<span class="b6-snav-quota"> (${activeSelCount}/${activeQuota})</span>` : ''}</div>
                             <div class="b6-snav-dots">${stallDotsHTML}</div>
                         </div>
                         <button class="b6-snav-btn" id="b6-stall-next" ${isLast ? 'disabled' : ''}>▶</button>
@@ -1175,10 +1030,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- 結帳列 -->
                 <div class="b6-checkout-strip">
                     <div class="b6-cstrip-info">
-                        <span class="b6-cstrip-count">🛒 <strong>${collectedCount}</strong> / ${mission.items.length} 件</span>
-                        <span class="b6-cstrip-total">小計：<span class="b6-basket-total">${total}</span> 元</span>
+                        <span class="b6-cstrip-count">🛒 <strong>${selectedCount}</strong> / ${totalRequired} 件</span>
+                        <span class="b6-cstrip-total${budgetOver ? ' over' : ''}">小計：<span class="b6-basket-total">${total}</span> 元</span>
                     </div>
-                    <button class="b6-checkout-btn" id="b6-checkout-btn" ${allDone ? '' : 'disabled'}>
+                    <button class="b6-checkout-btn" id="b6-checkout-btn" ${missionDone ? '' : 'disabled'}>
                         前往結帳 →
                     </button>
                 </div>
@@ -1243,37 +1098,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const _stallKeys = Object.keys(_currentStalls);
             const _switchStall = (newKey) => {
                 if (g.activeStall === newKey) return;
-                // 顯示離開攤位的小計（B6 stall subtotal, Round 25）
+                // 顯示離開攤位的小計
                 const leavingStall = g.activeStall;
-                const collectedHere = g.mission.items.filter(i => i.stall === leavingStall && g.collectedIds.has(i.id));
-                if (collectedHere.length > 0) {
-                    const subtotal = collectedHere.reduce((s, item) => {
-                        const found = (_currentStalls[leavingStall]?.items || []).find(p => p.id === item.id);
+                const selectedHere = (g.selectedItems || []).filter(i => i.stall === leavingStall);
+                if (selectedHere.length > 0) {
+                    const subtotal = selectedHere.reduce((s, si) => {
+                        const found = (_currentStalls[leavingStall]?.items || []).find(p => p.id === si.id);
                         return s + (found?.price || 0);
                     }, 0);
                     this._showStallSubtotal(_currentStalls[leavingStall].name, subtotal);
                 }
                 this.audio.play('click');
                 g.activeStall = newKey;
-                // 切換至已完成攤位提示（Round 45）
-                const destNeeded = g.mission.items.filter(i => i.stall === newKey);
-                const destDone   = destNeeded.every(i => g.collectedIds.has(i.id));
-                if (destDone && destNeeded.length > 0) {
-                    const toast45 = document.createElement('div');
-                    toast45.className = 'b6-stall-done-toast';
-                    toast45.textContent = `✅ ${_currentStalls[newKey]?.name || ''} 已收集完畢！`;
-                    document.body.appendChild(toast45);
-                    Game.TimerManager.setTimeout(() => { toast45.classList.add('b6-sdt-fade'); }, 1000, 'ui');
-                    Game.TimerManager.setTimeout(() => { if (document.body.contains(toast45)) toast45.remove(); }, 1600, 'ui');
+                // 切換至已完成攤位提示
+                const destReq = (g.mission.stalls || []).find(r => r.stall === newKey);
+                const destSelCount = (g.selectedItems || []).filter(i => i.stall === newKey).length;
+                if (destReq && destSelCount >= destReq.count) {
+                    const toast = document.createElement('div');
+                    toast.className = 'b6-stall-done-toast';
+                    toast.textContent = `✅ ${_currentStalls[newKey]?.name || ''} 已選購完畢！`;
+                    document.body.appendChild(toast);
+                    Game.TimerManager.setTimeout(() => { toast.classList.add('b6-sdt-fade'); }, 1000, 'ui');
+                    Game.TimerManager.setTimeout(() => { if (document.body.contains(toast)) toast.remove(); }, 1600, 'ui');
                 }
-                // 攤位商品語音引導（Round 39）：說出攤位名 + 需要收集的商品
+                // 攤位語音引導
                 const stallInfo = _currentStalls[newKey];
-                const neededHere = g.mission.items
-                    .filter(mi => mi.stall === newKey && !g.collectedIds.has(mi.id))
-                    .map(mi => { const d = stallInfo?.items.find(p => p.id === mi.id); return d ? d.name : mi.id; });
-                Game.Speech.speak(neededHere.length > 0
-                    ? `${stallInfo.name}，要找${neededHere.join('和')}`
-                    : `${stallInfo.name}，這裡已全部收集！`);
+                const remaining = destReq ? (destReq.count - destSelCount) : 0;
+                Game.Speech.speak(remaining > 0
+                    ? `${stallInfo.name}，還要選${remaining}樣`
+                    : `${stallInfo.name}，這裡已選購完畢！`);
                 this._renderShoppingUI();
             };
 
@@ -1292,106 +1145,85 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             }
 
-            // 商品點擊
-            document.querySelectorAll('.b6-product-btn:not([disabled])').forEach(btn => {
+            // 商品點擊（切換選取/取消，含配額與預算檢查）
+            document.querySelectorAll('.b6-product-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     const itemId = btn.dataset.itemId;
                     const stall  = btn.dataset.stall;
-                    const needIds = new Set(g.mission.items.map(i => i.id));
+                    const price  = parseInt(btn.dataset.price) || 0;
+                    const itemData = (_currentStalls[stall]?.items || []).find(i => i.id === itemId);
+                    const itemName = itemData?.name || '這個商品';
 
-                    if (!needIds.has(itemId)) {
+                    const existingIdx = (g.selectedItems || []).findIndex(si => si.stall === stall && si.id === itemId);
+                    const isSelected = existingIdx !== -1;
+
+                    if (isSelected) {
+                        // 取消選取
+                        g.selectedItems.splice(existingIdx, 1);
+                        this.audio.play('click');
+                        Game.Speech.speak(`取消選取${itemName}`);
+                        this._updateShoppingUIPartial();
+                        return;
+                    }
+
+                    // 檢查此攤位的配額
+                    const stallReq = (g.mission.stalls || []).find(r => r.stall === stall);
+                    if (!stallReq) {
+                        // 此攤位本關不需要購買
                         this.audio.play('error');
-                        const itemData = _currentStalls[stall].items.find(i => i.id === itemId);
-                        const itemName = itemData ? itemData.name : '這個';
-                        // 找出此攤位還需要收集的商品
-                        const neededAtStall = g.mission.items
-                            .filter(mi => mi.stall === stall && !g.collectedIds.has(mi.id))
-                            .map(mi => {
-                                const d = _currentStalls[stall]?.items.find(p => p.id === mi.id);
-                                return d ? `${d.icon} ${d.name}` : mi.id;
-                            });
                         const tipId = 'b6-wrong-tip';
                         let tip = document.getElementById(tipId);
-                        if (!tip) {
-                            tip = document.createElement('div');
-                            tip.id = tipId;
-                            document.body.appendChild(tip);
-                        }
+                        if (!tip) { tip = document.createElement('div'); tip.id = tipId; document.body.appendChild(tip); }
                         tip.className = 'b6-wrong-tip';
-                        if (neededAtStall.length > 0) {
-                            tip.innerHTML = `<div class="b6-wt-msg">❌ ${itemName}不在清單上</div>` +
-                                `<div class="b6-wt-hint">這裡需要：${neededAtStall.join('、')}</div>`;
-                            Game.Speech.speak(`${itemName}不對，這裡需要${neededAtStall.map(s=>s.replace(/^\S+\s/,'')).join('和')}`);
-                        } else {
-                            tip.innerHTML = `<div class="b6-wt-msg">❌ ${itemName}不在今天的購物清單上</div>`;
-                            Game.Speech.speak(`${itemName}不在今天的購物清單上`);
-                        }
+                        tip.innerHTML = `<div class="b6-wt-msg">❌ 這個攤位今天不在採購計畫中</div>`;
+                        Game.Speech.speak(`這個攤位今天不需要買東西`);
+                        Game.TimerManager.clearByCategory('wrongTip');
+                        Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2400, 'wrongTip');
+                        return;
+                    }
+                    const stallSelCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
+                    if (stallSelCount >= stallReq.count) {
+                        // 配額已滿：提示要換其他商品或取消其中一個
+                        this.audio.play('error');
+                        const tipId = 'b6-wrong-tip';
+                        let tip = document.getElementById(tipId);
+                        if (!tip) { tip = document.createElement('div'); tip.id = tipId; document.body.appendChild(tip); }
+                        tip.className = 'b6-wrong-tip';
+                        tip.innerHTML = `<div class="b6-wt-msg">這個攤位只需要選 ${stallReq.count} 樣</div><div class="b6-wt-hint">點已選的商品可以取消</div>`;
+                        Game.Speech.speak(`${_currentStalls[stall]?.name || ''}只需要選${stallReq.count}樣，點已選的商品可以取消`);
                         Game.TimerManager.clearByCategory('wrongTip');
                         Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2400, 'wrongTip');
                         return;
                     }
 
-                    g.collectedIds.add(itemId);
+                    // 檢查預算
+                    const currentTotal = this._calcMissionTotal();
+                    if (currentTotal + price > g.mission.budget) {
+                        this.audio.play('error');
+                        const over = (currentTotal + price) - g.mission.budget;
+                        const tipId = 'b6-wrong-tip';
+                        let tip = document.getElementById(tipId);
+                        if (!tip) { tip = document.createElement('div'); tip.id = tipId; document.body.appendChild(tip); }
+                        tip.className = 'b6-wrong-tip';
+                        tip.innerHTML = `<div class="b6-wt-msg">⚠️ 超出預算 ${over} 元！</div><div class="b6-wt-hint">換一個便宜一點的商品</div>`;
+                        Game.Speech.speak(`${itemName}${price}元，超出預算${over}元，請換一個便宜一點的`);
+                        Game.TimerManager.clearByCategory('wrongTip');
+                        Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2800, 'wrongTip');
+                        return;
+                    }
+
+                    // 加入選取
+                    if (!g.selectedItems) g.selectedItems = [];
+                    g.selectedItems.push({ stall, id: itemId });
+                    g.collectedIds.add(itemId); // 向後相容（結果頁使用）
                     this.audio.play('correct');
-                    btn.classList.add('collected');
-                    btn.disabled = true;
-                    // 收集進度動畫（Round 27）
-                    const collected = g.collectedIds.size;
-                    const needed    = g.mission.items.length;
-                    this._showCollectionProgress(collected, needed);
-
-                    // Update list item + 彈出價格動畫（A4 transaction pattern）
-                    const listItem = document.querySelector(`.b6-list-item[data-item-id="${itemId}"]`);
-                    if (listItem) {
-                        listItem.classList.add('checked', 'b6-list-bounce');
-                        Game.TimerManager.setTimeout(
-                            () => listItem.classList.remove('b6-list-bounce'), 600, 'ui'
-                        );
-                        const itemData = _currentStalls[stall].items.find(i => i.id === itemId);
-                        if (itemData) {
-                            this._showPricePopup(listItem, itemData.price);
-                            Game.Speech.speak(`${itemData.name}，${itemData.price}元`);
-                        }
-                    }
-
-                    // 收據飛出（Round 37）
-                    if (itemData) this._showItemReceiptFlyout(listItem, itemData);
-
-                    // Update total and checkout button
-                    const total     = this._calcMissionTotal();
-                    const basketEl  = document.querySelector('.b6-basket-total');
-                    if (basketEl) basketEl.textContent = total;
-
-                    // Update checkout strip count
-                    const cstripCountEl = document.querySelector('.b6-cstrip-count');
-                    if (cstripCountEl) cstripCountEl.innerHTML = `🛒 <strong>${g.collectedIds.size}</strong> / ${g.mission.items.length} 件`;
-
-                    // 浮動購物籃計數（Round 30）
-                    this._updateCartBadge(g.collectedIds.size, g.mission.items.length);
-
-                    const allDone   = g.mission.items.every(({ id }) => g.collectedIds.has(id));
-                    const checkoutBtn = document.getElementById('b6-checkout-btn');
-                    if (checkoutBtn) {
-                        const wasDone = !checkoutBtn.disabled;
-                        checkoutBtn.disabled = !allDone;
-                        if (allDone && !wasDone) {
-                            Game.Speech.speak('所有商品收集完成，可以去結帳了！');
-                            this._showAllCollectedFlash();
-                        }
-                    }
-
-                    // 攤位完成慶祝（Round 36）：更新 nav dot 為完成狀態
-                    const currentStall = g.activeStall;
-                    if (currentStall) {
-                        const stallItems = g.mission.items.filter(i => i.stall === currentStall);
-                        const stallDone  = stallItems.every(i => g.collectedIds.has(i.id));
-                        if (stallDone) {
-                            const _sKeys = Object.keys(_currentStalls);
-                            const _sIdx  = _sKeys.indexOf(currentStall);
-                            const dot = document.querySelectorAll('.b6-snav-dot')[_sIdx];
-                            if (dot) { dot.classList.remove('has-items'); dot.classList.add('done'); }
-                        }
-                    }
+                    // 飛出收據動畫
+                    if (itemData) this._showItemReceiptFlyout(btn, itemData);
+                    Game.Speech.speak(`${itemName}，${price}元`);
+                    // 收集進度動畫
+                    this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
+                    // 更新 UI
+                    this._updateShoppingUIPartial();
                 }, {}, 'gameUI');
             });
 
@@ -1419,16 +1251,131 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        // ── 局部更新購物 UI（不全重繪，只更新任務卡/結帳列/商品狀態）──
+        _updateShoppingUIPartial() {
+            const g      = this.state.game;
+            const mission = g.mission;
+            const total  = this._calcMissionTotal();
+            const budget = mission.budget;
+            const budgetOver = total > budget;
+            const missionDone = this._isMissionComplete();
+            const totalRequired = this._getTotalRequired();
+            const selectedCount = (g.selectedItems || []).length;
+
+            // 更新預算顯示
+            const budgetEl = document.querySelector('.b6-task-budget');
+            if (budgetEl) {
+                budgetEl.innerHTML = `預算：<strong class="${budgetOver ? 'b6-budget-over' : ''}">${budget} 元</strong>${budgetOver ? `<span class="b6-budget-warning"> ⚠️ 超出！</span>` : `<span class="b6-budget-left"> 剩 ${budget - total} 元</span>`}`;
+            }
+
+            // 更新攤位需求列（任務卡）
+            (mission.stalls || []).forEach(({ stall, count }) => {
+                const reqEl = document.querySelector(`.b6-stall-req[data-req-stall="${stall}"]`);
+                if (!reqEl) return;
+                const selected = (g.selectedItems || []).filter(i => i.stall === stall);
+                const done = selected.length >= count;
+                reqEl.classList.toggle('done', done);
+                reqEl.classList.toggle('active', stall === g.activeStall);
+                const progEl = reqEl.querySelector('.b6-sr-prog');
+                if (progEl) progEl.textContent = `${selected.length}/${count}${done ? ' ✅' : ''}`;
+                // 更新已選商品名稱
+                const stallInfo = _currentStalls[stall];
+                const selectedNames = selected.map(si => {
+                    const item = stallInfo?.items.find(i => i.id === si.id);
+                    return item ? `<span class="b6-sr-sel-item">${item.icon} ${item.name}</span>` : '';
+                }).join('');
+                let itemsEl = reqEl.querySelector('.b6-sr-items');
+                if (selectedNames) {
+                    if (!itemsEl) { itemsEl = document.createElement('div'); itemsEl.className = 'b6-sr-items'; reqEl.appendChild(itemsEl); }
+                    itemsEl.innerHTML = selectedNames;
+                } else if (itemsEl) {
+                    itemsEl.remove();
+                }
+            });
+
+            // 更新攤位標題配額顯示
+            const navLabelEl = document.querySelector('.b6-snav-label');
+            if (navLabelEl) {
+                const activeReq = (mission.stalls || []).find(r => r.stall === g.activeStall);
+                const activeSelCount = (g.selectedItems || []).filter(i => i.stall === g.activeStall).length;
+                const activeQuota = activeReq ? activeReq.count : 0;
+                const stallInfo = _currentStalls[g.activeStall];
+                navLabelEl.innerHTML = `${stallInfo?.icon || ''} ${stallInfo?.name || ''}${activeQuota > 0 ? `<span class="b6-snav-quota"> (${activeSelCount}/${activeQuota})</span>` : ''}`;
+            }
+
+            // 更新每個商品按鈕的狀態
+            const activeStallReq = (mission.stalls || []).find(r => r.stall === g.activeStall);
+            const activeQuota = activeStallReq ? activeStallReq.count : 0;
+            const activeSelCount = (g.selectedItems || []).filter(i => i.stall === g.activeStall).length;
+            const stallQuotaFull = activeSelCount >= activeQuota;
+            document.querySelectorAll('.b6-product-btn').forEach(btn => {
+                const itemId = btn.dataset.itemId;
+                const stall  = btn.dataset.stall;
+                const price  = parseInt(btn.dataset.price) || 0;
+                const isSelected = (g.selectedItems || []).some(si => si.stall === stall && si.id === itemId);
+                const wouldExceed = !isSelected && (total + price) > budget;
+                const isQuotaFull = !isSelected && stallQuotaFull;
+                btn.className = 'b6-product-btn' + (isSelected ? ' selected' : wouldExceed ? ' over-budget' : isQuotaFull ? ' quota-full' : '');
+                let mark = btn.querySelector('.b6-product-collected-mark');
+                let overMark = btn.querySelector('.b6-product-over-mark');
+                if (isSelected && !mark) {
+                    mark = document.createElement('span'); mark.className = 'b6-product-collected-mark'; mark.textContent = '✅';
+                    btn.appendChild(mark);
+                } else if (!isSelected && mark) mark.remove();
+                if (wouldExceed && !overMark) {
+                    overMark = document.createElement('span'); overMark.className = 'b6-product-over-mark'; overMark.textContent = '⚠️';
+                    btn.appendChild(overMark);
+                } else if (!wouldExceed && overMark) overMark.remove();
+            });
+
+            // 更新 nav dots
+            const stallKeys = Object.keys(_currentStalls);
+            const dots = document.querySelectorAll('.b6-snav-dot');
+            stallKeys.forEach((k, i) => {
+                const dot = dots[i];
+                if (!dot) return;
+                const req = (mission.stalls || []).find(r => r.stall === k);
+                const hasReq = !!req;
+                const selCount = (g.selectedItems || []).filter(si => si.stall === k).length;
+                const done = hasReq && selCount >= req.count;
+                dot.classList.toggle('done', done);
+                dot.classList.toggle('has-items', hasReq && !done);
+            });
+
+            // 更新結帳列
+            const basketEl = document.querySelector('.b6-basket-total');
+            if (basketEl) basketEl.textContent = total;
+            const cstripCountEl = document.querySelector('.b6-cstrip-count');
+            if (cstripCountEl) cstripCountEl.innerHTML = `🛒 <strong>${selectedCount}</strong> / ${totalRequired} 件`;
+            const cstripTotalEl = document.querySelector('.b6-cstrip-total');
+            if (cstripTotalEl) cstripTotalEl.classList.toggle('over', budgetOver);
+
+            // 結帳按鈕
+            const checkoutBtn = document.getElementById('b6-checkout-btn');
+            if (checkoutBtn) {
+                const wasDone = !checkoutBtn.disabled;
+                checkoutBtn.disabled = !missionDone;
+                if (missionDone && !wasDone) {
+                    Game.Speech.speak('所有商品選購完成，可以去結帳了！');
+                    this._showAllCollectedFlash();
+                }
+            }
+
+            // 浮動購物籃徽章
+            this._updateCartBadge(selectedCount, totalRequired);
+        },
+
         // ── 結帳前確認清單（B1 _showTaskModal pattern）──────────
         _showCheckoutConfirm(g, callback) {
             const existing = document.getElementById('b6-checkout-confirm');
             if (existing) { existing.remove(); callback(); return; }
-            const items = g.mission.items.filter(({ id }) => g.collectedIds.has(id));
-            const resolve = (item) => (_currentStalls[item.stall]?.items || []).find(i => i.id === item.id);
-            const total = items.reduce((sum, item) => sum + (resolve(item)?.price || 0), 0);
+            const items = (g.selectedItems || []).map(({ stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
+                return item ? { stall, id, ...item } : null;
+            }).filter(Boolean);
+            const total = items.reduce((sum, item) => sum + item.price, 0);
             const itemRows = items.map(item => {
-                const found = resolve(item);
-                return `<div class="b6-cc-row"><span>${found?.icon || ''} ${found?.name || item.id}</span><span>${found?.price || 0} 元</span></div>`;
+                return `<div class="b6-cc-row"><span>${item.icon || ''} ${item.name}</span><span>${item.price} 元</span></div>`;
             }).join('');
             const modal = document.createElement('div');
             modal.id = 'b6-checkout-confirm';
@@ -1554,14 +1501,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _calcMissionTotal() {
             const g = this.state.game;
-            const baseTotal = g.mission.items.reduce((sum, { stall, id }) => {
-                const item = _currentStalls[stall].items.find(i => i.id === id);
+            const baseTotal = (g.selectedItems || []).reduce((sum, { stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 return sum + (item ? item.price : 0);
             }, 0);
             const customTotal = (g.customItems || [])
                 .filter(i => !i._deleted)
                 .reduce((sum, i) => sum + i.price, 0);
             return baseTotal + customTotal;
+        },
+
+        // 所有攤位配額都達到且總額不超過預算
+        _isMissionComplete() {
+            const g = this.state.game;
+            const mission = g.mission;
+            if (!mission?.stalls) return false;
+            for (const req of mission.stalls) {
+                const cnt = (g.selectedItems || []).filter(i => i.stall === req.stall).length;
+                if (cnt < req.count) return false;
+            }
+            return this._calcMissionTotal() <= mission.budget;
+        },
+
+        // 本關所有攤位需要選取的總件數
+        _getTotalRequired() {
+            const mission = this.state.game.mission;
+            if (!mission?.stalls) return 0;
+            return mission.stalls.reduce((sum, req) => sum + req.count, 0);
         },
 
         // ── 11. 付款畫面（B1/B5 Phase 2 拖曳付款模式）───────────
@@ -1618,8 +1584,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB6P2RefCard(mission, total, mkt) {
-            const itemsList = mission.items.map(({ stall, id }) => {
-                const item = _currentStalls[stall]?.items.find(i => i.id === id);
+            const itemsList = (this.state.game.selectedItems || []).map(({ stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (!item) return '';
                 return `<div class="b6p2-ref-item">
                     <span>${item.icon || ''} ${item.name}</span>
@@ -2295,8 +2261,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 儲存本關收據（A3/A4 交易摘要模式）
             const total = this._calcMissionTotal();
-            const items = g.mission.items.map(({ stall, id }) => {
-                const item = _currentStalls[stall]?.items.find(i => i.id === id);
+            const items = (g.selectedItems || []).map(({ stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (item) g.stallStats[stall] = (g.stallStats[stall] || 0) + item.price;
                 return item ? { name: item.name, price: item.price } : null;
             }).filter(Boolean);
@@ -2732,30 +2698,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Shopping phase: find next uncollected mission item
-            const nextItem = g.mission.items.find(({ id }) => !g.collectedIds.has(id));
-            if (!nextItem) {
-                // 確認清單彈窗已開啟 → 點「去付款」
-                const ccGo = document.getElementById('b6-cc-go');
-                if (ccGo) {
-                    this._highlight(ccGo);
-                    this._queue = [{ el: ccGo, action: () => ccGo.click() }];
-                    return;
-                }
-                // All collected → checkout
-                const checkoutBtn = document.getElementById('b6-checkout-btn');
-                if (checkoutBtn && !checkoutBtn.disabled) {
-                    this._highlight(checkoutBtn);
-                    this._queue = [{ el: checkoutBtn, action: () => checkoutBtn.click() }];
-                }
+            // Shopping phase: find a stall with unmet quota, navigate, click cheapest valid item
+            // 確認清單彈窗已開啟 → 點「去付款」
+            const ccGo = document.getElementById('b6-cc-go');
+            if (ccGo) {
+                this._highlight(ccGo);
+                this._queue = [{ el: ccGo, action: () => ccGo.click() }];
+                return;
+            }
+            // All done → checkout
+            const checkoutBtn = document.getElementById('b6-checkout-btn');
+            if (checkoutBtn && !checkoutBtn.disabled) {
+                this._highlight(checkoutBtn);
+                this._queue = [{ el: checkoutBtn, action: () => checkoutBtn.click() }];
                 return;
             }
 
-            // Need to switch stall? Use prev/next nav buttons
-            if (nextItem.stall !== g.activeStall) {
+            // Find first stall with unmet quota
+            const mission = g.mission;
+            const budget  = mission.budget;
+            const currentTotal = Game._calcMissionTotal();
+            const unmetReq = (mission.stalls || []).find(req => {
+                const cnt = (g.selectedItems || []).filter(i => i.stall === req.stall).length;
+                return cnt < req.count;
+            });
+            if (!unmetReq) return;
+
+            // Navigate to that stall if not already there
+            if (unmetReq.stall !== g.activeStall) {
                 const _sk  = Object.keys(_currentStalls);
                 const curI = _sk.indexOf(g.activeStall);
-                const tgtI = _sk.indexOf(nextItem.stall);
+                const tgtI = _sk.indexOf(unmetReq.stall);
                 const navBtn = document.getElementById(tgtI > curI ? 'b6-stall-next' : 'b6-stall-prev');
                 if (navBtn && !navBtn.disabled) {
                     this._highlight(navBtn);
@@ -2764,11 +2737,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Click the product button
-            const productBtn = document.querySelector(`.b6-product-btn:not([disabled])[data-item-id="${nextItem.id}"]`);
-            if (productBtn) {
-                this._highlight(productBtn);
-                this._queue = [{ el: productBtn, action: () => productBtn.click() }];
+            // Find cheapest unselected affordable item in this stall
+            const alreadySelected = new Set((g.selectedItems || []).filter(i => i.stall === g.activeStall).map(i => i.id));
+            const stallItems = _currentStalls[g.activeStall]?.items || [];
+            const affordable = stallItems
+                .filter(item => !alreadySelected.has(item.id) && (currentTotal + item.price) <= budget)
+                .sort((a, b) => a.price - b.price);
+            const pick = affordable[0];
+            if (pick) {
+                const productBtn2 = document.querySelector(`.b6-product-btn[data-item-id="${pick.id}"]`);
+                if (productBtn2) {
+                    this._highlight(productBtn2);
+                    this._queue = [{ el: productBtn2, action: () => productBtn2.click() }];
+                }
             }
         },
 
