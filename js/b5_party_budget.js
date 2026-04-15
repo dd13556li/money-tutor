@@ -1821,7 +1821,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b5P2AutoSetGhostSlots() {
             const g = this.state.game;
-            const denoms = [1000, 500, 100, 50, 10, 5, 1];
+            const diff = this.state.settings.difficulty;
+            const trayDenomMap = {
+                easy:   [100, 50, 10, 5, 1],
+                normal: [500, 100, 50, 10, 5, 1],
+                hard:   [1000, 500, 100, 50, 10, 5, 1]
+            };
+            const denoms = trayDenomMap[diff] || trayDenomMap.easy;
             const total = g.p2Total;
             const coins = [];
             let rem = total;
