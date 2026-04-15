@@ -811,11 +811,15 @@ document.addEventListener('DOMContentLoaded', () => {
             g.phase       = 'shopping';
             g.paidAmount  = 0;
             g.customItems = []; // 自訂購物項目
+            g.p1HintMode  = false;  // 提示模式旗標
+            g.p1HintItems = [];     // [{stall, id}] 提示建議商品
 
             this._renderShoppingUI();
             this._showMissionIntroModal(g.mission, g.currentRound + 1, () => {
-                // afterClose callback（B1 pattern）：easy 模式逐項朗讀採購項目
+                // afterClose callback（B1 pattern）
                 if (this.state.settings.difficulty === 'easy') {
+                    // 簡單模式：自動啟動提示高亮，再逐攤朗讀
+                    this._b6P1ActivateHintMode();
                     Game.TimerManager.setTimeout(() => this._speakMissionItemsOneByOne(g.mission), 200, 'speech');
                 }
             });
@@ -905,22 +909,152 @@ document.addEventListener('DOMContentLoaded', () => {
             speakNext();
         },
 
-        // ── 第一頁提示：高亮當前攤位中任務需要的商品 ──────────
+        // ── 第一頁提示入口（依難度路由）────────────────────────
         _b6P1ShowHint() {
+            const diff = this.state.settings.difficulty;
+            if (diff === 'hard')   { this._b6P1ShowHardHintModal(); return; }
+            if (diff === 'normal') { this._b6P1ActivateHintMode(); return; }
+            // easy 模式：提示已在開始時自動啟動，重新高亮即可
+            this._b6P1ActivateHintMode();
+        },
+
+        // ── 貪婪法生成建議購買清單 ───────────────────────────
+        _b6P1GenerateHintItems() {
             const g = this.state.game;
-            const mission = g.mission;
-            const activeReq = (mission.stalls || []).find(r => r.stall === g.activeStall);
-            if (!activeReq) return;
-            const needed = activeReq.count;
-            const already = (g.selectedItems || []).filter(i => i.stall === g.activeStall).length;
-            const remain = needed - already;
-            if (remain <= 0) { Game.Speech.speak('這個攤位已選購完成！'); return; }
-            const stallInfo = _currentStalls[g.activeStall];
-            Game.Speech.speak(`${stallInfo.name}，還要選${toCountSpeech(remain)}樣`);
-            document.querySelectorAll('.b6-product-btn:not(.selected):not(.over-budget)').forEach(btn => {
-                btn.classList.add('b6-hint-pulse');
-                Game.TimerManager.setTimeout(() => btn.classList.remove('b6-hint-pulse'), 1800, 'ui');
+            let remaining = g.mission.budget;
+            const result = [];
+            for (const req of (g.mission.stalls || [])) {
+                const stallItems = (_currentStalls[req.stall]?.items || [])
+                    .slice()
+                    .sort((a, b) => a.price - b.price);
+                let picked = 0;
+                for (const item of stallItems) {
+                    if (picked >= req.count) break;
+                    if (item.price <= remaining) {
+                        result.push({ stall: req.stall, id: item.id });
+                        remaining -= item.price;
+                        picked++;
+                    }
+                }
+            }
+            return result;
+        },
+
+        // ── 更新「點這裡」高亮（當前攤位的提示商品）────────────
+        _b6P1UpdateHintHighlights() {
+            const g = this.state.game;
+            // 先移除所有既有高亮
+            document.querySelectorAll('.b6-product-btn').forEach(btn => {
+                btn.classList.remove('b6-product-here-hint');
             });
+            if (!g.p1HintMode) return;
+            // 困難模式：只用彈窗提示，不在商品卡顯示「點這裡」
+            if (this.state.settings.difficulty === 'hard') return;
+
+            const diff = this.state.settings.difficulty;
+            const hintItems = g.p1HintItems || [];
+            // 僅處理當前攤位、且尚未選取的提示商品
+            const unselected = hintItems.filter(h =>
+                h.stall === g.activeStall &&
+                !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+            );
+            // 簡單模式：每次只高亮一個；普通模式：全部高亮
+            const toHighlight = diff === 'easy' ? unselected.slice(0, 1) : unselected;
+            toHighlight.forEach(h => {
+                const btn = document.querySelector(`.b6-product-btn[data-item-id="${h.id}"]`);
+                if (btn) btn.classList.add('b6-product-here-hint');
+            });
+        },
+
+        // ── 啟動提示模式（生成 + 高亮）─────────────────────────
+        _b6P1ActivateHintMode() {
+            const g = this.state.game;
+            g.p1HintMode = true;
+            if (!g.p1HintItems || g.p1HintItems.length === 0) {
+                g.p1HintItems = this._b6P1GenerateHintItems();
+            }
+            this._b6P1UpdateHintHighlights();
+        },
+
+        // ── 困難模式提示彈窗（重置非提示商品，顯示建議清單）──
+        _b6P1ShowHardHintModal() {
+            const g = this.state.game;
+            // 生成建議清單
+            const newHintItems = this._b6P1GenerateHintItems();
+            g.p1HintItems = newHintItems;
+
+            // 只重置不在提示清單中的已選商品
+            if ((g.selectedItems || []).length > 0) {
+                const nonHint = (g.selectedItems || []).filter(si =>
+                    !newHintItems.some(h => h.stall === si.stall && h.id === si.id)
+                );
+                if (nonHint.length > 0) {
+                    g.selectedItems = (g.selectedItems || []).filter(si =>
+                        newHintItems.some(h => h.stall === si.stall && h.id === si.id)
+                    );
+                    this._updateShoppingUIPartial();
+                }
+            }
+
+            const existing = document.getElementById('b6-p1-hard-hint-overlay');
+            if (existing) existing.remove();
+
+            // 建立彈窗 HTML（已被選擇的商品顯示淡化＋標記）
+            const itemsHTML = newHintItems.map(({ stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
+                if (!item) return '';
+                const stallInfo = _currentStalls[stall];
+                const alreadySel = (g.selectedItems || []).some(si => si.stall === stall && si.id === id);
+                return `<div class="b6-p1hh-item${alreadySel ? ' b6-p1hh-item-done' : ''}">
+                    <span class="b6-p1hh-icon">${item.icon}</span>
+                    <span class="b6-p1hh-name">${item.name}</span>
+                    <span class="b6-p1hh-stall">${stallInfo?.name || ''}</span>
+                    <span class="b6-p1hh-price">${item.price} 元</span>
+                    ${alreadySel ? '<span class="b6-p1hh-done-badge">✅ 已選擇</span>' : ''}
+                </div>`;
+            }).join('');
+
+            const totalSuggested = newHintItems.reduce((s, h) => {
+                const item = (_currentStalls[h.stall]?.items || []).find(i => i.id === h.id);
+                return s + (item?.price || 0);
+            }, 0);
+
+            const overlay = document.createElement('div');
+            overlay.id = 'b6-p1-hard-hint-overlay';
+            overlay.className = 'b6-p1hh-overlay';
+            overlay.innerHTML = `
+                <div class="b6-p1hh-modal">
+                    <div class="b6-p1hh-header">💡 購物建議清單</div>
+                    <div class="b6-p1hh-subtext">以下是一組符合預算的購買方案，請按照提示選購。</div>
+                    <div class="b6-p1hh-list">${itemsHTML}</div>
+                    <div class="b6-p1hh-total">合計：<strong>${totalSuggested}</strong> 元（預算 ${g.mission.budget} 元）</div>
+                    <button class="b6-p1hh-close-btn" id="b6-p1hh-close">我知道了，開始購物</button>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            // 語音說明（跳過已選項）
+            const needSpeech = newHintItems.filter(h =>
+                !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+            ).map(({ stall, id }) => {
+                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
+                const stallInfo = _currentStalls[stall];
+                return item ? `${stallInfo?.name || ''}的${item.name}${item.price}元` : '';
+            }).filter(Boolean);
+            if (needSpeech.length > 0) {
+                Game.Speech.speak(`建議購買：${needSpeech.join('，')}`);
+            } else {
+                Game.Speech.speak('所有建議商品都已選擇，可以結帳了！');
+            }
+
+            // 關閉後啟動提示模式（困難模式不顯示「點這裡」，只設旗標）
+            const closeBtn = document.getElementById('b6-p1hh-close');
+            const dismiss = () => {
+                overlay.remove();
+                g.p1HintMode = true;
+                // 困難模式不呼叫 _b6P1UpdateHintHighlights（不顯示卡片高亮）
+            };
+            if (closeBtn) closeBtn.addEventListener('click', dismiss, { once: true });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────
@@ -1018,6 +1152,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const mktKey = this.state.settings.marketType;
             const mktInfo = mktKey === 'random' ? { icon: '🎲', name: '隨機市場' } : (B6_MARKETS[mktKey] || { icon: '🛒', name: '菜市場' });
 
+            // 已選商品清單（右側結帳卡）
+            const selectedItemsHTML = (g.selectedItems || []).length > 0
+                ? (g.selectedItems || []).map(({ stall, id }) => {
+                    const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
+                    if (!item) return '';
+                    return `<div class="b6-cart-item">
+                        <span class="b6-ci-icon">${item.icon}</span>
+                        <span class="b6-ci-name">${item.name}</span>
+                        <span class="b6-ci-price">${item.price} 元</span>
+                    </div>`;
+                }).join('')
+                : `<div class="b6-cart-empty">尚未選購商品</div>`;
+
             const app = document.getElementById('app');
             app.style.opacity = '0';
             app.innerHTML = `
@@ -1034,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="game-container">
 
-                <!-- 任務卡 -->
+                <!-- 任務卡（標題 + 預算） -->
                 <div class="b6-task-card">
                     <div class="b6-task-hdr">
                         <div class="b6-task-hdr-left">
@@ -1048,36 +1195,49 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="b6-p1-hint-btn" id="b6-p1-hint-btn">💡 提示</button>
                         </div>
                     </div>
-                    <div class="b6-task-stall-reqs">
-                        ${stallReqsHTML}
-                    </div>
                 </div>
 
-                <!-- 結帳列（市場卡上方） -->
-                <div class="b6-checkout-strip">
-                    <div class="b6-cstrip-row1">
-                        <span class="b6-cstrip-count">🛒 <strong>${selectedCount}</strong> / ${totalRequired} 件</span>
-                        <span class="b6-cstrip-total${budgetOver ? ' over' : ''}">小計：<span class="b6-basket-total">${total}</span> 元</span>
-                    </div>
-                    <button class="b6-checkout-btn" id="b6-checkout-btn" ${missionDone ? '' : 'disabled'}>
-                        前往結帳 →
-                    </button>
-                </div>
+                <!-- 三欄容器：左（攤位進度卡）+ 中（市場卡）+ 右（結帳卡）-->
+                <div class="b6-market-checkout-row">
 
-                <!-- 市場卡（左右按鈕切換攤位） -->
-                <div class="b6-market-card">
-                    <div class="b6-stall-nav">
-                        <button class="b6-snav-btn" id="b6-stall-prev" ${isFirst ? 'disabled' : ''}>◀</button>
-                        <div class="b6-snav-center">
-                            <div class="b6-snav-label">${_currentStalls[g.activeStall].icon} ${_currentStalls[g.activeStall].name}${activeQuota > 0 ? `<span class="b6-snav-quota"> (${activeSelCount}/${activeQuota})</span>` : ''}</div>
-                            <div class="b6-snav-dots">${stallDotsHTML}</div>
+                    <!-- 左側：攤位進度卡 -->
+                    <div class="b6-stall-card">
+                        <div class="b6-sc-header">🗒️ 採購進度</div>
+                        <div class="b6-task-stall-reqs">
+                            ${stallReqsHTML}
                         </div>
-                        <button class="b6-snav-btn" id="b6-stall-next" ${isLast ? 'disabled' : ''}>▶</button>
                     </div>
-                    <div class="b6-stall-panel">
-                        <div class="b6-products-grid">${productsHTML}</div>
+
+                    <!-- 中間：市場卡（左右按鈕切換攤位） -->
+                    <div class="b6-market-card">
+                        <div class="b6-stall-nav">
+                            <button class="b6-snav-btn" id="b6-stall-prev" ${isFirst ? 'disabled' : ''}>◀</button>
+                            <div class="b6-snav-center">
+                                <div class="b6-snav-label">${_currentStalls[g.activeStall].icon} ${_currentStalls[g.activeStall].name}${activeQuota > 0 ? `<span class="b6-snav-quota"> (${activeSelCount}/${activeQuota})</span>` : ''}</div>
+                                <div class="b6-snav-dots">${stallDotsHTML}</div>
+                            </div>
+                            <button class="b6-snav-btn" id="b6-stall-next" ${isLast ? 'disabled' : ''}>▶</button>
+                        </div>
+                        <div class="b6-stall-panel">
+                            <div class="b6-products-grid">${productsHTML}</div>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- 右側：結帳卡 -->
+                    <div class="b6-checkout-strip">
+                        <div class="b6-cstrip-row1">
+                            <span class="b6-cstrip-count">🛒 <strong>${selectedCount}</strong> / ${totalRequired} 件</span>
+                            <span class="b6-cstrip-total${budgetOver ? ' over' : ''}">小計：<span class="b6-basket-total">${total}</span> 元</span>
+                        </div>
+                        <div class="b6-cart-items" id="b6-cart-items">
+                            ${selectedItemsHTML}
+                        </div>
+                        <button class="b6-checkout-btn" id="b6-checkout-btn" ${missionDone ? '' : 'disabled'}>
+                            前往結帳 →
+                        </button>
+                    </div>
+
+                </div><!-- /.b6-market-checkout-row -->
 
                 <!-- 自訂購物項目 -->
                 <div id="b6-custom-items-list"></div>
@@ -1151,6 +1311,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 攤位左右切換
             const _stallKeys = Object.keys(_currentStalls);
+
+            // ── 攤位商品格局部更新（不重建整頁，只換商品面板）──
+            const _refreshStallPanel = this._b6RefreshPanel = () => {
+                const mission = g.mission;
+                const total   = this._calcMissionTotal();
+                const budget  = mission.budget;
+                const activeStallReq = (mission.stalls || []).find(r => r.stall === g.activeStall);
+                const activeQuota    = activeStallReq ? activeStallReq.count : 0;
+                const activeSelCount = (g.selectedItems || []).filter(i => i.stall === g.activeStall).length;
+                const stallQuotaFull = activeSelCount >= activeQuota;
+                const stallItems     = _currentStalls[g.activeStall].items;
+                const productsHTML = stallItems.map(item => {
+                    const isSelected  = (g.selectedItems || []).some(si => si.stall === g.activeStall && si.id === item.id);
+                    const wouldExceed = !isSelected && (total + item.price) > budget;
+                    const isQuotaFull = !isSelected && stallQuotaFull;
+                    let extraClass = '';
+                    if (isSelected)      extraClass = 'selected';
+                    else if (wouldExceed) extraClass = 'over-budget';
+                    else if (isQuotaFull) extraClass = 'quota-full';
+                    return `<button class="b6-product-btn${extraClass ? ' ' + extraClass : ''}"
+                        data-item-id="${item.id}" data-stall="${g.activeStall}" data-price="${item.price}">
+                        <span class="b6-product-icon">${item.icon}</span>
+                        <span class="b6-product-name">${item.name}</span>
+                        <span class="b6-product-price">${item.price} 元</span>
+                        <span class="b6-product-unit">/ ${item.unit}</span>
+                        ${isSelected  ? '<span class="b6-product-collected-mark">✅</span>' : ''}
+                        ${wouldExceed ? '<span class="b6-product-over-mark">⚠️</span>' : ''}
+                    </button>`;
+                }).join('');
+                const panelEl = document.querySelector('.b6-stall-panel');
+                if (panelEl) panelEl.innerHTML = `<div class="b6-products-grid">${productsHTML}</div>`;
+                // 更新導航按鈕狀態
+                const stallIdx = _stallKeys.indexOf(g.activeStall);
+                const prevBtn = document.getElementById('b6-stall-prev');
+                const nextBtn = document.getElementById('b6-stall-next');
+                if (prevBtn) prevBtn.disabled = stallIdx <= 0;
+                if (nextBtn) nextBtn.disabled = stallIdx >= _stallKeys.length - 1;
+                // 重新綁定新商品的點擊事件
+                _bindProductBtns();
+                // 更新導航標籤、dots、任務卡、結帳列
+                this._updateShoppingUIPartial();
+                // 提示高亮（攤位切換後重新標記）
+                this._b6P1UpdateHintHighlights();
+            };
+
             const _switchStall = (newKey) => {
                 if (g.activeStall === newKey) return;
                 // 顯示離開攤位的小計
@@ -1182,7 +1387,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Speech.speak(remaining > 0
                     ? `${stallInfo.name}，還要選${remaining}樣`
                     : `${stallInfo.name}，這裡已選購完畢！`);
-                this._renderShoppingUI();
+                // 只替換商品面板，不重建整頁
+                _refreshStallPanel();
             };
 
             const prevBtn = document.getElementById('b6-stall-prev');
@@ -1201,6 +1407,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 商品點擊（切換選取/取消，含配額與預算檢查）
+            // 抽成具名函數，攤位切換時可重新綁定新商品
+            const _bindProductBtns = () => {
             document.querySelectorAll('.b6-product-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     const itemId = btn.dataset.itemId;
@@ -1267,6 +1475,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
+                    // 提示模式守衛：點了非建議商品則報錯
+                    if (g.p1HintMode) {
+                        const isHintItem = (g.p1HintItems || []).some(h => h.stall === stall && h.id === itemId);
+                        if (!isHintItem) {
+                            this.audio.play('error');
+                            const tipId = 'b6-wrong-tip';
+                            let tip = document.getElementById(tipId);
+                            if (!tip) { tip = document.createElement('div'); tip.id = tipId; document.body.appendChild(tip); }
+                            tip.className = 'b6-wrong-tip';
+                            tip.innerHTML = `<div class="b6-wt-msg">❌ 請選擇提示的商品</div><div class="b6-wt-hint">看看橘色「點這裡」提示</div>`;
+                            Game.Speech.speak('不對喔，請選擇提示的商品');
+                            Game.TimerManager.clearByCategory('wrongTip');
+                            Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2400, 'wrongTip');
+                            return;
+                        }
+                    }
+
                     // 加入選取
                     if (!g.selectedItems) g.selectedItems = [];
                     g.selectedItems.push({ stall, id: itemId });
@@ -1279,8 +1504,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
                     // 更新 UI
                     this._updateShoppingUIPartial();
+
+                    // 簡單模式：當前攤位配額已滿 → 自動切換到下一個待買攤位
+                    if (this.state.settings.difficulty === 'easy' && g.p1HintMode) {
+                        const req = (g.mission.stalls || []).find(r => r.stall === stall);
+                        const nowCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
+                        if (req && nowCount >= req.count) {
+                            const nextReq = (g.mission.stalls || []).find(r => {
+                                if (r.stall === stall) return false;
+                                return (g.selectedItems || []).filter(i => i.stall === r.stall).length < r.count;
+                            });
+                            if (nextReq && g.activeStall !== nextReq.stall) {
+                                Game.TimerManager.setTimeout(() => {
+                                    g.activeStall = nextReq.stall;
+                                    this._b6RefreshPanel?.();
+                                    const newStallInfo = _currentStalls[nextReq.stall];
+                                    Game.Speech.speak(`前往${newStallInfo.name}`);
+                                }, 700, 'ui');
+                            }
+                        }
+                    }
                 }, {}, 'gameUI');
             });
+            }; // end _bindProductBtns
+            _bindProductBtns();
 
             // 結帳按鈕
             const checkoutBtn = document.getElementById('b6-checkout-btn');
@@ -1412,6 +1659,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const cstripTotalEl = document.querySelector('.b6-cstrip-total');
             if (cstripTotalEl) cstripTotalEl.classList.toggle('over', budgetOver);
 
+            // 更新已選商品清單（右側結帳卡）
+            const cartItemsEl = document.getElementById('b6-cart-items');
+            if (cartItemsEl) {
+                cartItemsEl.innerHTML = (g.selectedItems || []).length > 0
+                    ? (g.selectedItems || []).map(({ stall, id }) => {
+                        const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
+                        if (!item) return '';
+                        return `<div class="b6-cart-item">
+                            <span class="b6-ci-icon">${item.icon}</span>
+                            <span class="b6-ci-name">${item.name}</span>
+                            <span class="b6-ci-price">${item.price} 元</span>
+                        </div>`;
+                    }).join('')
+                    : `<div class="b6-cart-empty">尚未選購商品</div>`;
+            }
+
             // 結帳按鈕
             const checkoutBtn = document.getElementById('b6-checkout-btn');
             if (checkoutBtn) {
@@ -1420,11 +1683,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (missionDone && !wasDone) {
                     Game.Speech.speak('所有商品選購完成，可以去結帳了！');
                     this._showAllCollectedFlash();
+                    // 簡單模式：結帳按鈕顯示「點這裡」提示
+                    if (this.state.settings.difficulty === 'easy') {
+                        checkoutBtn.classList.add('b6-product-here-hint');
+                    }
                 }
+                // 非完成狀態時移除提示
+                if (!missionDone) checkoutBtn.classList.remove('b6-product-here-hint');
             }
 
             // 浮動購物籃徽章
             this._updateCartBadge(selectedCount, totalRequired);
+
+            // 提示高亮：商品狀態更新後重新標記（商品被選取後移至下一個）
+            this._b6P1UpdateHintHighlights();
         },
 
         // ── 結帳前確認清單（B1 _showTaskModal pattern）──────────
@@ -1623,6 +1895,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindB6P2Events(total);
             this._b6P2SetupDragDrop();
+
+            // 進入第二頁自動啟動輔助點擊
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(), 500, 'ui');
+            }
         },
 
         _renderB6P2RefCard(mission, total, mkt) {
@@ -1655,23 +1932,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB6P2WalletArea(total, diff) {
-            const hintLabel = diff === 'hard' ? '付法分析' : '提示';
             return `
             <div class="b6p2-wallet-area" id="b6p2-wallet-area">
                 <div class="b6p2-wallet-coins-label">需要付款 <span class="b6p2-wallet-need">${total} 元</span></div>
                 <div class="b6p2-wallet-header">
-                    <div>
-                        <div class="b6p2-wallet-placed-row">
-                            <span class="b6p2-wallet-placed-lbl">已放</span>
-                            <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span>
-                            <span class="b6p2-wallet-sep">/</span>
-                            <span class="b6p2-wallet-goal">${total} 元</span>
-                        </div>
+                    <div class="b6p2-wallet-placed-row">
+                        <span class="b6p2-wallet-placed-lbl">已放</span>
+                        <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span>
+                        <span class="b6p2-wallet-sep">/</span>
+                        <span class="b6p2-wallet-goal">${total} 元</span>
                     </div>
-                    <span class="b6p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b6p2-hint-mascot" onerror="this.style.display='none'">
-                        <button class="b6-hint-btn" id="b6-p2-hint-btn">💡 ${hintLabel}</button>
-                    </span>
                 </div>
                 <div class="b6p2-progress-wrap">
                     <div class="b6p2-progress" id="b6p2-progress">

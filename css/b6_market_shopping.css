@@ -1279,6 +1279,7 @@
     gap: 10px;
     min-height: 64px;
     align-items: center;
+    justify-content: center;
     padding: 8px 12px;
     background: #ffffff;
     border: 1.5px solid #bfdbfe;
@@ -1455,6 +1456,122 @@
     outline: 2.5px solid #10b981 !important;
     animation: b6HintPulse 0.9s ease infinite !important;
 }
+
+/* ── 「點這裡」提示高亮（普通/困難按提示鈕後、簡單模式自動）── */
+.b6-product-here-hint {
+    outline: 2.5px solid #f58025 !important;
+    outline-offset: 2px !important;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 1;
+    animation: b6HereHintPulse 1s ease-in-out infinite !important;
+}
+@keyframes b6HereHintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,128,37,0.5); }
+    50%       { box-shadow: 0 0 0 7px rgba(245,128,37,0); }
+}
+.b6-product-here-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -46px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f58025 0%, #ffa040 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 13px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(245,128,37,0.55);
+    pointer-events: none;
+    z-index: 9999;
+    animation: b6HereBounce 1s ease-in-out infinite;
+}
+@keyframes b6HereBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* ── 困難模式提示彈窗（第一頁購物建議清單）── */
+.b6-p1hh-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10200;
+    animation: bFadeIn 0.25s ease;
+}
+.b6-p1hh-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 440px;
+    width: calc(100% - 32px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+}
+.b6-p1hh-header {
+    font-size: 20px;
+    font-weight: 900;
+    color: #065f46;
+    text-align: center;
+    margin-bottom: 6px;
+}
+.b6-p1hh-subtext {
+    font-size: 13px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 14px;
+}
+.b6-p1hh-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.b6-p1hh-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+.b6-p1hh-icon  { font-size: 22px; flex-shrink: 0; }
+.b6-p1hh-name  { flex: 1; font-weight: 700; color: #1f2937; }
+.b6-p1hh-stall { font-size: 12px; color: #6b7280; }
+.b6-p1hh-price { font-weight: 800; color: #d97706; white-space: nowrap; }
+.b6-p1hh-total {
+    text-align: center;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 16px;
+}
+.b6-p1hh-total strong { color: #059669; font-size: 18px; }
+.b6-p1hh-close-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.b6-p1hh-close-btn:hover { opacity: 0.88; }
+/* 已選擇的提示商品：淡化＋徽章 */
+.b6-p1hh-item-done { opacity: 0.45; }
+.b6-p1hh-done-badge {
+    font-size: 11px; font-weight: 800; color: #059669;
+    background: #d1fae5; border-radius: 8px; padding: 2px 6px;
+    white-space: nowrap; flex-shrink: 0;
+}
+/* 結帳按鈕的「點這裡」泡泡往上偏移 */
+#b6-checkout-btn.b6-product-here-hint::after { top: -46px; }
 .b6-task-hdr-text {
     display: flex;
     flex-direction: column;
@@ -1540,6 +1657,57 @@
     line-height: 1;
 }
 
+/* ── 攤位進度卡（左側新卡片）── */
+.b6-stall-card {
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.1);
+    animation: bFadeIn 0.4s ease both;
+}
+.b6-sc-header {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.b6-stall-card .b6-task-stall-reqs {
+    padding: 10px 10px 8px;
+}
+
+/* ── 結帳卡：已選商品清單 ── */
+.b6-cart-items {
+    flex: 1;
+    min-height: 40px;
+    overflow-y: auto;
+    border: 1.5px solid #d1fae5;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+.b6-cart-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-bottom: 1px dashed #d1fae5;
+    font-size: 13px;
+}
+.b6-cart-item:last-child { border-bottom: none; }
+.b6-ci-icon  { font-size: 18px; flex-shrink: 0; }
+.b6-ci-name  { flex: 1; font-weight: 600; color: #374151; }
+.b6-ci-price { color: #d97706; font-weight: 700; white-space: nowrap; }
+.b6-cart-empty {
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
 /* ── 結帳列（取代深色 .b6-basket-bar）── */
 .b6-checkout-strip {
     display: flex;
@@ -1560,13 +1728,14 @@
     gap: 12px;
 }
 .b6-cstrip-count {
-    font-size: 14px;
+    font-size: 15px;
     color: #374151;
     font-weight: 600;
 }
 .b6-cstrip-count strong {
     color: #059669;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 800;
 }
 .b6-cstrip-total {
     font-size: 15px;
@@ -1575,7 +1744,7 @@
 }
 .b6-cstrip-total .b6-basket-total {
     color: #d97706;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
 }
 
@@ -1606,6 +1775,13 @@
     gap: 12px;
     box-sizing: border-box;
     width: 100%;
+}
+
+/* ── 市場卡 + 結帳卡 分割容器（行動版：垂直堆疊；桌面版：水平分割）── */
+.b6-market-checkout-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 /* ── 攤位左右導航（取代 tabs）── */
@@ -1718,43 +1894,231 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   B6 桌面端第一頁橫向佈局（≥900px）
+   B6 桌面端第一頁佈局（≥900px）
+   上：採購任務卡（全寬）
+   下：左大（市場商品卡）+ 右側欄（結帳卡），仿 A3 左右分割
    ══════════════════════════════════════════════════════════════ */
 @media (min-width: 900px) {
+
+    /* 外容器：flex column，全寬不限縮 */
     .b6-unit .game-container {
-        max-width: 1100px;
-        display: grid;
-        grid-template-columns: 340px 1fr;
-        grid-template-rows: auto auto auto;
-        gap: 16px;
-        align-items: start;
+        max-width: 1400px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 12px 16px 0;
     }
 
-    /* 任務卡：左欄第 1 行 */
+    /* ── 採購任務卡：全寬，底部無縫接左右分割 ── */
     .b6-unit .game-container .b6-task-card {
-        grid-column: 1;
-        grid-row: 1;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 16px 16px 0 0;
+        border-bottom: none;
+        margin-bottom: 0;
     }
 
-    /* 結帳列：左欄第 2 行 */
-    .b6-unit .game-container .b6-checkout-strip {
-        grid-column: 1;
-        grid-row: 2;
+    /* ── 左右分割容器 ── */
+    .b6-unit .game-container .b6-market-checkout-row {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: 100%;
+        box-sizing: border-box;
+        border: 2px solid #86efac;
+        border-top: none;
+        border-radius: 0 0 16px 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(16,185,129,0.12);
+        margin-bottom: 16px;
     }
 
-    /* 市場卡：右欄，橫跨任務卡 + 結帳列的高度 */
+    /* ── 左側：攤位進度卡（固定寬度）── */
+    .b6-unit .game-container .b6-stall-card {
+        flex: 0 0 200px;
+        border: none;
+        border-radius: 0;
+        border-right: 2px solid #bbf7d0;
+        box-shadow: none;
+        animation: none;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── 中間：市場卡（佔剩餘空間）── */
     .b6-unit .game-container .b6-market-card {
-        grid-column: 2;
-        grid-row: 1 / 3;
+        flex: 1;
+        min-width: 0;
+        border: none;
+        border-radius: 0;
+        border-right: 2px solid #bbf7d0;
+        box-shadow: none;
+        animation: none;
     }
 
-    /* 自訂購物項目：底部全寬 */
+    /* ── 右側：結帳卡（固定寬度側欄）── */
+    .b6-unit .game-container .b6-checkout-strip {
+        flex: 0 0 220px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        animation: none;
+        background: linear-gradient(160deg, #f0fdf4 0%, #dcfce7 100%);
+        padding: 14px 12px;
+    }
+
+    /* 結帳按鈕在右側欄撐滿 */
+    .b6-unit .game-container .b6-checkout-strip .b6-checkout-btn {
+        margin-top: auto;
+        font-size: 15px;
+        padding: 12px 10px;
+        border-radius: 12px;
+    }
+
+    /* 件數/小計字體統一 */
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-count { font-size: 14px; }
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-count strong { font-size: 14px; }
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-total { font-size: 14px; }
+    .b6-unit .game-container .b6-checkout-strip .b6-basket-total { font-size: 14px; }
+
+    /* 右側結帳卡：商品清單自動填充剩餘高度 */
+    .b6-unit .game-container .b6-checkout-strip .b6-cart-items {
+        flex: 1;
+        max-height: none;
+    }
+
+    /* 自訂購物項目：全寬 */
     .b6-unit .game-container #b6-custom-items-list,
     .b6-unit .game-container .b6-custom-items-panel {
-        grid-column: 1 / 3;
-        grid-row: 3;
+        width: 100%;
     }
 
+    /* ── 攤位進度卡：stall-req 在卡片內保持垂直列 ── */
+    .b6-unit .game-container .b6-stall-card .b6-task-stall-reqs {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+    }
+    .b6-unit .game-container .b6-stall-card .b6-stall-req {
+        flex-wrap: wrap;
+    }
+
+    /* ── 市場卡：允許垂直捲動（A3 pattern：overflow-y auto 而非 hidden）── */
+    .b6-unit .game-container .b6-market-card {
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+    }
+    .b6-stall-nav {
+        flex-shrink: 0;
+    }
+    .b6-stall-panel {
+        flex: 1;
+        overflow-y: auto;
+        max-height: calc(100vh - 220px);
+    }
+
+    /* ── 商品格線：≥900px 自動填充（平板/筆電友善，垂直捲動）── */
+    .b6-products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-rows: unset;
+        grid-auto-flow: unset;
+        grid-auto-columns: unset;
+        align-content: start;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    /* 商品按鈕：平板版本 */
+    .b6-product-btn {
+        padding: 12px 6px 10px;
+        gap: 6px;
+    }
+
+    /* 商品 Emoji 圖示：平板版本（適中尺寸）*/
+    .b6-product-icon {
+        width: 72px;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        line-height: 1;
+        margin: 0 auto;
+    }
+
+    .b6-product-name  { font-size: 13px; }
+    .b6-product-price { font-size: 13px; }
+    .b6-product-unit  { font-size: 11px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   B6 桌面端寬版（≥1200px）：充分利用寬螢幕，2 列橫展
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 1200px) {
+
+    /* 寬版容器：貼近視窗邊緣，大螢幕全顯示 */
+    .b6-unit .game-container {
+        max-width: min(1800px, calc(100vw - 40px));
+        padding: 12px 20px 0;
+    }
+
+    /* 左側攤位卡略加寬 */
+    .b6-unit .game-container .b6-stall-card {
+        flex: 0 0 220px;
+    }
+
+    /* 右側結帳卡略加寬 */
+    .b6-unit .game-container .b6-checkout-strip {
+        flex: 0 0 240px;
+        font-size: 15px;
+    }
+
+    /* 結帳卡字體 */
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-count,
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-count strong,
+    .b6-unit .game-container .b6-checkout-strip .b6-cstrip-total,
+    .b6-unit .game-container .b6-checkout-strip .b6-basket-total { font-size: 15px; }
+
+    /* stall panel：寬版取消 max-height 讓 2 列完整展開 */
+    .b6-stall-panel {
+        overflow-y: visible;
+        max-height: none;
+        overflow: visible;
+    }
+
+    /* ── 商品格線：寬版 2 列橫向展開（所有商品完整顯示）── */
+    .b6-products-grid {
+        grid-template-columns: unset;
+        grid-template-rows: repeat(2, auto);
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(110px, 1fr);
+        align-content: unset;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    /* 商品按鈕：寬版 */
+    .b6-product-btn {
+        padding: 14px 8px 12px;
+        gap: 7px;
+    }
+
+    /* 商品 Emoji 圖示：寬版（較大） */
+    .b6-product-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 64px;
+    }
+
+    .b6-product-name  { font-size: 14px; }
+    .b6-product-price { font-size: 14px; }
+    .b6-product-unit  { font-size: 12px; }
 }
 
 /* ── 任務卡攤位需求列 ── */
