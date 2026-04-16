@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean).join('');
             const stallsText = (mission.stalls || []).map(({ stall, count }) => {
                 const stallInfo = _currentStalls[stall];
-                return stallInfo ? `${stallInfo.name}選${count}樣` : '';
+                return stallInfo ? `${stallInfo.name}選${toCountSpeech(count)}樣` : '';
             }).filter(Boolean).join('，');
 
             const mktKey = mission._mktKey || this.state.settings.marketType;
@@ -879,7 +879,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             // 語音結束後關閉彈窗（B1 afterClose pattern）
             Game.Speech.speak(`${welcomePrefix}${stallsText}，預算${mission.budget}元。`, dismiss);
-            modal.addEventListener('click', dismiss, { once: true });
+            modal.addEventListener('click', () => {
+                window.speechSynthesis.cancel(); // 手動關閉時立刻停止當前語音
+                dismiss();
+            }, { once: true });
             Game.TimerManager.setTimeout(dismiss, 3500, 'turnTransition');
         },
 
@@ -903,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const req = reqs[idx++];
                 Game.Speech.speak(`${req.name}，選${toCountSpeech(req.count)}樣`, () => {
-                    Game.TimerManager.setTimeout(speakNext, 350, 'speech');
+                    Game.TimerManager.setTimeout(speakNext, 80, 'speech');
                 });
             };
             speakNext();
@@ -1499,28 +1502,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.audio.play('correct');
                     // 飛出收據動畫
                     if (itemData) this._showItemReceiptFlyout(btn, itemData);
-                    Game.Speech.speak(`${itemName}，${price}元`);
-                    // 收集進度動畫
-                    this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
-                    // 更新 UI
-                    this._updateShoppingUIPartial();
 
-                    // 簡單模式：當前攤位配額已滿 → 自動切換到下一個待買攤位
-                    if (this.state.settings.difficulty === 'easy' && g.p1HintMode) {
-                        const req = (g.mission.stalls || []).find(r => r.stall === stall);
-                        const nowCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
-                        if (req && nowCount >= req.count) {
-                            const nextReq = (g.mission.stalls || []).find(r => {
-                                if (r.stall === stall) return false;
-                                return (g.selectedItems || []).filter(i => i.stall === r.stall).length < r.count;
-                            });
-                            if (nextReq && g.activeStall !== nextReq.stall) {
-                                Game.TimerManager.setTimeout(() => {
-                                    g.activeStall = nextReq.stall;
-                                    this._b6RefreshPanel?.();
-                                    const newStallInfo = _currentStalls[nextReq.stall];
-                                    Game.Speech.speak(`前往${newStallInfo.name}`);
-                                }, 700, 'ui');
+                    const isMissionDone = this._isMissionComplete();
+                    const doUIUpdate = () => {
+                        this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
+                        this._updateShoppingUIPartial();
+                    };
+
+                    if (isMissionDone) {
+                        // 最後一個商品：語音播完才更新 UI（避免「所有商品選購完成」覆蓋名稱語音）
+                        Game.Speech.speak(`${itemName}，${price}元`, doUIUpdate);
+                    } else {
+                        Game.Speech.speak(`${itemName}，${price}元`);
+                        doUIUpdate();
+
+                        // 簡單模式：當前攤位配額已滿 → 自動切換到下一個待買攤位
+                        if (this.state.settings.difficulty === 'easy' && g.p1HintMode) {
+                            const req = (g.mission.stalls || []).find(r => r.stall === stall);
+                            const nowCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
+                            if (req && nowCount >= req.count) {
+                                const nextReq = (g.mission.stalls || []).find(r => {
+                                    if (r.stall === stall) return false;
+                                    return (g.selectedItems || []).filter(i => i.stall === r.stall).length < r.count;
+                                });
+                                if (nextReq && g.activeStall !== nextReq.stall) {
+                                    Game.TimerManager.setTimeout(() => {
+                                        g.activeStall = nextReq.stall;
+                                        this._b6RefreshPanel?.();
+                                        const newStallInfo = _currentStalls[nextReq.stall];
+                                        Game.Speech.speak(`前往${newStallInfo.name}`);
+                                    }, 700, 'ui');
+                                }
                             }
                         }
                     }
@@ -1896,6 +1908,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this._bindB6P2Events(total);
             this._b6P2SetupDragDrop();
 
+            // 簡單模式：立即顯示淡化金錢圖示（ghost slots）
+            if (diff === 'easy') {
+                this._b6P2AutoSetGhostSlots();
+                this._b6P2UpdateWalletDisplay();
+            }
+
             // 進入第二頁自動啟動輔助點擊
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(), 500, 'ui');
@@ -1948,7 +1966,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b6p2-progress-fill" id="b6p2-progress-fill"></div>
                     </div>
                 </div>
-                <div class="b6p2-my-money-label">💼 我的金錢區</div>
+                <div class="b6p2-my-money-label">💳 付款區</div>
                 <div class="b6p2-wallet-coins b6p2-drop-zone" id="b6p2-wallet-coins">
                     <span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>
                 </div>
@@ -1978,7 +1996,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b6p2-tray">
                 <div class="b6p2-tray-title">💰 金錢拖曳區</div>
-                <div class="b6p2-tray-subtitle">把金錢卡片拖曳到上方「我的金錢區」（可重複拖曳）</div>
+                <div class="b6p2-tray-subtitle">把金錢卡片拖曳到上方「付款區」（可重複拖曳）</div>
                 <div class="b6p2-tray-coins" id="b6p2-tray-coins">${coinsHtml}</div>
             </div>`;
         },
@@ -2938,6 +2956,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else                     msg = '要再加油喔，多練習幾次！';
                 Game.Speech.speak(msg);
             }, 300, 'speech');
+
         },
 
         _fireConfetti() {
@@ -3020,11 +3039,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // 最後一關結果頁：查看測驗總結
+            const viewSummaryBtn = document.getElementById('b6-view-summary-btn');
+            if (viewSummaryBtn) {
+                this._highlight(viewSummaryBtn);
+                this._queue = [{ el: viewSummaryBtn, action: () => viewSummaryBtn.click() }];
+                return;
+            }
+
             // Result next-round button
             const nextBtn = document.getElementById('b6-next-btn');
             if (nextBtn) {
                 this._highlight(nextBtn);
                 this._queue = [{ el: nextBtn, action: () => nextBtn.click() }];
+                return;
+            }
+
+            // Phase 2 拖曳付款畫面（b6p2）
+            if (document.getElementById('b6p2-wallet-coins')) {
+                const p2Confirm = document.getElementById('b6-p2-confirm-btn');
+                if (p2Confirm && !p2Confirm.disabled) {
+                    this._highlight(p2Confirm);
+                    this._queue = [{ el: p2Confirm, action: () => p2Confirm.click() }];
+                    return;
+                }
+                if (g.p2ShowHint && g.p2HintSlots?.length) {
+                    const nextSlot = g.p2HintSlots.find(s => !s.filled);
+                    if (nextSlot) {
+                        const trayEl = document.querySelector(`.b6p2-coin-drag[data-denom="${nextSlot.denom}"]`);
+                        if (trayEl) {
+                            this._highlight(trayEl);
+                            this._queue = [{ el: trayEl, action: () => Game._b6P2AddCoin(nextSlot.denom) }];
+                        }
+                    }
+                }
                 return;
             }
 

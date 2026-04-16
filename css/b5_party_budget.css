@@ -451,7 +451,7 @@
 /* ── B5 Round Intro Card (Round 24) ── */
 .b5-round-intro {
     position: fixed; inset: 0; z-index: 9800;
-    background: rgba(139,92,246,0.92); backdrop-filter: blur(4px);
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
     animation: b5RiIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
 }
@@ -1346,5 +1346,322 @@
     .b5p2-coin-drag .banknote-img { width: 80px; }
     .b5p2-wallet-coin .coin-img     { width: 48px; height: 48px; }
     .b5p2-wallet-coin .banknote-img { width: 80px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   B5 3欄購物佈局（同 B6 市場版面）
+   ══════════════════════════════════════════════════════════════ */
+
+/* game-container 在購物頁加寬 */
+.b5-unit .game-container.b5-game-container {
+    max-width: 880px;
+    padding: 8px 12px 20px;
+}
+
+/* 三欄主佈局 */
+.b5-shopping-layout {
+    display: grid;
+    grid-template-columns: 110px 1fr 190px;
+    gap: 8px;
+    align-items: start;
+    min-height: 0;
+}
+
+/* ── 左欄：類別標籤 ── */
+.b5-cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 60px;
+}
+
+.b5-cat-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 6px;
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    text-align: center;
+}
+.b5-cat-tab:hover {
+    border-color: #a78bfa;
+    background: #f5f3ff;
+}
+.b5-cat-tab.active {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: #7c3aed;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+}
+.b5-cat-tab-icon { font-size: 22px; line-height: 1; }
+.b5-cat-tab-name {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.b5-cat-tab-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    padding: 1px 5px;
+    margin-top: 1px;
+}
+.b5-cat-tab:not(.active) .b5-cat-tab-badge {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+/* ── 中欄：類別面板 ── */
+.b5-cat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.b5-cp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, #f5f3ff, #ede9fe);
+    border-bottom: 1px solid #ddd6fe;
+    gap: 8px;
+}
+.b5-cp-cat-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #6d28d9;
+}
+.b5-cp-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* 中欄商品格 */
+.b5-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    padding: 10px 12px 12px;
+    overflow-y: auto;
+    max-height: calc(100vh - 260px);
+}
+.b5-cp-hint {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+    padding: 24px 0;
+    grid-column: 1/-1;
+}
+
+/* ── 右欄：預算 & 購物清單 ── */
+.b5-right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #d1fae5;
+    border-radius: 14px;
+    padding: 12px 12px 14px;
+    position: sticky;
+    top: 60px;
+}
+
+.b5-rp-budget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #ecfdf5, #d1fae5);
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+.b5-rp-label    { font-size: 12px; font-weight: 600; color: #374151; }
+.b5-rp-budget-val { font-size: 18px; font-weight: 900; color: #059669; }
+
+.b5-rp-spent-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    padding: 0 2px;
+}
+.b5-rp-over { color: #dc2626 !important; }
+
+.b5-cart-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    border-top: 1px dashed #d1d5db;
+    padding-top: 6px;
+}
+
+.b5-cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    max-height: 200px;
+    min-height: 36px;
+}
+
+.b5-cart-empty {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 12px;
+    padding: 8px 0;
+}
+
+.b5-cart-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 12px;
+    animation: bFadeIn 0.2s ease;
+}
+.b5-ci-name  { flex: 1; font-weight: 600; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b5-ci-price { font-weight: 700; color: #d97706; flex-shrink: 0; }
+.b5-ci-remove {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    background: #fee2e2; border: none; border-radius: 50%;
+    color: #dc2626; font-size: 10px; font-weight: 700;
+    cursor: pointer; line-height: 18px; text-align: center; padding: 0;
+}
+.b5-ci-remove:hover { background: #fecaca; }
+
+/* 右欄確認按鈕 */
+.b5-right-panel .b5-confirm-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 10px;
+    margin-top: 4px;
+}
+
+/* 商品卡片在新佈局中改為 B6 直式排列 */
+.b5-shopping-layout .b5-item-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px 8px;
+    gap: 4px;
+    position: relative;
+}
+.b5-item-icon { font-size: 28px; line-height: 1; }
+.b5-shopping-layout .b5-item-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #374151;
+    flex: unset;
+}
+.b5-shopping-layout .b5-item-price {
+    font-size: 13px;
+    font-weight: bold;
+    color: #d97706;
+    text-align: center;
+}
+.b5-shopping-layout .b5-check-mark {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+    margin-left: 0;
+}
+
+/* ── 找零測驗彈窗 ── */
+.b5-cq-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: bPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.b5-cq-header {
+    font-size: 20px;
+    font-weight: 900;
+    color: #7c3aed;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.b5-cq-desc {
+    font-size: 14px;
+    color: #374151;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+.b5-cq-question {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-top: 6px;
+}
+.b5-cq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.b5-cq-btn {
+    padding: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #374151;
+}
+.b5-cq-btn:hover { background: #ede9fe; border-color: #a78bfa; color: #6d28d9; }
+
+/* ── RWD：手機版改為垂直堆疊 ── */
+@media (max-width: 640px) {
+    .b5-shopping-layout {
+        grid-template-columns: 1fr;
+    }
+    .b5-cat-list {
+        flex-direction: row;
+        overflow-x: auto;
+        position: static;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+    .b5-cat-tab {
+        flex-direction: row;
+        gap: 6px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .b5-right-panel {
+        position: static;
+    }
+    .b5-items-grid {
+        max-height: none;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .b5-cart-items { max-height: 120px; }
 }
 
