@@ -650,8 +650,12 @@
     background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 20px;
     padding: 6px 14px; font-size: 15px; font-weight: 600; color: #15803d;
 }
-.b6-mi-budget { font-size: 16px; color: #374151; margin-bottom: 10px; }
+.b6-mi-budget { font-size: 16px; color: #374151; margin-bottom: 6px; }
 .b6-mi-budget b { color: #f59e0b; font-size: 20px; }
+.b6-mi-budget-icons {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
+    gap: 6px; margin-bottom: 10px; min-height: 44px;
+}
 .b6-mi-hint { font-size: 12px; color: #9ca3af; }
 
 /* ── B6 Streak Badge (Round 20) ── */
@@ -1343,7 +1347,12 @@
 .b6p2-tray-title {
     font-size: 14px; font-weight: 600;
     color: #374151; margin-bottom: 12px; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
 }
+.b6p2-tray-wallet-icon { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+
+/* 確認付款按鈕自適應寬度 */
+#b6-p2-confirm-btn { align-self: center; width: fit-content; }
 .b6p2-tray-coins {
     display: flex; flex-wrap: wrap;
     gap: 10px; justify-content: center; align-items: flex-end;

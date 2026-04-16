@@ -851,6 +851,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const isFirstRound = roundNum === 1;
             const roundTitle = mktLabel;
 
+            // ── 預算金錢圖示：貪婪分解 + 隨機正反面 ──
+            const _miDenomMap = {
+                easy:   [100, 50, 10, 5, 1],
+                normal: [500, 100, 50, 10, 5, 1],
+                hard:   [1000, 500, 100, 50, 10, 5, 1]
+            };
+            const _miDiff = this.state.settings.difficulty;
+            const _miAllDenoms = _miDenomMap[_miDiff] || _miDenomMap.easy;
+            // 為所有面額生成正反面（ghost slot 一致性）
+            const _miBudgetFaces = {};
+            _miAllDenoms.forEach(d => { _miBudgetFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            // 貪婪分解預算
+            const _miBudgetCoins = [];
+            let _miRem = mission.budget;
+            for (const d of _miAllDenoms) { while (_miRem >= d) { _miBudgetCoins.push(d); _miRem -= d; } }
+            // 存至 game state 供第二頁拖曳盤使用
+            this.state.game.p2BudgetFaces = _miBudgetFaces;
+            this.state.game.p2BudgetCoins = _miBudgetCoins;
+            // 產生圖示 HTML（尺寸同拖曳盤）
+            const _miBudgetIconsHtml = _miBudgetCoins.map(d => {
+                const isBill = d >= 100;
+                const w = isBill ? '72px' : '44px';
+                return `<img src="../images/money/${d}_yuan_${_miBudgetFaces[d]}.png" alt="${d}元"
+                    style="width:${w};height:${isBill ? 'auto' : w};object-fit:contain;"
+                    onerror="this.style.display='none'">`;
+            }).join('');
+
             const modal = document.createElement('div');
             modal.id = 'b6-mission-intro';
             modal.className = 'b6-mission-intro';
@@ -860,6 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-mi-title">🛒 今天的採購任務</div>
                     <div class="b6-mi-items">${stallsHTML}</div>
                     <div class="b6-mi-budget">預算：<b>${mission.budget}</b> 元</div>
+                    <div class="b6-mi-budget-icons">${_miBudgetIconsHtml}</div>
                     <div class="b6-mi-hint" style="font-size:12px;color:#6b7280;margin-top:4px;">在預算內，從指定攤位各選指定數量的商品</div>
                     <div class="b6-mi-hint">點任意處開始</div>
                 </div>`;
@@ -1734,7 +1762,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b6-cc-sep"></div>
                         <div class="b6-cc-row b6-cc-total"><span>合計</span><span>${total} 元</span></div>
                         <div class="b6-cc-row b6-cc-budget"><span>預算</span><span>${g.mission.budget} 元</span></div>
-                        <div class="b6-cc-row b6-cc-avg"><span>共 ${items.length} 項，平均每項</span><span>${items.length > 0 ? Math.round(total / items.length) : 0} 元</span></div>
                     </div>
                     <button class="b6-cc-btn" id="b6-cc-go">✓ 去付款</button>
                 </div>`;
@@ -1974,16 +2001,28 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB6P2CoinTray(diff) {
+            const g = this.state.game;
             const denomMap = {
-                easy:   [1, 5, 10, 50, 100],
-                normal: [1, 5, 10, 50, 100, 500],
-                hard:   [1, 5, 10, 50, 100, 500, 1000]
+                easy:   [100, 50, 10, 5, 1],
+                normal: [500, 100, 50, 10, 5, 1],
+                hard:   [1000, 500, 100, 50, 10, 5, 1]
             };
-            const denoms = denomMap[diff] || denomMap.easy;
-            const trayFaces = {};
-            denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            const allDenoms = denomMap[diff] || denomMap.easy;
+
+            // 使用 intro modal 預先產生的面向；若無則重新產生（fallback）
+            let trayFaces = g.p2BudgetFaces;
+            let budgetCoins = g.p2BudgetCoins;
+            if (!trayFaces || !budgetCoins) {
+                trayFaces = {};
+                allDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+                budgetCoins = [];
+                let rem = g.mission?.budget || 0;
+                for (const d of allDenoms) { while (rem >= d) { budgetCoins.push(d); rem -= d; } }
+            }
+            // p2TrayFaces 涵蓋所有面額，供 ghost slot 使用
             this.state.game.p2TrayFaces = trayFaces;
-            const coinsHtml = denoms.map(d => {
+
+            const coinsHtml = budgetCoins.map(d => {
                 const isBill = d >= 100;
                 return `
                 <div class="b6p2-coin-drag" draggable="true" data-denom="${d}" title="${d}元">
@@ -1995,8 +2034,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             return `
             <div class="b6p2-tray">
-                <div class="b6p2-tray-title">💰 金錢拖曳區</div>
-                <div class="b6p2-tray-subtitle">把金錢卡片拖曳到上方「付款區」（可重複拖曳）</div>
+                <div class="b6p2-tray-title"><img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包</div>
                 <div class="b6p2-tray-coins" id="b6p2-tray-coins">${coinsHtml}</div>
             </div>`;
         },
