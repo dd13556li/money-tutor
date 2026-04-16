@@ -1917,6 +1917,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
+                    <span class="b6-p2-hint-wrap">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                        <button class="b-hint-btn" id="b6-p2-hint-btn">💡 提示</button>
+                    </span>
                     <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
                     <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
                 </div>
@@ -2076,16 +2080,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => {
                     this.audio.play('click');
-                    if (diff === 'hard') {
-                        this._showHardModeHintModal(total);
-                    } else {
-                        // 清空已放金錢再套用提示，避免統計錯誤
-                        g.p2Wallet  = [];
-                        g.p2UidCtr  = 0;
+                    if (diff === 'easy') {
+                        // 簡單模式：清空再套用 ghost slot 引導
+                        g.p2Wallet   = [];
+                        g.p2UidCtr   = 0;
                         g.p2ShowHint = true;
                         this._b6P2AutoSetGhostSlots();
                         this._b6P2UpdateWalletDisplay();
                         Game.Speech.speak('請按照提示放入正確的金錢');
+                    } else {
+                        // 普通 / 困難模式：A3 彈窗提示
+                        this._showHardModeHintModal(total);
                     }
                 }, {}, 'gameUI');
             }
@@ -2285,7 +2290,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const total  = this._b6P2GetWalletTotal();
             const req    = g.p2Total;
             const enough = total >= req;
-            const diff   = this.state.settings.difficulty;
             const totalEl = document.getElementById('b6p2-wallet-total');
             if (totalEl) {
                 totalEl.textContent = total + ' 元';
@@ -2300,13 +2304,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
                 const wasDisabled = confirmBtn.disabled;
-                const canConfirm  = diff === 'hard' ? total > 0 : enough;
-                confirmBtn.disabled = !canConfirm;
-                confirmBtn.classList.toggle('ready', canConfirm);
-                if (canConfirm && wasDisabled && total > 0) {
-                    const msg = (diff === 'easy' && total === req) ? '剛好！可以確認付款了！'
-                              : enough ? '金額足夠，可以確認付款了！' : '';
-                    if (msg) Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('ready', enough);
+                if (enough && wasDisabled) {
+                    const diff = this.state.settings.difficulty;
+                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
                 }
             }
         },
@@ -2331,13 +2334,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
                 const wasDisabled2 = confirmBtn.disabled;
-                const canConfirm   = diff === 'hard' ? total > 0 : enough;
-                confirmBtn.disabled = !canConfirm;
-                confirmBtn.classList.toggle('ready', canConfirm);
-                if (canConfirm && wasDisabled2 && total > 0) {
-                    const msg = (diff === 'easy' && total === req) ? '剛好！可以確認付款了！'
-                              : enough ? '金額足夠，可以確認付款了！' : '';
-                    if (msg) Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('ready', enough);
+                if (enough && wasDisabled2) {
+                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
                 }
             }
             const coinsEl = document.getElementById('b6p2-wallet-coins');
@@ -2406,41 +2407,183 @@ document.addEventListener('DOMContentLoaded', () => {
         _b6P2HandleConfirm(total) {
             const g      = this.state.game;
             const wTotal = this._b6P2GetWalletTotal();
-            const diff   = this.state.settings.difficulty;
-            // 簡單模式：≥ 即正確（多付也接受）；普通/困難：需精確 = total
-            const isCorrect = diff === 'easy' ? wTotal >= total : wTotal === total;
-
-            if (isCorrect) {
-                this.audio.play('correct');
-                this._showCenterFeedback('💯', '付款成功！');
-                g.paidAmount = wTotal;
-                Game.Speech.speak(`付了${toTWD(wTotal)}`, () => {
-                    Game.TimerManager.setTimeout(() => {
-                        this.state.isProcessing = false;
-                        this._showChange(wTotal, total);
-                    }, 400, 'turnTransition');
-                });
-            } else {
+            // 全難度統一：付款額 ≥ 應付額即正確（多付則找零）
+            if (wTotal < total) {
                 this.state.isProcessing = false;
                 this.audio.play('error');
                 g.p2ErrorCount = (g.p2ErrorCount || 0) + 1;
-                this._showCenterFeedback('❌', '再試一次！');
-                Game.Speech.speak(wTotal > total ? `拿了太多的錢，請再試一次` : `拿了太少的錢，請再試一次`);
-                g.p2Wallet    = [];
-                g.p2ShowHint  = false;
-                g.p2HintSlots = [];
+                this._showCenterFeedback('❌', '付太少了！');
+                Game.Speech.speak(`付太少了，還差${toTWD(total - wTotal)}，請再拖入金錢`);
                 const walletArea = document.getElementById('b6p2-wallet-area');
                 if (walletArea) {
                     walletArea.style.animation = 'b6p2Shake 0.4s ease';
-                    Game.TimerManager.setTimeout(() => {
-                        walletArea.style.animation = '';
-                        this._b6P2UpdateWalletDisplay();
-                    }, 500, 'ui');
+                    Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
                 }
-                if (g.p2ErrorCount >= 3) {
-                    Game.TimerManager.setTimeout(() => { this._b6P2AutoSetGhostSlots(); this._b6P2UpdateWalletDisplay(); }, 700, 'ui');
-                }
+                return;
             }
+            // 付款成功
+            const change = wTotal - total;
+            this.audio.play('correct');
+            this._showCenterFeedback('💯', '付款成功！');
+            g.paidAmount = wTotal;
+            if (change === 0) {
+                // 剛好付清：直接進入結果
+                Game.Speech.speak(`剛好${toTWD(wTotal)}，精準付款！`, () => {
+                    Game.TimerManager.setTimeout(() => {
+                        this.state.isProcessing = false;
+                        this._showChangeResult(wTotal, 0);
+                    }, 400, 'turnTransition');
+                });
+            } else {
+                // 超付：進入找零拖回階段
+                Game.Speech.speak(`付了${toTWD(wTotal)}`, () => {
+                    Game.TimerManager.setTimeout(() => {
+                        this.state.isProcessing = false;
+                        this._b6P2ShowChangeReturn(wTotal, total, change);
+                    }, 400, 'turnTransition');
+                });
+            }
+        },
+
+        // ── 找零拖回階段：change 金幣顯示於付款區，拖回我的錢包完成 ──
+        _b6P2ShowChangeReturn(paid, total, change) {
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
+            Game.EventManager.removeByCategory('gameUI');
+
+            // 分解找零金額
+            const denomMap = { easy:[100,50,10,5,1], normal:[500,100,50,10,5,1], hard:[1000,500,100,50,10,5,1] };
+            const denoms = denomMap[diff] || denomMap.easy;
+            const changeCoins = [];
+            let rem = change;
+            for (const d of denoms) { while (rem >= d) { changeCoins.push(d); rem -= d; } }
+
+            let uidCtr = 0;
+            const coins = changeCoins.map(d => ({
+                denom: d, uid: ++uidCtr,
+                face: Math.random() < 0.5 ? 'back' : 'front',
+                isBill: d >= 100, returned: false
+            }));
+            g.p2ChangeCoins    = coins;
+            g.p2ChangeMode     = true;
+
+            // 付款區：顯示找零金幣（可拖曳）
+            const walletCoinsEl = document.getElementById('b6p2-wallet-coins');
+            if (walletCoinsEl) {
+                walletCoinsEl.innerHTML = coins.map(coin => {
+                    const w = coin.isBill ? 100 : 60;
+                    return `<div class="b6p2-change-coin" draggable="true" data-uid="${coin.uid}" data-denom="${coin.denom}">
+                        <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                             style="width:${w}px;height:${coin.isBill?'auto':w+'px'};display:block;"
+                             draggable="false" onerror="this.style.display='none'">
+                        <span class="b6p2-change-label">${coin.denom}元</span>
+                    </div>`;
+                }).join('');
+            }
+
+            // 更新標籤
+            const areaLabel = document.querySelector('.b6p2-my-money-label');
+            if (areaLabel) areaLabel.textContent = '💰 找零區（把找零拖回錢包）';
+            const trayTitle = document.querySelector('.b6p2-tray-title');
+            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 ← 把找零拖回來`;
+
+            // 進度條重設為「找零回收」模式
+            const needLabel = document.querySelector('.b6p2-wallet-coins-label');
+            if (needLabel) needLabel.innerHTML = `找零 <span class="b6p2-wallet-need">${change} 元</span> 請拖回錢包`;
+            const totalEl2 = document.getElementById('b6p2-wallet-total');
+            if (totalEl2) { totalEl2.textContent = '0 元'; totalEl2.className = 'b6p2-wallet-total-val'; }
+            const fillEl2 = document.getElementById('b6p2-progress-fill');
+            if (fillEl2) { fillEl2.style.width = '0%'; fillEl2.className = 'b6p2-progress-fill'; }
+
+            // 隱藏確認付款按鈕
+            const confirmBtn = document.getElementById('b6-p2-confirm-btn');
+            if (confirmBtn) { confirmBtn.style.display = 'none'; }
+
+            // 隱藏提示按鈕
+            const hintBtn = document.getElementById('b6-p2-hint-btn');
+            if (hintBtn) hintBtn.closest('.b6-p2-hint-wrap')?.style.setProperty('display','none');
+
+            Game.Speech.speak(`找零${toTWD(change)}，請把找零拖回我的錢包`);
+
+            // 設定拖曳事件
+            this._b6P2SetupChangeReturn(coins, paid, total, change);
+        },
+
+        _b6P2SetupChangeReturn(coins, paid, total, change) {
+            const trayEl = document.getElementById('b6p2-tray-coins');
+            const walletEl = document.getElementById('b6p2-wallet-coins');
+            if (!trayEl || !walletEl) return;
+
+            trayEl.classList.add('b6p2-change-target');
+
+            const handleReturn = (uid) => {
+                const coin = coins.find(c => String(c.uid) === String(uid) && !c.returned);
+                if (!coin) return;
+                coin.returned = true;
+                this.audio.play('coin');
+                document.querySelector(`.b6p2-change-coin[data-uid="${uid}"]`)?.remove();
+
+                const returnedVal = coins.filter(c => c.returned).reduce((s, c) => s + c.denom, 0);
+                const totalEl3 = document.getElementById('b6p2-wallet-total');
+                if (totalEl3) { totalEl3.textContent = returnedVal + ' 元'; totalEl3.className = 'b6p2-wallet-total-val enough'; }
+                const fillEl3 = document.getElementById('b6p2-progress-fill');
+                if (fillEl3) { const pct = Math.min(Math.round(returnedVal / change * 100), 100); fillEl3.style.width = pct + '%'; fillEl3.className = 'b6p2-progress-fill full'; }
+
+                if (coins.every(c => c.returned)) {
+                    this.state.isProcessing = true;
+                    trayEl.classList.remove('b6p2-change-target');
+                    this._showCenterFeedback('🎉', '找零完成！');
+                    Game.Speech.speak(`找零完成，買菜成功！`, () => {
+                        Game.TimerManager.setTimeout(() => {
+                            this.state.isProcessing = false;
+                            this._showChangeResult(paid, change);
+                        }, 400, 'turnTransition');
+                    });
+                }
+            };
+
+            // Desktop drag
+            walletEl.querySelectorAll('.b6p2-change-coin').forEach(coinEl => {
+                const uid = coinEl.dataset.uid;
+                Game.EventManager.on(coinEl, 'dragstart', e => {
+                    e.dataTransfer.setData('text/plain', `change:${uid}`);
+                    coinEl.classList.add('b6p2-dragging');
+                }, {}, 'gameUI');
+                Game.EventManager.on(coinEl, 'dragend', () => coinEl.classList.remove('b6p2-dragging'), {}, 'gameUI');
+            });
+            Game.EventManager.on(trayEl, 'dragover', e => { e.preventDefault(); trayEl.classList.add('b6p2-drop-active'); }, {}, 'gameUI');
+            Game.EventManager.on(trayEl, 'dragleave', e => { if (!trayEl.contains(e.relatedTarget)) trayEl.classList.remove('b6p2-drop-active'); }, {}, 'gameUI');
+            Game.EventManager.on(trayEl, 'drop', e => {
+                e.preventDefault(); trayEl.classList.remove('b6p2-drop-active');
+                const d = e.dataTransfer.getData('text/plain');
+                if (d.startsWith('change:')) handleReturn(d.replace('change:', ''));
+            }, {}, 'gameUI');
+
+            // Touch drag
+            walletEl.querySelectorAll('.b6p2-change-coin').forEach(coinEl => {
+                const uid = coinEl.dataset.uid;
+                let ghostEl = null;
+                Game.EventManager.on(coinEl, 'touchstart', e => {
+                    const t = e.touches[0];
+                    ghostEl = coinEl.cloneNode(true);
+                    ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX-30}px;top:${t.clientY-40}px;`;
+                    document.body.appendChild(ghostEl);
+                }, { passive: true }, 'gameUI');
+                Game.EventManager.on(coinEl, 'touchmove', e => {
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    if (ghostEl) { ghostEl.style.left = (t.clientX-30)+'px'; ghostEl.style.top = (t.clientY-40)+'px'; }
+                    const r = trayEl.getBoundingClientRect();
+                    trayEl.classList.toggle('b6p2-drop-active', t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom);
+                }, { passive: false }, 'gameUI');
+                Game.EventManager.on(coinEl, 'touchend', e => {
+                    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+                    trayEl.classList.remove('b6p2-drop-active');
+                    const t = e.changedTouches[0];
+                    const r = trayEl.getBoundingClientRect();
+                    if (t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom) handleReturn(uid);
+                }, { passive: true }, 'gameUI');
+            });
         },
 
         // ── 付款提示（保留，困難模式彈窗仍使用）─────────────────
@@ -2482,7 +2625,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6-hm-imgs">
                         ${items.map(d => {
                             const imgSize = d >= 100 ? '62px' : '48px';
-                            return `<img src="../images/money/${d}_yuan_front.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
+                            const face = this.state.game.p2TrayFaces?.[d] || 'front';
+                            return `<img src="../images/money/${d}_yuan_${face}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
                         }).join('')}
                     </div>
                     <button class="b6-hm-close-btn" id="b6-hm-close">✕ 關閉</button>

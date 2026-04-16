@@ -1353,6 +1353,32 @@
 
 /* 確認付款按鈕自適應寬度 */
 #b6-p2-confirm-btn { align-self: center; width: fit-content; }
+
+/* ── 提示按鈕包裹（吉祥物 + 按鈕） ── */
+.b6-p2-hint-wrap { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ── 找零金幣（付款區顯示，可拖回錢包） ── */
+.b6p2-change-coin {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border: 2px solid #f59e0b; border-radius: 12px; padding: 6px 6px 4px;
+    cursor: grab; transition: all 0.18s; user-select: none; touch-action: none;
+    background: rgba(254, 243, 199, 0.6);
+}
+.b6p2-change-coin:hover { border-color: #d97706; background: rgba(253,230,138,0.8); transform: translateY(-3px); }
+.b6p2-change-coin:active { cursor: grabbing; }
+.b6p2-change-coin.b6p2-dragging { opacity: 0.4; transform: scale(0.9); }
+.b6p2-change-label { font-size: 12px; font-weight: 700; color: #b45309; }
+
+/* 找零放置目標（我的錢包 tray） */
+.b6p2-change-target {
+    border: 3px dashed #f59e0b !important;
+    background: rgba(254,243,199,0.3) !important;
+    min-height: 80px;
+}
+.b6p2-change-target.b6p2-drop-active {
+    border-color: #d97706 !important;
+    background: rgba(253,230,138,0.5) !important;
+}
 .b6p2-tray-coins {
     display: flex; flex-wrap: wrap;
     gap: 10px; justify-content: center; align-items: flex-end;
