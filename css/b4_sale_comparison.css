@@ -202,6 +202,13 @@
 
 .b4-option-card:active { transform: scale(0.97); }
 
+.b4-card-coin-bounce { animation: b4CardCoinBounce 0.28s ease; }
+@keyframes b4CardCoinBounce {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
 .b4-option-card.selected-correct {
     border-color: #10b981;
     background: #d1fae5;

@@ -130,6 +130,15 @@
     background: #fffbeb;
 }
 
+.b1-item-bounce {
+    animation: b1ItemBounce 0.28s ease;
+}
+@keyframes b1ItemBounce {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
 .b1-item-top {
     display: flex;
     align-items: center;

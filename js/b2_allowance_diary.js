@@ -929,11 +929,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 主題語音結束後才啟動 Easy 動畫或輔助點擊，避免語音互相中斷
                         if (diff === 'easy') {
                             this._animateEasyEntriesSequential(currentQ);
-                            // 簡單模式：動畫 + 金幣綁定（~400ms）完成後才啟動，
-                            // 不能用 else if——否則 easy 模式永遠不會啟動
-                            if (this.state.settings.clickMode === 'on') {
-                                Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 600, 'ui');
-                            }
+                            // 簡單模式永遠啟動輔助點擊提示動畫
+                            Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 600, 'ui');
                         } else if (this.state.settings.clickMode === 'on') {
                             Game.TimerManager.setTimeout(() => AssistClick.activate(currentQ), 300, 'ui');
                         }
@@ -1660,6 +1657,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     q.easyCoinsClicked[evIdx]++;
                     q.easyRunningTotal += denom;
                     q.easyEventTotals[evIdx] = (q.easyEventTotals[evIdx] || 0) + denom;
+
+                    // 事件列點擊彈跳動畫
+                    const evRow = btn.closest('.b2-event-row');
+                    if (evRow) {
+                        evRow.classList.add('b2-row-bounce');
+                        Game.TimerManager.setTimeout(() => evRow.classList.remove('b2-row-bounce'), 300, 'ui');
+                    }
 
                     this.audio.play('click');
 
@@ -2799,12 +2803,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
                     const isBanknote = slot.denom >= 100;
-                    const imgW = isBanknote ? '68px' : '60px';
+                    const imgW = isBanknote ? '100px' : '60px';
+                    const imgH = isBanknote ? 'auto'  : '60px';
                     const ghostClass = slot.filled ? '' : ' b2-wallet-ghost-slot';
                     const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                     return `<div class="b2-wallet-coin${ghostClass}" data-b2-hint-idx="${idx}">
                         <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
-                             style="width:${imgW};height:${imgW};object-fit:contain;"
+                             style="width:${imgW};height:${imgH};object-fit:contain;"
                              draggable="false" onerror="this.style.display:'none'">
                     </div>`;
                 }).join('');
@@ -2812,12 +2817,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinsEl.innerHTML = '<span class="b2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
             } else {
                 coinsEl.innerHTML = this.state.wallet.map(coin => {
-                    const imgW = coin.isBanknote ? '68px' : '60px';
+                    const imgW = coin.isBanknote ? '100px' : '60px';
+                    const imgH = coin.isBanknote ? 'auto'  : '60px';
                     const coinFace = coin.face || 'front';
                     return `
                     <div class="b2-wallet-coin b2-wc-removable" draggable="true" data-uid="${coin.uid}">
                         <img src="../images/money/${coin.denom}_yuan_${coinFace}.png" alt="${coin.denom}元"
-                             style="width:${imgW};height:${imgW};object-fit:contain;"
+                             style="width:${imgW};height:${imgH};object-fit:contain;"
                              onerror="this.style.display:'none'" draggable="false">
                         <button class="b2-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>
                     </div>`;

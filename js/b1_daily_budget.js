@@ -1155,9 +1155,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'easy') {
                 // 簡單模式：綁定可點擊金幣，逐項揭露後自動進入 Phase 2
                 this._bindB1EasyModeCoins(curr);
-                if (this.state.settings.clickMode === 'on') {
-                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
-                }
+                // 簡單模式永遠啟動輔助點擊提示動畫
+                Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
             } else if (diff === 'normal') {
                 // 普通模式：逐項點選金額（3選1 中央彈窗）
                 this._bindB1NormalItemChoices(curr);
@@ -1197,6 +1196,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     q.easyCoinsClicked[itemIdx] = (q.easyCoinsClicked[itemIdx] || 0) + 1;
                     q.easyRunningTotal += denom;
                     q.easyEventTotals[itemIdx] = (q.easyEventTotals[itemIdx] || 0) + denom;
+
+                    // 商店框點擊彈跳動畫
+                    const itemCard = btn.closest('.b1-schedule-item');
+                    if (itemCard) {
+                        itemCard.classList.add('b1-item-bounce');
+                        Game.TimerManager.setTimeout(() => itemCard.classList.remove('b1-item-bounce'), 300, 'ui');
+                    }
 
                     // 隨著點擊更新該項目的金額顯示
                     const costEl = document.getElementById(`b1-item-cost-${itemIdx}`);
@@ -1813,7 +1819,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
             }, {}, 'gameUI');
 
-            if (this.state.settings.clickMode === 'on') {
+            // 簡單模式永遠啟動；其他難度依 clickMode 設定
+            if (this.state.settings.difficulty === 'easy' || this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
             }
         },
@@ -2145,12 +2152,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     coinsEl.innerHTML = tmpSlots.map((slot, idx) => {
                         const isBanknote = slot.denom >= 100;
-                        const imgW = isBanknote ? '68px' : '60px';
+                        const imgW = isBanknote ? '100px' : '60px';
+                        const imgH = isBanknote ? 'auto'  : '60px';
                         const ghostClass = slot.filled ? '' : ' b1-wallet-ghost-slot';
                         const slotFace = slot.face || this.state.quiz.trayFaces?.[slot.denom] || 'front';
                         return `<div class="b1-wallet-coin${ghostClass}" data-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_${slotFace}.png" alt="${slot.denom}元"
-                                 style="width:${imgW};height:${imgW};object-fit:contain;"
+                                 style="width:${imgW};height:${imgH};object-fit:contain;"
                                  draggable="false" onerror="this.style.display='none'">
                         </div>`;
                     }).join('');
@@ -2162,13 +2170,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const coinFace = coin.face || 'front';
                         const imgSrc   = `../images/money/${coin.denom}_yuan_${coinFace}.png`;
                         const imgClass = coin.isBanknote ? 'banknote-img' : 'coin-img';
-                        const imgW     = coin.isBanknote ? '68px' : '60px';
+                        const imgW     = coin.isBanknote ? '100px' : '60px';
+                        const imgH     = coin.isBanknote ? 'auto'  : '60px';
                         const removableAttrs = removable ? `draggable="true" data-denom="${coin.denom}" class="b1-wallet-coin b1-wc-removable"` : `class="b1-wallet-coin"`;
                         const removeBtn = removable ? `<button class="b1-wc-remove" data-uid="${coin.uid}" title="拖回">✕</button>` : '';
                         return `
                         <div ${removableAttrs} data-uid="${coin.uid}">
                             <img src="${imgSrc}" alt="${coin.denom}元" class="${imgClass}"
-                                 style="width:${imgW};height:${imgW};object-fit:contain;"
+                                 style="width:${imgW};height:${imgH};object-fit:contain;"
                                  onerror="this.style.display='none'" draggable="false">
                             ${removeBtn}
                         </div>`;

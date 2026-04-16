@@ -94,6 +94,13 @@
 
 .b2-event-row:last-child { border-bottom: none; }
 
+.b2-row-bounce { animation: b2RowBounce 0.28s ease; }
+@keyframes b2RowBounce {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
 .b2-event-icon { font-size: 22px; flex-shrink: 0; }
 
 .b2-event-name {
