@@ -1479,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ════════════════════════════════════════════════════════
-        // ── 12. B5 Phase 2：付款操作（B1 _renderPhase2 pattern）──
+        // ── 12. B5 Phase 2：付款操作（B6 pattern）─────────────────
         // ════════════════════════════════════════════════════════
         _renderB5Phase2(selectedItems, total) {
             Game.TimerManager.clearAll();
@@ -1489,8 +1489,23 @@ document.addEventListener('DOMContentLoaded', () => {
             g.p2UidCtr     = 0;
             g.p2ErrorCount = 0;
             g.p2Total      = total;
+            g.p2TrayFaces  = {};
+            g.p2ShowHint   = false;
+            g.p2HintSlots  = [];
 
+            // 產生預算金幣（有限托盤，B6 pattern）
             const diff      = this.state.settings.difficulty;
+            const allDenoms = diff === 'hard'   ? [1000,500,100,50,10,5,1] :
+                              diff === 'normal' ? [500,100,50,10,5,1] : [100,50,10,5,1];
+            const trayFaces = {};
+            allDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            const budgetCoins = [];
+            let rem = g.budget || 0;
+            for (const d of allDenoms) { while (rem >= d) { budgetCoins.push(d); rem -= d; } }
+            g.p2BudgetFaces = trayFaces;
+            g.p2BudgetCoins = budgetCoins;
+            g.p2TrayFaces   = trayFaces;
+
             const diffLabel = { easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || '';
             const themeKey  = this.state.settings.partyTheme;
             const themeData = B5_THEMES[themeKey] || B5_THEMES.birthday;
@@ -1511,17 +1526,24 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="game-container">
                 ${this._renderB5P2RefCard(selectedItems, total, themeData)}
                 ${this._renderB5P2WalletArea(total)}
-                ${diff !== 'easy' ? `<div style="display:flex;justify-content:center;margin:8px 0;">
-                    <button class="b5-confirm-btn" id="b5-p2-confirm-btn" disabled>✅ 確認付款</button>
-                </div>` : ''}
-                ${this._renderB5P2CoinTray(diff)}
+                <button class="b5-confirm-btn" id="b5-p2-confirm-btn" disabled>✅ 確認付款</button>
+                ${this._renderB5P2CoinTray()}
             </div>`;
 
             this._bindB5P2Events(total);
-            Game.Speech.speak(`請準備${toTWD(total)}`);
+            this._b5P2SetupDragDrop();
+
+            Game.TimerManager.setTimeout(() => {
+                Game.Speech.speak(`共消費${toTWD(total)}，請拖曳正確的金錢圖示付款。`);
+            }, 300, 'speech');
 
             if (diff === 'easy') {
-                Game.TimerManager.setTimeout(() => this._b5P2AutoSetGhostSlots(), 300, 'ui');
+                this._b5P2AutoSetGhostSlots();
+                this._b5P2UpdateWalletDisplay();
+            }
+
+            if (this.state.settings.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(), 500, 'ui');
             }
         },
 
@@ -1529,13 +1551,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemsList = selectedItems.map(it =>
                 `<div class="b5p2-ref-item"><span>${it.icon} ${it.name}</span><span class="b5p2-ref-price">${it.price}元</span></div>`
             ).join('');
+            const customList = (this.state.game.customItems || [])
+                .filter(i => !i._deleted)
+                .map(i => `<div class="b5p2-ref-item"><span>📦 ${i.name}</span><span class="b5p2-ref-price">${i.price}元</span></div>`).join('');
             return `
             <div class="b5p2-ref-card">
                 <div class="b5p2-ref-header">
                     <span class="b5p2-ref-icon">${themeData.icon}</span>
                     <span class="b5p2-ref-title">${themeData.name}</span>
+                    <span class="b5-p2-hint-wrap">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                        <button class="b-hint-btn" id="b5-p2-hint-btn">💡 提示</button>
+                    </span>
                 </div>
-                <div class="b5p2-ref-items">${itemsList}</div>
+                <div class="b5p2-ref-items">${itemsList}${customList}</div>
                 <div class="b5p2-ref-total-row">
                     <span class="b5p2-ref-total-label">合計</span>
                     <span class="b5p2-ref-total-val">${total} 元</span>
@@ -1546,9 +1575,8 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderB5P2WalletArea(total) {
             return `
             <div class="b5p2-wallet-area" id="b5p2-wallet-area">
-                <div class="b5p2-wallet-coins-label">預算金額</div>
+                <div class="b5p2-wallet-coins-label">需要付款 <span class="b5p2-wallet-need">${total} 元</span></div>
                 <div class="b5p2-wallet-header">
-                    <div class="b5p2-wallet-need">${total} 元</div>
                     <div class="b5p2-wallet-placed-row">
                         <span class="b5p2-wallet-placed-lbl">已放</span>
                         <span class="b5p2-wallet-total-val" id="b5p2-wallet-total">0 元</span>
@@ -1561,27 +1589,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b5p2-progress-fill" id="b5p2-progress-fill"></div>
                     </div>
                 </div>
+                <div class="b5p2-my-money-label">💳 付款區</div>
                 <div class="b5p2-wallet-coins b5p2-drop-zone" id="b5p2-wallet-coins">
                     <span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>
                 </div>
             </div>`;
         },
 
-        _renderB5P2CoinTray(diff) {
-            const denomMap = {
-                easy:   [1, 5, 10, 50, 100],
-                normal: [1, 5, 10, 50, 100, 500],
-                hard:   [1, 5, 10, 50, 100, 500, 1000]
-            };
-            const denoms = denomMap[diff] || denomMap.easy;
-            const trayFaces = {};
-            denoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
-            this.state.game.p2TrayFaces = trayFaces;
-            const coinsHtml = denoms.map(d => {
-                const isBill = d >= 100;
-                const face = trayFaces[d];
+        _renderB5P2CoinTray() {
+            const g = this.state.game;
+            const budgetCoins = g.p2BudgetCoins || [];
+            const trayFaces   = g.p2BudgetFaces  || {};
+            let _trayUidCtr   = 0;
+            const coinsHtml = budgetCoins.map(d => {
+                const trayUid = 'tc' + (++_trayUidCtr);
+                const isBill  = d >= 100;
+                const face    = trayFaces[d] || 'front';
                 return `
-                <div class="b5p2-coin-drag" draggable="true" data-denom="${d}" title="${d}元">
+                <div class="b5p2-coin-drag" draggable="true" data-denom="${d}" data-tray-uid="${trayUid}" data-face="${face}" title="${d}元">
                     <img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
                          class="${isBill ? 'banknote-img' : 'coin-img'}" draggable="false"
                          onerror="this.style.display='none'">
@@ -1590,116 +1615,130 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             return `
             <div class="b5p2-tray">
-                <div class="b5p2-tray-title">💰 拖曳放正確的金錢圖示（可重複拖曳）</div>
+                <div class="b5p2-tray-title"><img src="../images/common/icons_wallet.png" class="b5p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包</div>
                 <div class="b5p2-tray-coins" id="b5p2-tray-coins">${coinsHtml}</div>
             </div>`;
         },
 
         _bindB5P2Events(total) {
-            this._b5P2SetupDragDrop();
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
 
-            // 確認付款按鈕（普通/困難）
+            // 確認付款按鈕
             const confirmBtn = document.getElementById('b5-p2-confirm-btn');
             if (confirmBtn) {
                 Game.EventManager.on(confirmBtn, 'click', () => {
+                    if (this.state.isProcessing) return;
+                    this.state.isProcessing = true;
                     this._b5P2HandleConfirm(total);
                 }, {}, 'gameUI');
             }
 
-            // 移除錢包幣（點 ✕）
+            // 移除幣（委派）＋ 拖回托盤
             const walletCoinsEl = document.getElementById('b5p2-wallet-coins');
             if (walletCoinsEl) {
-                Game.EventManager.on(walletCoinsEl, 'click', (e) => {
+                Game.EventManager.on(walletCoinsEl, 'click', e => {
                     const btn = e.target.closest('.b5p2-wc-remove');
-                    if (btn) {
-                        const uid = parseInt(btn.dataset.uid);
-                        if (!isNaN(uid)) this._b5P2RemoveCoin(uid);
-                    }
+                    if (btn) { this.audio.play('click'); this._b5P2RemoveCoin(btn.dataset.uid); }
                 }, {}, 'gameUI');
-                // 從錢包拖回托盤
-                Game.EventManager.on(walletCoinsEl, 'dragstart', (e) => {
+                Game.EventManager.on(walletCoinsEl, 'dragstart', e => {
                     const coinEl = e.target.closest('.b5p2-wc-removable');
                     if (!coinEl) return;
-                    const uid = parseInt(coinEl.dataset.uid);
-                    if (isNaN(uid)) return;
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', 'remove:' + uid);
+                    e.dataTransfer.setData('text/plain', `remove:${coinEl.dataset.uid}`);
                     coinEl.classList.add('b5p2-dragging');
                 }, {}, 'gameUI');
-                Game.EventManager.on(walletCoinsEl, 'dragend', (e) => {
+                Game.EventManager.on(walletCoinsEl, 'dragend', e => {
                     e.target.closest('.b5p2-wc-removable')?.classList.remove('b5p2-dragging');
                 }, {}, 'gameUI');
             }
-            const tray = document.getElementById('b5p2-tray-coins');
-            if (tray) {
-                Game.EventManager.on(tray, 'dragover', (e) => {
-                    if (e.dataTransfer.types.includes('text/plain')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-                }, {}, 'gameUI');
-                Game.EventManager.on(tray, 'drop', (e) => {
-                    e.preventDefault();
-                    const data = e.dataTransfer.getData('text/plain');
-                    if (data?.startsWith('remove:')) {
-                        const uid = parseInt(data.slice(7));
-                        if (!isNaN(uid)) this._b5P2RemoveCoin(uid);
+
+            // 提示按鈕
+            const hintBtn = document.getElementById('b5-p2-hint-btn');
+            if (hintBtn) {
+                Game.EventManager.on(hintBtn, 'click', () => {
+                    this.audio.play('click');
+                    if (diff === 'easy') {
+                        g.p2Wallet   = [];
+                        g.p2UidCtr   = 0;
+                        g.p2ShowHint = true;
+                        this._b5P2AutoSetGhostSlots();
+                        this._b5P2UpdateWalletDisplay();
+                        Game.Speech.speak('請按照提示放入正確的金錢');
+                    } else {
+                        this._showB5HardModeHintModal(total);
                     }
                 }, {}, 'gameUI');
             }
 
-            Game.EventManager.on(document.getElementById('back-to-settings') || document.querySelector('.b-back-btn'), 'click', () => {
-                this.showSettings();
-            }, {}, 'gameUI');
+            // 托盤接受從錢包拖回的幣
+            const tray = document.getElementById('b5p2-tray-coins');
+            if (tray) {
+                Game.EventManager.on(tray, 'dragover', e => e.preventDefault(), {}, 'gameUI');
+                Game.EventManager.on(tray, 'drop', e => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    if (data.startsWith('remove:')) this._b5P2RemoveCoin(data.replace('remove:', ''));
+                }, {}, 'gameUI');
+            }
         },
 
         _b5P2SetupDragDrop() {
             const walletCoins = document.getElementById('b5p2-wallet-coins');
             if (!walletCoins) return;
+
+            // Desktop：拖曳盤 → 錢包
             document.querySelectorAll('.b5p2-coin-drag').forEach(dragEl => {
-                Game.EventManager.on(dragEl, 'dragstart', (e) => {
-                    e.dataTransfer.effectAllowed = 'copy';
-                    e.dataTransfer.setData('text/plain', dragEl.dataset.denom);
+                const denom   = parseInt(dragEl.dataset.denom);
+                const trayUid = dragEl.dataset.trayUid;
+                const face    = dragEl.dataset.face;
+                Game.EventManager.on(dragEl, 'dragstart', e => {
+                    if (dragEl.dataset.inUse === 'true') { e.preventDefault(); return; }
+                    e.dataTransfer.setData('text/plain', `tray:${trayUid}:${denom}:${face}`);
+                    e.dataTransfer.effectAllowed = 'move';
                     dragEl.classList.add('b5p2-dragging');
-                    try {
-                        const img = dragEl.querySelector('img');
-                        const ghost = document.createElement('img');
-                        ghost.src = img ? img.src : '';
-                        ghost.style.cssText = 'position:fixed;top:-200px;left:-200px;width:56px;height:56px;object-fit:contain;';
-                        document.body.appendChild(ghost);
-                        e.dataTransfer.setDragImage(ghost, 28, 28);
-                        Game.TimerManager.setTimeout(() => ghost.remove(), 100, 'ui');
-                    } catch(ex) {}
                 }, {}, 'gameUI');
                 Game.EventManager.on(dragEl, 'dragend', () => dragEl.classList.remove('b5p2-dragging'), {}, 'gameUI');
             });
-            Game.EventManager.on(walletCoins, 'dragover', (e) => {
-                e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+
+            Game.EventManager.on(walletCoins, 'dragover', e => {
+                e.preventDefault();
                 walletCoins.classList.add('b5p2-drop-active');
             }, {}, 'gameUI');
-            Game.EventManager.on(walletCoins, 'dragleave', (e) => {
+            Game.EventManager.on(walletCoins, 'dragleave', e => {
                 if (!walletCoins.contains(e.relatedTarget)) walletCoins.classList.remove('b5p2-drop-active');
             }, {}, 'gameUI');
-            Game.EventManager.on(walletCoins, 'drop', (e) => {
+            Game.EventManager.on(walletCoins, 'drop', e => {
                 e.preventDefault();
                 walletCoins.classList.remove('b5p2-drop-active');
-                const denom = parseInt(e.dataTransfer.getData('text/plain'));
-                if (denom && !isNaN(denom)) this._b5P2AddCoin(denom);
+                const data = e.dataTransfer.getData('text/plain');
+                if (data.startsWith('remove:')) {
+                    this._b5P2RemoveCoin(data.replace('remove:', ''));
+                } else if (data.startsWith('tray:')) {
+                    const parts = data.split(':');
+                    const tUid = parts[1], d = parseInt(parts[2]), f = parts[3];
+                    const tEl = document.querySelector(`.b5p2-coin-drag[data-tray-uid="${tUid}"]`);
+                    if (tEl) { tEl.dataset.inUse = 'true'; tEl.style.display = 'none'; }
+                    this._b5P2AddCoin(d, { face: f, trayUid: tUid });
+                }
             }, {}, 'gameUI');
-            // Touch drag
-            let touchDenom = null, ghost = null;
+
+            // Touch drag：拖曳盤 → 錢包
             document.querySelectorAll('.b5p2-coin-drag').forEach(dragEl => {
-                Game.EventManager.on(dragEl, 'touchstart', (e) => {
-                    if (e.touches.length > 1) return;
-                    touchDenom = parseInt(dragEl.dataset.denom);
-                    const rect = dragEl.getBoundingClientRect();
-                    ghost = dragEl.cloneNode(true);
-                    ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;opacity:0.85;pointer-events:none;z-index:9999;transform:scale(1.15);transition:none;`;
-                    document.body.appendChild(ghost);
+                const denom   = parseInt(dragEl.dataset.denom);
+                const trayUid = dragEl.dataset.trayUid;
+                const face    = dragEl.dataset.face;
+                let ghostEl = null;
+                Game.EventManager.on(dragEl, 'touchstart', e => {
+                    if (dragEl.dataset.inUse === 'true') return;
+                    const t = e.touches[0];
+                    ghostEl = dragEl.cloneNode(true);
+                    ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX - 30}px;top:${t.clientY - 40}px;`;
+                    document.body.appendChild(ghostEl);
                 }, { passive: true }, 'gameUI');
-                Game.EventManager.on(dragEl, 'touchmove', (e) => {
-                    if (!ghost) return;
+                Game.EventManager.on(dragEl, 'touchmove', e => {
                     e.preventDefault();
                     const t = e.touches[0];
-                    ghost.style.left = (t.clientX - ghost.offsetWidth  / 2) + 'px';
-                    ghost.style.top  = (t.clientY - ghost.offsetHeight / 2) + 'px';
+                    if (ghostEl) { ghostEl.style.left = (t.clientX - 30) + 'px'; ghostEl.style.top = (t.clientY - 40) + 'px'; }
                     const wc = document.getElementById('b5p2-wallet-coins');
                     if (wc) {
                         const r = wc.getBoundingClientRect();
@@ -1708,52 +1747,88 @@ document.addEventListener('DOMContentLoaded', () => {
                             t.clientY >= r.top  && t.clientY <= r.bottom);
                     }
                 }, { passive: false }, 'gameUI');
-                Game.EventManager.on(dragEl, 'touchend', (e) => {
-                    if (!ghost || touchDenom === null) return;
+                Game.EventManager.on(dragEl, 'touchend', e => {
+                    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
                     const t = e.changedTouches[0];
                     const wc = document.getElementById('b5p2-wallet-coins');
                     if (wc) {
                         const r = wc.getBoundingClientRect();
-                        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
-                            this._b5P2AddCoin(touchDenom);
-                        }
                         wc.classList.remove('b5p2-drop-active');
+                        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+                            dragEl.dataset.inUse = 'true';
+                            dragEl.style.display = 'none';
+                            this._b5P2AddCoin(denom, { face, trayUid });
+                        }
                     }
-                    ghost.remove(); ghost = null; touchDenom = null;
                 }, { passive: true }, 'gameUI');
             });
+
+            // Touch drag：錢包 → 拖回托盤（普通/困難模式的 .b5p2-wc-removable）
+            const trayEl = document.getElementById('b5p2-tray-coins');
+            Game.EventManager.on(walletCoins, 'touchstart', e => {
+                const coin = e.target.closest('.b5p2-wc-removable');
+                if (!coin) return;
+                coin._touchDragUid = coin.dataset.uid;
+                const t = e.touches[0];
+                const ghost = coin.cloneNode(true);
+                ghost.id = 'b5p2-wallet-touch-ghost';
+                ghost.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.75;left:${t.clientX - 30}px;top:${t.clientY - 40}px;`;
+                document.body.appendChild(ghost);
+            }, { passive: true }, 'gameUI');
+            Game.EventManager.on(walletCoins, 'touchmove', e => {
+                const ghost = document.getElementById('b5p2-wallet-touch-ghost');
+                if (!ghost) return;
+                e.preventDefault();
+                const t = e.touches[0];
+                ghost.style.left = (t.clientX - 30) + 'px';
+                ghost.style.top  = (t.clientY - 40) + 'px';
+                if (trayEl) {
+                    const r = trayEl.getBoundingClientRect();
+                    trayEl.classList.toggle('b5p2-drop-active', t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom);
+                }
+            }, { passive: false }, 'gameUI');
+            Game.EventManager.on(walletCoins, 'touchend', e => {
+                const ghost = document.getElementById('b5p2-wallet-touch-ghost');
+                if (!ghost) return;
+                const t = e.changedTouches[0];
+                ghost.remove();
+                if (trayEl) {
+                    const r = trayEl.getBoundingClientRect();
+                    trayEl.classList.remove('b5p2-drop-active');
+                    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+                        const coin = e.target.closest('.b5p2-wc-removable') || walletCoins.querySelector('[data-uid="' + (walletCoins._touchDragUid || '') + '"]');
+                        const uid = coin?._touchDragUid || coin?.dataset?.uid;
+                        if (uid) { this.audio.play('click'); this._b5P2RemoveCoin(uid); }
+                    }
+                }
+            }, { passive: true }, 'gameUI');
         },
 
-        _b5P2AddCoin(denom) {
-            const g = this.state.game;
-            const q = g;
+        _b5P2AddCoin(denom, opts = {}) {
+            const g    = this.state.game;
             const diff = this.state.settings.difficulty;
-            if (q.p2ShowHint && q.p2HintSlots?.length) {
-                const slotIdx = q.p2HintSlots.findIndex(s => s.denom === denom && !s.filled);
+            const face    = opts.face    || g.p2TrayFaces?.[denom] || 'front';
+            const trayUid = opts.trayUid || null;
+            if (g.p2ShowHint && g.p2HintSlots?.length) {
+                const slotIdx = g.p2HintSlots.findIndex(s => s.denom === denom && !s.filled);
                 if (slotIdx === -1) { this.audio.play('error'); return; }
-                q.p2HintSlots[slotIdx].filled = true;
+                g.p2HintSlots[slotIdx].filled = true;
                 this.audio.play('coin');
-                const uid = ++q.p2UidCtr;
-                const face = q.p2TrayFaces?.[denom] || 'front';
-                q.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
-                // 只更新該 ghost slot：移除淡化 class，讓 opacity transition 顯示正常
-                const slotEl = document.querySelector(`[data-p2-hint-idx="${slotIdx}"]`);
+                const uid = ++g.p2UidCtr;
+                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face, trayUid });
+                const slotEl = document.querySelector(`[data-b5p2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b5p2-ghost-slot');
                 this._b5P2UpdateStatusOnly();
-                // Easy: 全部填滿後自動確認
-                if (diff === 'easy' && q.p2HintSlots.every(s => s.filled)) {
-                    Game.TimerManager.setTimeout(() => this._b5P2HandleConfirm(q.p2Total), 600, 'ui');
+                if (diff === 'easy' && g.p2HintSlots.every(s => s.filled)) {
+                    Game.TimerManager.setTimeout(() => this._b5P2HandleConfirm(g.p2Total), 600, 'ui');
                 }
             } else {
                 this.audio.play('coin');
-                const uid = ++q.p2UidCtr;
-                const face = q.p2TrayFaces?.[denom] || 'front';
-                q.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
-                // 直接 append 新幣元素，避免整區重新渲染閃爍
+                const uid = ++g.p2UidCtr;
+                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face, trayUid });
                 const coinsEl = document.getElementById('b5p2-wallet-coins');
                 if (coinsEl) {
-                    const emptyHint = coinsEl.querySelector('.b5p2-wallet-empty');
-                    if (emptyHint) emptyHint.remove();
+                    coinsEl.querySelector('.b5p2-wallet-empty')?.remove();
                     const canRemove = diff !== 'easy';
                     const isBill = denom >= 100;
                     const w = isBill ? 100 : 60;
@@ -1768,7 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this._b5P2UpdateStatusOnly();
             }
-            if (this.state.settings.difficulty !== 'hard') {
+            if (diff !== 'hard') {
                 const walletNow = this._b5P2GetWalletTotal();
                 Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
             }
@@ -1776,8 +1851,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b5P2RemoveCoin(uid) {
             const g = this.state.game;
-            g.p2Wallet = g.p2Wallet.filter(c => c.uid !== uid);
-            this._b5P2UpdateWalletDisplay();
+            const coinIdx = g.p2Wallet.findIndex(c => String(c.uid) === String(uid));
+            const coin = coinIdx !== -1 ? g.p2Wallet[coinIdx] : null;
+            // 恢復托盤元素顯示
+            if (coin?.trayUid) {
+                const tEl = document.querySelector(`.b5p2-coin-drag[data-tray-uid="${coin.trayUid}"]`);
+                if (tEl) { delete tEl.dataset.inUse; tEl.style.display = ''; }
+            }
+            if (g.p2ShowHint && g.p2HintSlots?.length) {
+                if (coinIdx !== -1) {
+                    let filledSoFar = 0;
+                    for (let i = 0; i < g.p2HintSlots.length; i++) {
+                        if (g.p2HintSlots[i].filled && g.p2HintSlots[i].denom === coin.denom && filledSoFar === coinIdx) {
+                            g.p2HintSlots[i].filled = false; break;
+                        }
+                        if (g.p2HintSlots[i].filled) filledSoFar++;
+                    }
+                    g.p2Wallet.splice(coinIdx, 1);
+                }
+                this._b5P2UpdateWalletDisplay();
+            } else {
+                g.p2Wallet = g.p2Wallet.filter(c => String(c.uid) !== String(uid));
+                document.querySelector(`.b5p2-wc-removable[data-uid="${uid}"]`)?.remove();
+                const coinsEl = document.getElementById('b5p2-wallet-coins');
+                if (coinsEl && g.p2Wallet.length === 0)
+                    coinsEl.innerHTML = '<span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
+                this._b5P2UpdateStatusOnly();
+            }
         },
 
         _b5P2GetWalletTotal() {
@@ -1790,7 +1890,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const total  = this._b5P2GetWalletTotal();
             const req    = g.p2Total;
             const enough = total >= req;
-            const diff   = this.state.settings.difficulty;
 
             const totalEl = document.getElementById('b5p2-wallet-total');
             if (totalEl) {
@@ -1798,18 +1897,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalEl.className = 'b5p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
             }
             const fillEl = document.getElementById('b5p2-progress-fill');
-            const wrapEl = document.getElementById('b5p2-progress');
-            if (fillEl && wrapEl && req > 0) {
+            if (fillEl && req > 0) {
                 const pct = Math.min(Math.round(total / req * 100), 100);
                 fillEl.style.width = pct + '%';
                 fillEl.className = 'b5p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
             }
             const confirmBtn = document.getElementById('b5-p2-confirm-btn');
             if (confirmBtn) {
-                // 簡單/困難：放夠或超出即可確認；普通：要剛好
-                const canConfirm = diff === 'normal' ? total === req : total >= req;
-                confirmBtn.disabled = !canConfirm;
-                confirmBtn.classList.toggle('ready', canConfirm);
+                const wasDisabled = confirmBtn.disabled;
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('ready', enough);
+                if (enough && wasDisabled) {
+                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
+                }
             }
         },
 
@@ -1825,50 +1926,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalEl.textContent = total + ' 元';
                 totalEl.className = 'b5p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
             }
-            const fillEl  = document.getElementById('b5p2-progress-fill');
-            const wrapEl  = document.getElementById('b5p2-progress');
-            if (fillEl && wrapEl && req > 0) {
+            const fillEl = document.getElementById('b5p2-progress-fill');
+            if (fillEl && req > 0) {
                 const pct = Math.min(Math.round(total / req * 100), 100);
                 fillEl.style.width = pct + '%';
                 fillEl.className = 'b5p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
             }
-
-            // Confirm button state (普通/困難)
             const confirmBtn = document.getElementById('b5-p2-confirm-btn');
             if (confirmBtn) {
-                const canConfirm = diff === 'normal' ? total === req : total >= req;
-                confirmBtn.disabled = !canConfirm;
-                confirmBtn.classList.toggle('ready', canConfirm);
+                const wasDisabled2 = confirmBtn.disabled;
+                confirmBtn.disabled = !enough;
+                confirmBtn.classList.toggle('ready', enough);
+                if (enough && wasDisabled2) {
+                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
+                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
+                }
             }
-
-            // Re-render wallet coins
             const coinsEl = document.getElementById('b5p2-wallet-coins');
             if (!coinsEl) return;
             if (g.p2ShowHint && g.p2HintSlots?.length) {
-                const canRemove = diff !== 'easy';
                 coinsEl.innerHTML = g.p2HintSlots.map((slot, idx) => {
                     if (!slot.filled) {
                         const isBill = slot.denom >= 100;
                         const w = isBill ? 100 : 60;
                         const face = slot.face || 'front';
-                        return `<div class="b5p2-wallet-coin b5p2-ghost-slot" data-p2-hint-idx="${idx}">
+                        return `<div class="b5p2-wallet-coin b5p2-ghost-slot" data-b5p2-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_${face}.png" alt="${slot.denom}元"
                                  style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                                 onerror="this.style.display='none'" draggable="false">
-                        </div>`;
+                                 onerror="this.style.display='none'" draggable="false"></div>`;
                     }
-                    const coin = g.p2Wallet[idx] || g.p2Wallet.find((c, ci) => {
-                        let filledCount = g.p2HintSlots.slice(0, idx).filter(s => s.filled).length;
-                        return ci === filledCount;
-                    });
+                    let filledCount = 0;
+                    let coin = null;
+                    for (let i = 0; i <= idx; i++) {
+                        if (g.p2HintSlots[i].filled) {
+                            if (i === idx) { coin = g.p2Wallet[filledCount]; break; }
+                            filledCount++;
+                        }
+                    }
                     if (!coin) return '';
                     const isBill = coin.denom >= 100;
                     const w = isBill ? 100 : 60;
-                    return `<div class="b5p2-wallet-coin" data-p2-hint-idx="${idx}">
+                    return `<div class="b5p2-wallet-coin" data-b5p2-hint-idx="${idx}">
                         <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
                              style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                             onerror="this.style.display='none'" draggable="false">
-                    </div>`;
+                             onerror="this.style.display='none'" draggable="false"></div>`;
                 }).join('');
             } else if (g.p2Wallet.length === 0) {
                 coinsEl.innerHTML = '<span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
@@ -1877,160 +1978,326 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinsEl.innerHTML = g.p2Wallet.map(coin => {
                     const isBill = coin.denom >= 100;
                     const w = isBill ? 100 : 60;
-                    const removable = canRemove ? `draggable="true" data-uid="${coin.uid}" class="b5p2-wallet-coin b5p2-wc-removable"` : `class="b5p2-wallet-coin"`;
+                    const cls = 'b5p2-wallet-coin' + (canRemove ? ' b5p2-wc-removable' : '');
+                    const extra = canRemove ? `draggable="true" data-uid="${coin.uid}"` : '';
                     const removeBtn = canRemove ? `<button class="b5p2-wc-remove" data-uid="${coin.uid}" title="移除">✕</button>` : '';
-                    return `<div ${removable}>
+                    return `<div class="${cls}" ${extra}>
                         <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
                              style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
                              onerror="this.style.display='none'" draggable="false">
-                        ${removeBtn}
-                    </div>`;
+                        ${removeBtn}</div>`;
                 }).join('');
             }
         },
 
         _b5P2AutoSetGhostSlots() {
-            const g = this.state.game;
-            const diff = this.state.settings.difficulty;
-            const trayDenomMap = {
-                easy:   [100, 50, 10, 5, 1],
-                normal: [500, 100, 50, 10, 5, 1],
-                hard:   [1000, 500, 100, 50, 10, 5, 1]
-            };
-            const denoms = trayDenomMap[diff] || trayDenomMap.easy;
+            const g     = this.state.game;
             const total = g.p2Total;
-            const coins = [];
-            let rem = total;
-            for (const d of denoms) {
-                const cnt = Math.floor(rem / d);
-                for (let i = 0; i < cnt; i++) coins.push(d);
-                rem -= cnt * d;
-                if (rem <= 0) break;
-            }
-            const trayFaces = g.p2TrayFaces || {};
+
+            // 取得托盤中實際可用的金幣（未被拖走的）
+            const available = [];
+            document.querySelectorAll('.b5p2-coin-drag').forEach(el => {
+                if (el.dataset.inUse !== 'true' && el.style.display !== 'none') {
+                    available.push({ denom: parseInt(el.dataset.denom), face: el.dataset.face || 'front' });
+                }
+            });
+
+            const optimal = this._b5P2FindOptimalPayment(available, total);
+            g.p2HintSlots = optimal.map(c => ({ denom: c.denom, filled: false, face: c.face }));
             g.p2ShowHint  = true;
-            g.p2HintSlots = coins.map(d => ({ denom: d, filled: false, face: trayFaces[d] || 'front' }));
-            this._b5P2UpdateWalletDisplay();
+        },
+
+        // ── 最小超額子集搜尋（B6 pattern）───────────────────────
+        _b5P2FindOptimalPayment(coins, total) {
+            const n = coins.length;
+            if (n === 0) return [];
+            if (n > 22) {
+                return coins.slice().sort((a,b) => b.denom - a.denom).reduce((acc, c) => {
+                    const s = acc.reduce((t,x)=>t+x.denom,0);
+                    if (s < total) acc.push(c);
+                    return acc;
+                }, []);
+            }
+            let bestMask = -1, bestSum = Infinity;
+            for (let mask = 1; mask < (1 << n); mask++) {
+                let sum = 0;
+                for (let i = 0; i < n; i++) { if (mask & (1 << i)) sum += coins[i].denom; }
+                if (sum >= total && sum < bestSum) { bestSum = sum; bestMask = mask; }
+            }
+            if (bestMask === -1) return coins;
+            const result = [];
+            for (let i = 0; i < n; i++) { if (bestMask & (1 << i)) result.push(coins[i]); }
+            return result.sort((a, b) => b.denom - a.denom);
         },
 
         _b5P2HandleConfirm(total) {
-            if (this.state.isProcessing) return;
-            this.state.isProcessing = true;
-            const g        = this.state.game;
-            const wTotal   = this._b5P2GetWalletTotal();
-            const diff     = this.state.settings.difficulty;
-            // 簡單/困難：≥ req；普通：= req
-            const isCorrect = diff === 'normal' ? wTotal === total : wTotal >= total;
-
-            if (isCorrect) {
-                this.audio.play('correct');
-                // 困難模式超額：進找零測驗
-                if (diff === 'hard' && wTotal > total) {
-                    this._showCenterFeedback('💰', '先算找零！');
-                    this._showB5ChangeQuiz(wTotal, total);
-                } else {
-                    this._showCenterFeedback('💯', '付款成功！');
-                    const change = wTotal - total;
-                    const msg = change > 0 ? `付款成功！找回${toTWD(change)}` : `付款成功！剛好${toTWD(total)}`;
-                    Game.Speech.speak(msg, () => {
-                        Game.TimerManager.setTimeout(() => {
-                            const area = document.getElementById('b5p2-wallet-area');
-                            if (area) {
-                                const btn = document.createElement('button');
-                                btn.className = 'b5-next-btn';
-                                btn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
-                                Game.EventManager.on(btn, 'click', () => this.nextRound(), {}, 'gameUI');
-                                area.after(btn);
-                            }
-                        }, 400, 'turnTransition');
-                    });
-                }
-            } else {
+            const g      = this.state.game;
+            const wTotal = this._b5P2GetWalletTotal();
+            if (wTotal < total) {
                 this.state.isProcessing = false;
                 this.audio.play('error');
                 g.p2ErrorCount = (g.p2ErrorCount || 0) + 1;
-                this._showCenterFeedback('❌', '再試一次！');
-                const isOver = wTotal > total;
-                Game.Speech.speak(isOver ? `拿了太多的錢，請再試一次` : `拿了太少的錢，請再試一次`);
-                // 清空錢包重試
-                g.p2Wallet    = [];
-                g.p2ShowHint  = false;
-                g.p2HintSlots = [];
+                this._showCenterFeedback('❌', '付太少了！');
+                Game.Speech.speak(`付太少了，還差${toTWD(total - wTotal)}，請再拖入金錢`);
                 const walletArea = document.getElementById('b5p2-wallet-area');
                 if (walletArea) {
                     walletArea.style.animation = 'b5p2Shake 0.4s ease';
+                    Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
+                }
+                return;
+            }
+            // 付款成功
+            const change = wTotal - total;
+            this.audio.play('correct');
+            this._showCenterFeedback('💯', '付款成功！');
+            g.paidAmount = wTotal;
+            if (change === 0) {
+                Game.Speech.speak(`剛好${toTWD(wTotal)}，精準付款！`, () => {
                     Game.TimerManager.setTimeout(() => {
-                        walletArea.style.animation = '';
-                        this._b5P2UpdateWalletDisplay();
-                    }, 500, 'ui');
-                }
-                // 3次錯誤後自動 ghost slot 提示
-                if (g.p2ErrorCount >= 3) {
-                    Game.TimerManager.setTimeout(() => this._b5P2AutoSetGhostSlots(), 700, 'ui');
-                }
+                        this.state.isProcessing = false;
+                        this._b5P2ShowResult(wTotal, 0);
+                    }, 400, 'turnTransition');
+                });
+            } else {
+                Game.Speech.speak(`付了${toTWD(wTotal)}`, () => {
+                    Game.TimerManager.setTimeout(() => {
+                        this.state.isProcessing = false;
+                        this._b5P2ShowChangeReturn(wTotal, total, change);
+                    }, 400, 'turnTransition');
+                });
             }
         },
 
-        // ── 困難模式找零測驗（B6 pattern）────────────────────────
-        _showB5ChangeQuiz(wTotal, total) {
-            document.getElementById('b5-change-quiz')?.remove();
-            const correct = wTotal - total;
-            const wrong1  = correct + 10;
-            const wrong2  = correct > 10 ? correct - 10 : correct + 20;
-            const options = [correct, wrong1, wrong2].sort(() => Math.random() - 0.5);
+        // ── 找零拖回階段（B6 pattern）────────────────────────────
+        _b5P2ShowChangeReturn(paid, total, change) {
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
+            Game.EventManager.removeByCategory('gameUI');
 
+            const denomMap = { easy:[100,50,10,5,1], normal:[500,100,50,10,5,1], hard:[1000,500,100,50,10,5,1] };
+            const denoms = denomMap[diff] || denomMap.easy;
+            const changeCoins = [];
+            let rem = change;
+            for (const d of denoms) { while (rem >= d) { changeCoins.push(d); rem -= d; } }
+
+            let uidCtr = 0;
+            const coins = changeCoins.map(d => ({
+                denom: d, uid: ++uidCtr,
+                face: Math.random() < 0.5 ? 'back' : 'front',
+                isBill: d >= 100, returned: false
+            }));
+            g.p2ChangeCoins = coins;
+            g.p2ChangeMode  = true;
+
+            // 付款區：顯示找零金幣（可拖曳）
+            const walletCoinsEl = document.getElementById('b5p2-wallet-coins');
+            if (walletCoinsEl) {
+                walletCoinsEl.innerHTML = coins.map(coin => {
+                    const w = coin.isBill ? 100 : 60;
+                    return `<div class="b5p2-change-coin" draggable="true" data-uid="${coin.uid}" data-denom="${coin.denom}">
+                        <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                             style="width:${w}px;height:${coin.isBill?'auto':w+'px'};display:block;"
+                             draggable="false" onerror="this.style.display='none'">
+                        <span class="b5p2-change-label">${coin.denom}元</span>
+                    </div>`;
+                }).join('');
+            }
+
+            // 更新標籤
+            const areaLabel = document.querySelector('.b5p2-my-money-label');
+            if (areaLabel) areaLabel.textContent = '💰 找零區（把找零拖回錢包）';
+            const trayTitle = document.querySelector('.b5p2-tray-title');
+            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b5p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 ← 把找零拖回來`;
+
+            const needLabel = document.querySelector('.b5p2-wallet-coins-label');
+            if (needLabel) needLabel.innerHTML = `找零 <span class="b5p2-wallet-need">${change} 元</span> 請拖回錢包`;
+            const totalEl2 = document.getElementById('b5p2-wallet-total');
+            if (totalEl2) { totalEl2.textContent = '0 元'; totalEl2.className = 'b5p2-wallet-total-val'; }
+            const fillEl2 = document.getElementById('b5p2-progress-fill');
+            if (fillEl2) { fillEl2.style.width = '0%'; fillEl2.className = 'b5p2-progress-fill'; }
+
+            // 隱藏確認付款按鈕和提示按鈕
+            const confirmBtn = document.getElementById('b5-p2-confirm-btn');
+            if (confirmBtn) confirmBtn.style.display = 'none';
+            const hintBtn = document.getElementById('b5-p2-hint-btn');
+            if (hintBtn) hintBtn.closest('.b5-p2-hint-wrap')?.style.setProperty('display','none');
+
+            Game.Speech.speak(`找零${toTWD(change)}，請把找零拖回我的錢包`);
+
+            this._b5P2SetupChangeReturn(coins, paid, total, change);
+        },
+
+        _b5P2SetupChangeReturn(coins, paid, total, change) {
+            const trayEl   = document.getElementById('b5p2-tray-coins');
+            const walletEl = document.getElementById('b5p2-wallet-coins');
+            if (!trayEl || !walletEl) return;
+
+            trayEl.classList.add('b5p2-change-target');
+
+            const handleReturn = (uid) => {
+                const coin = coins.find(c => String(c.uid) === String(uid) && !c.returned);
+                if (!coin) return;
+                coin.returned = true;
+                this.audio.play('coin');
+                document.querySelector(`.b5p2-change-coin[data-uid="${uid}"]`)?.remove();
+                // 找零拖回後在托盤顯示
+                const trayEl2 = document.getElementById('b5p2-tray-coins');
+                if (trayEl2) {
+                    const w = coin.isBill ? 100 : 60;
+                    const retDiv = document.createElement('div');
+                    retDiv.className = 'b5p2-coin-returned';
+                    retDiv.innerHTML = `<img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                        style="width:${w}px;height:${coin.isBill?'auto':w+'px'};display:block;" onerror="this.style.display='none'" draggable="false">
+                        <span class="b1-denom-label">${coin.denom}元</span>`;
+                    trayEl2.appendChild(retDiv);
+                }
+                const returnedVal = coins.filter(c => c.returned).reduce((s, c) => s + c.denom, 0);
+                const totalEl3 = document.getElementById('b5p2-wallet-total');
+                if (totalEl3) { totalEl3.textContent = returnedVal + ' 元'; totalEl3.className = 'b5p2-wallet-total-val enough'; }
+                const fillEl3 = document.getElementById('b5p2-progress-fill');
+                if (fillEl3) { const pct = Math.min(Math.round(returnedVal / change * 100), 100); fillEl3.style.width = pct + '%'; fillEl3.className = 'b5p2-progress-fill full'; }
+
+                if (coins.every(c => c.returned)) {
+                    this.state.isProcessing = true;
+                    trayEl.classList.remove('b5p2-change-target');
+                    this._showCenterFeedback('🎉', '找零完成！');
+                    Game.Speech.speak(`找零完成，付款成功！`, () => {
+                        Game.TimerManager.setTimeout(() => {
+                            this.state.isProcessing = false;
+                            this._b5P2ShowResult(paid, change);
+                        }, 400, 'turnTransition');
+                    });
+                }
+            };
+
+            // Desktop drag
+            walletEl.querySelectorAll('.b5p2-change-coin').forEach(coinEl => {
+                const uid = coinEl.dataset.uid;
+                Game.EventManager.on(coinEl, 'dragstart', e => {
+                    e.dataTransfer.setData('text/plain', `change:${uid}`);
+                    coinEl.classList.add('b5p2-dragging');
+                }, {}, 'gameUI');
+                Game.EventManager.on(coinEl, 'dragend', () => coinEl.classList.remove('b5p2-dragging'), {}, 'gameUI');
+            });
+            Game.EventManager.on(trayEl, 'dragover', e => { e.preventDefault(); trayEl.classList.add('b5p2-drop-active'); }, {}, 'gameUI');
+            Game.EventManager.on(trayEl, 'dragleave', e => { if (!trayEl.contains(e.relatedTarget)) trayEl.classList.remove('b5p2-drop-active'); }, {}, 'gameUI');
+            Game.EventManager.on(trayEl, 'drop', e => {
+                e.preventDefault(); trayEl.classList.remove('b5p2-drop-active');
+                const d = e.dataTransfer.getData('text/plain');
+                if (d.startsWith('change:')) handleReturn(d.replace('change:', ''));
+            }, {}, 'gameUI');
+
+            // Touch drag
+            walletEl.querySelectorAll('.b5p2-change-coin').forEach(coinEl => {
+                const uid = coinEl.dataset.uid;
+                let ghostEl = null;
+                Game.EventManager.on(coinEl, 'touchstart', e => {
+                    const t = e.touches[0];
+                    ghostEl = coinEl.cloneNode(true);
+                    ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX-30}px;top:${t.clientY-40}px;`;
+                    document.body.appendChild(ghostEl);
+                }, { passive: true }, 'gameUI');
+                Game.EventManager.on(coinEl, 'touchmove', e => {
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    if (ghostEl) { ghostEl.style.left = (t.clientX-30)+'px'; ghostEl.style.top = (t.clientY-40)+'px'; }
+                    const r = trayEl.getBoundingClientRect();
+                    trayEl.classList.toggle('b5p2-drop-active', t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom);
+                }, { passive: false }, 'gameUI');
+                Game.EventManager.on(coinEl, 'touchend', e => {
+                    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+                    trayEl.classList.remove('b5p2-drop-active');
+                    const t = e.changedTouches[0];
+                    const r = trayEl.getBoundingClientRect();
+                    if (t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom) handleReturn(uid);
+                }, { passive: true }, 'gameUI');
+            });
+        },
+
+        // ── 付款後顯示結果（下一關按鈕）─────────────────────────
+        _b5P2ShowResult(paid, change) {
+            const g = this.state.game;
+            Game.TimerManager.setTimeout(() => {
+                const area = document.getElementById('b5p2-wallet-area');
+                if (area) {
+                    const btn = document.createElement('button');
+                    btn.className = 'b5-next-btn';
+                    btn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
+                    Game.EventManager.on(btn, 'click', () => this.nextRound(), {}, 'gameUI');
+                    area.after(btn);
+                }
+            }, 400, 'turnTransition');
+        },
+
+        // ── 付款提示彈窗（A4 style：列表 + 確認後托盤打勾）───────
+        _showB5HardModeHintModal(total) {
+            const ALL_BILLS = [1000, 500, 100, 50, 10, 5, 1];
+            let rem = total;
+            const denomCounts = {};
+            ALL_BILLS.forEach(d => {
+                if (rem >= d) { denomCounts[d] = Math.floor(rem / d); rem %= d; }
+            });
+            const parts = Object.entries(denomCounts).sort(([a],[b])=>b-a).map(([d,cnt])=>`${cnt}個${d}元`);
+            const speechText = `需付${toTWD(total)}，可以用${parts.join('，')}`;
+            this._b5P2LastHintSpeech = speechText;
+            this._b5P2LastHintDenoms = denomCounts;
+
+            let hintListHTML = '';
+            Object.entries(denomCounts).sort(([a],[b])=>b-a).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                const face  = this.state.game.p2TrayFaces?.[denom] || 'front';
+                const isBill = denom >= 100;
+                const imgStyle = isBill ? 'width:80px;height:auto;max-height:50px;' : 'width:50px;height:50px;';
+                hintListHTML += `
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+                        <img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                             style="${imgStyle}object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                        <span style="font-size:18px;font-weight:700;color:#1f2937;">${denom}元</span>
+                        <span style="color:#9ca3af;font-size:16px;">×</span>
+                        <span style="font-size:18px;font-weight:700;color:#059669;">${cnt} 個</span>
+                    </div>`;
+            });
+
+            const existing = document.getElementById('b5-hard-hint-modal');
+            if (existing) existing.remove();
             const overlay = document.createElement('div');
-            overlay.id = 'b5-change-quiz';
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.id = 'b5-hard-hint-modal';
+            overlay.className = 'b6-hint-modal-overlay';
             overlay.innerHTML = `
-                <div class="b5-cq-card">
-                    <div class="b5-cq-header">💰 找零測驗</div>
-                    <div class="b5-cq-desc">
-                        付了 <b>${wTotal} 元</b>，需要 <b>${total} 元</b><br>
-                        <span class="b5-cq-question">應找回多少錢？</span>
-                    </div>
-                    <div class="b5-cq-options">
-                        ${options.map(opt =>
-                            `<button class="b5-cq-btn" data-val="${opt}">${opt} 元</button>`
-                        ).join('')}
+                <div class="b6-hint-modal" style="max-width:420px;width:92%;text-align:left;">
+                    <div class="b6-hm-header" style="text-align:center;font-size:20px;padding-bottom:4px;">💡 付款提示</div>
+                    <div style="text-align:center;font-size:14px;color:#6b7280;margin-bottom:14px;">建議的付款方式：</div>
+                    <div style="padding:0 4px;">${hintListHTML}</div>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">
+                        <button class="b6-hm-replay-btn" id="b5-hm-replay">🔊 再播一次</button>
+                        <button class="b6-hm-confirm-btn" id="b5-hm-close">我知道了</button>
                     </div>
                 </div>`;
             document.body.appendChild(overlay);
+            Game.Speech.speak(speechText);
 
-            Game.Speech.speak(`付了${toTWD(wTotal)}，需要${toTWD(total)}，應該找回多少元？`);
+            const closeAndApply = () => {
+                overlay.remove();
+                this._b5P2ApplyTrayTicks(this._b5P2LastHintDenoms || {});
+            };
+            Game.EventManager.on(document.getElementById('b5-hm-close'), 'click', closeAndApply, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b5-hm-replay'), 'click', () => {
+                this.audio.play('click');
+                Game.Speech.speak(this._b5P2LastHintSpeech || '');
+            }, {}, 'gameUI');
+            Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) closeAndApply(); }, {}, 'gameUI');
+        },
 
-            overlay.querySelectorAll('.b5-cq-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const val = parseInt(btn.dataset.val);
-                    if (val === correct) {
-                        btn.style.cssText += ';background:#d1fae5;border-color:#10b981;color:#065f46;';
-                        this.audio.play('correct');
-                        Game.Speech.speak(`找${toTWD(correct)}，答對了！`, () => {
-                            overlay.remove();
-                            const g = this.state.game;
-                            Game.TimerManager.setTimeout(() => {
-                                const area = document.getElementById('b5p2-wallet-area');
-                                if (area) {
-                                    const nextBtn = document.createElement('button');
-                                    nextBtn.className = 'b5-next-btn';
-                                    nextBtn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
-                                    Game.EventManager.on(nextBtn, 'click', () => this.nextRound(), {}, 'gameUI');
-                                    area.after(nextBtn);
-                                }
-                            }, 400, 'turnTransition');
-                        });
-                    } else {
-                        btn.style.cssText += ';background:#fee2e2;border-color:#ef4444;color:#991b1b;';
-                        this.audio.play('error');
-                        this.state.isProcessing = false;
-                        Game.Speech.speak(
-                            `不對喔，找零算${val > correct ? '太多了' : '太少了'}，請再試一次`
-                        );
-                        Game.TimerManager.setTimeout(() => {
-                            btn.style.background = '';
-                            btn.style.borderColor = '';
-                            btn.style.color = '';
-                        }, 900, 'ui');
+        // ── 托盤打勾提示（確認提示後套用）───────────────────────
+        _b5P2ApplyTrayTicks(denomCounts) {
+            document.querySelectorAll('.b5p2-coin-drag.b5p2-tray-tick').forEach(el => el.classList.remove('b5p2-tray-tick'));
+            Object.entries(denomCounts).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                let needed  = cnt;
+                document.querySelectorAll(`.b5p2-coin-drag[data-denom="${denom}"]`).forEach(el => {
+                    if (needed > 0 && el.dataset.inUse !== 'true' && el.style.display !== 'none' && !el.classList.contains('b5p2-tray-tick')) {
+                        el.classList.add('b5p2-tray-tick');
+                        needed--;
                     }
                 });
             });

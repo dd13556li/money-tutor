@@ -1076,6 +1076,14 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.b5-p2-hint-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
 }
 .b5p2-ref-icon  { font-size: 28px; line-height: 1; }
 .b5p2-ref-title { font-size: 17px; font-weight: 700; color: #92400e; }
@@ -1663,5 +1671,101 @@
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
     .b5-cart-items { max-height: 120px; }
+}
+
+/* ── B5 Phase 2 新增樣式（B6 pattern）───────────────────────── */
+
+/* 付款區標籤 */
+.b5p2-my-money-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 6px;
+    padding-left: 2px;
+}
+/* 需要金額 inline span */
+.b5p2-wallet-need {
+    font-weight: 900;
+    color: #dc2626;
+}
+
+/* 托盤 wallet 圖示 */
+.b5p2-tray-wallet-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* 托盤幣有限制：顯示 relative 供 ::after 打勾 */
+.b5p2-coin-drag {
+    position: relative;
+}
+
+/* 打勾提示（普通/困難模式，confirm hint 後出現） */
+.b5p2-coin-drag.b5p2-tray-tick {
+    border: 2px solid #22c55e !important;
+    border-radius: 10px;
+}
+.b5p2-coin-drag.b5p2-tray-tick::after {
+    content: '✓';
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    background: #22c55e;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 20px;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 找零拖回後，在托盤中顯示的已收回金幣 */
+.b5p2-coin-returned {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    background: rgba(209,250,229,0.5);
+    border: 2px solid #6ee7b7;
+    border-radius: 8px;
+    opacity: 0.85;
+}
+
+/* 付款區 change 金幣 */
+.b5p2-change-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px;
+    background: #fff;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.b5p2-change-coin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(251,191,36,0.3);
+}
+.b5p2-change-coin.b5p2-dragging { opacity: 0.4; }
+.b5p2-change-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* 找零目標放置區高亮 */
+.b5p2-change-target.b5p2-drop-active {
+    border-color: #22c55e !important;
+    background: rgba(209,250,229,0.2) !important;
 }
 

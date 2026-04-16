@@ -942,11 +942,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 第一頁提示入口（依難度路由）────────────────────────
         _b6P1ShowHint() {
+            const g    = this.state.game;
             const diff = this.state.settings.difficulty;
-            if (diff === 'hard')   { this._b6P1ShowHardHintModal(); return; }
-            if (diff === 'normal') { this._b6P1ActivateHintMode(); return; }
-            // easy 模式：提示已在開始時自動啟動，重新高亮即可
-            this._b6P1ActivateHintMode();
+            // 先重置所有已選商品（全模式統一）
+            g.selectedItems = [];
+            this._updateShoppingUIPartial();
+            // 依難度顯示提示
+            if (diff === 'hard') { this._b6P1ShowHardHintModal(); return; }
+            this._b6P1ActivateHintMode();  // easy + normal
         },
 
         // ── 貪婪法生成建議購買清單 ───────────────────────────
@@ -1007,25 +1010,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this._b6P1UpdateHintHighlights();
         },
 
-        // ── 困難模式提示彈窗（重置非提示商品，顯示建議清單）──
+        // ── 困難模式提示彈窗（顯示建議清單，selectedItems 已由呼叫方重置）──
         _b6P1ShowHardHintModal() {
             const g = this.state.game;
-            // 生成建議清單
+            // 生成建議清單（selectedItems 已在 _b6P1ShowHint 中重置）
             const newHintItems = this._b6P1GenerateHintItems();
             g.p1HintItems = newHintItems;
-
-            // 只重置不在提示清單中的已選商品
-            if ((g.selectedItems || []).length > 0) {
-                const nonHint = (g.selectedItems || []).filter(si =>
-                    !newHintItems.some(h => h.stall === si.stall && h.id === si.id)
-                );
-                if (nonHint.length > 0) {
-                    g.selectedItems = (g.selectedItems || []).filter(si =>
-                        newHintItems.some(h => h.stall === si.stall && h.id === si.id)
-                    );
-                    this._updateShoppingUIPartial();
-                }
-            }
 
             const existing = document.getElementById('b6-p1-hard-hint-overlay');
             if (existing) existing.remove();
@@ -1532,14 +1522,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (itemData) this._showItemReceiptFlyout(btn, itemData);
 
                     const isMissionDone = this._isMissionComplete();
-                    const doUIUpdate = () => {
+                    const doUIUpdate = (suppressCompletion = false) => {
                         this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
-                        this._updateShoppingUIPartial();
+                        this._updateShoppingUIPartial(suppressCompletion ? { suppressCompletion: true } : {});
                     };
 
                     if (isMissionDone) {
-                        // 最後一個商品：語音播完才更新 UI（避免「所有商品選購完成」覆蓋名稱語音）
-                        Game.Speech.speak(`${itemName}，${price}元`, doUIUpdate);
+                        // 立即更新 UI（壓制完成語音），待商品名語音播完再播完成提示
+                        doUIUpdate(true);
+                        Game.Speech.speak(`${itemName}，${price}元`, () => {
+                            Game.Speech.speak('所有商品選購完成，可以去結帳了！');
+                            this._showAllCollectedFlash();
+                            if (this.state.settings.difficulty === 'easy') {
+                                document.getElementById('b6-checkout-btn')?.classList.add('b6-product-here-hint');
+                            }
+                        });
                     } else {
                         Game.Speech.speak(`${itemName}，${price}元`);
                         doUIUpdate();
@@ -1601,7 +1598,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 局部更新購物 UI（不全重繪，只更新任務卡/結帳列/商品狀態）──
-        _updateShoppingUIPartial() {
+        _updateShoppingUIPartial(opts = {}) {
             const g      = this.state.game;
             const mission = g.mission;
             const total  = this._calcMissionTotal();
@@ -1720,7 +1717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkoutBtn) {
                 const wasDone = !checkoutBtn.disabled;
                 checkoutBtn.disabled = !missionDone;
-                if (missionDone && !wasDone) {
+                if (missionDone && !wasDone && !opts.suppressCompletion) {
                     Game.Speech.speak('所有商品選購完成，可以去結帳了！');
                     this._showAllCollectedFlash();
                     // 簡單模式：結帳按鈕顯示「點這裡」提示
@@ -1917,10 +1914,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
-                    <span class="b6-p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
-                        <button class="b-hint-btn" id="b6-p2-hint-btn">💡 提示</button>
-                    </span>
                     <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
                     <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
                 </div>
@@ -1971,6 +1964,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b6p2-ref-header">
                     <span class="b6p2-ref-icon">${mkt.icon}</span>
                     <span class="b6p2-ref-title">${mkt.name}</span>
+                    <span class="b6-p2-hint-wrap">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                        <button class="b-hint-btn" id="b6-p2-hint-btn">💡 提示</button>
+                    </span>
                 </div>
                 <div class="b6p2-ref-items">${itemsList}${customList}</div>
                 <div class="b6p2-ref-total-row">
@@ -2026,10 +2023,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // p2TrayFaces 涵蓋所有面額，供 ghost slot 使用
             this.state.game.p2TrayFaces = trayFaces;
 
+            let _trayUidCtr = 0;
             const coinsHtml = budgetCoins.map(d => {
+                const trayUid = 'tc' + (++_trayUidCtr);
                 const isBill = d >= 100;
                 return `
-                <div class="b6p2-coin-drag" draggable="true" data-denom="${d}" title="${d}元">
+                <div class="b6p2-coin-drag" draggable="true" data-denom="${d}" data-tray-uid="${trayUid}" data-face="${trayFaces[d]}" title="${d}元">
                     <img src="../images/money/${d}_yuan_${trayFaces[d]}.png" alt="${d}元"
                          class="${isBill ? 'banknote-img' : 'coin-img'}" draggable="false"
                          onerror="this.style.display='none'">
@@ -2113,10 +2112,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Desktop：拖曳盤 → 錢包
             document.querySelectorAll('.b6p2-coin-drag').forEach(dragEl => {
-                const denom = parseInt(dragEl.dataset.denom);
+                const denom   = parseInt(dragEl.dataset.denom);
+                const trayUid = dragEl.dataset.trayUid;
+                const face    = dragEl.dataset.face;
                 Game.EventManager.on(dragEl, 'dragstart', e => {
-                    e.dataTransfer.setData('text/plain', String(denom));
-                    e.dataTransfer.effectAllowed = 'copy';
+                    if (dragEl.dataset.inUse === 'true') { e.preventDefault(); return; }
+                    e.dataTransfer.setData('text/plain', `tray:${trayUid}:${denom}:${face}`);
+                    e.dataTransfer.effectAllowed = 'move';
                     dragEl.classList.add('b6p2-dragging');
                 }, {}, 'gameUI');
                 Game.EventManager.on(dragEl, 'dragend', () => dragEl.classList.remove('b6p2-dragging'), {}, 'gameUI');
@@ -2133,15 +2135,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 walletCoins.classList.remove('b6p2-drop-active');
                 const data = e.dataTransfer.getData('text/plain');
-                if (data.startsWith('remove:')) this._b6P2RemoveCoin(data.replace('remove:', ''));
-                else { const d = parseInt(data); if (!isNaN(d)) this._b6P2AddCoin(d); }
+                if (data.startsWith('remove:')) {
+                    this._b6P2RemoveCoin(data.replace('remove:', ''));
+                } else if (data.startsWith('tray:')) {
+                    const parts = data.split(':');
+                    const tUid = parts[1], d = parseInt(parts[2]), f = parts[3];
+                    const tEl = document.querySelector(`.b6p2-coin-drag[data-tray-uid="${tUid}"]`);
+                    if (tEl) { tEl.dataset.inUse = 'true'; tEl.style.display = 'none'; }
+                    this._b6P2AddCoin(d, { face: f, trayUid: tUid });
+                }
             }, {}, 'gameUI');
 
             // Touch drag：拖曳盤 → 錢包
             document.querySelectorAll('.b6p2-coin-drag').forEach(dragEl => {
-                const denom = parseInt(dragEl.dataset.denom);
+                const denom   = parseInt(dragEl.dataset.denom);
+                const trayUid = dragEl.dataset.trayUid;
+                const face    = dragEl.dataset.face;
                 let ghostEl = null;
                 Game.EventManager.on(dragEl, 'touchstart', e => {
+                    if (dragEl.dataset.inUse === 'true') return;
                     const t = e.touches[0];
                     ghostEl = dragEl.cloneNode(true);
                     ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX - 30}px;top:${t.clientY - 40}px;`;
@@ -2164,7 +2176,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (wc) {
                         const r = wc.getBoundingClientRect();
                         wc.classList.remove('b6p2-drop-active');
-                        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) this._b6P2AddCoin(denom);
+                        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+                            dragEl.dataset.inUse = 'true';
+                            dragEl.style.display = 'none';
+                            this._b6P2AddCoin(denom, { face, trayUid });
+                        }
                     }
                 }, { passive: true }, 'gameUI');
             });
@@ -2210,17 +2226,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { passive: true }, 'gameUI');
         },
 
-        _b6P2AddCoin(denom) {
+        _b6P2AddCoin(denom, opts = {}) {
             const g    = this.state.game;
             const diff = this.state.settings.difficulty;
+            const face    = opts.face    || g.p2TrayFaces?.[denom] || 'front';
+            const trayUid = opts.trayUid || null;
             if (g.p2ShowHint && g.p2HintSlots?.length) {
                 const slotIdx = g.p2HintSlots.findIndex(s => s.denom === denom && !s.filled);
                 if (slotIdx === -1) { this.audio.play('error'); return; }
                 g.p2HintSlots[slotIdx].filled = true;
                 this.audio.play('coin');
                 const uid = ++g.p2UidCtr;
-                const face = g.p2TrayFaces?.[denom] || 'front';
-                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
+                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face, trayUid });
                 const slotEl = document.querySelector(`[data-b6p2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b6p2-ghost-slot');
                 this._b6P2UpdateStatusOnly();
@@ -2230,8 +2247,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.audio.play('coin');
                 const uid = ++g.p2UidCtr;
-                const face = g.p2TrayFaces?.[denom] || 'front';
-                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face });
+                g.p2Wallet.push({ denom, uid, isBill: denom >= 100, face, trayUid });
                 const coinsEl = document.getElementById('b6p2-wallet-coins');
                 if (coinsEl) {
                     coinsEl.querySelector('.b6p2-wallet-empty')?.remove();
@@ -2257,10 +2273,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b6P2RemoveCoin(uid) {
             const g = this.state.game;
+            // 找到要移除的幣（取得 trayUid 以恢復托盤元素）
+            const coinIdx = g.p2Wallet.findIndex(c => String(c.uid) === String(uid));
+            const coin = coinIdx !== -1 ? g.p2Wallet[coinIdx] : null;
+            // 恢復托盤元素顯示
+            if (coin?.trayUid) {
+                const tEl = document.querySelector(`.b6p2-coin-drag[data-tray-uid="${coin.trayUid}"]`);
+                if (tEl) { delete tEl.dataset.inUse; tEl.style.display = ''; }
+            }
             if (g.p2ShowHint && g.p2HintSlots?.length) {
-                const coinIdx = g.p2Wallet.findIndex(c => String(c.uid) === String(uid));
                 if (coinIdx !== -1) {
-                    const coin = g.p2Wallet[coinIdx];
                     let filledSoFar = 0;
                     for (let i = 0; i < g.p2HintSlots.length; i++) {
                         if (g.p2HintSlots[i].filled && g.p2HintSlots[i].denom === coin.denom && filledSoFar === coinIdx) {
@@ -2389,19 +2411,45 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _b6P2AutoSetGhostSlots() {
-            const g = this.state.game;
-            const diff = this.state.settings.difficulty;
-            const trayDenomMap = {
-                easy:   [100, 50, 10, 5, 1],
-                normal: [500, 100, 50, 10, 5, 1],
-                hard:   [1000, 500, 100, 50, 10, 5, 1]
-            };
-            const denoms = trayDenomMap[diff] || trayDenomMap.easy;
-            let rem = g.p2Total;
-            const coins = [];
-            for (const d of denoms) { while (rem >= d) { coins.push(d); rem -= d; } }
-            g.p2HintSlots = coins.map(d => ({ denom: d, filled: false, face: g.p2TrayFaces?.[d] || 'front' }));
+            const g     = this.state.game;
+            const total = g.p2Total;
+
+            // 取得托盤中實際可用的金幣（未被拖走的）
+            const available = [];
+            document.querySelectorAll('.b6p2-coin-drag').forEach(el => {
+                if (el.dataset.inUse !== 'true' && el.style.display !== 'none') {
+                    available.push({ denom: parseInt(el.dataset.denom), face: el.dataset.face || 'front' });
+                }
+            });
+
+            // 找出最小超額付款組合（2^n 子集搜尋，n 通常 ≤ 8）
+            const optimal = this._b6P2FindOptimalPayment(available, total);
+            g.p2HintSlots = optimal.map(c => ({ denom: c.denom, filled: false, face: c.face }));
             g.p2ShowHint  = true;
+        },
+
+        // ── 最小超額子集搜尋 ─────────────────────────────────────
+        _b6P2FindOptimalPayment(coins, total) {
+            const n = coins.length;
+            if (n === 0) return [];
+            if (n > 22) {
+                // 超大集合：退化貪婪（實際不會發生）
+                return coins.slice().sort((a,b) => b.denom - a.denom).reduce((acc, c) => {
+                    const s = acc.reduce((t,x)=>t+x.denom,0);
+                    if (s < total) acc.push(c);
+                    return acc;
+                }, []);
+            }
+            let bestMask = -1, bestSum = Infinity;
+            for (let mask = 1; mask < (1 << n); mask++) {
+                let sum = 0;
+                for (let i = 0; i < n; i++) { if (mask & (1 << i)) sum += coins[i].denom; }
+                if (sum >= total && sum < bestSum) { bestSum = sum; bestMask = mask; }
+            }
+            if (bestMask === -1) return coins; // 不應發生（預算 ≥ 總額）
+            const result = [];
+            for (let i = 0; i < n; i++) { if (bestMask & (1 << i)) result.push(coins[i]); }
+            return result.sort((a, b) => b.denom - a.denom);
         },
 
         _b6P2HandleConfirm(total) {
@@ -2522,6 +2570,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 coin.returned = true;
                 this.audio.play('coin');
                 document.querySelector(`.b6p2-change-coin[data-uid="${uid}"]`)?.remove();
+                // 找零拖回錢包後：在我的錢包托盤中顯示已找零的金幣
+                const trayEl2 = document.getElementById('b6p2-tray-coins');
+                if (trayEl2) {
+                    const isBill = coin.isBill;
+                    const w = isBill ? 100 : 60;
+                    const retDiv = document.createElement('div');
+                    retDiv.className = 'b6p2-coin-returned';
+                    retDiv.innerHTML = `<img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
+                        style="width:${w}px;height:${isBill?'auto':w+'px'};display:block;" onerror="this.style.display='none'" draggable="false">
+                        <span class="b1-denom-label">${coin.denom}元</span>`;
+                    trayEl2.appendChild(retDiv);
+                }
 
                 const returnedVal = coins.filter(c => c.returned).reduce((s, c) => s + c.denom, 0);
                 const totalEl3 = document.getElementById('b6p2-wallet-total');
@@ -2596,46 +2656,81 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Speech.speak(`可以用${parts.join('，')}`);
         },
 
-        // ── 困難模式付法彈窗（B3 _showHardModeHintModal pattern）────
+        // ── 付款提示彈窗（A4 style：列表 + 確認後托盤打勾）───────
         _showHardModeHintModal(total) {
             const ALL_BILLS = [1000, 500, 100, 50, 10, 5, 1];
             let rem = total;
-            const items = [];
-            ALL_BILLS.forEach(d => {
-                if (rem >= d) {
-                    const cnt = Math.floor(rem / d);
-                    for (let i = 0; i < cnt; i++) items.push(d);
-                    rem %= d;
-                }
-            });
             const denomCounts = {};
-            items.forEach(d => { denomCounts[d] = (denomCounts[d] || 0) + 1; });
-            const parts = Object.entries(denomCounts)
-                .sort(([a], [b]) => b - a)
-                .map(([d, cnt]) => `${cnt}個${d}元`);
+            ALL_BILLS.forEach(d => {
+                if (rem >= d) { denomCounts[d] = Math.floor(rem / d); rem %= d; }
+            });
+            const parts = Object.entries(denomCounts).sort(([a],[b])=>b-a).map(([d,cnt])=>`${cnt}個${d}元`);
+            const speechText = `需付${toTWD(total)}，可以用${parts.join('，')}`;
+            this._b6P2LastHintSpeech  = speechText;
+            this._b6P2LastHintDenoms  = denomCounts;
+
+            // 建立彈窗列表 HTML（A4 style）
+            let hintListHTML = '';
+            Object.entries(denomCounts).sort(([a],[b])=>b-a).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                const face  = this.state.game.p2TrayFaces?.[denom] || 'front';
+                const isBill = denom >= 100;
+                const imgStyle = isBill ? 'width:80px;height:auto;max-height:50px;' : 'width:50px;height:50px;';
+                hintListHTML += `
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+                        <img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                             style="${imgStyle}object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                        <span style="font-size:18px;font-weight:700;color:#1f2937;">${denom}元</span>
+                        <span style="color:#9ca3af;font-size:16px;">×</span>
+                        <span style="font-size:18px;font-weight:700;color:#059669;">${cnt} 個</span>
+                    </div>`;
+            });
+
             const existing = document.getElementById('b6-hard-hint-modal');
             if (existing) existing.remove();
             const overlay = document.createElement('div');
             overlay.id = 'b6-hard-hint-modal';
             overlay.className = 'b6-hint-modal-overlay';
             overlay.innerHTML = `
-                <div class="b6-hint-modal">
-                    <div class="b6-hm-header">💡 付法分析</div>
-                    <div class="b6-hm-total-row">需付 <strong>${total}</strong> 元</div>
-                    <div class="b6-hm-imgs">
-                        ${items.map(d => {
-                            const imgSize = d >= 100 ? '62px' : '48px';
-                            const face = this.state.game.p2TrayFaces?.[d] || 'front';
-                            return `<img src="../images/money/${d}_yuan_${face}.png" style="width:${imgSize};height:auto;" draggable="false" alt="${d}元">`;
-                        }).join('')}
+                <div class="b6-hint-modal" style="max-width:420px;width:92%;text-align:left;">
+                    <div class="b6-hm-header" style="text-align:center;font-size:20px;padding-bottom:4px;">💡 付款提示</div>
+                    <div style="text-align:center;font-size:14px;color:#6b7280;margin-bottom:14px;">建議的付款方式：</div>
+                    <div style="padding:0 4px;">${hintListHTML}</div>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">
+                        <button class="b6-hm-replay-btn" id="b6-hm-replay">🔊 再播一次</button>
+                        <button class="b6-hm-confirm-btn" id="b6-hm-close">我知道了</button>
                     </div>
-                    <button class="b6-hm-close-btn" id="b6-hm-close">✕ 關閉</button>
                 </div>`;
             document.body.appendChild(overlay);
-            const close = () => overlay.remove();
-            Game.EventManager.on(document.getElementById('b6-hm-close'), 'click', close, {}, 'gameUI');
-            Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) close(); }, {}, 'gameUI');
-            Game.Speech.speak(`需付${toTWD(total)}，可以用${parts.join('，')}`);
+            Game.Speech.speak(speechText);
+
+            const closeAndApply = () => {
+                overlay.remove();
+                this._b6P2ApplyTrayTicks(this._b6P2LastHintDenoms || {});
+            };
+            Game.EventManager.on(document.getElementById('b6-hm-close'), 'click', closeAndApply, {}, 'gameUI');
+            Game.EventManager.on(document.getElementById('b6-hm-replay'), 'click', () => {
+                this.audio.play('click');
+                Game.Speech.speak(this._b6P2LastHintSpeech || '');
+            }, {}, 'gameUI');
+            Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) closeAndApply(); }, {}, 'gameUI');
+        },
+
+        // ── 托盤打勾提示（確認提示後套用）───────────────────────
+        _b6P2ApplyTrayTicks(denomCounts) {
+            // 清除舊打勾
+            document.querySelectorAll('.b6p2-coin-drag.b6p2-tray-tick').forEach(el => el.classList.remove('b6p2-tray-tick'));
+            // 依面額數量打勾（跳過已用出的硬幣）
+            Object.entries(denomCounts).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                let needed  = cnt;
+                document.querySelectorAll(`.b6p2-coin-drag[data-denom="${denom}"]`).forEach(el => {
+                    if (needed > 0 && el.dataset.inUse !== 'true' && el.style.display !== 'none' && !el.classList.contains('b6p2-tray-tick')) {
+                        el.classList.add('b6p2-tray-tick');
+                        needed--;
+                    }
+                });
+            });
         },
 
         // ── 12. 找零畫面 ──────────────────────────────────────

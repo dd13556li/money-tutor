@@ -1356,6 +1356,89 @@
 
 /* ── 提示按鈕包裹（吉祥物 + 按鈕） ── */
 .b6-p2-hint-wrap { display: inline-flex; align-items: center; gap: 4px; }
+.b6p2-ref-header .b6-p2-hint-wrap { margin-left: auto; }
+
+/* ── 提示按鈕（綠色，A3 style）── */
+.b-hint-btn {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: #fff;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.b-hint-btn:hover { background: linear-gradient(135deg, #45a049, #388e3c); transform: translateY(-1px); }
+
+/* ── 付款提示彈窗：再播一次 / 我知道了 ── */
+.b6-hm-replay-btn {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+.b6-hm-replay-btn:hover { background: linear-gradient(135deg, #45a049, #388e3c); }
+.b6-hm-confirm-btn {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+}
+.b6-hm-confirm-btn:hover { background: linear-gradient(135deg, #ea580c, #c2410c); }
+
+/* ── 托盤打勾提示 ── */
+.b6p2-coin-drag.b6p2-tray-tick {
+    border: 2px solid #22c55e !important;
+    background: rgba(220,252,231,0.7) !important;
+    position: relative;
+}
+.b6p2-coin-drag.b6p2-tray-tick::after {
+    content: '✓';
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    background: #22c55e;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 20px;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* ── 找零後返回托盤的金幣 ── */
+.b6p2-coin-returned {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    background: rgba(209,250,229,0.5);
+    border: 2px solid #6ee7b7;
+    border-radius: 8px;
+    opacity: 0.85;
+}
 
 /* ── 找零金幣（付款區顯示，可拖回錢包） ── */
 .b6p2-change-coin {
@@ -1388,6 +1471,7 @@
     gap: 4px; background: transparent; border: 2px solid transparent;
     border-radius: 12px; padding: 8px 6px 4px;
     cursor: grab; transition: all 0.18s; user-select: none; touch-action: none;
+    position: relative;
 }
 .b6p2-coin-drag:hover {
     border-color: rgba(16,185,129,0.5);
