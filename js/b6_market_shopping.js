@@ -1035,8 +1035,9 @@ document.addEventListener('DOMContentLoaded', () => {
             g.phase       = 'shopping';
             g.paidAmount  = 0;
             g.customItems = []; // 自訂購物項目
-            g.p1HintMode  = false;  // 提示模式旗標
-            g.p1HintItems = [];     // [{stall, id}] 提示建議商品
+            g.p1HintMode   = false;  // 提示模式旗標
+            g.p1HintItems  = [];     // [{stall, id}] 提示建議商品
+            g.p1ErrorCount = 0;      // 普通模式錯誤計數（3次自動提示）
 
             this._renderShoppingUI();
             if (g._skipIntroModal) {
@@ -1714,6 +1715,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.Speech.speak(`這個攤位今天不需要買東西`);
                         Game.TimerManager.clearByCategory('wrongTip');
                         Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2400, 'wrongTip');
+                        // 普通模式：3次錯誤自動提示
+                        if (diff === 'normal' && !g.p1HintMode) {
+                            g.p1ErrorCount = (g.p1ErrorCount || 0) + 1;
+                            if (g.p1ErrorCount >= 3) {
+                                g.p1ErrorCount = 0;
+                                Game.TimerManager.setTimeout(() => this._b6P1ShowHint(), 900, 'ui');
+                            }
+                        }
                         return;
                     }
                     const stallSelCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
@@ -1744,6 +1753,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.Speech.speak(`${itemName}${price}元，超出預算${over}元，請換一個便宜一點的`);
                         Game.TimerManager.clearByCategory('wrongTip');
                         Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2800, 'wrongTip');
+                        // 普通模式：3次錯誤自動提示
+                        if (diff === 'normal' && !g.p1HintMode) {
+                            g.p1ErrorCount = (g.p1ErrorCount || 0) + 1;
+                            if (g.p1ErrorCount >= 3) {
+                                g.p1ErrorCount = 0;
+                                Game.TimerManager.setTimeout(() => this._b6P1ShowHint(), 900, 'ui');
+                            }
+                        }
                         return;
                     }
 
@@ -2731,6 +2748,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletArea.style.animation = 'b6p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
                 }
+                // 普通模式：3次付款錯誤自動提示（困難模式不自動提示）
+                if (this.state.settings.difficulty === 'normal' && g.p2ErrorCount >= 3) {
+                    g.p2ErrorCount = 0;
+                    Game.TimerManager.setTimeout(() => this._showHardModeHintModal(total), 900, 'ui');
+                }
                 return;
             }
             // 付款成功
@@ -2801,7 +2823,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaLabel = document.querySelector('.b6p2-my-money-label');
             if (areaLabel) areaLabel.textContent = '💰 找零區（把找零拖回錢包）';
             const trayTitle = document.querySelector('.b6p2-tray-title');
-            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 <span id="b6p2-tray-placed">${walletBase}</span>元`;
+            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 <span id="b6p2-tray-placed">0</span>元`;
 
             // 進度條重設為「找零回收」模式
             const needLabel = document.querySelector('.b6p2-wallet-coins-label');
@@ -2858,7 +2880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalEl3 = document.getElementById('b6p2-wallet-total');
                 if (totalEl3) { totalEl3.textContent = returnedVal + ' 元'; totalEl3.className = 'b6p2-wallet-total-val enough'; }
                 const trayPlaced = document.getElementById('b6p2-tray-placed');
-                if (trayPlaced) trayPlaced.textContent = (g.p2WalletBase || 0) + returnedVal;
+                if (trayPlaced) trayPlaced.textContent = returnedVal;
                 const fillEl3 = document.getElementById('b6p2-progress-fill');
                 if (fillEl3) { const pct = Math.min(Math.round(returnedVal / change * 100), 100); fillEl3.style.width = pct + '%'; fillEl3.className = 'b6p2-progress-fill full'; }
 
@@ -2866,16 +2888,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.isProcessing = true;
                     trayEl.classList.remove('b6p2-change-target');
                     this._showCenterFeedback('🎉', '找零完成！');
-                    // 所有零錢已放回：播「找回N元」完整語音後再進入結果
-                    Game.Speech.speak(`找回${returnedVal}元`, () => {
-                        Game.TimerManager.setTimeout(() => {
-                            Game.Speech.speak(`找零完成，買菜成功！`, () => {
-                                Game.TimerManager.setTimeout(() => {
-                                    this.state.isProcessing = false;
-                                    this._showChangeResult(paid, change);
-                                }, 400, 'turnTransition');
-                            });
-                        }, 200, 'speech');
+                    // 所有零錢已放回：播「找回N元，找零完成！」後進入結果
+                    Game.Speech.speak(`找回${returnedVal}元，找零完成！`, () => {
+                        this.state.isProcessing = false;
+                        this._showChangeResult(paid, change);
                     });
                 } else {
                     // 每枚放回時播累加金額語音
