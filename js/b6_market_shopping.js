@@ -756,6 +756,9 @@ document.addEventListener('DOMContentLoaded', () => {
             g.streak       = 0;
             g.startTime    = Date.now();
             g.missions     = this._pickMissions(s.rounds, s.difficulty);
+            g.receipts     = [];
+            g.stallStats   = {};
+            g.exactPayments = 0;
 
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
@@ -816,11 +819,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._renderShoppingUI();
             this._showMissionIntroModal(g.mission, g.currentRound + 1, () => {
-                // afterClose callback（B1 pattern）
+                // afterClose callback：播放「開始購物」語音，簡單模式啟動提示高亮
+                Game.Speech.speak('開始購物');
                 if (this.state.settings.difficulty === 'easy') {
-                    // 簡單模式：自動啟動提示高亮，再逐攤朗讀
                     this._b6P1ActivateHintMode();
-                    Game.TimerManager.setTimeout(() => this._speakMissionItemsOneByOne(g.mission), 200, 'speech');
                 }
             });
 
@@ -842,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean).join('');
             const stallsText = (mission.stalls || []).map(({ stall, count }) => {
                 const stallInfo = _currentStalls[stall];
-                return stallInfo ? `${stallInfo.name}選${toCountSpeech(count)}樣` : '';
+                return stallInfo ? `${stallInfo.name}買${toCountSpeech(count)}樣` : '';
             }).filter(Boolean).join('，');
 
             const mktKey = mission._mktKey || this.state.settings.marketType;
@@ -883,13 +885,14 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.className = 'b6-mission-intro';
             modal.innerHTML = `
                 <div class="b6-mi-card">
+                    <button class="b6-mi-close-btn" id="b6-mi-close-btn">✕</button>
                     <div class="b6-mi-round">${roundTitle}</div>
                     <div class="b6-mi-title">🛒 今天的採購任務</div>
                     <div class="b6-mi-items">${stallsHTML}</div>
                     <div class="b6-mi-budget">預算：<b>${mission.budget}</b> 元</div>
                     <div class="b6-mi-budget-icons">${_miBudgetIconsHtml}</div>
                     <div class="b6-mi-hint" style="font-size:12px;color:#6b7280;margin-top:4px;">在預算內，從指定攤位各選指定數量的商品</div>
-                    <div class="b6-mi-hint">點任意處開始</div>
+                    <button class="b6-mi-dismiss-btn" id="b6-mi-dismiss-btn">關閉</button>
                 </div>`;
             document.body.appendChild(modal);
             const welcomePrefix = isFirstRound ? `歡迎來到${mkt.name}！` : '';
@@ -897,6 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dismiss = () => {
                 if (closed) return;
                 closed = true;
+                window.speechSynthesis.cancel();
                 if (modal.parentNode) {
                     modal.classList.add('b6-mi-fade');
                     Game.TimerManager.setTimeout(() => {
@@ -905,13 +909,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 350, 'ui');
                 }
             };
-            // 語音結束後關閉彈窗（B1 afterClose pattern）
-            Game.Speech.speak(`${welcomePrefix}${stallsText}，預算${mission.budget}元。`, dismiss);
-            modal.addEventListener('click', () => {
-                window.speechSynthesis.cancel(); // 手動關閉時立刻停止當前語音
-                dismiss();
-            }, { once: true });
-            Game.TimerManager.setTimeout(dismiss, 3500, 'turnTransition');
+
+            // 播放一段語音（攤位+預算），播完後彈窗保持開啟，等待使用者點「關閉」
+            Game.Speech.speak(`${welcomePrefix}${stallsText}，預算${mission.budget}元。`);
+
+            // ✕ 關閉按鈕（右上角小圓鈕）
+            const closeBtn = document.getElementById('b6-mi-close-btn');
+            if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); }, { once: true });
+            // 「關閉」文字按鈕（彈窗底部）
+            const dismissBtn = document.getElementById('b6-mi-dismiss-btn');
+            if (dismissBtn) dismissBtn.addEventListener('click', (e) => { e.stopPropagation(); dismiss(); }, { once: true });
         },
 
         // ── 簡單模式：攤位需求逐攤朗讀（B1 _speakItemsOneByOne pattern）─
@@ -1442,6 +1449,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isSelected = existingIdx !== -1;
 
                     if (isSelected) {
+                        // 簡單模式提示商品：不可取消選取
+                        if (this.state.settings.difficulty === 'easy' && g.p1HintMode) {
+                            const isHintItem = (g.p1HintItems || []).some(h => h.stall === stall && h.id === itemId);
+                            if (isHintItem) {
+                                this.audio.play('error');
+                                const tipId = 'b6-wrong-tip';
+                                let tip = document.getElementById(tipId);
+                                if (!tip) { tip = document.createElement('div'); tip.id = tipId; document.body.appendChild(tip); }
+                                tip.className = 'b6-wrong-tip';
+                                tip.innerHTML = `<div class="b6-wt-msg">❌ 提示商品不可取消</div>`;
+                                Game.Speech.speak('提示商品不可以取消');
+                                Game.TimerManager.clearByCategory('wrongTip');
+                                Game.TimerManager.setTimeout(() => { tip?.remove(); }, 2000, 'wrongTip');
+                                return;
+                            }
+                        }
                         // 取消選取
                         g.selectedItems.splice(existingIdx, 1);
                         this.audio.play('click');
@@ -1518,12 +1541,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     g.selectedItems.push({ stall, id: itemId });
                     g.collectedIds.add(itemId); // 向後相容（結果頁使用）
                     this.audio.play('correct');
-                    // 飛出收據動畫
-                    if (itemData) this._showItemReceiptFlyout(btn, itemData);
 
                     const isMissionDone = this._isMissionComplete();
                     const doUIUpdate = (suppressCompletion = false) => {
-                        this._showCollectionProgress(g.selectedItems.length, this._getTotalRequired());
+                        // 合併動畫：商品名稱+價格+進度 同一個置中元素
+                        if (itemData) this._showItemCollectFlash(itemData, g.selectedItems.length, this._getTotalRequired());
                         this._updateShoppingUIPartial(suppressCompletion ? { suppressCompletion: true } : {});
                     };
 
@@ -1581,7 +1603,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (replayBtn) {
                 Game.EventManager.on(replayBtn, 'click', () => {
                     this.audio.play('click');
-                    this._speakMissionItemsOneByOne(this.state.game.mission);
+                    const mission = this.state.game.mission;
+                    const replayText = (mission.stalls || []).map(({ stall, count }) => {
+                        const stallInfo = _currentStalls[stall];
+                        return stallInfo ? `${stallInfo.name}買${toCountSpeech(count)}樣` : '';
+                    }).filter(Boolean).join('，');
+                    Game.Speech.speak(`${replayText}，預算${mission.budget}元，請開始購物。`);
                 }, {}, 'gameUI');
             }
             const p1HintBtn = document.getElementById('b6-p1-hint-btn');
@@ -1774,20 +1801,33 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // ── 收集進度動畫（Round 27）──────────────────────────────
-        _showCollectionProgress(collected, needed) {
-            const prev = document.getElementById('b6-col-progress');
-            if (prev) prev.remove();
+        // ── 商品選購合併動畫（商品名稱+價格+進度，置中顯示）────────
+        _showItemCollectFlash(item, collected, needed) {
+            document.getElementById('b6-col-progress')?.remove();
+            document.querySelector('.b6-collect-flash')?.remove();
             const isAll = collected >= needed;
-            const prog = document.createElement('div');
-            prog.id = 'b6-col-progress';
-            prog.className = `b6-col-progress${isAll ? ' all-done' : ''}`;
-            prog.innerHTML = `<span class="b6-cp-plus">+1</span><span class="b6-cp-count">${collected}/${needed}</span>`;
-            document.body.appendChild(prog);
+            const el = document.createElement('div');
+            el.id = 'b6-col-progress';
+            el.className = `b6-collect-flash${isAll ? ' all-done' : ''}`;
+            el.innerHTML = `
+                <div class="b6-cf-item">
+                    <span class="b6-cf-icon">${item.icon || '🛒'}</span>
+                    <span class="b6-cf-name">${item.name}</span>
+                </div>
+                <div class="b6-cf-price">+${item.price}元</div>
+                <div class="b6-cf-progress">
+                    <span class="b6-cf-plus">+1</span>
+                    <span class="b6-cf-count">${collected}/${needed}</span>
+                </div>`;
+            document.body.appendChild(el);
             Game.TimerManager.setTimeout(() => {
-                prog.classList.add('b6-cp-fade');
-                Game.TimerManager.setTimeout(() => { if (prog.parentNode) prog.remove(); }, 400, 'ui');
-            }, 1200, 'ui');
+                el.classList.add('b6-cf-fade');
+                Game.TimerManager.setTimeout(() => { if (el.parentNode) el.remove(); }, 400, 'ui');
+            }, 1400, 'ui');
         },
+
+        // ── 舊 _showCollectionProgress 保留為空 stub（不再使用）───
+        _showCollectionProgress(collected, needed) {},
 
         // ── 全部收集完成中央閃光（Round 38）─────────────────────
         _showAllCollectedFlash() {
@@ -1796,7 +1836,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const el = document.createElement('div');
             el.id = 'b6-all-done-flash';
             el.className = 'b6-all-done-flash';
-            el.textContent = '🎉 全部收集完成！';
+            el.textContent = '🎉 全部選購完成！';
             document.body.appendChild(el);
             Game.TimerManager.setTimeout(() => { if (document.body.contains(el)) el.remove(); }, 1500, 'ui');
         },
@@ -1825,14 +1865,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.setTimeout(() => overlay.remove(), 1200, 'ui');
         },
 
-        // ── 商品收據飛出（Round 37）──────────────────────────────────
-        _showItemReceiptFlyout(anchor, item) {
-            const flyout = document.createElement('div');
-            flyout.className = 'b6-item-flyout b6-item-flyout-center';
-            flyout.innerHTML = `<span class="b6-if-icon">${item.icon || '🛒'}</span><span class="b6-if-name">${item.name}</span><span class="b6-if-price">+${item.price}元</span>`;
-            document.body.appendChild(flyout);
-            Game.TimerManager.setTimeout(() => flyout.remove(), 1000, 'ui');
-        },
+        // ── 商品收據飛出（已整合至 _showItemCollectFlash，保留空 stub）──
+        _showItemReceiptFlyout(anchor, item) {},
 
         // ── 浮動購物籃計數徽章（已移除，改由結帳列顯示）────────────
         _updateCartBadge(collected, needed) { },
@@ -1921,12 +1955,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="game-container">
                 ${this._renderB6P2RefCard(g.mission, total, mkt)}
                 ${this._renderB6P2WalletArea(total, diff)}
-                <button class="b5-confirm-btn" id="b6-p2-confirm-btn" disabled>✅ 確認付款</button>
+                ${diff !== 'easy' ? `<button class="b5-confirm-btn" id="b6-p2-confirm-btn" disabled>✅ 確認付款</button>` : ''}
                 ${this._renderB6P2CoinTray(diff)}
             </div>`;
 
             Game.TimerManager.setTimeout(() => {
-                Game.Speech.speak(`共消費${toTWD(total)}，請拖曳正確的金錢圖示付款。`);
+                Game.Speech.speak(`共消費${toTWD(total)}，請拿出正確的金額。`);
             }, 300, 'speech');
 
             this._bindB6P2Events(total);
@@ -2241,9 +2275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const slotEl = document.querySelector(`[data-b6p2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b6p2-ghost-slot');
                 this._b6P2UpdateStatusOnly();
-                if (diff === 'easy' && g.p2HintSlots.every(s => s.filled)) {
-                    Game.TimerManager.setTimeout(() => this._b6P2HandleConfirm(g.p2Total), 600, 'ui');
-                }
+                // auto-confirm moved to speech callback below
             } else {
                 this.audio.play('coin');
                 const uid = ++g.p2UidCtr;
@@ -2265,9 +2297,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this._b6P2UpdateStatusOnly();
             }
+            // 簡單/普通模式：播累加金額，播完後再執行下一個動作
             if (diff !== 'hard') {
                 const walletNow = this._b6P2GetWalletTotal();
-                Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow)), 80, 'ui');
+                const req = g.p2Total;
+                const allFilled = g.p2ShowHint && g.p2HintSlots?.length && g.p2HintSlots.every(s => s.filled);
+                const nowEnough = walletNow >= req;
+                Game.TimerManager.setTimeout(() => {
+                    Game.Speech.speak(toTWD(walletNow), () => {
+                        if (diff === 'easy' && allFilled) {
+                            // 簡單模式：所有 ghost slot 填完 → 自動確認
+                            Game.TimerManager.setTimeout(() => this._b6P2HandleConfirm(g.p2Total), 300, 'ui');
+                        } else if (diff === 'normal' && nowEnough) {
+                            // 普通模式：金額足夠 → 播提示語音（按鈕已由 _b6P2UpdateStatusOnly 啟用）
+                            const msg = walletNow === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
+                            Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 100, 'ui');
+                        }
+                    });
+                }, 80, 'ui');
             }
         },
 
@@ -2325,14 +2372,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
-                const wasDisabled = confirmBtn.disabled;
                 confirmBtn.disabled = !enough;
                 confirmBtn.classList.toggle('ready', enough);
-                if (enough && wasDisabled) {
-                    const diff = this.state.settings.difficulty;
-                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
-                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
-                }
             }
         },
 
@@ -2355,13 +2396,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
-                const wasDisabled2 = confirmBtn.disabled;
                 confirmBtn.disabled = !enough;
                 confirmBtn.classList.toggle('ready', enough);
-                if (enough && wasDisabled2) {
-                    const msg = total === req ? '剛好！可以確認付款了！' : '金額足夠，可以確認付款了！';
-                    Game.TimerManager.setTimeout(() => Game.Speech.speak(msg), 200, 'ui');
-                }
             }
             const coinsEl = document.getElementById('b6p2-wallet-coins');
             if (!coinsEl) return;
@@ -2472,7 +2508,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 付款成功
             const change = wTotal - total;
             this.audio.play('correct');
-            this._showCenterFeedback('💯', '付款成功！');
+            this._showCenterFeedback('✅', '付款成功！');
             g.paidAmount = wTotal;
             if (change === 0) {
                 // 剛好付清：直接進入結果
@@ -2529,17 +2565,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('');
             }
 
+            // 計算錢包基礎餘額（預算中未用於付款的部分）
+            const walletBase = (g.mission?.budget || 0) - paid;
+            g.p2WalletBase = walletBase;
+
             // 更新標籤
             const areaLabel = document.querySelector('.b6p2-my-money-label');
             if (areaLabel) areaLabel.textContent = '💰 找零區（把找零拖回錢包）';
             const trayTitle = document.querySelector('.b6p2-tray-title');
-            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 ← 把找零拖回來`;
+            if (trayTitle) trayTitle.innerHTML = `<img src="../images/common/icons_wallet.png" class="b6p2-tray-wallet-icon" onerror="this.style.display='none'"> 我的錢包 <span id="b6p2-tray-placed">${walletBase}</span>元`;
 
             // 進度條重設為「找零回收」模式
             const needLabel = document.querySelector('.b6p2-wallet-coins-label');
-            if (needLabel) needLabel.innerHTML = `找零 <span class="b6p2-wallet-need">${change} 元</span> 請拖回錢包`;
+            if (needLabel) needLabel.innerHTML = `找零 <span class="b6p2-wallet-need">${change} 元</span><br><span class="b6p2-return-instruction">請將零錢放回錢包</span>`;
             const totalEl2 = document.getElementById('b6p2-wallet-total');
             if (totalEl2) { totalEl2.textContent = '0 元'; totalEl2.className = 'b6p2-wallet-total-val'; }
+            // 分母改為找零金額（而非消費總額）
+            const goalEl = document.querySelector('.b6p2-wallet-goal');
+            if (goalEl) goalEl.textContent = `${change} 元`;
             const fillEl2 = document.getElementById('b6p2-progress-fill');
             if (fillEl2) { fillEl2.style.width = '0%'; fillEl2.className = 'b6p2-progress-fill'; }
 
@@ -2551,7 +2594,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn = document.getElementById('b6-p2-hint-btn');
             if (hintBtn) hintBtn.closest('.b6-p2-hint-wrap')?.style.setProperty('display','none');
 
-            Game.Speech.speak(`找零${toTWD(change)}，請把找零拖回我的錢包`);
+            Game.Speech.speak(`找您${change}元，請把找回的零錢，放回我的錢包`);
 
             // 設定拖曳事件
             this._b6P2SetupChangeReturn(coins, paid, total, change);
@@ -2586,6 +2629,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const returnedVal = coins.filter(c => c.returned).reduce((s, c) => s + c.denom, 0);
                 const totalEl3 = document.getElementById('b6p2-wallet-total');
                 if (totalEl3) { totalEl3.textContent = returnedVal + ' 元'; totalEl3.className = 'b6p2-wallet-total-val enough'; }
+                const trayPlaced = document.getElementById('b6p2-tray-placed');
+                if (trayPlaced) trayPlaced.textContent = (g.p2WalletBase || 0) + returnedVal;
                 const fillEl3 = document.getElementById('b6p2-progress-fill');
                 if (fillEl3) { const pct = Math.min(Math.round(returnedVal / change * 100), 100); fillEl3.style.width = pct + '%'; fillEl3.className = 'b6p2-progress-fill full'; }
 
@@ -2593,12 +2638,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.isProcessing = true;
                     trayEl.classList.remove('b6p2-change-target');
                     this._showCenterFeedback('🎉', '找零完成！');
-                    Game.Speech.speak(`找零完成，買菜成功！`, () => {
+                    // 所有零錢已放回：播「找回N元」完整語音後再進入結果
+                    Game.Speech.speak(`找回${returnedVal}元`, () => {
                         Game.TimerManager.setTimeout(() => {
-                            this.state.isProcessing = false;
-                            this._showChangeResult(paid, change);
-                        }, 400, 'turnTransition');
+                            Game.Speech.speak(`找零完成，買菜成功！`, () => {
+                                Game.TimerManager.setTimeout(() => {
+                                    this.state.isProcessing = false;
+                                    this._showChangeResult(paid, change);
+                                }, 400, 'turnTransition');
+                            });
+                        }, 200, 'speech');
                     });
+                } else {
+                    // 每枚放回時播累加金額語音
+                    Game.Speech.speak(`找回${returnedVal}元`);
                 }
             };
 
@@ -2929,7 +2982,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = (g.selectedItems || []).map(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (item) g.stallStats[stall] = (g.stallStats[stall] || 0) + item.price;
-                return item ? { name: item.name, price: item.price } : null;
+                return item ? { name: item.name, price: item.price, icon: item.icon || '🛒' } : null;
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
 
@@ -2952,135 +3005,173 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             const isFinalRound = (g.currentRound + 1) >= g.totalRounds;
 
-            if (isFinalRound) {
-                // ── 最終關：採購回顧合併頁（付款結果 + 收據 + 攤位分析 + 付款效率）──
-                document.body.style.overflow = 'auto';
-                document.documentElement.style.overflow = 'auto';
-                app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
+            // ── 全關卡統一：買菜成功頁（含採購清單 + 攤位分析）──
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+            app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
-                // 付款效率
-                const exactCount  = g.exactPayments || 0;
-                const totalRounds = g.totalRounds || 1;
-                const effPct   = Math.round(exactCount / totalRounds * 100);
-                const effLabel = effPct === 100 ? '💯 全部精準！' : effPct >= 60 ? '⭐ 表現不錯！' : '💪 繼續練習！';
-                const effHTML  = exactCount > 0 ? `
-                <div class="b-review-card">
-                    <h3>🎯 付款效率</h3>
-                    <div class="b6-eff-row">
-                        <div class="b6-eff-ring" style="--eff-pct:${effPct}">
-                            <svg viewBox="0 0 36 36" class="b6-eff-svg">
-                                <circle class="b6-eff-bg" cx="18" cy="18" r="15.9"/>
-                                <circle class="b6-eff-fill" cx="18" cy="18" r="15.9"
-                                    stroke-dasharray="${effPct} ${100 - effPct}" stroke-dashoffset="25"/>
-                            </svg>
-                            <span class="b6-eff-pct">${effPct}%</span>
-                        </div>
-                        <div class="b6-eff-info">
-                            <div class="b6-eff-label">${effLabel}</div>
-                            <div class="b6-eff-detail">精準付款 <strong>${exactCount}</strong> 次 / 共 <strong>${totalRounds}</strong> 關</div>
-                        </div>
+            // 付款效率（僅最終關顯示）
+            const exactCount  = g.exactPayments || 0;
+            const effRounds   = g.totalRounds || 1;
+            const effPct   = Math.round(exactCount / effRounds * 100);
+            const effLabel = effPct === 100 ? '💯 全部精準！' : effPct >= 60 ? '⭐ 表現不錯！' : '💪 繼續練習！';
+            const effHTML  = isFinalRound && exactCount > 0 ? `
+            <div class="b-review-card">
+                <h3>🎯 付款效率</h3>
+                <div class="b6-eff-row">
+                    <div class="b6-eff-ring" style="--eff-pct:${effPct}">
+                        <svg viewBox="0 0 36 36" class="b6-eff-svg">
+                            <circle class="b6-eff-bg" cx="18" cy="18" r="15.9"/>
+                            <circle class="b6-eff-fill" cx="18" cy="18" r="15.9"
+                                stroke-dasharray="${effPct} ${100 - effPct}" stroke-dashoffset="25"/>
+                        </svg>
+                        <span class="b6-eff-pct">${effPct}%</span>
                     </div>
-                </div>` : '';
+                    <div class="b6-eff-info">
+                        <div class="b6-eff-label">${effLabel}</div>
+                        <div class="b6-eff-detail">精準付款 <strong>${exactCount}</strong> 次 / 共 <strong>${effRounds}</strong> 關</div>
+                    </div>
+                </div>
+            </div>` : '';
 
-                // 採購收據
-                const receiptCardHTML = g.receipts.length > 0 ? `
+            // 金錢圖示 helper（攤位消費分析用）
+            const b6MkStallMoneyIcons = (amount) => {
+                const denoms = [1000, 500, 100, 50, 10, 5, 1];
+                let rem = amount; const parts = [];
+                for (const d of denoms) { const n = Math.floor(rem / d); if (n > 0) { parts.push({ d, n }); rem -= d * n; } }
+                return parts.map(({ d, n }) => {
+                    const isBill = d >= 100; const w = isBill ? 56 : 36;
+                    const face = Math.random() < 0.5 ? 'front' : 'back';
+                    return `<span class="b6-stall-money-icon"><img src="../images/money/${d}_yuan_${face}.png" style="width:${w}px;height:${isBill ? 'auto' : w + 'px'}" onerror="this.style.display='none'">${n > 1 ? `<span class="b6-stall-money-x">×${n}</span>` : ''}</span>`;
+                }).join('');
+            };
+
+            // 採購清單（逐項 + 導航，從最新一題開始）
+            const receipts = g.receipts;
+            const totalReceipts = receipts.length;
+            const startRcptIdx = totalReceipts - 1;
+            const renderReceiptContent = (idx) => {
+                const r = receipts[idx];
+                const itemRows = r.items.map(it => `
+                    <div class="b6-rcpt-item-row">
+                        <span class="b6-rcpt-item-icon">${it.icon || '🛒'}</span>
+                        <span class="b6-rcpt-item-name">${it.name}</span>
+                        <span class="b6-rcpt-item-price">${it.price}元</span>
+                    </div>`).join('');
+                return `${itemRows}
+                    <div class="b6-rcpt-divider"></div>
+                    <div class="b6-rcpt-sum-row">
+                        <span class="b6-rcpt-sum-label">付款</span>
+                        <span class="b6-rcpt-sum-val">${r.paid}元</span>
+                    </div>
+                    <div class="b6-rcpt-sum-row${r.change === 0 ? ' b6-rcpt-exact' : ''}">
+                        <span class="b6-rcpt-sum-label">找零</span>
+                        <span class="b6-rcpt-sum-val">${r.change}元</span>
+                    </div>`;
+            };
+            const receiptCardHTML = totalReceipts > 0 ? `
+            <div class="b-review-card">
+                <div class="b6-rcpt-header">
+                    <h3 class="b6-rcpt-title">🧾採購清單</h3>
+                    ${totalReceipts > 1 ? `<div class="b6-rcpt-nav">
+                        <button class="b6-rcpt-arrow" id="b6-rcpt-prev">◀</button>
+                        <span class="b6-rcpt-page" id="b6-rcpt-page">第 ${totalReceipts} 題 / 共 ${totalReceipts} 題</span>
+                        <button class="b6-rcpt-arrow" id="b6-rcpt-next" disabled>▶</button>
+                    </div>` : `<span class="b6-rcpt-single-page">第 1 題</span>`}
+                </div>
+                <div id="b6-rcpt-content">${renderReceiptContent(startRcptIdx)}</div>
+            </div>` : '';
+
+            // 攤位消費金額（可折疊）
+            const stallCardHTML = (() => {
+                const stats = g.stallStats;
+                if (!stats || Object.keys(stats).length === 0) return '';
+                const entries = Object.keys(_currentStalls)
+                    .filter(k => stats[k])
+                    .map(k => ({ name: _currentStalls[k].name, icon: _currentStalls[k].icon, total: stats[k] }));
+                if (!entries.length) return '';
+                const grandTotal = entries.reduce((s, e) => s + e.total, 0);
+                return `
                 <div class="b-review-card">
-                    <h3>🧾 採購收據</h3>
-                    <table class="b6-receipt-table">
-                        <thead><tr><th>關卡</th><th>採購商品</th><th>小計</th><th>付款</th><th>找零</th></tr></thead>
-                        <tbody>
-                            ${g.receipts.map((r, i) => `
-                            <tr class="${i % 2 === 0 ? 'b6-receipt-row-even' : ''}">
-                                <td class="b6-receipt-round">第${i + 1}關</td>
-                                <td class="b6-receipt-items">${r.items.map(it => it.name).join('、')}</td>
-                                <td class="b6-receipt-num">${r.total}元</td>
-                                <td class="b6-receipt-num">${r.paid}元</td>
-                                <td class="b6-receipt-change">${r.change}元</td>
-                            </tr>`).join('')}
-                        </tbody>
-                    </table>
-                </div>` : '';
-
-                // 攤位消費分析
-                const stallCardHTML = (() => {
-                    const stats = g.stallStats;
-                    if (!stats || Object.keys(stats).length === 0) return '';
-                    const entries = Object.keys(_currentStalls)
-                        .filter(k => stats[k])
-                        .map(k => ({ name: _currentStalls[k].name, icon: _currentStalls[k].icon, total: stats[k] }));
-                    if (!entries.length) return '';
-                    const grandTotal = entries.reduce((s, e) => s + e.total, 0);
-                    return `
-                    <div class="b-review-card">
-                        <h3>🏪 攤位消費分析</h3>
-                        <div class="b6-stall-bars">
-                            ${entries.map(e => {
-                                const pct = Math.round(e.total / grandTotal * 100);
-                                return `<div class="b6-stall-bar-row">
+                    <h3>🏪 攤位消費金額</h3>
+                    <div class="b6-stall-bars">
+                        ${entries.map(e => {
+                            const pct = Math.round(e.total / grandTotal * 100);
+                            return `
+                            <div class="b6-stall-collapsible">
+                                <div class="b6-stall-hdr-row">
                                     <span class="b6-stall-icon">${e.icon}</span>
                                     <span class="b6-stall-name">${e.name}</span>
-                                    <div class="b6-stall-track"><div class="b6-stall-fill" style="width:${pct}%"></div></div>
                                     <span class="b6-stall-total">${e.total}元</span>
-                                </div>`;
-                            }).join('')}
-                        </div>
-                    </div>`;
-                })();
-
-                app.innerHTML = `
-                <div class="b-review-wrapper">
-                    <div class="b-review-screen">
-                        <div class="b-review-header">
-                            <div class="b-review-emoji">${change === 0 ? '💯' : '🎉'}</div>
-                            <h1 class="b-review-title">${change === 0 ? '精準付款！' : '買菜成功！'}</h1>
-                            <p class="b-review-subtitle">${change === 0
-                                ? `剛好 ${paid} 元，不需找零`
-                                : `付了 ${paid} 元，找回 ${change} 元`}</p>
-                        </div>
-                        ${receiptCardHTML}
-                        ${stallCardHTML}
-                        ${effHTML}
-                        <button id="b6-view-summary-btn" class="b-review-next-btn">📊 查看測驗總結</button>
+                                    <button class="b6-stall-expand-btn">展開 ▼</button>
+                                </div>
+                                <div class="b6-stall-detail" style="display:none">
+                                    <div class="b6-stall-money-icons-row">${b6MkStallMoneyIcons(e.total)}</div>
+                                    <div class="b6-stall-bar-wrap">
+                                        <div class="b6-stall-track"><div class="b6-stall-fill" style="width:${pct}%"></div></div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('')}
                     </div>
                 </div>`;
+            })();
 
-                Game.TimerManager.setTimeout(() => document.getElementById('success-sound')?.play(), 100, 'confetti');
+            const nextBtnHTML = isFinalRound
+                ? `<button id="b6-view-summary-btn" class="b-review-next-btn">📊 查看測驗總結</button>`
+                : `<button id="b6-next-btn" class="b-review-next-btn">下一關 →</button>`;
+
+            app.innerHTML = `
+            <div class="b-review-wrapper">
+                <div class="b6-results-outer-card">
+                    <div class="b-review-header">
+                        <div class="b-review-emoji">${change === 0 ? '💯' : '🎉'}</div>
+                        <h1 class="b-review-title">${change === 0 ? '精準付款！' : '買菜成功！'}</h1>
+                        <p class="b-review-subtitle">${change === 0
+                            ? `剛好 ${paid} 元，不需找零`
+                            : `付了 ${paid} 元，找回 ${change} 元`}</p>
+                    </div>
+                    ${receiptCardHTML}
+                    ${stallCardHTML}
+                    ${effHTML}
+                    ${nextBtnHTML}
+                </div>
+            </div>`;
+
+            Game.TimerManager.setTimeout(() => document.getElementById('correct-sound')?.play(), 100, 'confetti');
+
+            // 收據導航（從最新題開始）
+            if (totalReceipts > 1) {
+                let rcptIdx = startRcptIdx;
+                const updateReceipt = () => {
+                    document.getElementById('b6-rcpt-content').innerHTML = renderReceiptContent(rcptIdx);
+                    document.getElementById('b6-rcpt-page').textContent = `第 ${rcptIdx + 1} 題 / 共 ${totalReceipts} 題`;
+                    document.getElementById('b6-rcpt-prev').disabled = rcptIdx === 0;
+                    document.getElementById('b6-rcpt-next').disabled = rcptIdx === totalReceipts - 1;
+                };
+                Game.EventManager.on(document.getElementById('b6-rcpt-prev'), 'click', () => { if (rcptIdx > 0) { rcptIdx--; updateReceipt(); } }, {}, 'gameUI');
+                Game.EventManager.on(document.getElementById('b6-rcpt-next'), 'click', () => { if (rcptIdx < totalReceipts - 1) { rcptIdx++; updateReceipt(); } }, {}, 'gameUI');
+            }
+
+            // 攤位展開/收起
+            document.querySelectorAll('.b6-stall-expand-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    const detail = btn.closest('.b6-stall-collapsible')?.querySelector('.b6-stall-detail');
+                    if (!detail) return;
+                    const isOpen = detail.style.display !== 'none';
+                    detail.style.display = isOpen ? 'none' : 'block';
+                    btn.textContent = isOpen ? '展開 ▼' : '收起 ▲';
+                }, {}, 'gameUI');
+            });
+
+            if (isFinalRound) {
                 Game.EventManager.on(document.getElementById('b6-view-summary-btn'), 'click', () => {
                     this.nextRound();
                 }, {}, 'gameUI');
-
             } else {
-                // ── 中間關卡：付款結果 + 下一關按鈕 ──
-                app.innerHTML = `
-                <div class="b-header">
-                    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🛒 菜市場買菜</span></div>
-                    <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[this.state.settings.difficulty] || ''}</div>
-                    <div class="b-header-right">
-                        <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
-                        <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
-                        <button class="b-back-btn" onclick="Game.showSettings()">返回設定</button>
-                    </div>
-                </div>
-                <div class="game-container">
-                    <div class="b6-change-section${change === 0 ? ' exact-payment' : ''}">
-                        <div class="b6-change-icon">${change === 0 ? '💯' : '🎉'}</div>
-                        ${change === 0
-                            ? `<div class="b6-change-text exact-text">精準付款！</div>
-                               <div class="b6-change-amount exact-amt">${paid} 元，不需找零</div>`
-                            : `<div class="b6-change-text">付了 ${paid} 元，找回</div>
-                               <div class="b6-change-amount">${change} 元</div>`}
-                        <div style="font-size:14px;color:#065f46;margin-top:4px;">買菜成功！</div>
-                    </div>
-                    <button class="b5-next-btn" id="b6-next-btn">下一關 →</button>
-                </div>`;
-
                 Game.EventManager.on(document.getElementById('b6-next-btn'), 'click', () => {
                     this._showRoundCompleteCard(g.currentRound + 1, items, total, paid, change, () => this.nextRound());
                 }, {}, 'gameUI');
-
-                if (change > 0) {
-                    Game.TimerManager.setTimeout(() => this._animateChangeCalc(paid, total, change), 400, 'ui');
-                }
             }
         },
 
@@ -3176,7 +3267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-res-grid">
                 <div class="b-res-card b-res-card-1">
                     <div class="b-res-icon">✅</div>
-                    <div class="b-res-label">完成關卡</div>
+                    <div class="b-res-label">完成題數</div>
                     <div class="b-res-value">${g.correctCount}/${g.totalRounds}</div>
                 </div>
                 <div class="b-res-card b-res-card-2">
@@ -3225,6 +3316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, {}, 'gameUI');
 
             this._fireConfetti();
+            Game.TimerManager.setTimeout(() => document.getElementById('success-sound')?.play(), 100, 'confetti');
             Game.TimerManager.setTimeout(() => {
                 let msg;
                 if (accuracy === 100)    msg = '太厲害了，全部完成了！';
@@ -3295,8 +3387,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildQueue() {
             if (!this._enabled) return;
-            // Wait for intro modal / round complete card to dismiss
-            if (document.getElementById('b6-mission-intro') || document.getElementById('b6-round-complete')) return;
+            // Wait for round complete card to dismiss
+            if (document.getElementById('b6-round-complete')) return;
+            // intro modal：優先點底部「關閉」鈕，fallback 為右上角 ✕
+            const miDismiss = document.getElementById('b6-mi-dismiss-btn') || document.getElementById('b6-mi-close-btn');
+            if (miDismiss) {
+                this._highlight(miDismiss);
+                this._queue = [{ el: miDismiss, action: () => miDismiss.click() }];
+                return;
+            }
             this._clearHighlight();
             this._queue = [];
 

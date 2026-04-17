@@ -462,21 +462,8 @@
     margin: 8px 0;
 }
 
-/* ── 錯誤提示浮層 ─────────────────────────────────────────────── */
-#b6-wrong-tip {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1f2937;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 500;
-    white-space: nowrap;
-}
+/* ── 錯誤提示浮層（id 已廢用，保留空殼防衝突）── */
+#b6-wrong-tip { /* overridden by .b6-wrong-tip class below */ }
 
 /* ── 動畫 ─────────────────────────────────────────────────────── */
 @keyframes b6ItemCollect {
@@ -637,12 +624,28 @@
 @keyframes b6MiIn { from { opacity:0; } to { opacity:1; } }
 .b6-mission-intro.b6-mi-fade { opacity: 0; transition: opacity 0.35s ease; }
 .b6-mi-card {
+    position: relative;
     background: white; border-radius: 20px; padding: 28px 32px; text-align: center;
     max-width: 340px; width: 90%;
     box-shadow: 0 12px 40px rgba(0,0,0,0.2);
     animation: b6MiPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 @keyframes b6MiPop { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+.b6-mi-close-btn {
+    position: absolute; top: 10px; right: 14px;
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 30px; height: 30px; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #6b7280; line-height: 1;
+}
+.b6-mi-close-btn:hover { background: #e5e7eb; color: #374151; }
+.b6-mi-dismiss-btn {
+    margin-top: 14px; width: 100%;
+    padding: 10px 0; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+}
+.b6-mi-dismiss-btn:hover { background: linear-gradient(135deg, #059669, #047857); }
 .b6-mi-round { font-size: 13px; color: #6b7280; margin-bottom: 4px; }
 .b6-mi-title { font-size: 20px; font-weight: 800; color: #1f2937; margin-bottom: 14px; }
 .b6-mi-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
@@ -676,13 +679,13 @@
 
 /* ── B6 Wrong Item Tip (Round 21) ── */
 .b6-wrong-tip {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    background: #1f2937; border-radius: 14px; padding: 10px 18px;
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #1f2937; border-radius: 10px; padding: 7px 12px;
     z-index: 9900; pointer-events: none; text-align: center;
     animation: b6WtIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-    min-width: 200px; max-width: 320px;
+    width: max-content; max-width: min(260px, 88vw);
 }
-@keyframes b6WtIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+@keyframes b6WtIn { from { opacity:0; transform:translate(-50%,-50%) scale(0.8); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
 .b6-wt-msg  { font-size: 14px; color: #fca5a5; font-weight: 700; }
 .b6-wt-hint { font-size: 12px; color: #6ee7b7; margin-top: 4px; }
 
@@ -765,8 +768,9 @@
     color: #1d4ed8;
 }
 .b6-cc-budget {
-    font-size: 14px;
-    color: #6b7280;
+    font-weight: 800;
+    font-size: 17px;
+    color: #059669;
 }
 .b6-cc-btn {
     width: 100%;
@@ -809,31 +813,48 @@
 }
 
 /* ── B6 收集進度動畫 (Round 27) ── */
-.b6-col-progress {
+/* ── 商品選購合併動畫（商品名稱 + 價格 + 進度，置中）── */
+@keyframes b6CollectFlashIn {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.55); }
+    55%  { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.b6-collect-flash {
     position: fixed;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    background: rgba(6,95,70,0.92);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
     color: #fff;
-    border-radius: 16px;
-    padding: 8px 14px;
+    border-radius: 22px;
+    padding: 16px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-weight: 700;
+    gap: 6px;
     z-index: 9500;
-    animation: b6CpIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
     pointer-events: none;
+    animation: b6CollectFlashIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    box-shadow: 0 8px 28px rgba(29,78,216,0.4);
+    min-width: 170px;
 }
-.b6-col-progress.all-done { background: rgba(217,119,6,0.95); }
-.b6-cp-plus  { font-size: 18px; font-weight: 900; color: #6ee7b7; }
-.b6-cp-count { font-size: 20px; font-weight: 900; }
-.b6-cp-fade  { transition: opacity 0.4s; opacity: 0; }
-@keyframes b6CpIn {
-    from { transform: translateY(-50%) scale(0.5); opacity: 0; }
-    to   { transform: translateY(-50%) scale(1);   opacity: 1; }
+.b6-collect-flash.all-done {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 8px 28px rgba(217,119,6,0.45);
 }
+.b6-cf-item { display: flex; align-items: center; gap: 10px; }
+.b6-cf-icon  { font-size: 30px; line-height: 1; }
+.b6-cf-name  { font-size: 22px; font-weight: 800; }
+.b6-cf-price { font-size: 18px; font-weight: 700; color: #bfdbfe; }
+.b6-collect-flash.all-done .b6-cf-price { color: #fef3c7; }
+.b6-cf-progress {
+    display: flex; align-items: center; gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    padding-top: 8px; margin-top: 2px; width: 100%; justify-content: center;
+}
+.b6-cf-plus  { font-size: 22px; font-weight: 900; color: #6ee7b7; }
+.b6-collect-flash.all-done .b6-cf-plus { color: #fef9c3; }
+.b6-cf-count { font-size: 24px; font-weight: 900; }
+.b6-cf-fade  { transition: opacity 0.4s; opacity: 0; }
 
 /* ── B6 精準付款 (Round 28) ── */
 .b6-change-section.exact-payment {
@@ -926,26 +947,13 @@
 }
 .b6-stall-done-flash { animation: b6StallFlash 0.8s ease; }
 
-/* ── Round 37：B6 商品收據飛出 ── */
+/* ── Round 37：b6FlyoutUp（已整合至 b6-collect-flash，keyframe 保留供其他地方參照）── */
 @keyframes b6FlyoutUp {
     0%   { opacity: 1; transform: translateY(0); }
     80%  { opacity: 1; }
     100% { opacity: 0; transform: translateY(-36px); }
 }
-.b6-item-flyout {
-    background: #1d4ed8;
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    animation: b6FlyoutUp 1s ease forwards;
-    white-space: nowrap;
-}
-.b6-if-price { color: #bfdbfe; }
+.b6-item-flyout { display: none; } /* 已由 b6-collect-flash 取代 */
 
 /* ── Round 38：B6 全部收集完成閃光 ── */
 @keyframes b6AllDoneIn {
@@ -1165,32 +1173,46 @@
 .b6p2-ref-header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     margin-bottom: 10px;
+    position: relative;
+}
+.b6p2-ref-header .b6-p2-hint-wrap {
+    position: absolute;
+    right: 0;
+    margin-left: 0;
 }
 .b6p2-ref-icon  { font-size: 28px; line-height: 1; }
 .b6p2-ref-title { font-size: 17px; font-weight: 700; color: #065f46; }
 .b6p2-ref-items {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px 12px;
     margin-bottom: 10px;
 }
 .b6p2-ref-item {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    gap: 4px;
     font-size: 14px;
     color: #374151;
-    padding: 3px 0;
-    border-bottom: 1px dashed #a7f3d0;
+    padding: 4px 10px;
+    border-bottom: none;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #a7f3d0;
 }
-.b6p2-ref-item:last-child { border-bottom: none; }
 .b6p2-ref-price { font-weight: 600; color: #047857; }
 .b6p2-ref-total-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 8px;
     border-top: 2px solid #10b981;
     padding-top: 8px;
     margin-top: 4px;
@@ -1224,6 +1246,12 @@
     color: #1d4ed8;
     letter-spacing: 0.5px;
     margin-bottom: 6px;
+    line-height: 1.5;
+}
+.b6p2-return-instruction {
+    font-size: 15px;
+    font-weight: 600;
+    color: #047857;
 }
 .b6p2-wallet-header {
     position: relative;
@@ -2391,19 +2419,134 @@
     animation: settingsBounce 2.5s ease-in-out infinite;
 }
 
-/* ── 收集動畫：置中顯示（取代靠近按鈕的浮出）── */
-@keyframes b6FlyoutCenter {
-    0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    60%  { opacity: 1; transform: translate(-50%, -60%) scale(1.1); }
-    100% { opacity: 0; transform: translate(-50%, -70%) scale(0.9); }
+/* b6FlyoutCenter / b6-item-flyout-center 已整合至 b6-collect-flash */
+
+/* ══════════════════════════════════════════════════════════════
+   B6 買菜成功頁：大卡片外框 + 採購清單 + 攤位消費金額
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 外框大卡片 ── */
+.b6-results-outer-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 20px 16px 24px;
+    box-sizing: border-box;
 }
-.b6-item-flyout-center {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%);
-    z-index: 8000 !important;
-    font-size: 16px !important;
-    padding: 10px 20px !important;
-    animation: b6FlyoutCenter 1s ease forwards !important;
+
+/* ── 採購清單 ── */
+.b6-rcpt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.b6-rcpt-title { margin: 0; font-size: 1rem; font-weight: 700; color: #92400e; }
+.b6-rcpt-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.b6-rcpt-arrow {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid #f59e0b;
+    background: #fff;
+    color: #b45309;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+}
+.b6-rcpt-arrow:not(:disabled):hover { background: #fef3c7; }
+.b6-rcpt-arrow:disabled { opacity: 0.35; cursor: default; }
+.b6-rcpt-page, .b6-rcpt-single-page {
+    font-size: 12px; color: #b45309; font-weight: 600;
+}
+.b6-rcpt-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+.b6-rcpt-item-row:last-of-type { border-bottom: none; }
+.b6-rcpt-item-icon { font-size: 20px; flex-shrink: 0; }
+.b6-rcpt-item-name { flex: 1; font-size: 14px; color: #374151; font-weight: 500; }
+.b6-rcpt-item-price { font-size: 14px; font-weight: 700; color: #047857; }
+.b6-rcpt-divider {
+    height: 2px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 2px;
+    margin: 8px 0 6px;
+}
+.b6-rcpt-sum-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 4px;
+    font-size: 14px;
+}
+.b6-rcpt-sum-label { color: #6b7280; font-weight: 500; }
+.b6-rcpt-sum-val   { font-weight: 700; color: #111827; }
+.b6-rcpt-exact .b6-rcpt-sum-val { color: #059669; }
+
+/* ── 攤位消費金額：可折疊列 ── */
+.b6-stall-collapsible {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.b6-stall-hdr-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fafafa;
+}
+.b6-stall-expand-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.b6-stall-expand-btn:hover { background: #f3f4f6; }
+.b6-stall-detail {
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+.b6-stall-money-icons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.b6-stall-money-icon {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.b6-stall-money-x {
+    font-size: 11px;
+    font-weight: 700;
+    color: #047857;
+}
+.b6-stall-bar-wrap { margin-top: 4px; }
+.b6-stall-hdr-row .b6-stall-total {
+    font-weight: 700;
+    color: #047857;
+    font-size: 14px;
 }
