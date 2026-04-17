@@ -1213,10 +1213,35 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    border-top: 2px solid #10b981;
-    padding-top: 8px;
+    width: 100%;
+    padding-top: 6px;
     margin-top: 4px;
 }
+/* ── 商品算式列 ── */
+.b6c-ref-formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 6px;
+    padding: 8px 6px 6px;
+}
+.b6c-rf-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 13px;
+    color: #374151;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #a7f3d0;
+    border-radius: 16px;
+    padding: 3px 9px;
+    white-space: nowrap;
+}
+.b6c-rf-item strong { color: #047857; }
+.b6c-rf-sep { font-size: 15px; font-weight: 700; color: #9ca3af; }
+.b6c-rf-eq  { font-size: 14px; font-weight: 700; color: #065f46; white-space: nowrap; }
+.b6c-rf-total { font-size: 20px; font-weight: 900; color: #047857; }
 .b6p2-ref-total-label { font-size: 14px; font-weight: 700; color: #065f46; }
 .b6p2-ref-total-val   { font-size: 22px; font-weight: 900; color: #047857; }
 
@@ -1379,8 +1404,45 @@
 }
 .b6p2-tray-wallet-icon { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
 
-/* 確認付款按鈕自適應寬度 */
+/* 確認付款 / 確認找零：統一強化按鈕（置中） */
 #b6-p2-confirm-btn { align-self: center; width: fit-content; }
+#b6c-confirm-btn   { align-self: center; width: fit-content; }
+
+.b6c-confirm-btn-main {
+    padding: 14px 52px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.35);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    align-self: center;
+    width: fit-content;
+}
+.b6c-confirm-btn-main:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(16,185,129,0.45);
+    background: linear-gradient(135deg, #059669, #047857);
+}
+.b6c-confirm-btn-main:disabled {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.b6c-confirm-btn-main.ready {
+    animation: b6cConfirmPulse 1.5s ease-in-out infinite;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+@keyframes b6cConfirmPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(16,185,129,0.4); transform: translateY(0); }
+    50%       { box-shadow: 0 8px 28px rgba(16,185,129,0.65); transform: translateY(-2px); }
+}
 
 /* ── 提示按鈕包裹（吉祥物 + 按鈕） ── */
 .b6-p2-hint-wrap { display: inline-flex; align-items: center; gap: 4px; }
@@ -2751,13 +2813,128 @@
 }
 .b6c-denom-card:active { cursor: grabbing; }
 .b6c-denom-card.b6p2-dragging { opacity: 0.4; transform: scale(0.9); }
-.b6c-denom-card .coin-img     { width: 60px;  height: 60px; }
-.b6c-denom-card .banknote-img { width: 100px; height: auto; }
+.b6c-denom-card .coin-img     { width: 52px;  height: 52px; }
+.b6c-denom-card .banknote-img { width: 80px; height: auto; }
 
 /* ── RWD ── */
 @media (max-width: 480px) {
     .b6c-header-amount    { font-size: 22px; }
-    .b6c-denom-card .coin-img     { width: 48px; height: 48px; }
-    .b6c-denom-card .banknote-img { width: 80px; }
+    .b6c-denom-card .coin-img     { width: 44px; height: 44px; }
+    .b6c-denom-card .banknote-img { width: 68px; }
     .b6c-wc-item img { max-width: 64px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   找零階段 Phase 2（與付款頁相同版面結構）
+   ══════════════════════════════════════════════════════════ */
+
+/* 找零區：使用付款頁 wallet-area 結構，覆蓋顏色為綠色系 */
+.b6c-change-area {
+    border-color: #86efac;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+.b6c-change-title {
+    color: #065f46;
+}
+.b6c-change-need {
+    color: #059669 !important;
+}
+/* 錢包剩餘顯示 */
+.b6c-wallet-remaining-row {
+    text-align: center;
+    font-size: 13px;
+    color: #047857;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    border-radius: 8px;
+    padding: 4px 10px;
+    margin-bottom: 6px;
+}
+/* 面額提示圖示列（找零區上方） */
+.b6c-change-denom-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 4px;
+}
+/* 找零區標籤（綠色，覆蓋付款頁藍色） */
+.b6c-change-zone-label {
+    color: #065f46 !important;
+    background: #d1fae5 !important;
+    border-color: #6ee7b7 !important;
+}
+/* 找零放置區（綠色虛線框） */
+.b6c-drop-zone {
+    border: 2px dashed #6ee7b7 !important;
+    background: #f0fdf4 !important;
+}
+.b6c-drop-zone.b6p2-drop-active {
+    border-color: #059669 !important;
+    background: rgba(16,185,129,0.08) !important;
+}
+/* 我的錢包托盤餘額徽章 */
+.b6c-wallet-bal-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #065f46;
+    background: #d1fae5;
+    border: 1.5px solid #6ee7b7;
+    border-radius: 10px;
+    padding: 2px 10px;
+    margin-left: 8px;
+}
+/* 找零階段：我的錢包左右分欄 */
+.b6c-wallet-split {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: 6px;
+}
+.b6c-wallet-split-left {
+    flex: 0 0 auto;
+    min-width: 90px;
+    max-width: 45%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 8px 6px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 10px;
+    border: 1px dashed #a7f3d0;
+}
+.b6c-wallet-split-right {
+    flex: 1 1 0;
+    min-height: 80px;
+    padding: 8px;
+    border-radius: 10px;
+}
+.b6c-wc-static {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* 找零資訊列（ref card 底部，顯示付款額與找零額） */
+.b6c-change-info-bar {
+    text-align: center;
+    font-size: 14px;
+    color: #065f46;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    border-radius: 8px;
+    padding: 5px 12px;
+    margin-top: 8px;
+}
+.b6c-need-num {
+    color: #b45309;
+    font-size: 16px;
+}
+/* 間距調整：付款區與錢包區之間 */
+.game-container > .b6p2-wallet-area {
+    margin-top: 4px;
 }
