@@ -2550,3 +2550,214 @@
     color: #047857;
     font-size: 14px;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   B6 找零階段重設計（b6c- 前綴）
+   ══════════════════════════════════════════════════════════════ */
+
+.b6c-change-page {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 12px 12px 24px;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* ── 標題卡：找零金額 + 進度條 ── */
+.b6c-header-card {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid #86efac;
+    border-radius: 16px;
+    padding: 14px 18px 12px;
+}
+.b6c-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.b6c-header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #065f46;
+}
+.b6c-header-amount {
+    font-size: 28px;
+    font-weight: 900;
+    color: #059669;
+}
+.b6c-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.b6c-progress-bar {
+    height: 10px;
+    background: #d1fae5;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.b6c-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+.b6c-progress-fill.full {
+    background: linear-gradient(90deg, #059669, #10b981);
+}
+.b6c-progress-label {
+    font-size: 13px;
+    color: #047857;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ── 我的錢包區（放置找零金幣）── */
+.b6c-wallet-zone {
+    background: #fff;
+    border: 2px dashed #86efac;
+    border-radius: 14px;
+    padding: 10px 12px 12px;
+    min-height: 110px;
+    transition: border-color 0.2s, background 0.2s;
+}
+.b6c-wallet-zone.b6p2-drop-active {
+    border-color: #059669;
+    background: rgba(16, 185, 129, 0.06);
+}
+.b6c-wallet-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #065f46;
+    margin-bottom: 8px;
+}
+.b6c-wallet-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-end;
+    min-height: 60px;
+}
+
+/* ── 放置在錢包區的金幣項目 ── */
+.b6c-wc-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 6px 4px;
+    background: rgba(209, 250, 229, 0.6);
+    border: 2px solid #6ee7b7;
+    border-radius: 10px;
+    position: relative;
+    animation: bCoinIn 0.22s ease;
+}
+.b6c-wc-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 2;
+}
+.b6c-wc-item:hover .b6c-wc-remove { opacity: 1; }
+
+/* ── Ghost slot（淡化提示格）── */
+.b6c-ghost-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 6px 4px;
+    background: rgba(209, 250, 229, 0.25);
+    border: 2px dashed #86efac;
+    border-radius: 10px;
+    animation: b6cGhostIn 0.3s ease;
+}
+@keyframes b6cGhostIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── 按鈕列（提示 + 確認）── */
+.b6c-btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.b6c-btn-row .b6-p2-hint-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── 面額托盤（可重複拖曳）── */
+.b6c-tray {
+    background: linear-gradient(135deg, #fefce8, #fef9c3);
+    border: 2px solid #fde68a;
+    border-radius: 14px;
+    padding: 12px 12px 14px;
+}
+.b6c-tray-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.b6c-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* ── 面額卡（可重複拖曳，黃色主題）── */
+.b6c-denom-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 6px 4px;
+    background: rgba(254, 243, 199, 0.8);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.b6c-denom-card:hover {
+    border-color: #d97706;
+    background: rgba(253, 230, 138, 0.9);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 14px rgba(217, 119, 6, 0.25);
+}
+.b6c-denom-card:active { cursor: grabbing; }
+.b6c-denom-card.b6p2-dragging { opacity: 0.4; transform: scale(0.9); }
+.b6c-denom-card .coin-img     { width: 60px;  height: 60px; }
+.b6c-denom-card .banknote-img { width: 100px; height: auto; }
+
+/* ── RWD ── */
+@media (max-width: 480px) {
+    .b6c-header-amount    { font-size: 22px; }
+    .b6c-denom-card .coin-img     { width: 48px; height: 48px; }
+    .b6c-denom-card .banknote-img { width: 80px; }
+    .b6c-wc-item img { max-width: 64px; }
+}
