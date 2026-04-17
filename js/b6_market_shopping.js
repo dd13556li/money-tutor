@@ -772,7 +772,228 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             document.body.style.overflow = '';
 
-            this.renderRound();
+            this.showWelcomeScreen();
+        },
+
+        // ── 歡迎畫面（A2 pattern：2頁式，設定完成後先顯示再進遊戲）──────
+        showWelcomeScreen() {
+            const app = document.getElementById('app');
+            const g   = this.state.game;
+            const s   = this.state.settings;
+
+            // 取得第一關任務及對應市場資料
+            const mission = g.missions[0];
+            const mktKey  = (mission && mission._mktKey) || s.marketType;
+            const mkt     = (mktKey !== 'random' ? B6_MARKETS[mktKey] : null) || B6_MARKETS.traditional;
+
+            // 確保 _currentStalls 已指向本關攤位
+            if (mission && mission._mktKey && B6_MARKETS[mission._mktKey]) {
+                _currentStalls = B6_MARKETS[mission._mktKey].stalls;
+            }
+
+            let currentPage = 1;
+
+            const renderPage = (page) => {
+                if (page === 1) {
+                    // ── 第1頁：市場歡迎 ──────────────────────────────────
+                    app.innerHTML = `
+                        <style>
+                            .b6-wc-container {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+                                padding: 20px;
+                            }
+                            .b6-wc-box {
+                                background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                                border: 3px solid #86efac;
+                                border-radius: 24px;
+                                padding: 50px 60px;
+                                text-align: center;
+                                max-width: 580px;
+                                width: 100%;
+                            }
+                            .b6-wc-icon { font-size: 80px; margin-bottom: 16px; line-height: 1; }
+                            .b6-wc-title {
+                                font-size: 32px;
+                                font-weight: 700;
+                                color: #065f46;
+                                margin-bottom: 20px;
+                            }
+                            .b6-wc-unit-img {
+                                width: 200px;
+                                height: 200px;
+                                object-fit: contain;
+                                border-radius: 16px;
+                            }
+                        </style>
+                        <div class="b6-wc-container">
+                            <div class="b6-wc-box">
+                                <div class="b6-wc-icon">${mkt.icon}</div>
+                                <h1 class="b6-wc-title">歡迎來到${mkt.name}！</h1>
+                                <img src="../images/icon-index-b6.png" alt="菜市場買菜"
+                                     class="b6-wc-unit-img"
+                                     onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+
+                    Game.Speech.speak(`歡迎來到${mkt.name}！`, () => {
+                        Game.TimerManager.setTimeout(() => {
+                            currentPage = 2;
+                            renderPage(2);
+                        }, 500, 'screenTransition');
+                    });
+
+                } else if (page === 2) {
+                    // ── 第2頁：預算顯示 + 採購任務 ──────────────────────
+                    const denomMap = {
+                        easy:   [100, 50, 10, 5, 1],
+                        normal: [500, 100, 50, 10, 5, 1],
+                        hard:   [1000, 500, 100, 50, 10, 5, 1]
+                    };
+                    const denoms    = denomMap[s.difficulty] || denomMap.easy;
+                    const budgetCoins = [];
+                    let rem = mission.budget;
+                    for (const d of denoms) { while (rem >= d) { budgetCoins.push(d); rem -= d; } }
+
+                    const budgetIconsHtml = budgetCoins.map(d => {
+                        const isBill = d >= 100;
+                        const face   = Math.random() < 0.5 ? 'back' : 'front';
+                        return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                            style="width:${isBill ? '72px' : '44px'};height:${isBill ? 'auto' : '44px'};object-fit:contain;"
+                            onerror="this.style.display='none'">`;
+                    }).join('');
+
+                    const stallsHTML = (mission.stalls || []).map(({ stall, count }) => {
+                        const stallInfo = _currentStalls[stall];
+                        if (!stallInfo) return '';
+                        return `<div class="b6-wc2-stall">${stallInfo.icon} ${stallInfo.name} <strong>× ${count}</strong> 樣</div>`;
+                    }).filter(Boolean).join('');
+                    const stallsSpeech = (mission.stalls || []).map(({ stall, count }) => {
+                        const stallInfo = _currentStalls[stall];
+                        return stallInfo ? `${stallInfo.name}買${toCountSpeech(count)}樣` : '';
+                    }).filter(Boolean).join('，');
+
+                    app.innerHTML = `
+                        <style>
+                            .b6-wc-container {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+                                padding: 20px;
+                            }
+                            .b6-wc2-box {
+                                background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                                border: 3px solid #86efac;
+                                border-radius: 24px;
+                                padding: 40px 50px;
+                                text-align: center;
+                                max-width: 600px;
+                                width: 100%;
+                            }
+                            .b6-wc2-label {
+                                font-size: 22px;
+                                font-weight: 600;
+                                color: #065f46;
+                                margin-bottom: 6px;
+                            }
+                            .b6-wc2-budget {
+                                font-size: 44px;
+                                font-weight: 800;
+                                color: #d97706;
+                                margin-bottom: 16px;
+                            }
+                            .b6-wc2-icons {
+                                display: flex;
+                                flex-wrap: wrap;
+                                justify-content: center;
+                                gap: 6px;
+                                margin-bottom: 24px;
+                            }
+                            .b6-wc2-divider {
+                                border: none;
+                                border-top: 2px dashed #86efac;
+                                margin: 0 0 20px;
+                            }
+                            .b6-wc2-stalls-label {
+                                font-size: 18px;
+                                font-weight: 600;
+                                color: #065f46;
+                                margin-bottom: 12px;
+                            }
+                            .b6-wc2-stalls {
+                                display: flex;
+                                flex-wrap: wrap;
+                                justify-content: center;
+                                gap: 10px;
+                                margin-bottom: 28px;
+                            }
+                            .b6-wc2-stall {
+                                background: rgba(255,255,255,0.7);
+                                border: 2px solid #86efac;
+                                border-radius: 12px;
+                                padding: 8px 18px;
+                                font-size: 17px;
+                                color: #065f46;
+                            }
+                            .b6-wc2-start-btn {
+                                background: linear-gradient(135deg, #10b981, #059669);
+                                color: #fff;
+                                border: none;
+                                border-radius: 16px;
+                                padding: 14px 40px;
+                                font-size: 20px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+                                transition: transform 0.15s, box-shadow 0.15s;
+                            }
+                            .b6-wc2-start-btn:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 6px 18px rgba(16,185,129,0.5);
+                            }
+                        </style>
+                        <div class="b6-wc-container">
+                            <div class="b6-wc2-box">
+                                <div class="b6-wc2-label">💰 今日預算</div>
+                                <div class="b6-wc2-budget">${mission.budget} 元</div>
+                                <div class="b6-wc2-icons">${budgetIconsHtml}</div>
+                                <hr class="b6-wc2-divider">
+                                <div class="b6-wc2-stalls-label">🛒 採購任務</div>
+                                <div class="b6-wc2-stalls">${stallsHTML}</div>
+                                <button class="b6-wc2-start-btn" id="b6-wc2-start-btn">開始購物 🛍️</button>
+                            </div>
+                        </div>`;
+
+                    // 播放完整語音：今日預算XX元，攤位需求
+                    Game.Speech.speak(`今日預算${mission.budget}元，${stallsSpeech}`);
+
+                    // 綁定「開始購物」按鈕：點擊後播語音再進入遊戲
+                    const startBtn = document.getElementById('b6-wc2-start-btn');
+                    if (startBtn) {
+                        Game.EventManager.on(startBtn, 'click', () => {
+                            window.speechSynthesis.cancel();
+                            Game.Speech.speak('開始購物', () => {
+                                g._skipIntroModal = true;
+                                this.renderRound();
+                            });
+                        }, {}, 'welcome');
+                    }
+                }
+            };
+
+            renderPage(1);
+
+            // 輔助點擊模式：啟動 overlay（buildQueue 會自動偵測 b6-wc2-start-btn）
+            if (s.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
+            }
         },
 
         _pickMissions(count, diff) {
@@ -818,13 +1039,20 @@ document.addEventListener('DOMContentLoaded', () => {
             g.p1HintItems = [];     // [{stall, id}] 提示建議商品
 
             this._renderShoppingUI();
-            this._showMissionIntroModal(g.mission, g.currentRound + 1, () => {
-                // afterClose callback：播放「開始購物」語音，簡單模式啟動提示高亮
-                Game.Speech.speak('開始購物');
+            if (g._skipIntroModal) {
+                // 從歡迎畫面進入，略過彈窗，直接觸發後續邏輯
+                g._skipIntroModal = false;
                 if (this.state.settings.difficulty === 'easy') {
                     this._b6P1ActivateHintMode();
                 }
-            });
+            } else {
+                this._showMissionIntroModal(g.mission, g.currentRound + 1, () => {
+                    Game.Speech.speak('開始購物');
+                    if (this.state.settings.difficulty === 'easy') {
+                        this._b6P1ActivateHintMode();
+                    }
+                });
+            }
 
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
@@ -3387,6 +3615,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildQueue() {
             if (!this._enabled) return;
+            // 歡迎畫面第2頁：點「開始購物」按鈕
+            const wcStartBtn = document.getElementById('b6-wc2-start-btn');
+            if (wcStartBtn) {
+                this._highlight(wcStartBtn);
+                this._queue = [{ el: wcStartBtn, action: () => wcStartBtn.click() }];
+                return;
+            }
             // Wait for round complete card to dismiss
             if (document.getElementById('b6-round-complete')) return;
             // intro modal：優先點底部「關閉」鈕，fallback 為右上角 ✕
