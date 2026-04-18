@@ -403,12 +403,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row b-settings-title-row">
-                        <h1>單元B5：生日派對預算</h1>
+                    <div class="settings-title-row">
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
+                        <h1>單元B5：生日派對預算</h1>
                     </div>
                     <div class="game-settings">
+                        <div class="b-setting-group">
+                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
+                                🔒 紫色商品為必買；在預算內選購商品辦派對<br>
+                                簡單：預算寬裕；困難：需要精算才不超支
+                            </label>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">難度：</label>
                             <div class="b-btn-group" id="diff-group">
@@ -439,34 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">關卡數：</label>
-                            <div class="b-btn-group" id="rounds-group">
-                                <button class="b-sel-btn" data-val="1">1關</button>
-                                <button class="b-sel-btn" data-val="3">3關</button>
-                                <button class="b-sel-btn" data-val="5">5關</button>
-                                <button class="b-sel-btn" data-val="8">8關</button>
-                                <button class="b-sel-btn" id="b5-custom-rounds-btn">自訂選項</button>
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
-                            <label class="b-setting-label">📝 作業單：</label>
-                            <div class="b-btn-group">
-                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
-                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                                    產生作業單
-                                </a>
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
-                            <label class="b-setting-label">🎁 獎勵系統：</label>
-                            <div class="b-btn-group">
-                                <a href="#" id="settings-reward-link" class="b-sel-btn active"
-                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                                    開啟獎勵系統
-                                </a>
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label class="b-setting-label">🎪 派對主題</label>
                             <div class="b-btn-group" id="theme-group">
                                 <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
@@ -479,10 +457,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
-                                🔒 紫色商品為必買；在預算內選購商品辦派對<br>
-                                簡單：預算寬裕；困難：需要精算才不超支
-                            </label>
+                            <label class="b-setting-label">關卡數：</label>
+                            <div class="b-btn-group" id="rounds-group">
+                                <button class="b-sel-btn" data-val="1">1關</button>
+                                <button class="b-sel-btn" data-val="3">3關</button>
+                                <button class="b-sel-btn" data-val="5">5關</button>
+                                <button class="b-sel-btn" data-val="8">8關</button>
+                                <button class="b-sel-btn" id="b5-custom-rounds-btn">自訂選項</button>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">🎁 獎勵系統：</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-reward-link" class="b-sel-btn active"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    開啟獎勵系統
+                                </a>
+                            </div>
+                        </div>
+                        <div class="b-setting-group">
+                            <label class="b-setting-label">📝 作業單：</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    產生作業單
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="game-buttons">

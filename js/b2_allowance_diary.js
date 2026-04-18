@@ -547,12 +547,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row b-settings-title-row">
-                        <h1>單元B2：零用錢日記</h1>
+                    <div class="settings-title-row">
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
+                        <h1>單元B2：零用錢日記</h1>
                     </div>
                     <div class="game-settings">
+                        <div class="b-setting-group">
+                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
+                                ✨ 看每週的收入和支出，計算最後剩下多少錢<br>
+                                簡單：2個事件，點擊/拖曳；普通：4個事件，選擇題；困難：5個事件，數字輸入
+                            </label>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">難度：</label>
                             <div class="b-btn-group" id="diff-group">
@@ -573,17 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">題數：</label>
-                            <div class="b-btn-group" id="count-group">
-                                <button class="b-sel-btn" data-val="1">1題</button>
-                                <button class="b-sel-btn" data-val="5">5題</button>
-                                <button class="b-sel-btn" data-val="10">10題</button>
-                                <button class="b-sel-btn" data-val="15">15題</button>
-                                <button class="b-sel-btn" data-val="20">20題</button>
-                                <button class="b-sel-btn" id="b2-custom-count-btn">自訂選項</button>
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label class="b-setting-label">📓 日記主題：</label>
                             <div class="b-btn-group" id="theme-group">
                                 <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
@@ -601,12 +596,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">📝 作業單：</label>
-                            <div class="b-btn-group">
-                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
-                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                                    產生作業單
-                                </a>
+                            <label class="b-setting-label">題數：</label>
+                            <div class="b-btn-group" id="count-group">
+                                <button class="b-sel-btn" data-val="1">1題</button>
+                                <button class="b-sel-btn" data-val="5">5題</button>
+                                <button class="b-sel-btn" data-val="10">10題</button>
+                                <button class="b-sel-btn" data-val="15">15題</button>
+                                <button class="b-sel-btn" data-val="20">20題</button>
+                                <button class="b-sel-btn" id="b2-custom-count-btn">自訂選項</button>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -619,10 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
-                                ✨ 看每週的收入和支出，計算最後剩下多少錢<br>
-                                簡單：2個事件，點擊/拖曳；普通：4個事件，選擇題；困難：5個事件，數字輸入
-                            </label>
+                            <label class="b-setting-label">📝 作業單：</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    產生作業單
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="game-buttons">

@@ -322,12 +322,18 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="unit-welcome">
                 <div class="welcome-content">
-                    <div class="settings-title-row b-settings-title-row">
-                        <h1>單元B1：今天帶多少錢</h1>
+                    <div class="settings-title-row">
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
+                        <h1>單元B1：今天帶多少錢</h1>
                     </div>
                     <div class="game-settings">
+                        <div class="b-setting-group">
+                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
+                                ✨ 看行程清單，準備好正確的錢幣，出發！<br>
+                                簡單：2項費用；普通：3項費用；困難：3~4項費用，需自行加總
+                            </label>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">🎯 難度選擇</label>
                             <div class="b-btn-group">
@@ -383,15 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">📝 作業單</label>
-                            <div class="b-btn-group">
-                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
-                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                                    產生作業單
-                                </a>
-                            </div>
-                        </div>
-                        <div class="b-setting-group">
                             <label class="b-setting-label">🎁 獎勵系統</label>
                             <div class="b-btn-group">
                                 <a href="#" id="settings-reward-link" class="b-sel-btn active"
@@ -401,10 +398,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
-                                ✨ 看行程清單，準備好正確的錢幣，出發！<br>
-                                簡單：2項費用；普通：3項費用；困難：3~4項費用，需自行加總
-                            </label>
+                            <label class="b-setting-label">📝 作業單</label>
+                            <div class="b-btn-group">
+                                <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
+                                   style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                                    產生作業單
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="game-buttons">

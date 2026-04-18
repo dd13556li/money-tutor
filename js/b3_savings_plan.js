@@ -320,12 +320,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
     <div class="unit-welcome">
         <div class="welcome-content">
-            <div class="settings-title-row b-settings-title-row">
-                <h1>單元B3：存錢計畫</h1>
+            <div class="settings-title-row">
                 <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                      class="settings-mascot-img" onerror="this.style.display='none'">
+                <h1>單元B3：存錢計畫</h1>
             </div>
             <div class="game-settings">
+                <div class="b-setting-group">
+                    <label style="font-size:13px;color:#6b7280;text-align:left;display:block;">
+                        ✨ 設定存錢目標，每天累積存款，達成夢想！<br>
+                        簡單：固定每日存款；普通：選擇存款天數與金額；困難：金額每天隨機變動
+                    </label>
+                </div>
                 <div class="b-setting-group">
                     <label class="b-setting-label">🎯 難度選擇：</label>
                     <div class="b-btn-group" id="diff-group">
@@ -450,20 +456,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b3-hard-settings b3-days-preview" id="b3-h-days-preview" style="display:none;"></div>
 
                 <div class="b-setting-group">
-                    <label class="b-setting-label">📝 作業單：</label>
-                    <div class="b-btn-group">
-                        <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
-                           style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
-                            產生作業單
-                        </a>
-                    </div>
-                </div>
-                <div class="b-setting-group">
                     <label class="b-setting-label">🎁 獎勵系統：</label>
                     <div class="b-btn-group">
                         <a href="#" id="settings-reward-link" class="b-sel-btn active"
                            style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
                             開啟獎勵系統
+                        </a>
+                    </div>
+                </div>
+                <div class="b-setting-group">
+                    <label class="b-setting-label">📝 作業單：</label>
+                    <div class="b-btn-group">
+                        <a href="#" id="settings-worksheet-link" class="b-sel-btn active"
+                           style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+                            產生作業單
                         </a>
                     </div>
                 </div>
