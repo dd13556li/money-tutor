@@ -655,7 +655,194 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
 
-            this.renderRound();
+            this.showWelcomeScreen();
+        },
+
+        // ── 歡迎畫面（B6 showWelcomeScreen pattern：2頁式，設定後先顯示再進遊戲）─
+        showWelcomeScreen() {
+            const app = document.getElementById('app');
+            const g   = this.state.game;
+            const s   = this.state.settings;
+
+            // 取得第一關情境及主題資料
+            const scenario        = g.scenarios[0];
+            const effectiveThemeKey = scenario._themeKey || s.partyTheme;
+            const themeData       = B5_THEMES[effectiveThemeKey] || B5_THEMES.birthday;
+            const items = scenario.availableIds
+                .map(id => themeData.allItems.find(i => i.id === id)).filter(Boolean);
+
+            let currentPage = 1;
+
+            const renderPage = (page) => {
+                if (page === 1) {
+                    // ── 第1頁：派對主題歡迎 ──────────────────────────────────
+                    app.innerHTML = `
+                        <style>
+                            .b5-wc-container {
+                                display:flex;flex-direction:column;justify-content:center;
+                                align-items:center;min-height:100vh;
+                                background:linear-gradient(135deg,#ede9fe 0%,#c4b5fd 100%);
+                                padding:20px;
+                            }
+                            .b5-wc-box {
+                                background:linear-gradient(135deg,#faf5ff 0%,#ede9fe 100%);
+                                border:3px solid #a78bfa;border-radius:24px;
+                                padding:50px 60px;text-align:center;
+                                max-width:560px;width:100%;
+                            }
+                            .b5-wc-icon { font-size:80px;margin-bottom:16px;line-height:1; }
+                            .b5-wc-title {
+                                font-size:30px;font-weight:800;color:#4c1d95;
+                                margin-bottom:8px;
+                            }
+                            .b5-wc-sub {
+                                font-size:17px;color:#6d28d9;margin-bottom:24px;
+                            }
+                            .b5-wc-unit-img {
+                                width:180px;height:180px;object-fit:contain;
+                                border-radius:16px;
+                            }
+                            @media(max-width:480px){
+                                .b5-wc-box{padding:32px 20px;}
+                                .b5-wc-icon{font-size:60px;}
+                                .b5-wc-title{font-size:22px;}
+                                .b5-wc-unit-img{width:130px;height:130px;}
+                            }
+                        </style>
+                        <div class="b5-wc-container">
+                            <div class="b5-wc-box">
+                                <div class="b5-wc-icon">${themeData.icon}</div>
+                                <h1 class="b5-wc-title">今天要舉辦${themeData.name}！</h1>
+                                <p class="b5-wc-sub">讓我們一起規劃派對預算吧！</p>
+                                <img src="../images/index/icon-index-b5.png" alt="生日派對預算"
+                                     class="b5-wc-unit-img" onerror="this.style.display='none'">
+                            </div>
+                        </div>`;
+
+                    Game.Speech.speak(`今天要舉辦${themeData.name}，讓我們一起規劃派對預算吧！`, () => {
+                        Game.TimerManager.setTimeout(() => { currentPage = 2; renderPage(2); }, 500, 'screenTransition');
+                    });
+
+                } else if (page === 2) {
+                    // ── 第2頁：預算 + 商品預覽 + 開始按鈕 ──────────────────
+                    const denomMap = {
+                        easy:   [100, 50, 10, 5, 1],
+                        normal: [500, 100, 50, 10, 5, 1],
+                        hard:   [1000, 500, 100, 50, 10, 5, 1]
+                    };
+                    const denoms = denomMap[s.difficulty] || denomMap.easy;
+                    const budgetCoins = [];
+                    let rem = scenario.budget;
+                    for (const d of denoms) { while (rem >= d) { budgetCoins.push(d); rem -= d; } }
+                    const budgetIconsHtml = budgetCoins.map(d => {
+                        const isBill = d >= 100;
+                        const face   = Math.random() < 0.5 ? 'back' : 'front';
+                        return `<img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                            style="width:${isBill ? '72px' : '44px'};height:${isBill ? 'auto' : '44px'};
+                            object-fit:contain;" onerror="this.style.display='none'">`;
+                    }).join('');
+
+                    const showItems = items.slice(0, 9);
+                    const extra = items.length - showItems.length;
+                    const itemIconsHtml = showItems.map(i =>
+                        `<span class="b5-wc2-item-icon" title="${i.name}">${i.icon}</span>`
+                    ).join('') + (extra > 0 ? `<span class="b5-wc2-item-more">+${extra}</span>` : '');
+
+                    app.innerHTML = `
+                        <style>
+                            .b5-wc-container {
+                                display:flex;flex-direction:column;justify-content:center;
+                                align-items:center;min-height:100vh;
+                                background:linear-gradient(135deg,#ede9fe 0%,#c4b5fd 100%);
+                                padding:20px;
+                            }
+                            .b5-wc2-box {
+                                background:linear-gradient(135deg,#faf5ff 0%,#ede9fe 100%);
+                                border:3px solid #a78bfa;border-radius:24px;
+                                padding:40px 50px;text-align:center;
+                                max-width:600px;width:100%;
+                            }
+                            .b5-wc2-label {
+                                font-size:22px;font-weight:700;color:#4c1d95;margin-bottom:6px;
+                            }
+                            .b5-wc2-budget {
+                                font-size:44px;font-weight:800;color:#d97706;margin-bottom:16px;
+                            }
+                            .b5-wc2-icons {
+                                display:flex;flex-wrap:wrap;justify-content:center;
+                                gap:6px;margin-bottom:24px;
+                            }
+                            .b5-wc2-divider {
+                                border:none;border-top:2px dashed #a78bfa;margin:0 0 20px;
+                            }
+                            .b5-wc2-stalls-label {
+                                font-size:18px;font-weight:700;color:#4c1d95;margin-bottom:12px;
+                            }
+                            .b5-wc2-items {
+                                display:flex;flex-wrap:wrap;justify-content:center;
+                                gap:8px;margin-bottom:28px;
+                            }
+                            .b5-wc2-item-icon {
+                                font-size:28px;background:rgba(255,255,255,0.7);
+                                border:2px solid #c4b5fd;border-radius:12px;
+                                padding:8px 10px;
+                            }
+                            .b5-wc2-item-more {
+                                font-size:18px;font-weight:700;color:#6d28d9;
+                                background:rgba(255,255,255,0.7);border:2px solid #c4b5fd;
+                                border-radius:12px;padding:8px 14px;align-self:center;
+                            }
+                            .b5-wc2-start-btn {
+                                background:linear-gradient(135deg,#7c3aed,#6d28d9);
+                                color:#fff;border:none;border-radius:16px;
+                                padding:14px 40px;font-size:20px;font-weight:700;
+                                cursor:pointer;
+                                box-shadow:0 4px 12px rgba(124,58,237,0.4);
+                                transition:transform 0.15s,box-shadow 0.15s;
+                            }
+                            .b5-wc2-start-btn:hover {
+                                transform:translateY(-2px);
+                                box-shadow:0 6px 18px rgba(124,58,237,0.5);
+                            }
+                            @media(max-width:480px){
+                                .b5-wc2-box{padding:28px 16px;}
+                                .b5-wc2-budget{font-size:34px;}
+                                .b5-wc2-item-icon{font-size:22px;padding:6px 8px;}
+                                .b5-wc2-start-btn{font-size:17px;padding:12px 28px;}
+                            }
+                        </style>
+                        <div class="b5-wc-container">
+                            <div class="b5-wc2-box">
+                                <div class="b5-wc2-label">💰 本關預算</div>
+                                <div class="b5-wc2-budget">${scenario.budget} 元</div>
+                                <div class="b5-wc2-icons">${budgetIconsHtml}</div>
+                                <hr class="b5-wc2-divider">
+                                <div class="b5-wc2-stalls-label">🎪 派對商品（共 ${items.length} 件）</div>
+                                <div class="b5-wc2-items">${itemIconsHtml}</div>
+                                <button class="b5-wc2-start-btn" id="b5-wc2-start-btn">開始挑選！ 🎉</button>
+                            </div>
+                        </div>`;
+
+                    Game.Speech.speak(`本關預算${scenario.budget}元，從${items.length}個商品中選購，在預算內就可以！`);
+
+                    const startBtn = document.getElementById('b5-wc2-start-btn');
+                    if (startBtn) {
+                        Game.EventManager.on(startBtn, 'click', () => {
+                            window.speechSynthesis.cancel();
+                            Game.Speech.speak('開始挑選！', () => {
+                                g._skipIntroModal = true;
+                                this.renderRound();
+                            });
+                        }, {}, 'welcome');
+                    }
+                }
+            };
+
+            renderPage(1);
+
+            if (s.clickMode === 'on') {
+                Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
+            }
         },
 
         _pickScenarios(count, diff) {
@@ -719,13 +906,21 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = this._renderRoundHTML();
             this._bindRoundEvents();
             this._updateTotalBar();
-            this._showRoundIntroCard(g.currentRound + 1, scenario.budget, () => {
-                // afterClose callback（B1 pattern）：關卡介紹語音結束後，easy 模式逐項朗讀必買商品
+            if (g._skipIntroModal) {
+                g._skipIntroModal = false;
                 if (this.state.settings.difficulty === 'easy') {
                     Game.TimerManager.setTimeout(() => this._speakMustItemsOneByOne(), 200, 'speech');
                     this._b5P1ActivateHintMode();
                 }
-            });
+            } else {
+                this._showRoundIntroCard(g.currentRound + 1, scenario.budget, () => {
+                    // afterClose callback（B1 pattern）：關卡介紹語音結束後，easy 模式逐項朗讀必買商品
+                    if (this.state.settings.difficulty === 'easy') {
+                        Game.TimerManager.setTimeout(() => this._speakMustItemsOneByOne(), 200, 'speech');
+                        this._b5P1ActivateHintMode();
+                    }
+                });
+            }
 
             if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
@@ -3152,6 +3347,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const g = Game.state.game;
             if (!g) return;
+
+            // 歡迎畫面第2頁：偵測「開始挑選！」按鈕
+            const wcStartBtn = document.getElementById('b5-wc2-start-btn');
+            if (wcStartBtn) {
+                this._highlight(wcStartBtn);
+                this._queue = [{ el: wcStartBtn, action: () => wcStartBtn.click() }];
+                return;
+            }
 
             // Phase 2 找零階段（b5c）
             if (document.getElementById('b5c-wallet-zone')) {
