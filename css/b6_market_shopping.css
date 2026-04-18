@@ -1335,7 +1335,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    min-height: 64px;
+    min-height: 104px;
     align-items: center;
     justify-content: center;
     padding: 8px 12px;
@@ -1642,7 +1642,7 @@
 }
 /* 任務卡左側吉祥物（已移至右側，改用 .b6-task-hdr-right img） */
 .b6-task-mascot {
-    height: 48px;
+    height: 72px;
     width: auto;
     flex-shrink: 0;
     object-fit: contain;
@@ -1804,14 +1804,14 @@
     gap: 4px;
 }
 .b6-task-budget {
-    font-size: 13px;
+    font-size: 18px;
     color: #374151;
     text-align: center;
 }
 .b6-task-budget strong {
-    font-size: 15px;
+    font-size: 22px;
     color: #d97706;
-    font-weight: 800;
+    font-weight: 900;
 }
 
 /* 任務清單項目（覆蓋舊 .b6-list-card 的 border-bottom 細節） */
@@ -1972,7 +1972,7 @@
 }
 
 @media (max-width: 480px) {
-    .b6-task-mascot  { width: 36px; height: 36px; }
+    .b6-task-mascot  { width: 48px; height: 48px; }
     .b6-task-title   { font-size: 14px; }
     .b6-cstrip-total .b6-basket-total { font-size: 15px; }
     .b6-checkout-strip .b6-checkout-btn { padding: 8px 14px; font-size: 14px; }

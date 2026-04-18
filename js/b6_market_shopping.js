@@ -2267,11 +2267,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b6p2-payment-header">
                 <div class="b6p2-wallet-coins-label">需要付款 <span class="b6p2-wallet-need">${total} 元</span></div>
-                <div class="b6p2-progress-wrap">
-                    <div class="b6p2-progress" id="b6p2-progress">
-                        <div class="b6p2-progress-fill" id="b6p2-progress-fill"></div>
-                    </div>
-                </div>
             </div>
             <div class="b6p2-wallet-area" id="b6p2-wallet-area">
                 <div class="b6p2-my-money-label">💳 付款區 <span class="b6p2-pay-status">已付 <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span> / ${total} 元</span></div>
@@ -2612,12 +2607,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalEl.textContent = total + ' 元';
                 totalEl.className = 'b6p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
             }
-            const fillEl = document.getElementById('b6p2-progress-fill');
-            if (fillEl && req > 0) {
-                const pct = Math.min(Math.round(total / req * 100), 100);
-                fillEl.style.width = pct + '%';
-                fillEl.className = 'b6p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
-            }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
                 confirmBtn.disabled = !btnOk;
@@ -2637,12 +2626,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (totalEl) {
                 totalEl.textContent = total + ' 元';
                 totalEl.className = 'b6p2-wallet-total-val' + (enough ? ' enough' : total > 0 ? ' not-enough' : '');
-            }
-            const fillEl = document.getElementById('b6p2-progress-fill');
-            if (fillEl && req > 0) {
-                const pct = Math.min(Math.round(total / req * 100), 100);
-                fillEl.style.width = pct + '%';
-                fillEl.className = 'b6p2-progress-fill' + (enough ? ' full' : pct >= 70 ? ' near' : '');
             }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
@@ -2917,11 +2900,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         💼 我的錢包
                         <span class="b6c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b6c-wallet-info"><span id="b6c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b6c-placed-total">0</span>/${change} 元）</span>
                     </div>
-                    <div class="b6p2-progress-wrap">
-                        <div class="b6p2-progress">
-                            <div class="b6c-progress-fill" id="b6c-progress-fill"></div>
-                        </div>
-                    </div>
                     <div class="b6c-wallet-split">
                         <div class="b6c-wallet-split-left">
                             ${walletStaticHtml || '<span class="b6p2-wallet-empty" style="font-size:12px;">（餘額為0）</span>'}
@@ -3142,8 +3120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const placedTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
             const pct    = change > 0 ? Math.min(Math.round(placedTotal / change * 100), 100) : 0;
             const exact  = placedTotal === change;
-            const fillEl  = document.getElementById('b6c-progress-fill');
-            if (fillEl)  { fillEl.style.width = pct + '%'; fillEl.className = 'b6c-progress-fill' + (pct >= 100 ? ' full' : ''); }
             // 已找回進度（整合至錢包標題，hard 模式隱藏但仍更新數值）
             const totalEl = document.getElementById('b6c-placed-total');
             if (totalEl) totalEl.textContent = placedTotal;
