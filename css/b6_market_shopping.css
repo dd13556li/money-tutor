@@ -1753,10 +1753,22 @@
     padding: 8px 12px;
     font-size: 14px;
 }
+.b6-p1hh-stall-name { font-size: 13px; color: #6b7280; white-space: nowrap; flex-shrink: 0; }
 .b6-p1hh-icon  { font-size: 22px; flex-shrink: 0; }
 .b6-p1hh-name  { flex: 1; font-weight: 700; color: #1f2937; }
-.b6-p1hh-stall { font-size: 12px; color: #6b7280; }
 .b6-p1hh-price { font-weight: 800; color: #d97706; white-space: nowrap; }
+.b6-p1hh-speak-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background 0.15s;
+}
+.b6-p1hh-speak-btn:hover { background: #fef3c7; }
 .b6-p1hh-total {
     text-align: center;
     font-size: 14px;
@@ -1779,7 +1791,7 @@
 }
 .b6-p1hh-close-btn:hover { opacity: 0.88; }
 /* 已選擇的提示商品：淡化＋徽章 */
-.b6-p1hh-item-done { opacity: 0.45; }
+.b6-p1hh-item-done { opacity: 0.6; background: #f0fdf4; border-radius: 8px; }
 .b6-p1hh-done-badge {
     font-size: 11px; font-weight: 800; color: #059669;
     background: #d1fae5; border-radius: 8px; padding: 2px 6px;

@@ -1182,12 +1182,15 @@ document.addEventListener('DOMContentLoaded', () => {
         _b6P1ShowHint() {
             const g    = this.state.game;
             const diff = this.state.settings.difficulty;
-            // 先重置所有已選商品（全模式統一）
+            if (diff === 'hard') {
+                // 困難模式：不重置已選商品，直接顯示建議彈窗
+                this._b6P1ShowHardHintModal();
+                return;
+            }
+            // 簡單/普通模式：重置已選商品後啟動提示模式
             g.selectedItems = [];
             this._updateShoppingUIPartial();
-            // 依難度顯示提示
-            if (diff === 'hard') { this._b6P1ShowHardHintModal(); return; }
-            this._b6P1ActivateHintMode();  // easy + normal
+            this._b6P1ActivateHintMode();
         },
 
         // ── 貪婪法生成建議購買清單 ───────────────────────────
@@ -1248,28 +1251,29 @@ document.addEventListener('DOMContentLoaded', () => {
             this._b6P1UpdateHintHighlights();
         },
 
-        // ── 困難模式提示彈窗（顯示建議清單，selectedItems 已由呼叫方重置）──
+        // ── 困難模式提示彈窗（顯示建議清單，不重置已選、不限制自由選購）──
         _b6P1ShowHardHintModal() {
             const g = this.state.game;
-            // 生成建議清單（selectedItems 已在 _b6P1ShowHint 中重置）
             const newHintItems = this._b6P1GenerateHintItems();
             g.p1HintItems = newHintItems;
 
             const existing = document.getElementById('b6-p1-hard-hint-overlay');
             if (existing) existing.remove();
 
-            // 建立彈窗 HTML（已被選擇的商品顯示淡化＋標記）
+            // 每列格式：「攤位名 icon 商品名 價格」+ 已選標記 + 🔊 按鈕
             const itemsHTML = newHintItems.map(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (!item) return '';
                 const stallInfo = _currentStalls[stall];
                 const alreadySel = (g.selectedItems || []).some(si => si.stall === stall && si.id === id);
+                const speechText = `${stallInfo?.name || ''}，${item.name}，${item.price}元`;
                 return `<div class="b6-p1hh-item${alreadySel ? ' b6-p1hh-item-done' : ''}">
+                    <span class="b6-p1hh-stall-name">${stallInfo?.name || ''}</span>
                     <span class="b6-p1hh-icon">${item.icon}</span>
                     <span class="b6-p1hh-name">${item.name}</span>
-                    <span class="b6-p1hh-stall">${stallInfo?.name || ''}</span>
                     <span class="b6-p1hh-price">${item.price} 元</span>
-                    ${alreadySel ? '<span class="b6-p1hh-done-badge">✅ 已選擇</span>' : ''}
+                    ${alreadySel ? '<span class="b6-p1hh-done-badge">✅ 已選</span>' : ''}
+                    <button class="b6-p1hh-speak-btn" data-speech="${speechText}" title="播放語音">🔊</button>
                 </div>`;
             }).join('');
 
@@ -1284,36 +1288,29 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = `
                 <div class="b6-p1hh-modal">
                     <div class="b6-p1hh-header">💡 購物建議清單</div>
-                    <div class="b6-p1hh-subtext">以下是一組符合預算的購買方案，請按照提示選購。</div>
+                    <div class="b6-p1hh-subtext">以下是一組符合預算的購買參考方案。</div>
                     <div class="b6-p1hh-list">${itemsHTML}</div>
                     <div class="b6-p1hh-total">合計：<strong>${totalSuggested}</strong> 元（預算 ${g.mission.budget} 元）</div>
                     <button class="b6-p1hh-close-btn" id="b6-p1hh-close">我知道了，開始購物</button>
                 </div>`;
             document.body.appendChild(overlay);
 
-            // 語音說明（跳過已選項）
-            const needSpeech = newHintItems.filter(h =>
-                !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
-            ).map(({ stall, id }) => {
-                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
-                const stallInfo = _currentStalls[stall];
-                return item ? `${stallInfo?.name || ''}的${item.name}${item.price}元` : '';
-            }).filter(Boolean);
-            if (needSpeech.length > 0) {
-                Game.Speech.speak(`建議購買：${needSpeech.join('，')}`);
-            } else {
-                Game.Speech.speak('所有建議商品都已選擇，可以結帳了！');
-            }
+            // 🔊 按鈕：點按播放語音（不自動播）
+            overlay.querySelectorAll('.b6-p1hh-speak-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    Game.Speech.speak(btn.dataset.speech || '');
+                });
+            });
 
-            // 關閉後啟動提示模式（困難模式不顯示「點這裡」，只設旗標）
+            // 關閉：不設 p1HintMode，困難模式保持自由選購
             const closeBtn = document.getElementById('b6-p1hh-close');
             const dismiss = () => {
+                window.speechSynthesis.cancel();
                 overlay.remove();
-                g.p1HintMode = true;
-                // 困難模式不呼叫 _b6P1UpdateHintHighlights（不顯示卡片高亮）
             };
             if (closeBtn) closeBtn.addEventListener('click', dismiss, { once: true });
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+            overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
         },
 
         // ── 連勝徽章（B3 streak pattern）─────────────────────
@@ -1768,8 +1765,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    // 提示模式守衛：點了非建議商品則報錯
-                    if (g.p1HintMode) {
+                    // 提示模式守衛：easy/normal 限制只能選建議商品；困難模式自由選購
+                    if (g.p1HintMode && diff !== 'hard') {
                         const isHintItem = (g.p1HintItems || []).some(h => h.stall === stall && h.id === itemId);
                         if (!isHintItem) {
                             this.audio.play('error');
