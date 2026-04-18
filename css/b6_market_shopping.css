@@ -2417,36 +2417,53 @@
 }
 
 /* ── 商品按鈕新狀態 ── */
+
+/* 已選擇：強綠色、縮放放大、明顯勾勾徽章 */
 .b6-product-btn.selected {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    border-color: #34d399;
-    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.4);
+    background: linear-gradient(135deg, #bbf7d0, #6ee7b7);
+    border: 3px solid #10b981;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.35), 0 6px 16px rgba(16,185,129,0.3);
+    transform: scale(1.04);
+    cursor: default;
 }
+.b6-product-btn.selected:hover { transform: scale(1.04); }
 
+/* 超過金額：紅色警示、灰暗圖示 */
 .b6-product-btn.over-budget {
-    background: #fef9c3;
-    border-color: #fbbf24;
-    opacity: 0.75;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border: 2px solid #ef4444;
+    opacity: 0.88;
+    cursor: not-allowed;
 }
+.b6-product-btn.over-budget:hover { transform: none; box-shadow: none; }
+.b6-product-btn.over-budget .b6-product-icon { filter: grayscale(40%); }
 
+/* 無需選擇（攤位已選滿）：灰暗、不可點 */
 .b6-product-btn.quota-full {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    opacity: 0.6;
+    background: #e5e7eb;
+    border: 2px solid #9ca3af;
+    opacity: 0.42;
+    cursor: not-allowed;
+    filter: grayscale(70%);
 }
+.b6-product-btn.quota-full:hover { transform: none; box-shadow: none; }
 
+/* 標記角標 */
 .b6-product-over-mark {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    font-size: 12px;
+    top: 3px;
+    right: 3px;
+    font-size: 16px;
+    line-height: 1;
 }
 
 .b6-product-collected-mark {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    font-size: 13px;
+    top: 3px;
+    right: 3px;
+    font-size: 18px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(16,185,129,0.5));
 }
 
 /* ── 預算顯示 ── */

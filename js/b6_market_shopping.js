@@ -1401,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b6-product-price">${item.price} 元</span>
                     <span class="b6-product-unit">/ ${item.unit}</span>
                     ${isSelected ? '<span class="b6-product-collected-mark">✅</span>' : ''}
-                    ${wouldExceed ? '<span class="b6-product-over-mark">⚠️</span>' : ''}
+                    ${wouldExceed ? '<span class="b6-product-over-mark">💸</span>' : ''}
                 </button>`;
             }).join('');
 
@@ -1596,7 +1596,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b6-product-price">${item.price} 元</span>
                         <span class="b6-product-unit">/ ${item.unit}</span>
                         ${isSelected  ? '<span class="b6-product-collected-mark">✅</span>' : ''}
-                        ${wouldExceed ? '<span class="b6-product-over-mark">⚠️</span>' : ''}
+                        ${wouldExceed ? '<span class="b6-product-over-mark">💸</span>' : ''}
                     </button>`;
                 }).join('');
                 const panelEl = document.querySelector('.b6-stall-panel');
