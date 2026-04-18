@@ -3244,14 +3244,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletZone.style.animation = 'b6p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletZone.style.animation = ''; }, 500, 'ui');
                 }
-                // 錯誤後清空找零區，讓使用者重新拖曳
-                Game.TimerManager.setTimeout(() => {
-                    g.changePlaced    = [];
-                    g.changeGhostMode = false;
-                    g.changeHintSlots = [];
-                    this._b6P2UpdateChangeDisplay(change);
-                    this._b6P2RenderWalletCoins(change);
-                }, 700, 'ui');
+                // 錯誤後立即清空找零區（同步，避免計時器競爭條件）
+                g.changePlaced    = [];
+                g.changeGhostMode = false;
+                g.changeHintSlots = [];
+                this._b6P2UpdateChangeDisplay(change);
+                this._b6P2RenderWalletCoins(change);
                 // 普通模式：3次錯誤自動顯示 ghost slots
                 if (diff === 'normal' && g.changeErrorCount >= 3) {
                     g.changeErrorCount = 0;
