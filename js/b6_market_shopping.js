@@ -2194,7 +2194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
                     <span class="b-header-unit">${mkt.icon} ${mkt.name}</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
@@ -2778,7 +2777,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.paidAmount = wTotal;
             if (change === 0) {
                 // 剛好付清：直接進入結果
-                Game.Speech.speak(`剛好${toTWD(wTotal)}，精準付款！`, () => {
+                Game.Speech.speak(`剛好${toTWD(wTotal)}，買菜成功！`, () => {
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this._showChangeResult(wTotal, 0);
@@ -3630,11 +3629,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 易/普通模式結果語音（困難模式語音已在 _showChangeQuiz 播出）
             if (this.state.settings.difficulty !== 'hard') {
-                if (change === 0) {
-                    Game.Speech.speak(`精準付款！剛好${toTWD(paid)}，不需找零，買菜成功！`);
-                } else {
-                    Game.Speech.speak(`付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);
-                }
+                Game.Speech.speak(change === 0
+                    ? `剛好${toTWD(paid)}，買菜成功！`
+                    : `付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);
             }
 
             g.correctCount++;
@@ -3767,8 +3764,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-review-wrapper">
                 <div class="b6-results-outer-card">
                     <div class="b-review-header">
-                        <div class="b-review-emoji">${change === 0 ? '💯' : '🎉'}</div>
-                        <h1 class="b-review-title">${change === 0 ? '精準付款！' : '買菜成功！'}</h1>
+                        <div class="b-review-emoji">🎉</div>
+                        <h1 class="b-review-title">買菜成功！</h1>
                         <p class="b-review-subtitle">${change === 0
                             ? `剛好 ${paid} 元，不需找零`
                             : `付了 ${paid} 元，找回 ${change} 元`}</p>
