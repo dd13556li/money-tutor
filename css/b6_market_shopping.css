@@ -2428,15 +2428,15 @@
 }
 .b6-product-btn.selected:hover { transform: scale(1.04); }
 
-/* 超過金額：紅色警示、灰暗圖示 */
+/* 超過金額：同無需選擇 */
 .b6-product-btn.over-budget {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    border: 2px solid #ef4444;
-    opacity: 0.88;
+    background: #e5e7eb;
+    border: 2px solid #9ca3af;
+    opacity: 0.42;
     cursor: not-allowed;
+    filter: grayscale(70%);
 }
 .b6-product-btn.over-budget:hover { transform: none; box-shadow: none; }
-.b6-product-btn.over-budget .b6-product-icon { filter: grayscale(40%); }
 
 /* 無需選擇（攤位已選滿）：灰暗、不可點 */
 .b6-product-btn.quota-full {
