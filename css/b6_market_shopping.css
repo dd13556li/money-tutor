@@ -1246,21 +1246,22 @@
 .b6p2-ref-total-val   { font-size: 22px; font-weight: 900; color: #047857; }
 
 /* ── 錢包區（drop zone）── */
+.b6p2-payment-header {
+    margin-bottom: 4px;
+}
 .b6p2-wallet-area {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border: 2.5px dashed #93c5fd;
+    background: #fff;
+    border: 2px solid #e5e7eb;
     border-radius: 16px;
     padding: 14px 16px;
     min-height: 120px;
-    box-shadow: inset 0 2px 8px rgba(59,130,246,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     transition: border-color 0.25s, background 0.25s;
 }
 .b6p2-wallet-area.enough {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
     border-color: #34d399;
 }
 .b6p2-wallet-area.over-budget {
-    background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
     border-color: #fca5a5;
 }
 /* "需要付款" 大標題 */
@@ -1423,6 +1424,7 @@
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     align-self: center;
     width: fit-content;
+    margin: 12px auto;
 }
 .b6c-confirm-btn-main:hover:not(:disabled) {
     transform: translateY(-3px);
@@ -2089,11 +2091,7 @@
     font-size: 22px;
     font-weight: 900;
     color: #1d4ed8;
-    margin: 8px auto 4px;
-    padding: 6px 14px;
-    background: #eff6ff;
-    border: 1.5px solid #bfdbfe;
-    border-radius: 8px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2969,7 +2967,7 @@
     color: #b45309;
     font-size: 26px;
 }
-/* 間距調整：付款區與錢包區之間 */
-.game-container > .b6p2-wallet-area {
+/* 間距調整：付款卡與錢包托盤之間 */
+.game-container > .b6p2-payment-header {
     margin-top: 4px;
 }

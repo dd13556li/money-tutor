@@ -1668,6 +1668,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const _bindProductBtns = () => {
             document.querySelectorAll('.b6-product-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
+                    if (document.getElementById('b6-mission-intro')) return;
                     const itemId = btn.dataset.itemId;
                     const stall  = btn.dataset.stall;
                     const price  = parseInt(btn.dataset.price) || 0;
@@ -2204,7 +2205,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="game-container">
                 ${this._renderB6P2RefCard(g.mission, total, mkt)}
                 ${this._renderB6P2WalletArea(total, diff)}
-                ${diff !== 'easy' ? `<button class="b6c-confirm-btn-main" id="b6-p2-confirm-btn" disabled>✅ 確認付款</button>` : ''}
+                ${diff !== 'easy' ? `<button class="b6c-confirm-btn-main" id="b6-p2-confirm-btn" disabled>確認付款</button>` : ''}
                 ${this._renderB6P2CoinTray(diff)}
             </div>`;
 
@@ -2263,13 +2264,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _renderB6P2WalletArea(total, diff) {
             return `
-            <div class="b6p2-wallet-area" id="b6p2-wallet-area">
+            <div class="b6p2-payment-header">
                 <div class="b6p2-wallet-coins-label">需要付款 <span class="b6p2-wallet-need">${total} 元</span></div>
                 <div class="b6p2-progress-wrap">
                     <div class="b6p2-progress" id="b6p2-progress">
                         <div class="b6p2-progress-fill" id="b6p2-progress-fill"></div>
                     </div>
                 </div>
+            </div>
+            <div class="b6p2-wallet-area" id="b6p2-wallet-area">
                 <div class="b6p2-my-money-label">💳 付款區 <span class="b6p2-pay-status">已付 <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span> / ${total} 元</span></div>
                 <div class="b6p2-wallet-coins b6p2-drop-zone" id="b6p2-wallet-coins">
                     <span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>
@@ -2598,8 +2601,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b6P2UpdateStatusOnly() {
             const g      = this.state.game;
+            const diff   = this.state.settings.difficulty;
             const total  = this._b6P2GetWalletTotal();
             const req    = g.p2Total;
+            const btnOk  = diff === 'hard' ? (total > 0) : (total >= req);
             const enough = total >= req;
             const totalEl = document.getElementById('b6p2-wallet-total');
             if (totalEl) {
@@ -2614,17 +2619,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
-                confirmBtn.disabled = !enough;
-                confirmBtn.classList.toggle('ready', enough);
+                confirmBtn.disabled = !btnOk;
+                confirmBtn.classList.toggle('ready', btnOk);
+                confirmBtn.textContent = btnOk ? '✅ 確認付款' : '確認付款';
             }
         },
 
         _b6P2UpdateWalletDisplay() {
             const g      = this.state.game;
+            const diff   = this.state.settings.difficulty;
             const total  = this._b6P2GetWalletTotal();
             const req    = g.p2Total;
             const enough = total >= req;
-            const diff   = this.state.settings.difficulty;
+            const btnOk  = diff === 'hard' ? (total > 0) : enough;
             const totalEl = document.getElementById('b6p2-wallet-total');
             if (totalEl) {
                 totalEl.textContent = total + ' 元';
@@ -2638,8 +2645,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const confirmBtn = document.getElementById('b6-p2-confirm-btn');
             if (confirmBtn) {
-                confirmBtn.disabled = !enough;
-                confirmBtn.classList.toggle('ready', enough);
+                confirmBtn.disabled = !btnOk;
+                confirmBtn.classList.toggle('ready', btnOk);
+                confirmBtn.textContent = btnOk ? '✅ 確認付款' : '確認付款';
             }
             const coinsEl = document.getElementById('b6p2-wallet-coins');
             if (!coinsEl) return;
@@ -2732,8 +2740,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b6P2HandleConfirm(total) {
             const g      = this.state.game;
+            const diff   = this.state.settings.difficulty;
             const wTotal = this._b6P2GetWalletTotal();
-            // 全難度統一：付款額 ≥ 應付額即正確（多付則找零）
+
+            // 普通模式：超額付款 → 退回
+            if (diff === 'normal' && wTotal > total) {
+                this.state.isProcessing = false;
+                this.audio.play('error');
+                this._showCenterFeedback('❌', '付太多了！');
+                Game.Speech.speak(`你付了太多的錢，因為只需要付${toTWD(total)}，請再試一次`);
+                Game.TimerManager.setTimeout(() => {
+                    g.p2Wallet = [];
+                    const coinsEl = document.getElementById('b6p2-wallet-coins');
+                    if (coinsEl) coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
+                    this._b6P2UpdateStatusOnly();
+                }, 700, 'ui');
+                return;
+            }
+
+            // 付款不足
             if (wTotal < total) {
                 this.state.isProcessing = false;
                 this.audio.play('error');
@@ -2745,8 +2770,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletArea.style.animation = 'b6p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
                 }
-                // 普通模式：3次付款錯誤自動提示（困難模式不自動提示）
-                if (this.state.settings.difficulty === 'normal' && g.p2ErrorCount >= 3) {
+                // 困難模式：退回金錢
+                if (diff === 'hard') {
+                    Game.TimerManager.setTimeout(() => {
+                        g.p2Wallet = [];
+                        const coinsEl = document.getElementById('b6p2-wallet-coins');
+                        if (coinsEl) coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
+                        this._b6P2UpdateStatusOnly();
+                    }, 800, 'ui');
+                }
+                // 普通模式：3次付款錯誤自動提示
+                if (diff === 'normal' && g.p2ErrorCount >= 3) {
                     g.p2ErrorCount = 0;
                     Game.TimerManager.setTimeout(() => this._showHardModeHintModal(total), 900, 'ui');
                 }
@@ -3243,6 +3277,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 找零正確
+            this.audio.play('correct');
+            this._fireConfetti();
             this._showCenterFeedback('🎉', '找零完成！');
             Game.Speech.speak(`找回${toTWD(change)}，找零完成！`, () => {
                 this.state.isProcessing = false;
