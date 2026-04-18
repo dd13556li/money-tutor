@@ -3649,29 +3649,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
-            // 付款效率（僅最終關顯示）
-            const exactCount  = g.exactPayments || 0;
-            const effRounds   = g.totalRounds || 1;
-            const effPct   = Math.round(exactCount / effRounds * 100);
-            const effLabel = effPct === 100 ? '💯 全部精準！' : effPct >= 60 ? '⭐ 表現不錯！' : '💪 繼續練習！';
-            const effHTML  = isFinalRound && exactCount > 0 ? `
-            <div class="b-review-card">
-                <h3>🎯 付款效率</h3>
-                <div class="b6-eff-row">
-                    <div class="b6-eff-ring" style="--eff-pct:${effPct}">
-                        <svg viewBox="0 0 36 36" class="b6-eff-svg">
-                            <circle class="b6-eff-bg" cx="18" cy="18" r="15.9"/>
-                            <circle class="b6-eff-fill" cx="18" cy="18" r="15.9"
-                                stroke-dasharray="${effPct} ${100 - effPct}" stroke-dashoffset="25"/>
-                        </svg>
-                        <span class="b6-eff-pct">${effPct}%</span>
-                    </div>
-                    <div class="b6-eff-info">
-                        <div class="b6-eff-label">${effLabel}</div>
-                        <div class="b6-eff-detail">精準付款 <strong>${exactCount}</strong> 次 / 共 <strong>${effRounds}</strong> 關</div>
-                    </div>
-                </div>
-            </div>` : '';
+            const effHTML = '';
 
             // 金錢圖示 helper（攤位消費分析用）
             const b6MkStallMoneyIcons = (amount) => {
