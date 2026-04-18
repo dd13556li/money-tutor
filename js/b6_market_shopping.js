@@ -3139,48 +3139,89 @@ document.addEventListener('DOMContentLoaded', () => {
             const walletCoinsEl = document.getElementById('b6c-wallet-coins');
             if (!walletCoinsEl) return;
 
-            // Ghost slot 模式：渲染已填/未填格
-            if (g.changeGhostMode && g.changeHintSlots && g.changeHintSlots.length > 0) {
-                // 若全部填滿則退出 ghost 模式改為一般渲染
+            const _makeFilledSlot = (denom, face, uid, slotIdx) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'b6c-wc-item';
+                div.draggable = true;
+                div.dataset.uid = uid || '';
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                    <span class="b1-denom-label">${denom}元</span>
+                    <button class="b6c-wc-remove" data-uid="${uid || ''}"${slotIdx != null ? ` data-slot-idx="${slotIdx}"` : ''} title="移除">×</button>`;
+                return div;
+            };
+            const _makeGhostSlot = (denom, face) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'b6c-ghost-slot';
+                div.dataset.denom = denom;
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;opacity:0.3;" draggable="false" onerror="this.style.display='none'">
+                    <span class="b1-denom-label" style="opacity:0.3;">${denom}元</span>`;
+                return div;
+            };
+
+            // Ghost slot 模式：只替換狀態改變的格子
+            if (g.changeGhostMode && g.changeHintSlots?.length > 0) {
                 if (g.changeHintSlots.every(s => s.filled)) {
                     g.changeGhostMode = false;
+                    // fall through to normal mode render
                 } else {
-                    walletCoinsEl.innerHTML = g.changeHintSlots.map((slot, idx) => {
-                        const isBill = slot.denom >= 100;
-                        const w = isBill ? 80 : 52;
-                        if (slot.filled) {
-                            return `<div class="b6c-wc-item" draggable="true" data-uid="${slot.uid || ''}">
-                                <img src="../images/money/${slot.denom}_yuan_${slot.face}.png" alt="${slot.denom}元"
-                                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
-                                <span class="b1-denom-label">${slot.denom}元</span>
-                                <button class="b6c-wc-remove" data-slot-idx="${idx}" title="移除">×</button>
-                            </div>`;
-                        }
-                        return `<div class="b6c-ghost-slot" data-denom="${slot.denom}">
-                            <img src="../images/money/${slot.denom}_yuan_${slot.face}.png" alt="${slot.denom}元"
-                                 style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;opacity:0.3;" draggable="false" onerror="this.style.display='none'">
-                            <span class="b1-denom-label" style="opacity:0.3;">${slot.denom}元</span>
-                        </div>`;
-                    }).join('');
+                    const kids = Array.from(walletCoinsEl.children);
+                    if (kids.length !== g.changeHintSlots.length) {
+                        // 首次建立：直接填入
+                        walletCoinsEl.innerHTML = '';
+                        g.changeHintSlots.forEach((slot, idx) => {
+                            walletCoinsEl.appendChild(
+                                slot.filled
+                                    ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx)
+                                    : _makeGhostSlot(slot.denom, slot.face)
+                            );
+                        });
+                    } else {
+                        // DOM diff：只更新狀態改變的格子（避免整體重繪動畫）
+                        g.changeHintSlots.forEach((slot, idx) => {
+                            const el = kids[idx];
+                            const curFilled = el.classList.contains('b6c-wc-item');
+                            if (slot.filled === curFilled) return;
+                            walletCoinsEl.replaceChild(
+                                slot.filled
+                                    ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx)
+                                    : _makeGhostSlot(slot.denom, slot.face),
+                                el
+                            );
+                        });
+                    }
                     return;
                 }
             }
 
-            // 一般模式
+            // 一般模式：DOM diff，只增刪變化的金幣，不觸動已存在的元素
             if (!g.changePlaced || g.changePlaced.length === 0) {
                 walletCoinsEl.innerHTML = '<span class="b6p2-wallet-empty">把找零金錢拖曳到這裡</span>';
                 return;
             }
-            walletCoinsEl.innerHTML = g.changePlaced.map(p => {
-                const isBill = p.denom >= 100;
-                const w = isBill ? 80 : 52;
-                return `<div class="b6c-wc-item" draggable="true" data-uid="${p.uid}">
-                    <img src="../images/money/${p.denom}_yuan_${p.face}.png" alt="${p.denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
-                    <span class="b1-denom-label">${p.denom}元</span>
-                    <button class="b6c-wc-remove" data-uid="${p.uid}" title="移除">×</button>
-                </div>`;
-            }).join('');
+            const emptyEl = walletCoinsEl.querySelector('.b6p2-wallet-empty');
+            if (emptyEl) emptyEl.remove();
+
+            const existingMap = {};
+            walletCoinsEl.querySelectorAll('.b6c-wc-item').forEach(el => {
+                existingMap[el.dataset.uid] = el;
+            });
+            const desiredUids = new Set(g.changePlaced.map(p => p.uid));
+
+            // 移除已不存在的
+            Object.entries(existingMap).forEach(([uid, el]) => {
+                if (!desiredUids.has(uid)) el.remove();
+            });
+            // 新增尚未存在的（追加至末尾，保持既有元素不動）
+            g.changePlaced.forEach(p => {
+                if (existingMap[p.uid]) return;
+                walletCoinsEl.appendChild(_makeFilledSlot(p.denom, p.face, p.uid, null));
+            });
         },
 
         // 輔助點擊：直接加入找零金幣（不需拖曳）
