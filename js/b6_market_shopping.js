@@ -974,10 +974,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 播放完整語音：今日預算XX元，攤位需求
                     Game.Speech.speak(`今日預算${mission.budget}元，${stallsSpeech}`);
 
-                    // 綁定「開始購物」按鈕：點擊後播語音再進入遊戲
+                    // 綁定「開始購物」按鈕：點擊後播語音再進入遊戲（disabled 防止重複點擊）
                     const startBtn = document.getElementById('b6-wc2-start-btn');
                     if (startBtn) {
                         Game.EventManager.on(startBtn, 'click', () => {
+                            if (startBtn.disabled) return;
+                            startBtn.disabled = true;
                             window.speechSynthesis.cancel();
                             Game.Speech.speak('開始購物', () => {
                                 g._skipIntroModal = true;
@@ -2743,21 +2745,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const diff   = this.state.settings.difficulty;
             const wTotal = this._b6P2GetWalletTotal();
 
-            // 普通模式：超額付款 → 退回
-            if (diff === 'normal' && wTotal > total) {
-                this.state.isProcessing = false;
-                this.audio.play('error');
-                this._showCenterFeedback('❌', '付太多了！');
-                Game.Speech.speak(`你付了太多的錢，因為只需要付${toTWD(total)}，請再試一次`);
-                Game.TimerManager.setTimeout(() => {
-                    g.p2Wallet = [];
-                    const coinsEl = document.getElementById('b6p2-wallet-coins');
-                    if (coinsEl) coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
-                    this._b6P2UpdateStatusOnly();
-                }, 700, 'ui');
-                return;
-            }
-
             // 付款不足
             if (wTotal < total) {
                 this.state.isProcessing = false;
@@ -2770,14 +2757,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletArea.style.animation = 'b6p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletArea.style.animation = ''; }, 500, 'ui');
                 }
-                // 困難模式：退回金錢
+                // 困難模式：立即退回金錢（同步清空，避免計時器競爭條件）
                 if (diff === 'hard') {
-                    Game.TimerManager.setTimeout(() => {
-                        g.p2Wallet = [];
-                        const coinsEl = document.getElementById('b6p2-wallet-coins');
-                        if (coinsEl) coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
-                        this._b6P2UpdateStatusOnly();
-                    }, 800, 'ui');
+                    g.p2Wallet = [];
+                    const coinsEl = document.getElementById('b6p2-wallet-coins');
+                    if (coinsEl) coinsEl.innerHTML = '<span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>';
+                    this._b6P2UpdateStatusOnly();
                 }
                 // 普通模式：3次付款錯誤自動提示
                 if (diff === 'normal' && g.p2ErrorCount >= 3) {
