@@ -1398,11 +1398,11 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .b6p2-tray-title {
-    font-size: 14px; font-weight: 600;
+    font-size: 22px; font-weight: 900;
     color: #374151; margin-bottom: 12px; text-align: center;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.b6p2-tray-wallet-icon { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.b6p2-tray-wallet-icon { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
 
 /* 確認付款 / 確認找零：統一強化按鈕（置中） */
 #b6-p2-confirm-btn { align-self: center; width: fit-content; }
@@ -1589,6 +1589,10 @@
     .b6p2-ref-total-val      { font-size: 18px; }
     .b6p2-wallet-need        { font-size: 18px; }
     .b6p2-wallet-coins-label { font-size: 18px; }
+    .b6p2-my-money-label     { font-size: 18px; gap: 6px; }
+    .b6p2-tray-title         { font-size: 18px; }
+    .b6p2-tray-wallet-icon   { width: 26px; height: 26px; }
+    .b6c-change-need-big     { font-size: 20px; }
     .b6p2-coin-drag .coin-img     { width: 48px; height: 48px; }
     .b6p2-coin-drag .banknote-img { width: 80px; }
 }
@@ -2082,16 +2086,25 @@
 
 /* ── Phase 2 我的金錢區 標籤 ── */
 .b6p2-my-money-label {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 900;
     color: #1d4ed8;
     margin: 8px auto 4px;
-    padding: 4px 10px;
+    padding: 6px 14px;
     background: #eff6ff;
     border: 1.5px solid #bfdbfe;
     border-radius: 8px;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     text-align: center;
+}
+.b6p2-pay-status {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
 }
 
 /* ── Phase 2 金錢拖曳區 副標題 ── */
@@ -2919,7 +2932,29 @@
     gap: 2px;
 }
 
-/* 找零資訊列（ref card 底部，顯示付款額與找零額） */
+/* 找零頁：精簡 ref card（移除商品列表後） */
+.b6c-compact-card {
+    padding: 12px 18px;
+}
+/* 找零金額大字顯示 */
+.b6c-change-need-big {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    color: #065f46;
+    margin: 12px 0 4px;
+}
+/* 找零頁：錢包餘額整合標籤（普通顯示，困難隱藏） */
+.b6c-wallet-info {
+    font-size: 14px;
+    font-weight: 700;
+    color: #065f46;
+    margin-left: 8px;
+}
+.b6c-wallet-info.b6c-hidden {
+    display: none;
+}
+/* 找零資訊列（ref card 底部，顯示付款額與找零額）—已停用，保留相容 */
 .b6c-change-info-bar {
     text-align: center;
     font-size: 14px;
@@ -2932,7 +2967,7 @@
 }
 .b6c-need-num {
     color: #b45309;
-    font-size: 16px;
+    font-size: 26px;
 }
 /* 間距調整：付款區與錢包區之間 */
 .game-container > .b6p2-wallet-area {

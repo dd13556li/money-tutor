@@ -2265,20 +2265,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b6p2-wallet-area" id="b6p2-wallet-area">
                 <div class="b6p2-wallet-coins-label">需要付款 <span class="b6p2-wallet-need">${total} 元</span></div>
-                <div class="b6p2-wallet-header">
-                    <div class="b6p2-wallet-placed-row">
-                        <span class="b6p2-wallet-placed-lbl">已放</span>
-                        <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span>
-                        <span class="b6p2-wallet-sep">/</span>
-                        <span class="b6p2-wallet-goal">${total} 元</span>
-                    </div>
-                </div>
                 <div class="b6p2-progress-wrap">
                     <div class="b6p2-progress" id="b6p2-progress">
                         <div class="b6p2-progress-fill" id="b6p2-progress-fill"></div>
                     </div>
                 </div>
-                <div class="b6p2-my-money-label">💳 付款區</div>
+                <div class="b6p2-my-money-label">💳 付款區 <span class="b6p2-pay-status">已付 <span class="b6p2-wallet-total-val" id="b6p2-wallet-total">0 元</span> / ${total} 元</span></div>
                 <div class="b6p2-wallet-coins b6p2-drop-zone" id="b6p2-wallet-coins">
                     <span class="b6p2-wallet-empty">把金錢卡片拖曳到這裡</span>
                 </div>
@@ -2839,6 +2831,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ── 錢包剩餘金額（付款後）───────────────────────────────
             const walletRemaining = g.mission.budget - paid;
+            g.changeWalletBase = walletRemaining;
 
             // ── 靜態錢包圖示：貪婪分解剩餘金額 ─────────────────────
             const _wDenoms = [1000, 500, 100, 50, 10, 5, 1];
@@ -2886,7 +2879,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <div class="game-container">
-                <div class="b6p2-ref-card">
+                <div class="b6p2-ref-card b6c-compact-card">
                     <div class="b6p2-ref-header">
                         <span class="b6p2-ref-icon">${mkt.icon}</span>
                         <span class="b6p2-ref-title">${mkt.name}</span>
@@ -2895,10 +2888,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="b-hint-btn" id="b6c-hint-btn">💡 提示</button>
                         </span>
                     </div>
-                    ${this._b6RefFormulaHtml(_changeAllItems, total)}
-                    <div class="b6c-change-info-bar">
-                        您付了 <strong>${paid}</strong> 元，需找零 <strong class="b6c-need-num">${change}</strong> 元
-                    </div>
+                    <div class="b6c-change-need-big">需找零 <strong class="b6c-need-num">${change}</strong> 元</div>
                 </div>
                 <div class="b6p2-tray">
                     <div class="b6p2-tray-title">💰 找零面額（可重複拖曳）</div>
@@ -2907,14 +2897,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b6p2-wallet-area b6c-change-area">
                     <div class="b6p2-wallet-coins-label b6c-change-title">
                         💼 我的錢包
-                        <span class="b6c-wallet-bal-badge">付款後剩餘 ${walletRemaining} 元</span>
-                    </div>
-                    <div class="b6p2-wallet-header">
-                        <div class="b6p2-wallet-placed-row">
-                            <span class="b6p2-wallet-placed-lbl">已收零</span>
-                            <span class="b6p2-wallet-total-val" id="b6c-placed-total">${diff === 'hard' ? '？' : '0'}</span>
-                            ${diff !== 'hard' ? `<span class="b6p2-wallet-sep">/</span><span class="b6p2-wallet-goal">${change} 元</span>` : ''}
-                        </div>
+                        <span class="b6c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b6c-wallet-info"><span id="b6c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b6c-placed-total">0</span>/${change} 元）</span>
                     </div>
                     <div class="b6p2-progress-wrap">
                         <div class="b6p2-progress">
@@ -3055,10 +3038,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hintBtn) {
                 Game.EventManager.on(hintBtn, 'click', () => {
                     this.audio.play('click');
-                    if (diff === 'normal') {
-                        this._b6P2ShowChangeGhostSlots(change);
-                    } else {
+                    if (diff === 'hard') {
+                        // 困難模式：揭露錢包餘額資訊
+                        const walletInfo = document.getElementById('b6c-wallet-info');
+                        if (walletInfo) walletInfo.classList.remove('b6c-hidden');
                         this._b6P2ShowChangeHintModal(change);
+                    } else {
+                        this._b6P2ShowChangeGhostSlots(change);
                     }
                 }, {}, 'gameUI');
             }
@@ -3139,12 +3125,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const pct    = change > 0 ? Math.min(Math.round(placedTotal / change * 100), 100) : 0;
             const exact  = placedTotal === change;
             const fillEl  = document.getElementById('b6c-progress-fill');
-            const totalEl = document.getElementById('b6c-placed-total');
             if (fillEl)  { fillEl.style.width = pct + '%'; fillEl.className = 'b6c-progress-fill' + (pct >= 100 ? ' full' : ''); }
-            if (totalEl && this.state.settings.difficulty !== 'hard') {
-                totalEl.textContent = placedTotal;
-                totalEl.className = 'b6p2-wallet-total-val' + (exact ? ' enough' : placedTotal > 0 ? ' not-enough' : '');
-            }
+            // 已找回進度（整合至錢包標題，hard 模式隱藏但仍更新數值）
+            const totalEl = document.getElementById('b6c-placed-total');
+            if (totalEl) totalEl.textContent = placedTotal;
+            // 錢包餘額 = 付款後剩餘 + 已找回
+            const balanceEl = document.getElementById('b6c-wallet-balance');
+            if (balanceEl) balanceEl.textContent = (g.changeWalletBase || 0) + placedTotal;
             const confirmBtn = document.getElementById('b6c-confirm-btn');
             if (confirmBtn) {
                 confirmBtn.disabled = false;
