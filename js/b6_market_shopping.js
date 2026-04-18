@@ -1643,9 +1643,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 攤位語音引導
                 const stallInfo = _currentStalls[newKey];
                 const remaining = destReq ? (destReq.count - destSelCount) : 0;
+                const remStr = remaining === 2 ? '兩' : String(remaining);
                 Game.Speech.speak(remaining > 0
-                    ? `${stallInfo.name}，還要選${remaining}樣`
-                    : `${stallInfo.name}，這裡已選購完畢！`);
+                    ? `${stallInfo.name}，還要買${remStr}樣`
+                    : `今天${stallInfo.name}不用買`);
                 // 只替換商品面板，不重建整頁
                 _refreshStallPanel();
             };
