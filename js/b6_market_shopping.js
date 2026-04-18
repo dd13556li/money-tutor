@@ -2255,7 +2255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b6p2-ref-icon">${mkt.icon}</span>
                     <span class="b6p2-ref-title">${mkt.name}</span>
                     <span class="b6-p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
                         <button class="b-hint-btn" id="b6-p2-hint-btn">💡 提示</button>
                     </span>
                 </div>
@@ -2885,7 +2885,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b6p2-ref-icon">${mkt.icon}</span>
                         <span class="b6p2-ref-title">${mkt.name}</span>
                         <span class="b6-p2-hint-wrap">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
                             <button class="b-hint-btn" id="b6c-hint-btn">💡 提示</button>
                         </span>
                     </div>
