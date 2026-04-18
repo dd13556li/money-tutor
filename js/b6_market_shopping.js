@@ -3259,12 +3259,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletZone.style.animation = 'b6p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletZone.style.animation = ''; }, 500, 'ui');
                 }
-                // 錯誤後立即清空找零區（同步，避免計時器競爭條件）
-                g.changePlaced    = [];
-                g.changeGhostMode = false;
-                g.changeHintSlots = [];
-                this._b6P2UpdateChangeDisplay(change);
-                this._b6P2RenderWalletCoins(change);
+                // 普通/簡單模式：立即清空找零區並重置 ghost 模式
+                // 困難模式：保留錢包內容，讓學生自行調整
+                if (diff !== 'hard') {
+                    g.changePlaced    = [];
+                    g.changeGhostMode = false;
+                    g.changeHintSlots = [];
+                    this._b6P2UpdateChangeDisplay(change);
+                    this._b6P2RenderWalletCoins(change);
+                }
                 // 普通模式：3次錯誤自動顯示 ghost slots
                 if (diff === 'normal' && g.changeErrorCount >= 3) {
                     g.changeErrorCount = 0;
