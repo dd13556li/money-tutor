@@ -516,8 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="b-diff-desc" id="diff-desc"></div>
                         </div>
-                        <div class="b-setting-group">
-                            <div id="b6-custom-items-toggle-row" style="display:none;">
+                        <div class="b-setting-group" id="b6-custom-items-wrap" style="display:none;">
+                            <div id="b6-custom-items-toggle-row">
                                 <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂購物項目</label>
                                 <div class="b-btn-group" id="b6-custom-items-group" style="margin-top:4px;">
                                     <button class="b-sel-btn active" data-custom="off">關閉</button>
@@ -602,18 +602,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.state.settings.difficulty = btn.dataset.val;
                     const desc = document.getElementById('diff-desc');
                     if (desc) { desc.textContent = this._diffDescriptions[btn.dataset.val]; desc.classList.add('show'); }
-                    const assistGroup = document.getElementById('assist-click-group');
-                    const customToggle = document.getElementById('b6-custom-items-toggle-row');
+                    const assistGroup  = document.getElementById('assist-click-group');
+                    const customWrap   = document.getElementById('b6-custom-items-wrap');
                     if (assistGroup) {
                         if (btn.dataset.val === 'easy') {
                             assistGroup.style.display = '';
-                            if (customToggle) customToggle.style.display = 'none';
+                            if (customWrap) customWrap.style.display = 'none';
                             this.state.settings.customItemsEnabled = false;
                             document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
                         } else {
                             assistGroup.style.display = 'none';
                             this.state.settings.clickMode = 'off';
-                            if (customToggle) customToggle.style.display = '';
+                            if (customWrap) customWrap.style.display = '';
                         }
                     }
                     this._checkCanStart();
