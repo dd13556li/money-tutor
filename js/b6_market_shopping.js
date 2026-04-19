@@ -986,15 +986,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             });
                         }, {}, 'welcome');
                     }
+
+                    // 輔助點擊模式：page2 已有按鈕才啟動 overlay
+                    if (s.clickMode === 'on') {
+                        Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
+                    }
                 }
             };
 
             renderPage(1);
-
-            // 輔助點擊模式：啟動 overlay（buildQueue 會自動偵測 b6-wc2-start-btn）
-            if (s.clickMode === 'on') {
-                Game.TimerManager.setTimeout(() => AssistClick.activate(), 400, 'ui');
-            }
         },
 
         _pickMissions(count, diff) {
@@ -1192,6 +1192,22 @@ document.addEventListener('DOMContentLoaded', () => {
             this._b6P1ActivateHintMode();
         },
 
+        // ── 預算進度條資訊 ────────────────────────────────────
+        _b6BudgetBarInfo(total, budget) {
+            const ratio = budget > 0 ? total / budget : 0;
+            const pct   = Math.min(Math.round(ratio * 100), 100);
+            let label, emoji, color;
+            if (total === 0)       { label = '準備購物';       emoji = '🛒'; color = '#10b981'; }
+            else if (ratio < 0.25) { label = '還有很多錢';     emoji = '💰'; color = '#10b981'; }
+            else if (ratio < 0.5)  { label = '花掉四分之一';   emoji = '🪙'; color = '#22c55e'; }
+            else if (ratio < 0.55) { label = '花掉一半';       emoji = '💸'; color = '#f59e0b'; }
+            else if (ratio < 0.75) { label = '錢剩下一半';     emoji = '💸'; color = '#f59e0b'; }
+            else if (ratio < 0.9)  { label = '錢剩下四分之一'; emoji = '⚠️'; color = '#f97316'; }
+            else if (ratio < 1.0)  { label = '錢快花完了';     emoji = '🔴'; color = '#ef4444'; }
+            else                   { label = '超出預算了';     emoji = '🚨'; color = '#dc2626'; }
+            return { pct, label, emoji, color };
+        },
+
         // ── 貪婪法生成建議購買清單 ───────────────────────────
         _b6P1GenerateHintItems() {
             const g = this.state.game;
@@ -1214,13 +1230,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return result;
         },
 
-        // ── 更新「點這裡」高亮（當前攤位的提示商品）────────────
+        // ── 更新「點這裡」高亮（當前攤位的提示商品 + 導航按鈕）──
         _b6P1UpdateHintHighlights() {
             const g = this.state.game;
             // 先移除所有既有高亮
             document.querySelectorAll('.b6-product-btn').forEach(btn => {
                 btn.classList.remove('b6-product-here-hint');
             });
+            document.getElementById('b6-stall-prev')?.classList.remove('b6-product-here-hint');
+            document.getElementById('b6-stall-next')?.classList.remove('b6-product-here-hint');
             if (!g.p1HintMode) return;
             // 困難模式：只用彈窗提示，不在商品卡顯示「點這裡」
             if (this.state.settings.difficulty === 'hard') return;
@@ -1238,6 +1256,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.querySelector(`.b6-product-btn[data-item-id="${h.id}"]`);
                 if (btn) btn.classList.add('b6-product-here-hint');
             });
+
+            // 簡單模式：當前攤位的提示商品都選完，但其他攤位還有未選的提示商品 → 高亮導航按鈕
+            if (diff === 'easy' && toHighlight.length === 0) {
+                const remainingInOtherStalls = hintItems.filter(h =>
+                    !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+                );
+                if (remainingInOtherStalls.length > 0) {
+                    const _stallKeys = Object.keys(_currentStalls || {});
+                    const curIdx = _stallKeys.indexOf(g.activeStall);
+                    const nextIdx = _stallKeys.indexOf(remainingInOtherStalls[0].stall);
+                    const navBtn = document.getElementById(nextIdx > curIdx ? 'b6-stall-next' : 'b6-stall-prev');
+                    if (navBtn && !navBtn.disabled) navBtn.classList.add('b6-product-here-hint');
+                }
+            }
         },
 
         // ── 啟動提示模式（生成 + 高亮）─────────────────────────
@@ -1337,6 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const total   = this._calcMissionTotal();
             const budget  = mission.budget;
             const budgetOver = total > budget;
+            const diff    = this.state.settings.difficulty;
 
             // 任務卡：顯示每個攤位的選購進度
             const stallReqsHTML = (mission.stalls || []).map(({ stall, count }) => {
@@ -1450,6 +1483,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="b6-p1-hint-btn" id="b6-p1-hint-btn">💡 提示</button>
                         </div>
                     </div>
+                    ${diff !== 'hard' ? (() => {
+                        const { pct, label, emoji, color } = this._b6BudgetBarInfo(total, budget);
+                        return `<div class="b6-budget-bar-wrap" id="b6-budget-bar-wrap">
+                            <div class="b6-budget-bar-track">
+                                <div class="b6-budget-bar-fill" id="b6-budget-bar-fill" style="width:${pct}%;background-color:${color};"></div>
+                            </div>
+                            <div class="b6-budget-bar-label" id="b6-budget-bar-label">${emoji} ${label}</div>
+                        </div>`;
+                    })() : ''}
                 </div>
 
                 <!-- 三欄容器：左（攤位進度卡）+ 中（市場卡）+ 右（結帳卡）-->
@@ -1562,7 +1604,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _bindShoppingEvents() {
-            const g = this.state.game;
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
 
             // 攤位左右切換
             const _stallKeys = Object.keys(_currentStalls);
@@ -1884,6 +1927,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const budgetEl = document.querySelector('.b6-task-budget');
             if (budgetEl) {
                 budgetEl.innerHTML = `預算 <strong class="${budgetOver ? 'b6-budget-over' : ''}">${budget} 元</strong>${budgetOver ? `<span class="b6-budget-warning"> ⚠️ 超出！</span>` : ''}`;
+            }
+
+            // 更新預算進度條（簡單／普通模式）
+            const barFill = document.getElementById('b6-budget-bar-fill');
+            const barLabel = document.getElementById('b6-budget-bar-label');
+            if (barFill && barLabel) {
+                const { pct, label, emoji, color } = this._b6BudgetBarInfo(total, budget);
+                barFill.style.width = pct + '%';
+                barFill.style.backgroundColor = color;
+                barLabel.textContent = emoji + ' ' + label;
             }
 
             // 更新攤位需求列（任務卡）
@@ -2214,10 +2267,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this._bindB6P2Events(total);
             this._b6P2SetupDragDrop();
 
-            // 簡單模式：立即顯示淡化金錢圖示（ghost slots）
+            // 簡單模式：立即顯示淡化金錢圖示（ghost slots）+ 托盤提示
             if (diff === 'easy') {
                 this._b6P2AutoSetGhostSlots();
                 this._b6P2UpdateWalletDisplay();
+                this._b6P2UpdateTrayHints();
             }
 
             // 進入第二頁自動啟動輔助點擊
@@ -2513,6 +2567,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const slotEl = document.querySelector(`[data-b6p2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b6p2-ghost-slot');
                 this._b6P2UpdateStatusOnly();
+                if (diff === 'easy') this._b6P2UpdateTrayHints();
                 // auto-confirm moved to speech callback below
             } else {
                 this.audio.play('coin');
@@ -2693,6 +2748,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const optimal = this._b6P2FindOptimalPayment(available, total);
             g.p2HintSlots = optimal.map(c => ({ denom: c.denom, filled: false, face: c.face }));
             g.p2ShowHint  = true;
+        },
+
+        // 簡單模式：在付款托盤幣上顯示「點這裡」提示
+        _b6P2UpdateTrayHints() {
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
+            document.querySelectorAll('.b6p2-coin-drag').forEach(el => {
+                el.classList.remove('b6-product-here-hint');
+            });
+            if (diff !== 'easy') return;
+            // 計算每個面額還需多少個（根據未填 ghost slots）
+            const needed = {};
+            (g.p2HintSlots || []).filter(s => !s.filled).forEach(s => {
+                needed[s.denom] = (needed[s.denom] || 0) + 1;
+            });
+            // 對托盤中可用的幣，按面額逐一標記
+            const usedCount = {};
+            document.querySelectorAll('.b6p2-coin-drag').forEach(el => {
+                if (el.dataset.inUse === 'true' || el.style.display === 'none') return;
+                const d = parseInt(el.dataset.denom);
+                if (!needed[d]) return;
+                usedCount[d] = (usedCount[d] || 0) + 1;
+                if (usedCount[d] <= needed[d]) el.classList.add('b6-product-here-hint');
+            });
         },
 
         // ── 最小超額子集搜尋 ─────────────────────────────────────
@@ -2911,7 +2990,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="b6c-confirm-btn-main" id="b6c-confirm-btn" disabled>✅ 確認找零</button>
             </div>`;
 
-            Game.Speech.speak(`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`);
+            Game.Speech.speak(`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`, diff === 'easy' ? () => {
+                this._b6P2ShowChangeGhostSlots(change);
+            } : null);
             this._b6P2SetupChangeInteraction(change, paid);
         },
 
@@ -2943,8 +3024,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this._b6P2UpdateChangeDisplay(change);
                 this._b6P2RenderWalletCoins(change);
-                // 普通模式：播放累加金額語音
-                if (diff === 'normal') {
+                if (g.changeGhostMode) this._b6P2UpdateChangeTrayHints();
+                // 簡單/普通模式：播放累加金額語音
+                if (diff !== 'hard') {
                     const runningTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
                     Game.Speech.speak(`找為${toTWD(runningTotal)}`);
                 }
@@ -2994,9 +3076,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, { passive: true }, 'gameUI');
             });
 
-            // ── 移除錢包中的金幣（點 × 按鈕）────────────────────────
+            // ── 移除錢包中的金幣（點 × 按鈕，簡單模式禁用）──────────
             const walletCoinsEl = document.getElementById('b6c-wallet-coins');
-            if (walletCoinsEl) {
+            if (walletCoinsEl && diff !== 'easy') {
                 Game.EventManager.on(walletCoinsEl, 'click', e => {
                     const btn = e.target.closest('.b6c-wc-remove');
                     if (!btn) return;
@@ -3042,9 +3124,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             }
 
-            // ── 錢包幣拖回找零面額區（拖出 wallet zone 即移除）────────
+            // ── 錢包幣拖回找零面額區（拖出 wallet zone 即移除，簡單模式禁用）──
             let _draggingWalletUid = null;
-            if (walletCoinsEl) {
+            if (walletCoinsEl && diff !== 'easy') {
                 Game.EventManager.on(walletCoinsEl, 'dragstart', e => {
                     const item = e.target.closest('.b6c-wc-item[data-uid]');
                     if (!item) return;
@@ -3053,24 +3135,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.dataTransfer.effectAllowed = 'move';
                 }, {}, 'gameUI');
             }
-            Game.EventManager.on(document, 'dragend', e => {
-                if (!_draggingWalletUid) return;
-                const uid = _draggingWalletUid;
-                _draggingWalletUid = null;
-                if (e.dataTransfer.dropEffect === 'none') {
-                    if (g.changeGhostMode) {
-                        const slotIdx = (g.changeHintSlots || []).findIndex(s => s.uid === uid);
-                        if (slotIdx !== -1) { g.changeHintSlots[slotIdx].filled = false; g.changeHintSlots[slotIdx].uid = null; }
+            if (diff !== 'easy') {
+                Game.EventManager.on(document, 'dragend', e => {
+                    if (!_draggingWalletUid) return;
+                    const uid = _draggingWalletUid;
+                    _draggingWalletUid = null;
+                    if (e.dataTransfer.dropEffect === 'none') {
+                        if (g.changeGhostMode) {
+                            const slotIdx = (g.changeHintSlots || []).findIndex(s => s.uid === uid);
+                            if (slotIdx !== -1) { g.changeHintSlots[slotIdx].filled = false; g.changeHintSlots[slotIdx].uid = null; }
+                        }
+                        g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
+                        this.audio.play('click');
+                        this._b6P2UpdateChangeDisplay(change);
+                        this._b6P2RenderWalletCoins(change);
                     }
-                    g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
-                    this.audio.play('click');
-                    this._b6P2UpdateChangeDisplay(change);
-                    this._b6P2RenderWalletCoins(change);
-                }
-            }, {}, 'gameUI');
+                }, {}, 'gameUI');
+            }
 
-            // ── Touch 拖回：錢包幣觸控拖出 wallet zone 即移除 ─────────
-            if (walletCoinsEl) {
+            // ── Touch 拖回：錢包幣觸控拖出 wallet zone 即移除（簡單模式禁用）──
+            if (walletCoinsEl && diff !== 'easy') {
                 let _touchWalletUid = null;
                 let _touchGhostEl   = null;
                 Game.EventManager.on(walletCoinsEl, 'touchstart', e => {
@@ -3113,7 +3197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _b6P2UpdateChangeDisplay(change) {
-            const g = this.state.game;
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
             const placedTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
             const pct    = change > 0 ? Math.min(Math.round(placedTotal / change * 100), 100) : 0;
             const exact  = placedTotal === change;
@@ -3127,11 +3212,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmBtn) {
                 confirmBtn.disabled = false;
                 confirmBtn.classList.toggle('ready', exact);
+                // 簡單模式：金額正確時在確認鈕顯示「點這裡」
+                if (diff === 'easy') confirmBtn.classList.toggle('b6-product-here-hint', exact);
             }
         },
 
         _b6P2RenderWalletCoins(change) {
-            const g = this.state.game;
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
             const walletCoinsEl = document.getElementById('b6c-wallet-coins');
             if (!walletCoinsEl) return;
 
@@ -3140,12 +3228,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 80 : 52;
                 const div = document.createElement('div');
                 div.className = 'b6c-wc-item';
-                div.draggable = true;
-                div.dataset.uid = uid || '';
+                // 簡單模式：不可拖曳也不顯示移除按鈕
+                if (diff !== 'easy') {
+                    div.draggable = true;
+                    div.dataset.uid = uid || '';
+                }
                 div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
                      style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
                     <span class="b1-denom-label">${denom}元</span>
-                    <button class="b6c-wc-remove" data-uid="${uid || ''}"${slotIdx != null ? ` data-slot-idx="${slotIdx}"` : ''} title="移除">×</button>`;
+                    ${diff !== 'easy' ? `<button class="b6c-wc-remove" data-uid="${uid || ''}"${slotIdx != null ? ` data-slot-idx="${slotIdx}"` : ''} title="移除">×</button>` : ''}`;
                 return div;
             };
             const _makeGhostSlot = (denom, face) => {
@@ -3162,7 +3253,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Ghost slot 模式：只替換狀態改變的格子
             if (g.changeGhostMode && g.changeHintSlots?.length > 0) {
-                if (g.changeHintSlots.every(s => s.filled)) {
+                if (g.changeHintSlots.every(s => s.filled) && diff !== 'easy') {
                     g.changeGhostMode = false;
                     // fall through to normal mode render
                 } else {
@@ -3301,9 +3392,28 @@ document.addEventListener('DOMContentLoaded', () => {
             g.changeHintSlots = slots;
             this._b6P2UpdateChangeDisplay(change);
             this._b6P2RenderWalletCoins(change);
+            this._b6P2UpdateChangeTrayHints();
             // 語音提示
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
             Game.Speech.speak(`可以用${parts.join('，')}`);
+        },
+
+        // 找零面額托盤的「點這裡」提示（ghost 模式下按未填 slot 標記對應面額卡）
+        _b6P2UpdateChangeTrayHints() {
+            const g = this.state.game;
+            document.querySelectorAll('.b6c-denom-card').forEach(el => {
+                el.classList.remove('b6-product-here-hint');
+            });
+            if (!g.changeGhostMode) return;
+            const needed = {};
+            (g.changeHintSlots || []).filter(s => !s.filled).forEach(s => {
+                needed[s.denom] = (needed[s.denom] || 0) + 1;
+            });
+            // 每個面額只需標記一張卡（面額卡可重複使用，不需計數）
+            document.querySelectorAll('.b6c-denom-card').forEach(el => {
+                const d = parseInt(el.dataset.denom);
+                if (needed[d]) el.classList.add('b6-product-here-hint');
+            });
         },
 
         _b6P2ShowChangeHintModal(change) {
@@ -4019,9 +4129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildQueue() {
             if (!this._enabled) return;
-            // 歡迎畫面第2頁：點「開始購物」按鈕
+            // 歡迎畫面第2頁：點「開始購物」按鈕（已 disabled 表示已點，不重複 highlight）
             const wcStartBtn = document.getElementById('b6-wc2-start-btn');
-            if (wcStartBtn) {
+            if (wcStartBtn && !wcStartBtn.disabled) {
                 this._highlight(wcStartBtn);
                 this._queue = [{ el: wcStartBtn, action: () => wcStartBtn.click() }];
                 return;
@@ -4031,6 +4141,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // intro modal：優先點底部「關閉」鈕，fallback 為右上角 ✕
             const miDismiss = document.getElementById('b6-mi-dismiss-btn') || document.getElementById('b6-mi-close-btn');
             if (miDismiss) {
+                // 若 modal 正在淡出（b6-mi-fade），清空 queue 讓 MutationObserver 在移除後重新 buildQueue
+                const modal = document.getElementById('b6-mission-intro');
+                if (modal && modal.classList.contains('b6-mi-fade')) {
+                    this._clearHighlight();
+                    this._queue = [];
+                    return;
+                }
                 this._highlight(miDismiss);
                 this._queue = [{ el: miDismiss, action: () => miDismiss.click() }];
                 return;
@@ -4177,13 +4294,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Find cheapest unselected affordable item in this stall
+            // Find the item to click in this stall
             const alreadySelected = new Set((g.selectedItems || []).filter(i => i.stall === g.activeStall).map(i => i.id));
             const stallItems = _currentStalls[g.activeStall]?.items || [];
-            const affordable = stallItems
-                .filter(item => !alreadySelected.has(item.id) && (currentTotal + item.price) <= budget)
-                .sort((a, b) => a.price - b.price);
-            const pick = affordable[0];
+
+            // In hint mode (easy/normal), only click hint items to avoid the guard rejection
+            let pick;
+            if (g.p1HintMode && Game.state.settings.difficulty !== 'hard') {
+                const hintForStall = (g.p1HintItems || []).filter(h =>
+                    h.stall === g.activeStall && !alreadySelected.has(h.id)
+                );
+                // easy mode shows 1 hint item at a time; normal shows all — pick the first unselected
+                pick = stallItems.find(item => hintForStall.some(h => h.id === item.id));
+            } else {
+                pick = stallItems
+                    .filter(item => !alreadySelected.has(item.id) && (currentTotal + item.price) <= budget)
+                    .sort((a, b) => a.price - b.price)[0];
+            }
             if (pick) {
                 const productBtn2 = document.querySelector(`.b6-product-btn[data-item-id="${pick.id}"]`);
                 if (productBtn2) {

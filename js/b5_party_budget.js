@@ -2192,7 +2192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     coinsEl.querySelector('.b5p2-wallet-empty')?.remove();
                     const canRemove = diff !== 'easy';
                     const isBill = denom >= 100;
-                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
+                    const imgStyle = isBill ? 'width:100px;height:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     const div = document.createElement('div');
                     div.className = 'b5p2-wallet-coin b5p2-coin-new' + (canRemove ? ' b5p2-wc-removable' : '');
                     if (canRemove) { div.setAttribute('draggable', 'true'); div.dataset.uid = String(uid); }
@@ -2311,7 +2311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinsEl.innerHTML = g.p2HintSlots.map((slot, idx) => {
                     if (!slot.filled) {
                         const isBill = slot.denom >= 100;
-                        const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
+                        const imgStyle = isBill ? 'width:100px;height:auto;display:block;' : 'width:60px;height:60px;display:block;';
                         const face = slot.face || 'front';
                         return `<div class="b5p2-wallet-coin b5p2-ghost-slot" data-b5p2-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_${face}.png" alt="${slot.denom}元"
@@ -2327,7 +2327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (!coin) return '';
                     const isBill = coin.denom >= 100;
-                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
+                    const imgStyle = isBill ? 'width:100px;height:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     return `<div class="b5p2-wallet-coin" data-b5p2-hint-idx="${idx}">
                         <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
                              style="${imgStyle}" onerror="this.style.display='none'" draggable="false"></div>`;
@@ -2338,7 +2338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const canRemove = diff !== 'easy';
                 coinsEl.innerHTML = g.p2Wallet.map(coin => {
                     const isBill = coin.denom >= 100;
-                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
+                    const imgStyle = isBill ? 'width:100px;height:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     const cls = 'b5p2-wallet-coin' + (canRemove ? ' b5p2-wc-removable' : '');
                     const extra = canRemove ? `draggable="true" data-uid="${coin.uid}"` : '';
                     const removeBtn = canRemove ? `<button class="b5p2-wc-remove" data-uid="${coin.uid}" title="移除">✕</button>` : '';

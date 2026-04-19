@@ -3000,3 +3000,39 @@
 .game-container > .b6p2-payment-header {
     margin-top: 4px;
 }
+
+/* ── 預算進度條（簡單／普通模式）── */
+.b6-budget-bar-wrap {
+    margin-top: 10px;
+    padding: 0 2px;
+}
+.b6-budget-bar-track {
+    background: #d1fae5;
+    border-radius: 999px;
+    height: 14px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #a7f3d0;
+}
+.b6-budget-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.45s cubic-bezier(.25,.8,.25,1), background-color 0.45s ease;
+    min-width: 0%;
+}
+.b6-budget-bar-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    margin-top: 5px;
+    letter-spacing: 0.02em;
+}
+
+/* 攤位導航按鈕與確認找零按鈕的「點這裡」泡泡 */
+.b6-snav-btn.b6-product-here-hint::after { top: -46px; }
+#b6c-confirm-btn.b6-product-here-hint::after { top: -46px; }
+#b6-p2-confirm-btn.b6-product-here-hint::after { top: -46px; }

@@ -1274,7 +1274,7 @@
 
 /* 錢包幣圖示尺寸（與拖曳盤一致）*/
 .b5p2-wallet-coin .coin-img     { width: 60px;  height: 60px; }
-.b5p2-wallet-coin .banknote-img { height: 80px; width: auto; }
+.b5p2-wallet-coin .banknote-img { width: 100px; height: auto; }
 
 /* ── 錢幣托盤 ── */
 .b5p2-tray {
@@ -1323,7 +1323,7 @@
 .b5p2-coin-drag:active { cursor: grabbing; }
 .b5p2-coin-drag.b5p2-dragging { opacity: 0.4; transform: scale(0.92); }
 .b5p2-coin-drag .coin-img     { width: 60px;  height: 60px; }
-.b5p2-coin-drag .banknote-img { height: 80px; width: auto; }
+.b5p2-coin-drag .banknote-img { width: 100px; height: auto; }
 .b5p2-denom-label {
     font-size: 12px;
     font-weight: bold;
