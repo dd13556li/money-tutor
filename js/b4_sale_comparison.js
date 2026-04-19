@@ -3889,7 +3889,7 @@ document.addEventListener('DOMContentLoaded', () => {
         backToMenu() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeAll();
-            window.location.href = '../index.html#part4';
+            window.location.href = '../index.html#part3';
         }
 
     };  // end Game

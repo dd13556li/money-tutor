@@ -39,9 +39,13 @@ const B5_ITEM_CATEGORIES = {
     pumpkin:'decor', costume:'activity', candy_bag:'food',
     witch_hat:'decor', spider:'decor', skull:'decor', glow:'activity',
     ghost:'activity', treat:'food', fangs:'activity',
+    hw_bat:'decor', hw_mask:'activity',
+    hw_chocolate:'food', hw_cookie:'food', hw_popcorn:'food',
     // 春日野餐
     sandwich:'food', blanket:'decor', fruit:'food', juice:'food',
     cookies:'food', sunhat:'decor', frisbee:'activity', bubble:'activity', kite:'activity',
+    pc_onigiri:'food', pc_flowers:'decor', pc_umbrella:'decor',
+    pc_badminton:'activity', pc_rope:'activity',
 };
 const B5_CATEGORY_META = {
     food:     { name: '食物飲料', icon: '🍱' },
@@ -50,59 +54,76 @@ const B5_CATEGORY_META = {
 };
 
 // ── 關卡設定（依難度，每關有預算和可用商品清單）──────────────
+// 每關：食物飲料5種 + 裝飾道具5種 + 遊戲活動5種 = 共15種商品
 const B5_SCENARIOS = {
     easy: [
-        // 簡單：預算寬裕，只需在預算內選購即可
-        { budget: 700,  availableIds: ['cake','drink','balloon','hat','candle'] },
-        { budget: 600,  availableIds: ['cake','drink','ribbon','plate','candle'] },
-        { budget: 650,  availableIds: ['cake','drink','balloon','plate','hat'] },
-        { budget: 750,  availableIds: ['cake','drink','candy','hat','candle'] },
-        { budget: 680,  availableIds: ['cake','drink','popper','candle','balloon'] },
-        { budget: 720,  availableIds: ['cake','drink','ribbon','hat','plate'] },
-        { budget: 600,  availableIds: ['cake','drink','balloon','candle','plate'] },
-        { budget: 650,  availableIds: ['cake','drink','hat','popper','candle'] },
-        { budget: 700,  availableIds: ['cake','drink','banner','photo','candle'] },
-        { budget: 650,  availableIds: ['cake','drink','candy','popper','ribbon'] },
-        { budget: 720,  availableIds: ['cake','drink','plate','candle','banner'] },
-        { budget: 680,  availableIds: ['cake','drink','ribbon','balloon','plate'] },
-        { budget: 700,  availableIds: ['cake','drink','cup','napkin','sticker'] },
-        { budget: 650,  availableIds: ['cake','drink','wand','tablecloth','balloon'] },
-        { budget: 680,  availableIds: ['cake','drink','lights','hat','candle'] },
-        { budget: 720,  availableIds: ['cake','drink','sticker','ribbon','cup'] },
+        // 簡單：預算約70%，提示模式引導選購，每類5種（食5+裝5+活5=15種）
+        // 食物: cake+drink+candy+plate+cup=690 / 裝飾: balloon+candle+ribbon+hat+banner=295 / 活動: photo+popper+gift+game+wand=570 → 共1555
+        { budget:1100, availableIds:['cake','drink','candy','plate','cup','balloon','candle','ribbon','hat','banner','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+plate+napkin=670 / 裝飾: balloon+candle+ribbon+sticker+lights=275 / 活動: photo+popper+gift+game+wand=570 → 共1515
+        { budget:1060, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','sticker','lights','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+cup+napkin=700 / 裝飾: balloon+ribbon+hat+banner+tablecloth=335 / 活動: photo+popper+speaker+game+wand=650 → 共1685
+        { budget:1180, availableIds:['cake','drink','candy','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','popper','speaker','game','wand'] },
+        // 食物: cake+drink+plate+cup+napkin=635 / 裝飾: candle+ribbon+hat+lights+sticker=305 / 活動: popper+gift+speaker+game+wand=700 → 共1640
+        { budget:1150, availableIds:['cake','drink','plate','cup','napkin','candle','ribbon','hat','lights','sticker','popper','gift','speaker','game','wand'] },
+        // 食物: cake+drink+candy+plate+cup=690 / 裝飾: balloon+hat+banner+lights+tablecloth=365 / 活動: photo+popper+gift+game+wand=570 → 共1625
+        { budget:1140, availableIds:['cake','drink','candy','plate','cup','balloon','hat','banner','lights','tablecloth','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+plate+napkin=670 / 裝飾: candle+ribbon+banner+sticker+tablecloth=280 / 活動: photo+popper+gift+speaker+wand=730 → 共1680
+        { budget:1180, availableIds:['cake','drink','candy','plate','napkin','candle','ribbon','banner','sticker','tablecloth','photo','popper','gift','speaker','wand'] },
+        // 食物: cake+drink+candy+cup+napkin=700 / 裝飾: balloon+hat+ribbon+lights+tablecloth=360 / 活動: photo+popper+speaker+game+wand=650 → 共1710
+        { budget:1200, availableIds:['cake','drink','candy','cup','napkin','balloon','hat','ribbon','lights','tablecloth','photo','popper','speaker','game','wand'] },
+        // 食物: cake+drink+plate+cup+napkin=635 / 裝飾: balloon+candle+ribbon+hat+banner=295 / 活動: photo+popper+gift+speaker+wand=730 → 共1660
+        { budget:1160, availableIds:['cake','drink','plate','cup','napkin','balloon','candle','ribbon','hat','banner','photo','popper','gift','speaker','wand'] },
+        // 食物: cake+drink+candy+plate+cup=690 / 裝飾: candle+hat+banner+lights+tablecloth=345 / 活動: photo+popper+gift+game+wand=570 → 共1605
+        { budget:1120, availableIds:['cake','drink','candy','plate','cup','candle','hat','banner','lights','tablecloth','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+plate+napkin=670 / 裝飾: balloon+candle+ribbon+hat+banner=295 / 活動: popper+gift+speaker+game+wand=700 → 共1665
+        { budget:1170, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','hat','banner','popper','gift','speaker','game','wand'] },
+        // 食物: cake+drink+candy+cup+napkin=700 / 裝飾: balloon+candle+ribbon+sticker+lights=275 / 活動: photo+gift+speaker+game+wand=795 → 共1770
+        { budget:1240, availableIds:['cake','drink','candy','cup','napkin','balloon','candle','ribbon','sticker','lights','photo','gift','speaker','game','wand'] },
+        // 食物: cake+drink+plate+cup+napkin=635 / 裝飾: balloon+ribbon+hat+banner+tablecloth=335 / 活動: photo+popper+gift+game+wand=570 → 共1540
+        { budget:1080, availableIds:['cake','drink','plate','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+plate+cup=690 / 裝飾: candle+ribbon+hat+lights+sticker=305 / 活動: photo+popper+gift+game+wand=570 → 共1565
+        { budget:1100, availableIds:['cake','drink','candy','plate','cup','candle','ribbon','hat','lights','sticker','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+candy+plate+napkin=670 / 裝飾: balloon+hat+ribbon+lights+tablecloth=360 / 活動: photo+popper+speaker+game+wand=650 → 共1680
+        { budget:1180, availableIds:['cake','drink','candy','plate','napkin','balloon','hat','ribbon','lights','tablecloth','photo','popper','speaker','game','wand'] },
+        // 食物: cake+drink+candy+cup+napkin=700 / 裝飾: candle+ribbon+banner+sticker+tablecloth=280 / 活動: photo+popper+gift+game+wand=570 → 共1550
+        { budget:1090, availableIds:['cake','drink','candy','cup','napkin','candle','ribbon','banner','sticker','tablecloth','photo','popper','gift','game','wand'] },
+        // 食物: cake+drink+plate+cup+napkin=635 / 裝飾: balloon+hat+banner+lights+tablecloth=365 / 活動: photo+popper+gift+game+wand=570 → 共1570
+        { budget:1100, availableIds:['cake','drink','plate','cup','napkin','balloon','hat','banner','lights','tablecloth','photo','popper','gift','game','wand'] },
     ],
     normal: [
-        // 普通：需思考，在預算內選購，但不能全選
-        { budget: 700,  availableIds: ['cake','drink','balloon','gift','plate','candle','hat'] },
-        { budget: 750,  availableIds: ['cake','drink','ribbon','gift','photo','candle','hat'] },
-        { budget: 800,  availableIds: ['cake','drink','balloon','gift','candy','popper','hat'] },
-        { budget: 650,  availableIds: ['cake','drink','balloon','plate','ribbon','candle','hat'] },
-        { budget: 720,  availableIds: ['cake','drink','gift','ribbon','photo','plate','candle'] },
-        { budget: 780,  availableIds: ['cake','drink','candy','gift','popper','banner','hat'] },
-        { budget: 700,  availableIds: ['cake','drink','balloon','photo','plate','ribbon','candle'] },
-        { budget: 760,  availableIds: ['cake','drink','gift','candy','banner','popper','hat'] },
-        { budget: 730,  availableIds: ['cake','drink','balloon','photo','candy','ribbon','plate'] },
-        { budget: 710,  availableIds: ['cake','drink','gift','plate','banner','balloon','candle'] },
-        { budget: 740,  availableIds: ['cake','drink','candy','hat','photo','popper','ribbon'] },
-        { budget: 770,  availableIds: ['cake','drink','balloon','banner','ribbon','hat','gift'] },
-        { budget: 720,  availableIds: ['cake','drink','cup','napkin','lights','sticker','tablecloth'] },
-        { budget: 760,  availableIds: ['cake','drink','game','wand','sticker','cup','tablecloth'] },
-        { budget: 750,  availableIds: ['cake','drink','lights','ribbon','hat','sticker','napkin'] },
-        { budget: 740,  availableIds: ['cake','drink','tablecloth','cup','game','balloon','candle'] },
+        // 普通：預算約為總額58%，需思考取捨
+        { budget: 900, availableIds:['cake','drink','candy','plate','cup','balloon','candle','ribbon','hat','banner','photo','popper','gift','game','wand'] },
+        { budget: 980, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','sticker','lights','photo','popper','gift','speaker','wand'] },
+        { budget: 980, availableIds:['cake','drink','candy','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','popper','speaker','game','wand'] },
+        { budget: 960, availableIds:['cake','drink','plate','cup','napkin','candle','ribbon','hat','lights','sticker','popper','gift','speaker','game','wand'] },
+        { budget: 950, availableIds:['cake','drink','candy','plate','cup','balloon','hat','banner','lights','tablecloth','photo','popper','gift','game','wand'] },
+        { budget: 980, availableIds:['cake','drink','candy','plate','napkin','candle','ribbon','banner','sticker','tablecloth','photo','popper','gift','speaker','wand'] },
+        { budget: 950, availableIds:['cake','drink','candy','cup','napkin','balloon','hat','ribbon','lights','tablecloth','photo','popper','speaker','game','wand'] },
+        { budget: 970, availableIds:['cake','drink','plate','cup','napkin','balloon','candle','ribbon','hat','banner','photo','popper','gift','speaker','wand'] },
+        { budget:1000, availableIds:['cake','drink','candy','plate','cup','candle','hat','banner','lights','tablecloth','photo','popper','gift','speaker','game'] },
+        { budget: 960, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','hat','banner','popper','gift','speaker','game','wand'] },
+        { budget: 900, availableIds:['cake','drink','candy','cup','napkin','balloon','candle','ribbon','sticker','lights','photo','popper','gift','game','wand'] },
+        { budget: 980, availableIds:['cake','drink','plate','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','popper','gift','game','wand'] },
+        { budget: 950, availableIds:['cake','drink','candy','plate','cup','candle','ribbon','hat','lights','sticker','photo','popper','gift','game','wand'] },
+        { budget:1050, availableIds:['cake','drink','candy','plate','napkin','balloon','hat','ribbon','lights','tablecloth','photo','popper','gift','speaker','wand'] },
+        { budget: 900, availableIds:['cake','drink','candy','cup','napkin','candle','ribbon','banner','sticker','tablecloth','photo','popper','gift','game','wand'] },
+        { budget:1000, availableIds:['cake','drink','plate','cup','napkin','balloon','hat','banner','lights','tablecloth','popper','gift','speaker','game','wand'] },
     ],
     hard: [
-        // 困難：預算偏緊，需精算組合，多一項就超支
-        { budget: 700,  availableIds: ['cake','drink','balloon','gift','plate','candle','ribbon','hat','candy'] },
-        { budget: 750,  availableIds: ['cake','drink','ribbon','gift','photo','candle','hat','popper','candy'] },
-        { budget: 720,  availableIds: ['cake','drink','balloon','gift','banner','plate','ribbon','hat','photo'] },
-        { budget: 680,  availableIds: ['cake','drink','balloon','gift','candy','popper','ribbon','hat','banner'] },
-        { budget: 760,  availableIds: ['cake','drink','gift','photo','candy','popper','banner','ribbon','hat'] },
-        { budget: 740,  availableIds: ['cake','drink','balloon','gift','photo','plate','candle','ribbon','popper'] },
-        { budget: 710,  availableIds: ['cake','drink','candy','banner','gift','hat','photo','ribbon','popper'] },
-        { budget: 770,  availableIds: ['cake','drink','balloon','gift','photo','candy','plate','banner','hat'] },
-        { budget: 720,  availableIds: ['cake','drink','cup','napkin','lights','sticker','tablecloth','wand','game'] },
-        { budget: 760,  availableIds: ['cake','drink','game','gift','lights','ribbon','tablecloth','cup','sticker'] },
-        { budget: 740,  availableIds: ['cake','drink','speaker','balloon','hat','cup','sticker','napkin','wand'] },
-        { budget: 730,  availableIds: ['cake','drink','photo','game','lights','tablecloth','ribbon','hat','sticker'] },
+        // 困難：預算約為總額46~48%，需精算組合
+        { budget: 720, availableIds:['cake','drink','candy','plate','cup','balloon','candle','ribbon','hat','banner','photo','popper','gift','game','wand'] },
+        { budget: 800, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','sticker','lights','photo','popper','gift','speaker','wand'] },
+        { budget: 800, availableIds:['cake','drink','candy','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','popper','speaker','game','wand'] },
+        { budget: 780, availableIds:['cake','drink','plate','cup','napkin','candle','ribbon','hat','lights','sticker','popper','gift','speaker','game','wand'] },
+        { budget: 900, availableIds:['cake','drink','candy','plate','cup','balloon','hat','banner','lights','tablecloth','photo','popper','gift','speaker','game'] },
+        { budget: 800, availableIds:['cake','drink','candy','plate','napkin','candle','ribbon','banner','sticker','tablecloth','photo','popper','gift','speaker','wand'] },
+        { budget: 760, availableIds:['cake','drink','candy','cup','napkin','balloon','hat','ribbon','lights','tablecloth','photo','popper','speaker','game','wand'] },
+        { budget: 770, availableIds:['cake','drink','plate','cup','napkin','balloon','candle','ribbon','hat','banner','photo','popper','gift','game','wand'] },
+        { budget: 820, availableIds:['cake','drink','candy','plate','cup','candle','hat','banner','lights','tablecloth','photo','popper','gift','speaker','game'] },
+        { budget: 780, availableIds:['cake','drink','candy','plate','napkin','balloon','candle','ribbon','hat','banner','popper','gift','speaker','game','wand'] },
+        { budget: 860, availableIds:['cake','drink','candy','cup','napkin','balloon','candle','ribbon','sticker','lights','photo','gift','speaker','game','wand'] },
+        { budget: 870, availableIds:['cake','drink','candy','cup','napkin','balloon','ribbon','hat','banner','tablecloth','photo','gift','speaker','game','wand'] },
     ],
 };
 
@@ -116,90 +137,120 @@ const B5_THEMES = {
     halloween: {
         name: '萬聖節派對', icon: '🎃',
         allItems: [
-            { id:'pumpkin',  name:'南瓜燈',    price:150, icon:'🎃' },
-            { id:'costume',  name:'萬聖節服裝', price:250, icon:'👻' },
-            { id:'candy_bag',name:'糖果袋',     price:80,  icon:'🍬' },
-            { id:'witch_hat',name:'巫師帽',     price:60,  icon:'🧙' },
-            { id:'spider',   name:'蜘蛛網裝飾', price:45,  icon:'🕸️' },
-            { id:'skull',    name:'骷髏擺件',   price:70,  icon:'💀' },
-            { id:'glow',     name:'螢光棒',     price:25,  icon:'🌟' },
-            { id:'ghost',    name:'鬼臉面具',   price:90,  icon:'😱' },
-            { id:'treat',    name:'糖果包裝袋', price:40,  icon:'🛍️' },
-            { id:'fangs',    name:'吸血鬼牙齒', price:30,  icon:'🦷' },
+            { id:'pumpkin',     name:'南瓜燈',      price:150, icon:'🎃' },
+            { id:'costume',     name:'萬聖節服裝',   price:250, icon:'👻' },
+            { id:'candy_bag',   name:'糖果袋',       price:80,  icon:'🍬' },
+            { id:'witch_hat',   name:'巫師帽',       price:60,  icon:'🧙' },
+            { id:'spider',      name:'蜘蛛網裝飾',   price:45,  icon:'🕸️' },
+            { id:'skull',       name:'骷髏擺件',     price:70,  icon:'💀' },
+            { id:'glow',        name:'螢光棒',       price:25,  icon:'🌟' },
+            { id:'ghost',       name:'鬼臉面具',     price:90,  icon:'😱' },
+            { id:'treat',       name:'糖果包裝袋',   price:40,  icon:'🛍️' },
+            { id:'fangs',       name:'吸血鬼牙齒',   price:30,  icon:'🦷' },
+            { id:'hw_bat',      name:'蝙蝠裝飾',     price:40,  icon:'🦇' },
+            { id:'hw_mask',     name:'恐怖面具',     price:65,  icon:'😈' },
+            { id:'hw_chocolate',name:'萬聖節巧克力', price:35,  icon:'🍫' },
+            { id:'hw_cookie',   name:'鬼臉餅乾',     price:30,  icon:'🍪' },
+            { id:'hw_popcorn',  name:'鬼怪爆米花',   price:40,  icon:'🍿' },
         ],
         scenarios: {
+            // 全部15種商品（食物5+裝飾5+活動5）；食物=225,裝飾=365,活動=460,合計=1050
+            // 食物: candy_bag(80)+treat(40)+hw_chocolate(35)+hw_cookie(30)+hw_popcorn(40)=225
+            // 裝飾: pumpkin(150)+witch_hat(60)+spider(45)+skull(70)+hw_bat(40)=365
+            // 活動: costume(250)+glow(25)+ghost(90)+fangs(30)+hw_mask(65)=460
             easy: [
-                { budget:600, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow'] },
-                { budget:550, availableIds:['pumpkin','costume','spider','skull','fangs'] },
-                { budget:580, availableIds:['pumpkin','costume','treat','glow','witch_hat'] },
-                { budget:620, availableIds:['pumpkin','costume','ghost','candy_bag','glow'] },
-                { budget:570, availableIds:['pumpkin','costume','skull','treat','spider'] },
-                { budget:610, availableIds:['pumpkin','costume','witch_hat','fangs','glow'] },
-                { budget:590, availableIds:['pumpkin','costume','candy_bag','spider','glow'] },
-                { budget:600, availableIds:['pumpkin','costume','glow','treat','fangs'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:750, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
             ],
             normal: [
-                { budget:640, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow','skull','spider'] },
-                { budget:700, availableIds:['pumpkin','costume','ghost','treat','fangs','witch_hat','skull'] },
-                { budget:680, availableIds:['pumpkin','costume','candy_bag','spider','skull','glow','fangs'] },
-                { budget:660, availableIds:['pumpkin','costume','witch_hat','ghost','treat','candy_bag','glow'] },
-                { budget:720, availableIds:['pumpkin','costume','skull','fangs','candy_bag','witch_hat','treat'] },
-                { budget:650, availableIds:['pumpkin','costume','spider','glow','ghost','witch_hat','candy_bag'] },
-                { budget:690, availableIds:['pumpkin','costume','fangs','skull','treat','ghost','spider'] },
-                { budget:670, availableIds:['pumpkin','costume','candy_bag','glow','skull','witch_hat','ghost'] },
+                { budget:620, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:640, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:660, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:680, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:700, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:620, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:640, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:660, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:680, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:700, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
             ],
             hard: [
-                { budget:640, availableIds:['pumpkin','costume','candy_bag','witch_hat','glow','skull','spider','ghost','treat'] },
-                { budget:680, availableIds:['pumpkin','costume','ghost','treat','fangs','witch_hat','skull','spider','glow'] },
-                { budget:660, availableIds:['pumpkin','costume','candy_bag','spider','skull','glow','fangs','treat','witch_hat'] },
-                { budget:700, availableIds:['pumpkin','costume','witch_hat','ghost','treat','candy_bag','glow','fangs','skull'] },
-                { budget:650, availableIds:['pumpkin','costume','skull','fangs','candy_bag','witch_hat','treat','ghost','spider'] },
-                { budget:720, availableIds:['pumpkin','costume','spider','glow','ghost','witch_hat','candy_bag','fangs','skull'] },
+                { budget:490, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:510, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:530, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:550, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:570, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:490, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:510, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
+                { budget:530, availableIds:['pumpkin','witch_hat','spider','skull','hw_bat','costume','glow','ghost','fangs','hw_mask','candy_bag','treat','hw_chocolate','hw_cookie','hw_popcorn'] },
             ],
         },
     },
     picnic: {
         name: '春日野餐', icon: '🌸',
         allItems: [
-            { id:'sandwich', name:'三明治',    price:120, icon:'🥪' },
-            { id:'blanket',  name:'野餐墊',    price:180, icon:'🧺' },
-            { id:'fruit',    name:'水果盒',    price:95,  icon:'🍓' },
-            { id:'juice',    name:'果汁飲料',  price:60,  icon:'🧃' },
-            { id:'cookies',  name:'餅乾點心',  price:75,  icon:'🍪' },
-            { id:'sunhat',   name:'遮陽帽',    price:150, icon:'👒' },
-            { id:'frisbee',  name:'飛盤',      price:85,  icon:'🥏' },
-            { id:'bubble',   name:'泡泡水',    price:30,  icon:'🫧' },
-            { id:'balloon',  name:'彩色汽球',  price:50,  icon:'🎈' },
-            { id:'kite',     name:'風箏',      price:160, icon:'🪁' },
+            { id:'sandwich',    name:'三明治',    price:120, icon:'🥪' },
+            { id:'blanket',     name:'野餐墊',    price:180, icon:'🧺' },
+            { id:'fruit',       name:'水果盒',    price:95,  icon:'🍓' },
+            { id:'juice',       name:'果汁飲料',  price:60,  icon:'🧃' },
+            { id:'cookies',     name:'餅乾點心',  price:75,  icon:'🍪' },
+            { id:'sunhat',      name:'遮陽帽',    price:150, icon:'👒' },
+            { id:'frisbee',     name:'飛盤',      price:85,  icon:'🥏' },
+            { id:'bubble',      name:'泡泡水',    price:30,  icon:'🫧' },
+            { id:'balloon',     name:'彩色汽球',  price:50,  icon:'🎈' },
+            { id:'kite',        name:'風箏',      price:160, icon:'🪁' },
+            { id:'pc_onigiri',  name:'飯糰',      price:45,  icon:'🍙' },
+            { id:'pc_flowers',  name:'野花束',    price:55,  icon:'🌺' },
+            { id:'pc_umbrella', name:'遮陽傘',    price:90,  icon:'⛱️' },
+            { id:'pc_badminton',name:'羽毛球組',  price:75,  icon:'🏸' },
+            { id:'pc_rope',     name:'跳繩',      price:50,  icon:'🪢' },
         ],
         scenarios: {
+            // 全部15種商品（食物5+裝飾5+活動5）；食物=395,裝飾=525,活動=400,合計=1320
+            // 食物: sandwich(120)+fruit(95)+juice(60)+cookies(75)+pc_onigiri(45)=395
+            // 裝飾: blanket(180)+sunhat(150)+balloon(50)+pc_flowers(55)+pc_umbrella(90)=525
+            // 活動: frisbee(85)+bubble(30)+kite(160)+pc_badminton(75)+pc_rope(50)=400
             easy: [
-                { budget:500, availableIds:['sandwich','blanket','juice','bubble','cookies'] },
-                { budget:480, availableIds:['sandwich','blanket','fruit','balloon','bubble'] },
-                { budget:520, availableIds:['sandwich','blanket','cookies','juice','balloon'] },
-                { budget:490, availableIds:['sandwich','blanket','bubble','fruit','juice'] },
-                { budget:510, availableIds:['sandwich','blanket','balloon','cookies','bubble'] },
-                { budget:500, availableIds:['sandwich','blanket','juice','fruit','balloon'] },
-                { budget:480, availableIds:['sandwich','blanket','cookies','bubble','fruit'] },
-                { budget:520, availableIds:['sandwich','blanket','balloon','juice','bubble'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:950, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
             ],
             normal: [
-                { budget:600, availableIds:['sandwich','blanket','fruit','juice','cookies','frisbee','bubble'] },
-                { budget:650, availableIds:['sandwich','blanket','frisbee','balloon','cookies','juice','fruit'] },
-                { budget:620, availableIds:['sandwich','blanket','bubble','kite','juice','cookies','balloon'] },
-                { budget:580, availableIds:['sandwich','blanket','fruit','frisbee','balloon','bubble','cookies'] },
-                { budget:640, availableIds:['sandwich','blanket','cookies','juice','kite','bubble','fruit'] },
-                { budget:610, availableIds:['sandwich','blanket','balloon','frisbee','fruit','cookies','bubble'] },
-                { budget:630, availableIds:['sandwich','blanket','juice','kite','frisbee','balloon','bubble'] },
-                { budget:600, availableIds:['sandwich','blanket','frisbee','fruit','cookies','bubble','balloon'] },
+                { budget:760, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:790, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:820, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:850, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:880, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:760, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:790, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:820, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:850, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:880, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
             ],
             hard: [
-                { budget:630, availableIds:['sandwich','blanket','fruit','juice','cookies','frisbee','bubble','balloon','kite'] },
-                { budget:660, availableIds:['sandwich','blanket','frisbee','balloon','cookies','juice','fruit','bubble','kite'] },
-                { budget:640, availableIds:['sandwich','blanket','bubble','kite','juice','cookies','balloon','fruit','frisbee'] },
-                { budget:620, availableIds:['sandwich','blanket','fruit','frisbee','balloon','bubble','cookies','juice','kite'] },
-                { budget:680, availableIds:['sandwich','blanket','cookies','juice','kite','bubble','fruit','frisbee','balloon'] },
-                { budget:650, availableIds:['sandwich','blanket','balloon','frisbee','fruit','cookies','bubble','kite','juice'] },
+                { budget:600, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:630, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:660, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:690, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:720, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:600, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:630, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
+                { budget:660, availableIds:['sandwich','fruit','juice','cookies','pc_onigiri','blanket','sunhat','balloon','pc_flowers','pc_umbrella','frisbee','bubble','kite','pc_badminton','pc_rope'] },
             ],
         },
     },
@@ -385,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.submitted    = false;
             g.successfulRoundItems = [];
             g.roundStats           = [];
+            g.roundItemsList       = [];
             this.state.isEndingGame = false;
             this.state.isProcessing  = false;
             Game.Debug.log('init', '🔄 [B5] 遊戲狀態已重置');
@@ -457,12 +509,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b-setting-group">
-                            <label class="b-setting-label">關卡數：</label>
+                            <label class="b-setting-label">題數：</label>
                             <div class="b-btn-group" id="rounds-group">
-                                <button class="b-sel-btn" data-val="1">1關</button>
-                                <button class="b-sel-btn" data-val="3">3關</button>
-                                <button class="b-sel-btn" data-val="5">5關</button>
-                                <button class="b-sel-btn" data-val="8">8關</button>
+                                <button class="b-sel-btn" data-val="1">1題</button>
+                                <button class="b-sel-btn" data-val="3">3題</button>
+                                <button class="b-sel-btn" data-val="5">5題</button>
+                                <button class="b-sel-btn" data-val="8">8題</button>
                                 <button class="b-sel-btn" id="b5-custom-rounds-btn">自訂選項</button>
                             </div>
                         </div>
@@ -549,10 +601,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const b5CustomRoundsBtn = document.getElementById('b5-custom-rounds-btn');
             if (b5CustomRoundsBtn) {
                 Game.EventManager.on(b5CustomRoundsBtn, 'click', () => {
-                    this._showSettingsCountNumpad('關卡數', (n) => {
+                    this._showSettingsCountNumpad('題數', (n) => {
                         document.querySelectorAll('#rounds-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                         b5CustomRoundsBtn.classList.add('active');
-                        b5CustomRoundsBtn.textContent = `${n}關`;
+                        b5CustomRoundsBtn.textContent = `${n}題`;
                         this.state.settings.rounds = n;
                         this._checkCanStart();
                     });
@@ -1033,7 +1085,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b5-task-hdr-left">
                             <div class="b5-task-hdr-text">
                                 <div class="b5-task-title">🎪 派對採購任務<button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button></div>
-                                <div class="b5-task-budget">預算：<strong>${g.budget}</strong> 元</div>
                             </div>
                         </div>
                         <div class="b5-task-hdr-right">
@@ -1042,6 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>
+                ${this._renderB5BudgetCard(g)}
                 <div class="b5-shopping-layout">
                     <div class="b5-cat-list" id="b5-cat-list">${this._renderB5CatList(cats, activeCat)}</div>
                     <div class="b5-cat-panel" id="b5-cat-panel">${this._renderB5CatPanel(activeCat)}</div>
@@ -1145,11 +1197,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
         },
 
-        _renderB5RightPanel(g) {
+        _renderB5BudgetCard(g) {
             const total = this._getTotal();
             const rem   = g.budget - total;
             const pct   = g.budget > 0 ? Math.min(Math.round(total / g.budget * 100), 100) : 0;
             const meterCls = total > g.budget ? ' over' : total > g.budget * 0.9 ? ' near' : ' ok';
+            return `
+            <div class="b5-budget-standalone-card" id="b5-budget-standalone-card">
+                <div class="b5-rp-budget-row">
+                    <span class="b5-rp-label">本關預算</span>
+                    <span class="b5-rp-budget-val">${g.budget} 元</span>
+                </div>
+                <div class="b5-budget-meter">
+                    <div class="b5-budget-meter-fill${meterCls}" id="b5-budget-meter-fill" style="width:${pct}%"></div>
+                    <span class="b5-meter-label" id="b5-meter-label">${pct}%</span>
+                </div>
+                <div class="b5-rp-spent-row">
+                    <span>已選 <b id="b5-total-amount">${total}</b> 元</span>
+                    <span class="${rem < 0 ? 'b5-rp-over' : ''}">剩 <b id="b5-remaining-amount">${rem}</b> 元</span>
+                </div>
+            </div>`;
+        },
+
+        _renderB5RightPanel(g) {
+            const total = this._getTotal();
             const canConfirm = total > 0 && total <= g.budget;
             const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
             const cartHTML = selectedItems.length
@@ -1161,18 +1232,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`).join('')
                 : '<div class="b5-cart-empty">尚未選購任何商品</div>';
             return `
-            <div class="b5-rp-budget-row">
-                <span class="b5-rp-label">本關預算</span>
-                <span class="b5-rp-budget-val">${g.budget} 元</span>
-            </div>
-            <div class="b5-budget-meter">
-                <div class="b5-budget-meter-fill${meterCls}" id="b5-budget-meter-fill" style="width:${pct}%"></div>
-                <span class="b5-meter-label" id="b5-meter-label">${pct}%</span>
-            </div>
-            <div class="b5-rp-spent-row">
-                <span>已選 <b id="b5-total-amount">${total}</b> 元</span>
-                <span class="${rem < 0 ? 'b5-rp-over' : ''}">剩 <b id="b5-remaining-amount">${rem}</b> 元</span>
-            </div>
             <div class="b5-cart-header">🛒 購物清單</div>
             <div class="b5-cart-items" id="b5-cart-items">${cartHTML}</div>
             <button class="b5-confirm-btn${canConfirm ? ' ready' : ''}" id="b5-confirm-btn" ${canConfirm ? '' : 'disabled'}>確認購買</button>`;
@@ -1449,8 +1508,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const replayBtn = document.getElementById('replay-speech-btn');
             if (replayBtn) {
                 Game.EventManager.on(replayBtn, 'click', () => {
-                    const text = this.state.game.lastSpeechText;
-                    if (text) Game.Speech.speak(text);
+                    const b = this.state.game.budget;
+                    Game.Speech.speak(`派對採購任務，請在預算${b}元之內採購所需商品`);
                 }, {}, 'gameUI');
             }
 
@@ -1662,25 +1721,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resultArea) {
                 const rem = g.budget - total;
                 if (isCorrect) {
-                    const remPct = g.budget > 0 ? Math.round((rem / g.budget) * 100) : 0;
                     const isPerfectBudget = rem === 0;
-                    const savingsBadge = rem > 0
-                        ? `<div class="b5-savings-badge">💰 節省了 ${rem} 元（節省 ${remPct}%）！</div>`
-                        : '';
-                    const usePct = g.budget > 0 ? Math.round((total / g.budget) * 100) : 0;
-                    const effInfo = isPerfectBudget ? { icon: '💯', label: '完美！剛好用完預算！', cls: 'perfect-exact' }
-                        : usePct >= 95 ? { icon: '💎', label: '完美預算！', cls: 'perfect' }
-                        : usePct >= 80 ? { icon: '⭐', label: '善用預算！', cls: 'good' }
-                        : usePct >= 60 ? { icon: '👍', label: '不錯預算！', cls: 'ok' }
-                        : { icon: '💡', label: '節省模式', cls: 'save' };
-                    const effBadge = `<div class="b5-eff-badge ${effInfo.cls}">${effInfo.icon} ${effInfo.label} <span class="b5-eff-pct">${usePct}%</span></div>`;
-                    resultArea.innerHTML = `
-                        <div class="b5-result-banner success${isPerfectBudget ? ' perfect-budget' : ''}">
-                            ${isPerfectBudget ? '🎯 完美配額！' : '🎉 太棒了！派對辦起來！'}
-                            <div class="b5-result-sub">共花了 ${total} 元${isPerfectBudget ? '，剛好用完！' : `，還剩 ${rem} 元`}</div>
-                        </div>
-                        ${effBadge}
-                        ${savingsBadge}`;
+                    resultArea.innerHTML = '';
                 } else {
                     // 計算建議移除的選購商品（最貴的、移除後不超支）
                     const overBy = total - g.budget;
@@ -1737,7 +1779,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 // 記錄各關預算使用（B6 receipts pattern）
                 g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
-                // 記錄本關選購物品（A4 交易摘要模式）
+                // 記錄本關選購物品（per-round list for review page navigation）
+                const roundItemObjects = g.items.filter(i => g.selectedIds.has(i.id)).map(i => ({ icon: i.icon, name: i.name, price: i.price }));
+                (g.customItems || []).filter(c => !c._deleted).forEach(c => roundItemObjects.push({ icon: '📦', name: c.name, price: c.price || 0 }));
+                const roundTotal = roundItemObjects.reduce((s, i) => s + i.price, 0);
+                if (!g.roundItemsList) g.roundItemsList = [];
+                g.roundItemsList.push({ roundNum: g.currentRound + 1, items: roundItemObjects, total: roundTotal });
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
                         g.successfulRoundItems.push(`${i.icon} ${i.name}`);
@@ -1746,10 +1793,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rem = g.budget - total;
                 if (rem === 0) {
                     this._showCenterFeedback('💯', '完美配額！');
-                    Game.Speech.speak(`完美！剛好花了${toTWD(total)}，用完全部預算！`);
+                    Game.Speech.speak(`完美！剛好花了${toTWD(total)}，前往結帳！`, () => {
+                        Game.TimerManager.setTimeout(() => {
+                            const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
+                            this._renderB5Phase2(selectedItems, total);
+                        }, 300, 'turnTransition');
+                    });
                 } else {
-                    this._showCenterFeedback('✅', '太棒了！');
-                    Game.Speech.speak(`太棒了！共花了${toTWD(total)}，還剩${toTWD(rem)}！`);
+                    this._showCenterFeedback('🎊', '太棒了，派對辦起來！');
+                    Game.Speech.speak(`太棒了！共花了${toTWD(total)}，前往結帳！`, () => {
+                        Game.TimerManager.setTimeout(() => {
+                            const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
+                            this._renderB5Phase2(selectedItems, total);
+                        }, 300, 'turnTransition');
+                    });
                 }
             } else {
                 g.streak = 0;
@@ -1763,31 +1820,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // 正確 → Phase 2 付款；錯誤 → 重試/跳過按鈕
-            Game.TimerManager.setTimeout(() => {
+            // 錯誤 → 重試/跳過按鈕（正確路徑已由語音 callback 驅動）
+            if (!isCorrect) Game.TimerManager.setTimeout(() => {
                 const resultArea2 = document.getElementById('b5-result-area');
                 if (resultArea2) {
-                    if (isCorrect) {
-                        // 進入 Phase 2 付款
-                        const selectedItems = g.items.filter(i => g.selectedIds.has(i.id));
-                        this._renderB5Phase2(selectedItems, total);
-                        return;
-                    } else {
-                        // Retry: re-render same round
-                        const retryBtn = document.createElement('button');
-                        retryBtn.className = 'b5-next-btn';
-                        retryBtn.textContent = '🔄 再試一次';
-                        retryBtn.style.background = '#6366f1';
-                        Game.EventManager.on(retryBtn, 'click', () => this.renderRound(), {}, 'gameUI');
-                        resultArea2.appendChild(retryBtn);
-                        // Skip button
-                        const skipBtn = document.createElement('button');
-                        skipBtn.className = 'b5-next-btn';
-                        skipBtn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
-                        skipBtn.style.cssText = 'background:#9ca3af;margin-top:8px;';
-                        Game.EventManager.on(skipBtn, 'click', () => this.nextRound(), {}, 'gameUI');
-                        resultArea2.appendChild(skipBtn);
-                    }
+                    const retryBtn = document.createElement('button');
+                    retryBtn.className = 'b5-next-btn';
+                    retryBtn.textContent = '🔄 再試一次';
+                    retryBtn.style.background = '#6366f1';
+                    Game.EventManager.on(retryBtn, 'click', () => this.renderRound(), {}, 'gameUI');
+                    resultArea2.appendChild(retryBtn);
+                    const skipBtn = document.createElement('button');
+                    skipBtn.className = 'b5-next-btn';
+                    skipBtn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
+                    skipBtn.style.cssText = 'background:#9ca3af;margin-top:8px;';
+                    Game.EventManager.on(skipBtn, 'click', () => this.nextRound(), {}, 'gameUI');
+                    resultArea2.appendChild(skipBtn);
                 }
             }, 1400, 'turnTransition');
         },
@@ -1798,6 +1846,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderB5Phase2(selectedItems, total) {
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
+            this.state.isProcessing = false;
             const g = this.state.game;
             g.p2Wallet     = [];
             g.p2UidCtr     = 0;
@@ -1827,7 +1876,6 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
                     <span class="b-header-unit">${themeData.icon} 生日派對預算</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
@@ -1840,7 +1888,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="game-container">
                 ${this._renderB5P2RefCard(selectedItems, total, themeData)}
                 ${this._renderB5P2WalletArea(total)}
-                ${diff !== 'easy' ? `<button class="b5-confirm-btn" id="b5-p2-confirm-btn" disabled>✅ 確認付款</button>` : ''}
+                ${diff !== 'easy' ? `<button class="b5-confirm-btn b5-p2-confirm-wrap" id="b5-p2-confirm-btn" disabled>✅ 確認付款</button>` : ''}
                 ${this._renderB5P2CoinTray()}
             </div>`;
 
@@ -1862,27 +1910,29 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB5P2RefCard(selectedItems, total, themeData) {
-            const itemsList = selectedItems.map(it =>
-                `<div class="b5p2-ref-item"><span>${it.icon} ${it.name}</span><span class="b5p2-ref-price">${it.price}元</span></div>`
+            const allItems = [
+                ...selectedItems,
+                ...(this.state.game.customItems || []).filter(i => !i._deleted).map(i => ({ icon: '📦', name: i.name, price: i.price }))
+            ];
+            const formulaParts = allItems.map((it, idx) =>
+                (idx > 0 ? '<span class="b5p2-fp">+</span>' : '') +
+                `<span class="b5p2-fi"><span class="b5p2-fi-icon">${it.icon}</span><span class="b5p2-fi-name">${it.name}</span><span class="b5p2-fi-price">${it.price}元</span></span>`
             ).join('');
-            const customList = (this.state.game.customItems || [])
-                .filter(i => !i._deleted)
-                .map(i => `<div class="b5p2-ref-item"><span>📦 ${i.name}</span><span class="b5p2-ref-price">${i.price}元</span></div>`).join('');
+            const formulaHTML = formulaParts + `<span class="b5p2-fp">=</span><span class="b5p2-fi-total">${total}元</span>`;
             return `
             <div class="b5p2-ref-card">
                 <div class="b5p2-ref-header">
-                    <span class="b5p2-ref-icon">${themeData.icon}</span>
-                    <span class="b5p2-ref-title">${themeData.name}</span>
+                    <span class="b5p2-ref-spacer"></span>
+                    <div class="b5p2-ref-center">
+                        <span class="b5p2-ref-icon">${themeData.icon}</span>
+                        <span class="b5p2-ref-title">${themeData.name}</span>
+                    </div>
                     <span class="b5-p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
-                        <button class="b-hint-btn" id="b5-p2-hint-btn">💡 提示</button>
+                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
+                        <button class="b5-p1-hint-btn" id="b5-p2-hint-btn">💡 提示</button>
                     </span>
                 </div>
-                <div class="b5p2-ref-items">${itemsList}${customList}</div>
-                <div class="b5p2-ref-total-row">
-                    <span class="b5p2-ref-total-label">合計</span>
-                    <span class="b5p2-ref-total-val">${total} 元</span>
-                </div>
+                <div class="b5p2-formula-row">${formulaHTML}</div>
             </div>`;
         },
 
@@ -2142,13 +2192,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     coinsEl.querySelector('.b5p2-wallet-empty')?.remove();
                     const canRemove = diff !== 'easy';
                     const isBill = denom >= 100;
-                    const w = isBill ? 100 : 60;
+                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     const div = document.createElement('div');
                     div.className = 'b5p2-wallet-coin b5p2-coin-new' + (canRemove ? ' b5p2-wc-removable' : '');
                     if (canRemove) { div.setAttribute('draggable', 'true'); div.dataset.uid = String(uid); }
                     div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
-                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                         onerror="this.style.display='none'" draggable="false">
+                         style="${imgStyle}" onerror="this.style.display='none'" draggable="false">
                     ${canRemove ? `<button class="b5p2-wc-remove" data-uid="${uid}" title="移除">✕</button>` : ''}`;
                     coinsEl.appendChild(div);
                 }
@@ -2262,12 +2311,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinsEl.innerHTML = g.p2HintSlots.map((slot, idx) => {
                     if (!slot.filled) {
                         const isBill = slot.denom >= 100;
-                        const w = isBill ? 100 : 60;
+                        const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
                         const face = slot.face || 'front';
                         return `<div class="b5p2-wallet-coin b5p2-ghost-slot" data-b5p2-hint-idx="${idx}">
                             <img src="../images/money/${slot.denom}_yuan_${face}.png" alt="${slot.denom}元"
-                                 style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                                 onerror="this.style.display='none'" draggable="false"></div>`;
+                                 style="${imgStyle}" onerror="this.style.display='none'" draggable="false"></div>`;
                     }
                     let filledCount = 0;
                     let coin = null;
@@ -2279,11 +2327,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (!coin) return '';
                     const isBill = coin.denom >= 100;
-                    const w = isBill ? 100 : 60;
+                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     return `<div class="b5p2-wallet-coin" data-b5p2-hint-idx="${idx}">
                         <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
-                             style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                             onerror="this.style.display='none'" draggable="false"></div>`;
+                             style="${imgStyle}" onerror="this.style.display='none'" draggable="false"></div>`;
                 }).join('');
             } else if (g.p2Wallet.length === 0) {
                 coinsEl.innerHTML = '<span class="b5p2-wallet-empty">把錢幣拖曳到這裡 👈</span>';
@@ -2291,14 +2338,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const canRemove = diff !== 'easy';
                 coinsEl.innerHTML = g.p2Wallet.map(coin => {
                     const isBill = coin.denom >= 100;
-                    const w = isBill ? 100 : 60;
+                    const imgStyle = isBill ? 'height:80px;width:auto;display:block;' : 'width:60px;height:60px;display:block;';
                     const cls = 'b5p2-wallet-coin' + (canRemove ? ' b5p2-wc-removable' : '');
                     const extra = canRemove ? `draggable="true" data-uid="${coin.uid}"` : '';
                     const removeBtn = canRemove ? `<button class="b5p2-wc-remove" data-uid="${coin.uid}" title="移除">✕</button>` : '';
                     return `<div class="${cls}" ${extra}>
                         <img src="../images/money/${coin.denom}_yuan_${coin.face}.png" alt="${coin.denom}元"
-                             style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;"
-                             onerror="this.style.display='none'" draggable="false">
+                             style="${imgStyle}" onerror="this.style.display='none'" draggable="false">
                         ${removeBtn}</div>`;
                 }).join('');
             }
@@ -2375,14 +2421,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this._b5P2ShowResult(wTotal, 0);
-                    }, 400, 'turnTransition');
+                    }, 700, 'turnTransition');
                 });
             } else {
-                Game.Speech.speak(`付了${toTWD(wTotal)}`, () => {
+                Game.Speech.speak(`付了${toTWD(wTotal)}，需要找您${toTWD(change)}`, () => {
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
                         this._b5P2ShowChangeReturn(wTotal, total, change);
-                    }, 400, 'turnTransition');
+                    }, 700, 'turnTransition');
                 });
             }
         },
@@ -2462,7 +2508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
                     <span class="b-header-unit">${themeData.icon} 生日派對預算</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
@@ -2475,11 +2520,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="game-container">
                 <div class="b5p2-ref-card">
                     <div class="b5p2-ref-header">
-                        <span class="b5p2-ref-icon">${themeData.icon}</span>
-                        <span class="b5p2-ref-title">${themeData.name}</span>
+                        <span class="b5p2-ref-spacer"></span>
+                        <div class="b5p2-ref-center">
+                            <span class="b5p2-ref-icon">${themeData.icon}</span>
+                            <span class="b5p2-ref-title">${themeData.name}</span>
+                        </div>
                         <span class="b5-p2-hint-wrap">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
-                            <button class="b-hint-btn" id="b5c-hint-btn">💡 提示</button>
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
+                            <button class="b5-p1-hint-btn" id="b5c-hint-btn">💡 提示</button>
                         </span>
                     </div>
                     <div class="b5c-change-info-bar">
@@ -2550,16 +2598,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     g.changeHintSlots[slotIdx].filled = true;
                     g.changeHintSlots[slotIdx].uid = uid;
                     g.changePlaced.push({ denom, uid, face });
+                    this._b5P2UpdateChangeDisplay(change);
+                    this._b5P2RenderWalletCoins(change);
                 } else {
                     this.audio.play('coin');
                     g.changePlaced.push({ denom, uid, face });
+                    this._b5P2UpdateChangeDisplay(change);
+                    // 直接追加 DOM，避免重繪時已放置金幣重複動畫
+                    const walletCoinsEl = document.getElementById('b5c-wallet-coins');
+                    if (walletCoinsEl) {
+                        walletCoinsEl.querySelector('.b5p2-wallet-empty, .b6p2-wallet-empty')?.remove();
+                        const isBill = denom >= 100;
+                        const w = isBill ? 80 : 52;
+                        const div = document.createElement('div');
+                        div.className = 'b5c-wc-item b5c-coin-new';
+                        div.setAttribute('draggable', 'true');
+                        div.dataset.uid = uid;
+                        div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                             style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                        <span class="b1-denom-label">${denom}元</span>
+                        <button class="b5c-wc-remove" data-uid="${uid}" title="移除">×</button>`;
+                        walletCoinsEl.appendChild(div);
+                        Game.TimerManager.setTimeout(() => div.classList.remove('b5c-coin-new'), 280, 'ui');
+                    }
                 }
-                this._b5P2UpdateChangeDisplay(change);
-                this._b5P2RenderWalletCoins(change);
-                if (diff === 'normal') {
-                    const runningTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
-                    Game.Speech.speak(`找為${toTWD(runningTotal)}`);
-                }
+                const cumulativeTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
+                Game.Speech.speak(toTWD(cumulativeTotal));
             };
 
             // Desktop drag-from-tray
@@ -2621,12 +2685,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             g.changeHintSlots[slotIdx].uid = null;
                             g.changePlaced = g.changePlaced.filter(p => p.uid !== uid);
                         }
+                        this._b5P2UpdateChangeDisplay(change);
+                        this._b5P2RenderWalletCoins(change);
                     } else {
                         const uid = btn.dataset.uid;
                         g.changePlaced = g.changePlaced.filter(p => p.uid !== uid);
+                        document.querySelector(`.b5c-wc-item[data-uid="${uid}"]`)?.remove();
+                        if (walletCoinsEl && g.changePlaced.length === 0)
+                            walletCoinsEl.innerHTML = '<span class="b6p2-wallet-empty">把找零金錢拖曳到這裡</span>';
+                        this._b5P2UpdateChangeDisplay(change);
                     }
-                    this._b5P2UpdateChangeDisplay(change);
-                    this._b5P2RenderWalletCoins(change);
                 }, {}, 'gameUI');
             }
 
@@ -2667,14 +2735,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const uid = _draggingWalletUid;
                 _draggingWalletUid = null;
                 if (e.dataTransfer.dropEffect === 'none') {
+                    this.audio.play('click');
                     if (g.changeGhostMode) {
                         const slotIdx = (g.changeHintSlots || []).findIndex(s => s.uid === uid);
                         if (slotIdx !== -1) { g.changeHintSlots[slotIdx].filled = false; g.changeHintSlots[slotIdx].uid = null; }
+                        g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
+                        this._b5P2UpdateChangeDisplay(change);
+                        this._b5P2RenderWalletCoins(change);
+                    } else {
+                        g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
+                        document.querySelector(`.b5c-wc-item[data-uid="${uid}"]`)?.remove();
+                        const coinsEl2 = document.getElementById('b5c-wallet-coins');
+                        if (coinsEl2 && g.changePlaced.length === 0)
+                            coinsEl2.innerHTML = '<span class="b6p2-wallet-empty">把找零金錢拖曳到這裡</span>';
+                        this._b5P2UpdateChangeDisplay(change);
                     }
-                    g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
-                    this.audio.play('click');
-                    this._b5P2UpdateChangeDisplay(change);
-                    this._b5P2RenderWalletCoins(change);
                 }
             }, {}, 'gameUI');
 
@@ -2708,14 +2783,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const r    = zone?.getBoundingClientRect();
                     const inside = r && t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
                     if (!inside) {
+                        this.audio.play('click');
                         if (g.changeGhostMode) {
                             const slotIdx = (g.changeHintSlots || []).findIndex(s => s.uid === uid);
                             if (slotIdx !== -1) { g.changeHintSlots[slotIdx].filled = false; g.changeHintSlots[slotIdx].uid = null; }
+                            g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
+                            this._b5P2UpdateChangeDisplay(change);
+                            this._b5P2RenderWalletCoins(change);
+                        } else {
+                            g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
+                            document.querySelector(`.b5c-wc-item[data-uid="${uid}"]`)?.remove();
+                            const coinsEl3 = document.getElementById('b5c-wallet-coins');
+                            if (coinsEl3 && g.changePlaced.length === 0)
+                                coinsEl3.innerHTML = '<span class="b6p2-wallet-empty">把找零金錢拖曳到這裡</span>';
+                            this._b5P2UpdateChangeDisplay(change);
                         }
-                        g.changePlaced = (g.changePlaced || []).filter(p => p.uid !== uid);
-                        this.audio.play('click');
-                        this._b5P2UpdateChangeDisplay(change);
-                        this._b5P2RenderWalletCoins(change);
                     }
                 }, { passive: true }, 'gameUI');
             }
@@ -2842,10 +2924,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 找零正確
+            document.getElementById('correct-sound')?.play();
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, zIndex: 1001 });
+            }
             this._showCenterFeedback('🎉', '找零完成！');
-            Game.Speech.speak(`找回${toTWD(change)}，找零完成！`, () => {
+            Game.Speech.speak(`找零完成！`, () => {
                 this.state.isProcessing = false;
-                this._b5P2ShowResult(paid, change);
+                Game.TimerManager.setTimeout(() => this.nextRound(), 300, 'turnTransition');
             });
         },
 
@@ -3085,56 +3171,78 @@ document.addEventListener('DOMContentLoaded', () => {
             else                     { badge = '練習 ⭐'; badgeColor = '#94a3b8'; medalIcon = '⭐'; }
 
             // 各關預算使用統計（F5 量比較 pattern）
-            const roundStatsCardHTML = g.roundStats && g.roundStats.length > 0 ? (() => {
-                const totalBudget = g.roundStats.reduce((s, r) => s + r.budget, 0);
-                const totalSpent  = g.roundStats.reduce((s, r) => s + r.spent,  0);
-                const totalSaved  = totalBudget - totalSpent;
-                const avgPct = Math.round(totalSpent / totalBudget * 100);
-                return `
-            <div class="b5-res-budget-stats">
-
-                <h3>📊 各關預算使用</h3>
-                <div class="b5-budget-bars">
-                    ${g.roundStats.map(r => {
-                        const pct = Math.round(r.spent / r.budget * 100);
-                        const barClass = pct > 100 ? 'over' : pct >= 90 ? 'near' : 'ok';
-                        return `<div class="b5-bar-row">
-                            <span class="b5-bar-label">第${r.roundNum}關</span>
-                            <div class="b5-bar-track">
-                                <div class="b5-bar-fill ${barClass}" style="width:${Math.min(pct,100)}%"></div>
-                            </div>
-                            <span class="b5-bar-val">${r.spent}/${r.budget}元</span>
-                        </div>`;
-                    }).join('')}
-                </div>
-                <div class="b5-res-total-row">
-                    <span>總預算：<strong>${totalBudget}元</strong></span>
-                    <span>總花費：<strong>${totalSpent}元</strong></span>
-                    <span class="${totalSaved >= 0 ? 'saved' : 'over'}">節省：<strong>${totalSaved >= 0 ? '+'+totalSaved : totalSaved}元</strong></span>
-                    <span>平均使用率：<strong>${avgPct}%</strong></span>
-                </div>
-            </div>`;
-            })() : '';
-
             // 派對物品回顧
             const themeForResult = this.state.settings.partyTheme === 'random'
                 ? { icon: '🎲', name: '隨機派對' }
                 : (B5_THEMES[this.state.settings.partyTheme] || B5_THEMES.birthday);
-            const partyCardHTML = g.successfulRoundItems.length > 0 ? `
-            <div class="b-review-card">
-                <h3>${themeForResult.icon} 本次${themeForResult.name}採購物品</h3>
-                <div class="b5-party-tags">
-                    ${g.successfulRoundItems.map(item =>
-                        `<span class="b5-party-tag">${item}</span>`).join('')}
-                </div>
-            </div>` : '';
+
+            // 每題採購物品 + 預算統計導覽
+            const roundItemsList = g.roundItemsList || [];
+            const totalRoundsCount = roundItemsList.length;
+            let b5RicIdx = 0;
+
+            const _perRoundHTML = (idx) => {
+                if (!totalRoundsCount) return '';
+                const entry = roundItemsList[Math.min(idx, totalRoundsCount - 1)];
+                const stats = (g.roundStats || [])[idx];
+                const hasMultiple = totalRoundsCount > 1;
+
+                const navHTML = `<div class="b5-ric-nav">
+                    ${hasMultiple ? `<button class="b5-ric-nav-btn" id="b5-ric-prev" ${idx === 0 ? 'disabled' : ''}>◀</button>` : '<span></span>'}
+                    <span class="b5-ric-nav-label">第 ${entry.roundNum} 題採購物品</span>
+                    ${hasMultiple ? `<button class="b5-ric-nav-btn" id="b5-ric-next" ${idx >= totalRoundsCount - 1 ? 'disabled' : ''}>▶</button>` : '<span></span>'}
+                </div>`;
+
+                const rows = (entry.items || []).map(item => {
+                    if (typeof item === 'object') {
+                        return `<tr><td class="b5-it-icon">${item.icon}</td><td class="b5-it-name">${item.name}</td><td class="b5-it-price">${item.price}元</td></tr>`;
+                    }
+                    const sp = item.indexOf(' ');
+                    return `<tr><td class="b5-it-icon">${item.slice(0, sp)}</td><td class="b5-it-name" colspan="2">${item.slice(sp + 1)}</td></tr>`;
+                }).join('');
+                const tableTotal = entry.total ?? (entry.items || []).reduce((s, i) => s + (typeof i === 'object' ? i.price : 0), 0);
+                const tableHTML = `<table class="b5-items-table">
+                    <thead><tr><th>商品</th><th>名稱</th><th>價格</th></tr></thead>
+                    <tbody>${rows}
+                    <tr class="b5-it-total-row"><td>💰</td><td>總計</td><td>${tableTotal}元</td></tr>
+                    </tbody></table>`;
+
+                const statsHTML = stats ? `<div class="b5-per-round-stats">
+                    <div class="b5-prs-item"><span class="b5-prs-label">本題預算</span><span class="b5-prs-val">${stats.budget}元</span></div>
+                    <div class="b5-prs-item"><span class="b5-prs-label">實際花費</span><span class="b5-prs-val b5-prs-spent">${stats.spent}元</span></div>
+                    <div class="b5-prs-item"><span class="b5-prs-label">剩餘金額</span><span class="b5-prs-val ${stats.budget - stats.spent >= 0 ? 'b5-prs-saved' : 'b5-prs-over'}">${stats.budget - stats.spent}元</span></div>
+                </div>` : '';
+
+                return navHTML + tableHTML + statsHTML;
+            };
+
+            const _updateSummaryBtn = () => {
+                const btn = document.getElementById('b5-view-summary-btn');
+                if (btn) btn.style.display = (b5RicIdx >= totalRoundsCount - 1) ? '' : 'none';
+            };
+            const _bindRicNav = () => {
+                document.getElementById('b5-ric-prev')?.addEventListener('click', () => {
+                    if (b5RicIdx > 0) {
+                        b5RicIdx--;
+                        document.getElementById('b5-round-items-card').innerHTML = _perRoundHTML(b5RicIdx);
+                        _bindRicNav(); _updateSummaryBtn();
+                    }
+                });
+                document.getElementById('b5-ric-next')?.addEventListener('click', () => {
+                    if (b5RicIdx < totalRoundsCount - 1) {
+                        b5RicIdx++;
+                        document.getElementById('b5-round-items-card').innerHTML = _perRoundHTML(b5RicIdx);
+                        _bindRicNav(); _updateSummaryBtn();
+                    }
+                });
+            };
 
             const app = document.getElementById('app');
             document.body.style.overflow = 'auto';
             document.documentElement.style.overflow = 'auto';
             app.style.overflow = 'auto'; app.style.height = 'auto'; app.style.minHeight = '100vh';
 
-            // ── 第一頁：測驗回顧 ──
+            // ── 第一頁：派對回顧 ──
             app.innerHTML = `
 <div class="b-review-wrapper">
     <div class="b-review-screen">
@@ -3143,16 +3251,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <h1 class="b-review-title">派對回顧</h1>
             <p class="b-review-subtitle">看看這次的採購記錄！</p>
         </div>
-        ${roundStatsCardHTML}
-        ${partyCardHTML}
-        <button id="b5-view-summary-btn" class="b-review-next-btn">
+        <div class="b5-review-big-card">
+            ${totalRoundsCount > 0 ? `<div class="b5-round-items-card" id="b5-round-items-card">${_perRoundHTML(0)}</div>` : ''}
+        </div>
+        <button id="b5-view-summary-btn" class="b-review-next-btn" style="${totalRoundsCount > 1 ? 'display:none' : ''}">
             📊 查看測驗總結
         </button>
     </div>
 </div>`;
 
+            _bindRicNav();
+
             Game.TimerManager.setTimeout(() => {
-                document.getElementById('success-sound')?.play();
+                this.audio.play('correct');
             }, 100, 'confetti');
             Game.TimerManager.setTimeout(() => {
                 Game.Speech.speak('完成了！來看看派對回顧吧！');
@@ -3210,44 +3321,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
-            ${roundStatsCardHTML}
-
-            ${/* 預算效率星評（Round 31 pattern）*/ (() => {
-                if (!g.roundStats || g.roundStats.length === 0) return '';
-                const avgPct2 = Math.round(g.roundStats.reduce((s,r) => s + r.spent/r.budget*100, 0) / g.roundStats.length);
-                const stars = avgPct2 >= 90 ? 3 : avgPct2 >= 60 ? 2 : 1;
-                const starHTML = ['⭐','⭐','⭐'].map((s, i) => `<span class="b5-star${i < stars ? ' lit' : ''}">${s}</span>`).join('');
-                const label = stars === 3 ? '預算大師！' : stars === 2 ? '不錯的控制！' : '繼續練習！';
-                return `<div class="b5-star-rating">
-                    <div class="b5-star-row">${starHTML}</div>
-                    <div class="b5-star-label">${label}（平均使用率 ${avgPct2}%）</div>
-                </div>`;
-            })()}
-
-            ${partyCardHTML}
-
-            ${/* 必買vs選購比例條（Round 40）*/ (() => {
-                if (!g.roundStats || g.roundStats.length === 0) return '';
-                const totalMust = g.roundStats.reduce((s, r) => s + (r.mustSpent || 0), 0);
-                const totalOpt  = g.roundStats.reduce((s, r) => s + (r.optSpent  || 0), 0);
-                const total     = totalMust + totalOpt;
-                if (total === 0) return '';
-                const mustPct = Math.round(totalMust / total * 100);
-                const optPct  = 100 - mustPct;
-                return `<div class="b5-res-ratio">
-                    <h3>🛒 必買 vs 選購比例</h3>
-                    <div class="b5-ratio-bar">
-                        <div class="b5-ratio-must" style="width:${mustPct}%">必買 ${mustPct}%</div>
-                        <div class="b5-ratio-opt"  style="width:${optPct}%">選購 ${optPct}%</div>
-                    </div>
-                    <div class="b5-ratio-vals">
-                        <span>必買：${totalMust}元</span>
-                        <span>選購：${totalOpt}元</span>
-                    </div>
-                </div>`;
-            })()}
-
-
             <div class="b-res-btns">
                 <button id="play-again-btn" class="b-res-play-btn">
                     <span class="btn-icon">🔄</span><span class="btn-text">再玩一次</span>
@@ -3301,7 +3374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         backToMenu() {
             Game.TimerManager.clearAll();
             Game.EventManager.removeAll();
-            window.location.href = '../index.html#part4';
+            window.location.href = '../index.html#part3';
         },
     };
 
