@@ -544,10 +544,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🏪 市場類型：</label>
                             <div class="b-btn-group" id="market-group">
+                                <button class="b-sel-btn" data-market="random">隨機 🎲</button>
                                 <button class="b-sel-btn" data-market="traditional">🏪 傳統市場</button>
                                 <button class="b-sel-btn" data-market="supermarket">🛒 超市</button>
                                 <button class="b-sel-btn" data-market="nightmarket">🏮 夜市</button>
-                                <button class="b-sel-btn" data-market="random">隨機 🎲</button>
                             </div>
                         </div>
                         <div class="b-setting-group">

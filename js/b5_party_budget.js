@@ -499,10 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b-setting-group">
                             <label class="b-setting-label">🎪 派對主題</label>
                             <div class="b-btn-group" id="theme-group">
+                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                                 <button class="b-sel-btn" data-theme="birthday">生日派對 🎂</button>
                                 <button class="b-sel-btn" data-theme="halloween">萬聖節 🎃</button>
                                 <button class="b-sel-btn" data-theme="picnic">春日野餐 🌸</button>
-                                <button class="b-sel-btn" data-theme="random">隨機 🎲</button>
                             </div>
                             <div style="margin-top:4px;font-size:12px;color:#6b7280;">
                                 每個主題有不同的必買商品和預算挑戰！
