@@ -7725,9 +7725,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="a3c-change-title">💰 找零金額</div>
                                 <div class="a3c-change-amount">${changeAmount} 元</div>
                             </div>
-                            <div class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info">
-                                <span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）
-                            </div>
                         </div>
                         <div class="a3c-info-right" style="flex-direction:row;min-width:unset;">
                             <img src="../images/index/educated_money_bag_character.png" alt="" class="a3c-mascot a3c-mascot-bounce" onerror="this.style.display='none'">
@@ -7743,9 +7740,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 卡片3：我的錢包 -->
                     <div class="a3c-change-card">
-                        <div class="a3c-card-title" style="display:flex;justify-content:center;align-items:center;gap:8px;">
-                            <span>💼 我的錢包</span>
-                            <button class="a3c-wallet-toggle-btn" id="a3c-wallet-toggle">▼ 展開錢包</button>
+                        <div class="a3c-card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info"><span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）</span>
+                                <span>💼 我的錢包</span>
+                            </div>
+                            <button class="a3c-wallet-toggle-btn" id="a3c-wallet-toggle">▶ 展開錢包</button>
                         </div>
                         <div class="a3c-wallet-split">
                             <!-- 左：原有錢包（預設折疊） -->
@@ -7968,7 +7968,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!left) return;
                     const expanded = left.style.display !== 'none';
                     left.style.display = expanded ? 'none' : '';
-                    walletToggle.textContent = expanded ? '▼ 展開錢包' : '▲ 收起錢包';
+                    walletToggle.textContent = expanded ? '▶ 展開錢包' : '◀ 收起錢包';
                 });
             }
         },

@@ -9313,9 +9313,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span class="a4c-change-label">找零金額：</span>
                                         <span class="a4c-change-num">${change} 元</span>
                                     </div>
-                                    <span class="a4c-wallet-info a4c-hidden" id="a4c-wallet-info">
-                                        （<span id="a4c-wallet-balance">${walletRemaining}</span>元，已找回 <span id="a4c-placed-total">0</span>/${change} 元）
-                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -9333,9 +9330,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 我的錢包 -->
                     <div class="a4c-card">
-                        <div class="a4c-card-title" style="display:flex;justify-content:center;align-items:center;gap:8px;">
-                            <span>💼 我的錢包</span>
-                            <button class="a4c-wallet-toggle-btn" id="a4c-wallet-toggle">▼ 展開錢包</button>
+                        <div class="a4c-card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="a4c-wallet-info a4c-hidden" id="a4c-wallet-info"><span id="a4c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a4c-placed-total">0</span>/${change} 元）</span>
+                                <span>💼 我的錢包</span>
+                            </div>
+                            <button class="a4c-wallet-toggle-btn" id="a4c-wallet-toggle">▶ 展開錢包</button>
                         </div>
                         <div class="a4c-wallet-split">
                             <!-- 左：原有錢包（預設折疊） -->
@@ -9552,7 +9552,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!left) return;
                     const expanded = left.style.display !== 'none';
                     left.style.display = expanded ? 'none' : '';
-                    walletToggle.textContent = expanded ? '▼ 展開錢包' : '▲ 收起錢包';
+                    walletToggle.textContent = expanded ? '▶ 展開錢包' : '◀ 收起錢包';
                 });
             }
         },

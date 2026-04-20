@@ -9216,11 +9216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="position:absolute;left:-19px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-right:19px solid #1976d2;pointer-events:none;"></div>
                             <div style="flex:1;text-align:center;">
                                 <p class="npc-dialogue-text" style="margin:0;">找您 ${change} 元</p>
-                                <div class="a6c-wallet-info-row" style="margin-top:6px;">
-                                    <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info" style="font-size:13px;color:#5b21b6;">
-                                        <span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）
-                                    </span>
-                                </div>
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                                 <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
@@ -9237,9 +9232,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 我的錢包 -->
                     <div class="a6c-card">
-                        <div class="a6c-card-title" style="display:flex;justify-content:center;align-items:center;gap:8px;">
-                            <span>💼 我的錢包</span>
-                            <button class="a6c-wallet-toggle-btn" id="a6c-wallet-toggle">▼ 展開錢包</button>
+                        <div class="a6c-card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info"><span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）</span>
+                                <span>💼 我的錢包</span>
+                            </div>
+                            <button class="a6c-wallet-toggle-btn" id="a6c-wallet-toggle">▶ 展開錢包</button>
                         </div>
                         <div class="a6c-wallet-split">
                             <!-- 左：原有錢包（預設折疊） -->
@@ -9458,7 +9456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!left) return;
                     const expanded = left.style.display !== 'none';
                     left.style.display = expanded ? 'none' : '';
-                    walletToggle.textContent = expanded ? '▼ 展開錢包' : '▲ 收起錢包';
+                    walletToggle.textContent = expanded ? '▶ 展開錢包' : '◀ 收起錢包';
                 }, {}, 'changeDrag');
             }
         },
