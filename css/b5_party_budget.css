@@ -462,6 +462,14 @@
     background: white; border-radius: 20px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.25);
 }
+.b5-ri-cancel-btn {
+    display: block; margin: 0 auto 12px;
+    background: #f3f4f6; border: 1.5px solid #d1d5db;
+    color: #6b7280; font-size: 13px; font-weight: 600;
+    padding: 5px 14px; border-radius: 8px; cursor: pointer;
+    transition: background 0.15s;
+}
+.b5-ri-cancel-btn:hover { background: #e5e7eb; color: #374151; }
 .b5-ri-round  { font-size: 18px; font-weight: 700; color: #7c3aed; margin-bottom: 8px; }
 .b5-ri-icon   { font-size: 52px; margin: 8px 0; }
 .b5-ri-label  { font-size: 14px; color: #6b7280; margin-top: 4px; }
@@ -2313,3 +2321,112 @@
 .b5-prs-spent { color: #7c3aed; }
 .b5-prs-saved { color: #059669; }
 .b5-prs-over  { color: #dc2626; }
+
+/* ── Round Intro card: item list ── */
+.b5-ri-list-title { font-size: 14px; font-weight: 700; color: #5b21b6; margin: 10px 0 6px; }
+.b5-ri-list { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.b5-ri-item-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; background: #f5f3ff; border-radius: 8px;
+}
+.b5-ri-item-icon  { font-size: 20px; }
+.b5-ri-item-name  { flex: 1; font-size: 14px; font-weight: 600; color: #374151; }
+.b5-ri-item-price { font-size: 14px; font-weight: 700; color: #7c3aed; white-space: nowrap; }
+.b5-ri-total { margin-top: 10px; font-size: 16px; font-weight: 800; color: #d97706; }
+
+/* ── Target checklist in task card ── */
+.b5-target-checklist { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.b5-tc-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 8px; border-radius: 8px;
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    transition: background 0.15s, border-color 0.15s;
+}
+.b5-tc-item.done { background: #d1fae5; border-color: #6ee7b7; }
+.b5-tc-check { font-size: 16px; width: 20px; text-align: center; }
+.b5-tc-icon  { font-size: 18px; }
+.b5-tc-name  { flex: 1; font-size: 13px; font-weight: 600; color: #374151; }
+.b5-tc-price { font-size: 13px; font-weight: 700; color: #7c3aed; white-space: nowrap; }
+.b5-tc-hard-summary {
+    padding: 6px 10px; border-radius: 8px;
+    background: #f3f4f6; font-size: 14px; font-weight: 600; color: #374151;
+    margin-top: 4px;
+}
+
+/* ── Target badge on item cards ── */
+.b5-item-card.b5-item-target {
+    border: 2px solid #7c3aed !important;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+.b5-target-badge {
+    position: absolute; top: 4px; right: 4px;
+    background: #7c3aed; color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 5px; border-radius: 6px;
+    letter-spacing: 0.3px;
+    pointer-events: none;
+}
+/* ensure item-card has position:relative for badge */
+.b5-item-card { position: relative; }
+
+/* ── Hard mode hint modal additions ── */
+.b5-hm-progress {
+    text-align: center; font-size: 14px; font-weight: 700;
+    color: #5b21b6; margin-bottom: 8px;
+}
+.b5-hm-row.b5-hm-done {
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+.b5-hm-tick {
+    font-size: 16px; color: #059669; font-weight: 900;
+    margin-left: 4px;
+}
+
+/* 找零頁：錢包餘額整合標籤（普通顯示，困難隱藏） */
+.b5c-wallet-info {
+    font-size: 14px;
+    font-weight: 700;
+    color: #5b21b6;
+    margin-left: 8px;
+}
+.b5c-wallet-info.b6c-hidden {
+    display: none;
+}
+
+/* 找零頁：「點這裡」提示高亮（簡單模式自動，普通/困難按提示後） */
+.b6-product-here-hint {
+    outline: 2.5px solid #f58025 !important;
+    outline-offset: 2px !important;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 1;
+    animation: b6HereHintPulse 1s ease-in-out infinite !important;
+}
+@keyframes b6HereHintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,128,37,0.5); }
+    50%       { box-shadow: 0 0 0 7px rgba(245,128,37,0); }
+}
+.b6-product-here-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -46px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f58025 0%, #ffa040 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 13px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(245,128,37,0.55);
+    pointer-events: none;
+    z-index: 9999;
+    animation: b6HereBounce 1s ease-in-out infinite;
+}
+@keyframes b6HereBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(-5px); }
+}
+#b5c-confirm-btn.b6-product-here-hint::after { top: -46px; }
