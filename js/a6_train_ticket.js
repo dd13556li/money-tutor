@@ -9601,10 +9601,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a6cHintSlots = slots;
             this._a6UpdateChangeDisplay(change);
             this._a6RenderWalletCoins(change);
-            // 展開左側錢包區（Ghost slot 需要與原有金幣對照）
-            const _wb = document.getElementById('a6c-wallet-left');
-            const _wt = document.getElementById('a6c-wallet-toggle');
-            if (_wb && _wb.style.display === 'none') { _wb.style.display = ''; if (_wt) _wt.textContent = '▲ 收起錢包'; }
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
             this.Speech.speak(`可以用${parts.join('，')}`);
         },

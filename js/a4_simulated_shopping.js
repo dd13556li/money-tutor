@@ -9375,7 +9375,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn    = document.getElementById('a4c-hint-btn');
             if (!trayEl || !walletZone) return;
 
+            let _dropCooldown = false;
             const handleDrop = (denom) => {
+                if (_dropCooldown) return;
+                _dropCooldown = true;
+                setTimeout(() => { _dropCooldown = false; }, 300);
                 const face = gs.a4cTrayFaces?.[denom] || 'front';
                 const uid  = 'a4c' + Date.now() + Math.floor(Math.random() * 10000);
                 if (gs.a4cGhostMode) {
@@ -9536,12 +9540,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     gs.a4cHintShown = true;
                     const walletInfo = document.getElementById('a4c-wallet-info');
                     if (walletInfo) walletInfo.classList.remove('a4c-hidden');
-                    const leftPanel = document.getElementById('a4c-wallet-left');
-                    const toggleBtn = document.getElementById('a4c-wallet-toggle');
-                    if (leftPanel && leftPanel.style.display === 'none') {
-                        leftPanel.style.display = '';
-                        if (toggleBtn) toggleBtn.textContent = '▲ 收起錢包';
-                    }
                     this._a4ShowChangeGhostSlots(change);
                     this._a4ShowChangeHintModal(change);
                 });
@@ -9695,10 +9693,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a4cHintSlots = slots;
             this._a4UpdateChangeDisplay(change);
             this._a4RenderWalletCoins(change);
-            // 展開左側錢包區（Ghost slot 需要與原有金幣對照）
-            const _wb = document.getElementById('a4c-wallet-left');
-            const _wt = document.getElementById('a4c-wallet-toggle');
-            if (_wb && _wb.style.display === 'none') { _wb.style.display = ''; if (_wt) _wt.textContent = '▲ 收起錢包'; }
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
             this.speech.speak(`可以用${parts.join('，')}`);
         },
