@@ -9605,6 +9605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gs.a4cGhostMode && gs.a4cHintSlots?.length > 0) {
                 if (gs.a4cHintSlots.every(s => s.filled)) {
                     gs.a4cGhostMode = false;
+                    walletCoinsEl.innerHTML = '';  // 清除所有 ghost slot，避免殘留
                 } else {
                     const kids = Array.from(walletCoinsEl.children);
                     if (kids.length !== gs.a4cHintSlots.length) {

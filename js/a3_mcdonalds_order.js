@@ -8022,7 +8022,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gs.a3cGhostMode && gs.a3cHintSlots?.length > 0) {
                 if (gs.a3cHintSlots.every(s => s.filled)) {
                     gs.a3cGhostMode = false;
-                    // fall through to normal render
+                    walletCoinsEl.innerHTML = '';  // 清除所有 ghost slot，避免殘留
                 } else {
                     const kids = Array.from(walletCoinsEl.children);
                     if (kids.length !== gs.a3cHintSlots.length) {
