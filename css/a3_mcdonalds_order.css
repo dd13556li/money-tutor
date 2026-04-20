@@ -1958,7 +1958,8 @@ body.click-mode-enabled .fade-in {
 }
 .a3c-wallet-info.a3c-hidden { display: none; }
 
-.a3c-mascot { width: 60px; height: auto; }
+.a3c-mascot { width: 44px; height: auto; }
+.a3c-mascot-bounce { animation: settingsBounce 2.5s ease-in-out infinite; }
 
 .a3c-hint-btn {
     background: linear-gradient(135deg, #ffcc02, #ff8f00);
@@ -1972,12 +1973,24 @@ body.click-mode-enabled .fade-in {
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(255,204,2,0.4);
 }
+.a3c-wallet-toggle-btn {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
 
 .a3c-card-title {
     font-size: 15px;
     font-weight: 700;
     color: #c62d42;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .a3c-tray-coins {

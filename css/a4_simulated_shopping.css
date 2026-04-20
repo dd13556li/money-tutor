@@ -3958,7 +3958,8 @@ body.click-mode-active *:focus-visible {
     min-width: 76px;
 }
 
-.a4c-mascot { width: 56px; height: auto; }
+.a4c-mascot { width: 44px; height: auto; }
+.a4c-mascot-bounce { animation: settingsBounce 2.5s ease-in-out infinite; }
 
 .a4c-hint-btn {
     background: linear-gradient(135deg, #10b981, #059669);
@@ -3971,6 +3972,17 @@ body.click-mode-active *:focus-visible {
     cursor: pointer;
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+}
+.a4c-wallet-toggle-btn {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .a4c-card {
@@ -3985,6 +3997,7 @@ body.click-mode-active *:focus-visible {
     font-weight: 700;
     color: #059669;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .a4c-tray-coins {

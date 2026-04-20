@@ -1023,7 +1023,7 @@
 
                         <!-- 按鈕區 -->
                         <div class="game-buttons">
-                            <button class="back-to-main-btn" onclick="location.href='../index.html#part3'">
+                            <button class="back-to-main-btn" onclick="location.href='../index.html#part4'">
                                 返回主畫面
                             </button>
                             ${this.isSettingsComplete()
@@ -1252,12 +1252,12 @@
             const backBtn = startBtnContainer.querySelector('.back-to-main-btn');
             if (this.isSettingsComplete()) {
                 startBtnContainer.innerHTML = `
-                    ${backBtn ? backBtn.outerHTML : '<button class="back-to-main-btn" onclick="location.href=\'../index.html#part3\'">返回主畫面</button>'}
+                    ${backBtn ? backBtn.outerHTML : '<button class="back-to-main-btn" onclick="location.href=\'../index.html#part4\'">返回主畫面</button>'}
                     <button class="start-btn" onclick="VendingMachine.startGame()">開始遊戲</button>
                 `;
             } else {
                 startBtnContainer.innerHTML = `
-                    ${backBtn ? backBtn.outerHTML : '<button class="back-to-main-btn" onclick="location.href=\'../index.html#part3\'">返回主畫面</button>'}
+                    ${backBtn ? backBtn.outerHTML : '<button class="back-to-main-btn" onclick="location.href=\'../index.html#part4\'">返回主畫面</button>'}
                     <button class="start-btn disabled" onclick="VendingMachine.showMissingSettings()">請完成所有設定選項</button>
                 `;
             }

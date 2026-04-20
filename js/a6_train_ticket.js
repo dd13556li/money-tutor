@@ -9125,6 +9125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a6cErrorCount = 0;
             gs.a6cPlaced     = [];
             gs.a6cTotal      = change;
+            gs.a6cHintShown  = false;
 
             // 面額托盤
             let trayDenoms;
@@ -9190,25 +9191,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div style="flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto;box-sizing:border-box;">
 
-                    <!-- NPC 視窗 + 提示鈕 -->
-                    <div class="ticket-window-combined" style="margin:0;flex:none;">
+                    <!-- 售票員對話框 -->
+                    <div class="ticket-window-combined" style="align-items:center;margin:0;padding:0;">
                         <div class="clerk-section">
                             <div class="npc-character">
-                                <img src="../images/a6/train_clerk.png" alt="火車站售票員" style="width:100%;height:100%;object-fit:contain;">
+                                <img src="..\images\a6\train_clerk.png" alt="火車站售票員" style="width:100%;height:100%;object-fit:contain;">
                             </div>
                         </div>
-                        <div class="right-section" style="display:flex;flex-direction:column;gap:8px;">
-                            <div class="npc-dialogue-box" style="flex:1;">
-                                <p class="npc-dialogue-text">找您 ${change} 元</p>
-                            </div>
-                            <div class="a6c-wallet-info-row">
-                                <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info">
-                                    <span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）
-                                </span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
-                                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;" onerror="this.style.display='none'">
-                                <button class="a6c-hint-btn" id="a6c-hint-btn">💡 提示</button>
+                        <div class="right-section" style="gap:0;">
+                            <div class="npc-dialogue-box" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                                <div style="flex:1;text-align:center;">
+                                    <p class="npc-dialogue-text" style="margin:0;">找您 ${change} 元</p>
+                                    <div class="a6c-wallet-info-row" style="margin-top:6px;">
+                                        <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info" style="font-size:13px;color:#5b21b6;">
+                                            <span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）
+                                        </span>
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
+                                    <button class="a6c-hint-btn" id="a6c-hint-btn">💡 提示</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -9221,11 +9224,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 我的錢包 -->
                     <div class="a6c-card">
-                        <div class="a6c-card-title">💼 我的錢包</div>
+                        <div class="a6c-card-title" style="display:flex;justify-content:center;align-items:center;gap:8px;">
+                            <span>💼 我的錢包</span>
+                            <button class="a6c-wallet-toggle-btn" id="a6c-wallet-toggle">▼ 展開錢包</button>
+                        </div>
                         <div class="a6c-wallet-split">
-                            <div class="a6c-wallet-left">
+                            <!-- 左：原有錢包（預設折疊） -->
+                            <div class="a6c-wallet-left" id="a6c-wallet-left" style="display:none;">
                                 ${walletStaticHtml || '<span class="a6c-empty-hint">（餘額為0）</span>'}
                             </div>
+                            <!-- 右：找零放置區（永遠展開，折疊時佔滿全寬） -->
                             <div class="a6c-wallet-right a6c-drop-zone" id="a6c-wallet-zone">
                                 <div id="a6c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
                                     <span class="a6c-empty-hint">把找零金錢拖曳到這裡</span>
@@ -9270,9 +9278,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this._a6UpdateChangeDisplay(change);
                 this._a6RenderWalletCoins(change);
-                if (gs.a6cGhostMode) this._a6UpdateChangeTrayHints();
                 const runningTotal = (gs.a6cPlaced || []).reduce((s, p) => s + p.denom, 0);
-                this.Speech.speak(`找為${runningTotal}元`, { interrupt: true });
+                if (gs.a6cHintShown) this.Speech.speak(`找回${runningTotal}元`, { interrupt: true });
             };
 
             // Desktop drag from tray
@@ -9419,9 +9426,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hintBtn) {
                 this.EventManager.on(hintBtn, 'click', () => {
                     this.playSound('click');
+                    gs.a6cHintShown = true;
                     const walletInfo = document.getElementById('a6c-wallet-info');
                     if (walletInfo) walletInfo.classList.remove('a6c-hidden');
+                    this._a6ShowChangeGhostSlots(change);
                     this._a6ShowChangeHintModal(change);
+                }, {}, 'changeDrag');
+            }
+
+            const walletToggle = document.getElementById('a6c-wallet-toggle');
+            if (walletToggle) {
+                this.EventManager.on(walletToggle, 'click', () => {
+                    const left = document.getElementById('a6c-wallet-left');
+                    if (!left) return;
+                    const expanded = left.style.display !== 'none';
+                    left.style.display = expanded ? 'none' : '';
+                    walletToggle.textContent = expanded ? '▼ 展開錢包' : '▲ 收起錢包';
                 }, {}, 'changeDrag');
             }
         },
@@ -9564,7 +9584,10 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a6cHintSlots = slots;
             this._a6UpdateChangeDisplay(change);
             this._a6RenderWalletCoins(change);
-            this._a6UpdateChangeTrayHints();
+            // 展開左側錢包區（Ghost slot 需要與原有金幣對照）
+            const _wb = document.getElementById('a6c-wallet-left');
+            const _wt = document.getElementById('a6c-wallet-toggle');
+            if (_wb && _wb.style.display === 'none') { _wb.style.display = ''; if (_wt) _wt.textContent = '▲ 收起錢包'; }
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
             this.Speech.speak(`可以用${parts.join('，')}`);
         },
@@ -11622,7 +11645,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 返回主畫面
         backToMainMenu() {
             // 返回到單元選擇畫面
-            window.location.href = '../index.html#part3';
+            window.location.href = '../index.html#part4';
         },
 
         async unlockAudio() {

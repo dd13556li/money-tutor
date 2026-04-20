@@ -13764,7 +13764,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         backToMainMenu() {
             // 返回到單元選擇畫面或主選單
-            window.location.href = '../index.html#part3';
+            window.location.href = '../index.html#part4';
         },
 
         // =====================================================

@@ -2820,7 +2820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 返回主畫面
         backToMainMenu() {
             // 返回到遊戲選單畫面
-            window.location.href = '../index.html#part3';
+            window.location.href = '../index.html#part4';
         },
 
         startGame() {
@@ -7656,6 +7656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a3cErrorCount = 0;
             gs.a3cPlaced     = [];
             gs.a3cTotal      = changeAmount;
+            gs.a3cHintShown  = false;
 
             // 面額托盤（依找零金額）
             let trayDenoms;
@@ -7720,14 +7721,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <!-- 卡片1：找零金額 + 吉祥物 + 提示鈕 -->
                     <div class="a3c-change-card a3c-info-card">
                         <div class="a3c-info-left">
-                            <div class="a3c-change-title">💰 找零金額</div>
-                            <div class="a3c-change-amount">${changeAmount} 元</div>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+                                <div class="a3c-change-title">💰 找零金額</div>
+                                <div class="a3c-change-amount">${changeAmount} 元</div>
+                            </div>
                             <div class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info">
                                 <span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）
                             </div>
                         </div>
-                        <div class="a3c-info-right">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a3c-mascot" onerror="this.style.display='none'">
+                        <div class="a3c-info-right" style="flex-direction:row;min-width:unset;">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a3c-mascot a3c-mascot-bounce" onerror="this.style.display='none'">
                             <button class="a3c-hint-btn" id="a3c-hint-btn">💡 提示</button>
                         </div>
                     </div>
@@ -7740,11 +7743,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 卡片3：我的錢包 -->
                     <div class="a3c-change-card">
-                        <div class="a3c-card-title">💼 我的錢包</div>
+                        <div class="a3c-card-title" style="display:flex;justify-content:center;align-items:center;gap:8px;">
+                            <span>💼 我的錢包</span>
+                            <button class="a3c-wallet-toggle-btn" id="a3c-wallet-toggle">▼ 展開錢包</button>
+                        </div>
                         <div class="a3c-wallet-split">
-                            <div class="a3c-wallet-left">
+                            <!-- 左：原有錢包（預設折疊） -->
+                            <div class="a3c-wallet-left" id="a3c-wallet-left" style="display:none;">
                                 ${walletStaticHtml || '<span class="a3c-empty-hint">（餘額為0）</span>'}
                             </div>
+                            <!-- 右：找零放置區（永遠展開） -->
                             <div class="a3c-wallet-right a3c-drop-zone" id="a3c-wallet-zone">
                                 <div id="a3c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
                                     <span class="a3c-empty-hint">把找零金錢拖曳到這裡</span>
@@ -7791,10 +7799,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 this._a3UpdateChangeDisplay(change);
                 this._a3RenderWalletCoins(change);
-                if (gs.a3cGhostMode) this._a3UpdateChangeTrayHints();
                 const runningTotal = (gs.a3cPlaced || []).reduce((s, p) => s + p.denom, 0);
-                if (this.state.settings.speechEnabled && this.speech) {
-                    this.speech.speakText(`找為${runningTotal}元`);
+                if (gs.a3cHintShown && this.state.settings.speechEnabled && this.speech) {
+                    this.speech.speakText(`找回${runningTotal}元`);
                 }
             };
 
@@ -7942,9 +7949,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hintBtn) {
                 hintBtn.addEventListener('click', () => {
                     this.audio.playSound('beep');
+                    gs.a3cHintShown = true;
                     const walletInfo = document.getElementById('a3c-wallet-info');
                     if (walletInfo) walletInfo.classList.remove('a3c-hidden');
+                    const leftPanel = document.getElementById('a3c-wallet-left');
+                    const toggleBtn = document.getElementById('a3c-wallet-toggle');
+                    if (leftPanel && leftPanel.style.display === 'none') {
+                        leftPanel.style.display = '';
+                        if (toggleBtn) toggleBtn.textContent = '▲ 收起錢包';
+                    }
+                    this._a3ShowChangeGhostSlots(change);
                     this._a3ShowChangeHintModal(change);
+                });
+            }
+
+            const walletToggle = document.getElementById('a3c-wallet-toggle');
+            if (walletToggle) {
+                walletToggle.addEventListener('click', () => {
+                    const left = document.getElementById('a3c-wallet-left');
+                    if (!left) return;
+                    const expanded = left.style.display !== 'none';
+                    left.style.display = expanded ? 'none' : '';
+                    walletToggle.textContent = expanded ? '▼ 展開錢包' : '▲ 收起錢包';
                 });
             }
         },
@@ -8104,7 +8130,10 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.a3cHintSlots = slots;
             this._a3UpdateChangeDisplay(change);
             this._a3RenderWalletCoins(change);
-            this._a3UpdateChangeTrayHints();
+            // 展開左側錢包區（Ghost slot 需要與原有金幣對照）
+            const _wb = document.getElementById('a3c-wallet-left');
+            const _wt = document.getElementById('a3c-wallet-toggle');
+            if (_wb && _wb.style.display === 'none') { _wb.style.display = ''; if (_wt) _wt.textContent = '▲ 收起錢包'; }
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
             if (this.state.settings.speechEnabled && this.speech) {
                 this.speech.speakText(`可以用${parts.join('，')}`);

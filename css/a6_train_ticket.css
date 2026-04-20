@@ -2308,6 +2308,7 @@ a.selection-btn {
     font-weight: 700;
     color: #1d4ed8;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .a6c-wallet-info-row {
@@ -2332,6 +2333,17 @@ a.selection-btn {
     cursor: pointer;
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+}
+.a6c-wallet-toggle-btn {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .a6c-tray-coins {
