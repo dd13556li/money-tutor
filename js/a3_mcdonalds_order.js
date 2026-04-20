@@ -8105,6 +8105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 找零正確
             this.audio.playSound('success');
+            this.playStepSuccess(true); // success 已播放 correct02.mp3，只需煙火
             gs.changeErrorCount = 0;
             gs.changeHintShown  = false;
             if (this.state.settings.speechEnabled && this.speech) {

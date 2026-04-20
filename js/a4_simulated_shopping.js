@@ -9279,11 +9279,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedItem.category === 'multi-selection') {
                 itemDisplayText = selectedItem.items.map(item => {
                     const productInfo = this.parseProductDisplay(item, 1);
-                    return `${this.getProductIconHTML(item, '5rem')}<span style="font-size:1.3em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
+                    return `${this.getProductIconHTML(item, '8rem')}<span style="font-size:1.8em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
                 }).join('、');
             } else {
                 const productInfo = this.parseProductDisplay(selectedItem, 1);
-                itemDisplayText = `${this.getProductIconHTML(selectedItem, '5rem')}<span style="font-size:1.3em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
+                itemDisplayText = `${this.getProductIconHTML(selectedItem, '8rem')}<span style="font-size:1.8em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
             }
 
             app.innerHTML = `
@@ -9672,6 +9672,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 找零正確
             this.state.gameState.isProcessingChange = false;
+            this.audio.playCorrect02Sound();
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, angle: 90, spread: 70, origin: { x: 0.5, y: 0.3 }, startVelocity: 35, ticks: 70, colors: ['#FFD700','#FFA500','#FF6B6B','#4CAF50','#2196F3','#FF69B4'] });
+            }
             const speechText = `正確！應該找您${this.convertToTraditionalCurrency(change)}`;
             this.speech.speak(speechText, {
                 callback: () => {
