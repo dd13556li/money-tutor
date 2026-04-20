@@ -9578,7 +9578,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('a4c-confirm-btn');
             if (confirmBtn) {
                 confirmBtn.disabled = false;
-                confirmBtn.classList.toggle('a4c-confirm-ready', exact);
             }
         },
 

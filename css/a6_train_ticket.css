@@ -2492,9 +2492,6 @@ a.selection-btn {
     opacity: 0.5;
 }
 .a6c-confirm-btn:not(:disabled) { opacity: 1; }
-.a6c-confirm-btn.a6c-confirm-ready {
-    /* 不 pulse，避免提示正確答案 */
-}
 .a6c-confirm-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 .a6c-confirm-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #F57C00, #E65100);

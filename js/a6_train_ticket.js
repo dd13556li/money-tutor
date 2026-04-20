@@ -9475,7 +9475,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('a6c-confirm-btn');
             if (confirmBtn) {
                 confirmBtn.disabled = false;
-                confirmBtn.classList.toggle('a6c-confirm-ready', exact);
             }
         },
 
