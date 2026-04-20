@@ -9249,7 +9249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <!-- 右：找零放置區（永遠展開，折疊時佔滿全寬） -->
                             <div class="a6c-wallet-right a6c-drop-zone" id="a6c-wallet-zone">
-                                <div id="a6c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
+                                <div id="a6c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;justify-content:center;min-height:60px;">
                                     <span class="a6c-empty-hint">把找零金錢拖曳到這裡</span>
                                 </div>
                             </div>

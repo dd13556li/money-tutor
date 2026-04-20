@@ -9347,7 +9347,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <!-- 右：找零放置區（永遠展開） -->
                             <div class="a4c-wallet-right a4c-drop-zone" id="a4c-wallet-zone">
-                                <div id="a4c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
+                                <div id="a4c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;justify-content:center;min-height:60px;">
                                     <span class="a4c-empty-hint">把找零金錢拖曳到這裡</span>
                                 </div>
                             </div>
