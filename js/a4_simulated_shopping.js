@@ -9695,6 +9695,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let i = 0; i < cnt; i++) slots.push({ denom, face, filled: false, uid: null });
             });
             gs.a4cHintSlots = slots;
+            // 強制清空，避免 DOM diff 誤判 empty-hint span 為 ghost slot
+            const _wc4 = document.getElementById('a4c-wallet-coins');
+            if (_wc4) _wc4.innerHTML = '';
             this._a4UpdateChangeDisplay(change);
             this._a4RenderWalletCoins(change);
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);

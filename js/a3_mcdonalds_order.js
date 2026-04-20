@@ -8129,6 +8129,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let i = 0; i < cnt; i++) slots.push({ denom, face, filled: false, uid: null });
             });
             gs.a3cHintSlots = slots;
+            // 強制清空，避免 DOM diff 誤判 empty-hint span 為 ghost slot
+            const _wc3 = document.getElementById('a3c-wallet-coins');
+            if (_wc3) _wc3.innerHTML = '';
             this._a3UpdateChangeDisplay(change);
             this._a3RenderWalletCoins(change);
             const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
