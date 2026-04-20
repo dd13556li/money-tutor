@@ -2140,7 +2140,7 @@ body.click-mode-enabled .fade-in {
 }
 .a3c-confirm-btn:not(:disabled) { opacity: 1; }
 .a3c-confirm-btn.a3c-confirm-ready {
-    animation: a3cConfirmPulse 1.5s infinite;
+    /* 不 pulse，避免提示正確答案 */
 }
 .a3c-confirm-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 .a3c-confirm-btn:hover:not(:disabled) {

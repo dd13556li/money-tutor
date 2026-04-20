@@ -5127,10 +5127,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 確認多選購買
         confirmMultiPurchase() {
+            if (this.state.isProcessing) return;
             if (!this.state.gameState.selectedItems || this.state.gameState.selectedItems.length === 0) {
                 this.speech.speak('請先選擇要購買的商品', { interrupt: true });
                 return;
             }
+            this.state.isProcessing = true;
             
             const difficulty = this.state.settings.difficulty;
             const totalPrice = this.state.gameState.selectedItems.reduce((sum, item) => sum + item.price, 0);
@@ -5201,6 +5203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     totalInput.placeholder = '請重新輸入正確金額';
                     confirmBtn.disabled = true;
                     confirmBtn.textContent = '確認購買';
+                    this.state.isProcessing = false;
                     return;
                 }
             } else {
@@ -5211,6 +5214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 🔧 [新增] 確認多選價格（第二步專用 - 普通/困難）
         confirmMultiPurchasePrice() {
+            if (this.state.isProcessing) return;
             const difficulty = this.state.settings.difficulty;
             const totalPrice = this.state.gameState.selectedItems
                 .reduce((sum, item) => sum + item.price, 0);
@@ -5231,6 +5235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (inputValue === totalPrice) {
                 // 答對
+                this.state.isProcessing = true;
                 Game.Debug.log('payment', '✅ [A4-價格確認] 答對！進入付款流程');
                 this.audio.playCorrect02Sound(() => {
                     let speechCompleted = false;
@@ -5267,6 +5272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalInput.value = '';
                 totalInput.placeholder = '請重新輸入正確金額';
                 confirmBtn.disabled = true;
+                this.state.isProcessing = false;
             }
         },
 
@@ -5343,11 +5349,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 🔧 [新增] 進入價格確認流程（自選模式 - 普通/困難）
         proceedToConfirmPrice() {
+            if (this.state.isProcessing) return;
             if (!this.state.gameState.selectedItems || this.state.gameState.selectedItems.length === 0) {
                 this.speech.speak('請先選擇要購買的商品', { interrupt: true });
                 return;
             }
 
+            this.state.isProcessing = true;
             const itemNames = this.state.gameState.selectedItems
                 .map(item => item.name)
                 .join('、');
@@ -5364,6 +5372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.speech.speak(speechText, {
                     callback: () => {
                         Game.TimerManager.setTimeout(() => {
+                            this.state.isProcessing = false;
                             // 使用 SceneManager 切換到價格確認場景
                             Game.SceneManager.switchScene('priceConfirmation', Game);
                         }, 1000, 'screenTransition');
