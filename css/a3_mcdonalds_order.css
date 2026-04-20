@@ -2142,7 +2142,16 @@ body.click-mode-enabled .fade-in {
     box-shadow: 0 4px 15px rgba(76,175,80,0.4);
     animation: a3cConfirmPulse 1.5s infinite;
 }
-.a3c-confirm-btn:disabled { cursor: not-allowed; }
+.a3c-confirm-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.a3c-confirm-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #F57C00, #E65100);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245,124,0,0.45);
+}
+.a3c-confirm-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 
 @keyframes a3cConfirmPulse {
     0%, 100% { transform: scale(1); }

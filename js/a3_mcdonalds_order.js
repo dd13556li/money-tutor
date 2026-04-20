@@ -7740,12 +7740,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 卡片3：我的錢包 -->
                     <div class="a3c-change-card">
-                        <div class="a3c-card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                        <div class="a3c-card-title" style="display:flex;align-items:center;">
+                            <div style="flex:1;"></div>
                             <div style="display:flex;align-items:center;gap:8px;">
-                                <span class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info"><span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）</span>
                                 <span>💼 我的錢包</span>
+                                <span class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info"><span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）</span>
                             </div>
-                            <button class="a3c-wallet-toggle-btn" id="a3c-wallet-toggle">▶ 展開錢包</button>
+                            <div style="flex:1;display:flex;justify-content:flex-end;">
+                                <button class="a3c-wallet-toggle-btn" id="a3c-wallet-toggle">▶ 展開錢包</button>
+                            </div>
                         </div>
                         <div class="a3c-wallet-split">
                             <!-- 左：原有錢包（預設折疊） -->

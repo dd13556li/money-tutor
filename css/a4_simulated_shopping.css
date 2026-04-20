@@ -4149,7 +4149,16 @@ body.click-mode-active *:focus-visible {
     box-shadow: 0 4px 15px rgba(16,185,129,0.4);
     animation: a4cConfirmPulse 1.5s infinite;
 }
-.a4c-confirm-btn:disabled { cursor: not-allowed; }
+.a4c-confirm-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.a4c-confirm-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #F57C00, #E65100);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245,124,0,0.45);
+}
+.a4c-confirm-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 
 @keyframes a4cConfirmPulse {
     0%, 100% { transform: scale(1); }

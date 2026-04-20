@@ -2495,7 +2495,16 @@ a.selection-btn {
     box-shadow: 0 4px 15px rgba(37,99,235,0.4);
     animation: a6cConfirmPulse 1.5s infinite;
 }
-.a6c-confirm-btn:disabled { cursor: not-allowed; }
+.a6c-confirm-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.a6c-confirm-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #F57C00, #E65100);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245,124,0,0.45);
+}
+.a6c-confirm-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 
 @keyframes a6cConfirmPulse {
     0%, 100% { transform: scale(1); }
