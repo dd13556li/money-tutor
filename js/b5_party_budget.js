@@ -897,11 +897,11 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'b5-round-intro';
             card.innerHTML = `
                 <div class="b5-ri-inner">
-                    <button class="b5-ri-cancel-btn" id="b5-ri-cancel">✕ 關閉</button>
                     <div class="b5-ri-round">${themeData.icon} 第 ${roundNum} 關</div>
                     <div class="b5-ri-list-title">🛒 今天要買的商品</div>
                     <div class="b5-ri-list">${listHTML}</div>
                     <div class="b5-ri-hint">${diff === 'hard' ? '記住採購清單再關閉' : '點「關閉」開始採購'}</div>
+                    <button class="b5-ri-cancel-btn" id="b5-ri-cancel">✕ 關閉</button>
                 </div>`;
             document.body.appendChild(card);
 
@@ -2277,7 +2277,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             }
-            // 付款成功 → 進入找零階段
+            // 付款成功 → 進入找零階段（語音播完 + 最短等待雙條件）
             const change = wTotal - total;
             this.audio.play('correct');
             this._showCenterFeedback('💯', '付款成功！');
@@ -2285,12 +2285,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const speechText = change === 0
                 ? `剛好${toTWD(wTotal)}，精準付款！`
                 : `付了${toTWD(wTotal)}，需要找您${toTWD(change)}`;
-            Game.Speech.speak(speechText, () => {
-                Game.TimerManager.setTimeout(() => {
-                    this.state.isProcessing = false;
-                    this._b5P2ShowChangeReturn(wTotal, total, change);
-                }, 700, 'turnTransition');
-            });
+            let _speechDone = false, _timerDone = false;
+            const _proceed = () => {
+                if (!_speechDone || !_timerDone) return;
+                this.state.isProcessing = false;
+                this._b5P2ShowChangeReturn(wTotal, total, change);
+            };
+            Game.Speech.speak(speechText, () => { _speechDone = true; _proceed(); });
+            Game.TimerManager.setTimeout(() => { _timerDone = true; _proceed(); }, 1500, 'turnTransition');
         },
 
         // ── 找零拖回階段（B6 重設計 pattern）────────────────────────────
