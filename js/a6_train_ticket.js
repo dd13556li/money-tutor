@@ -3803,7 +3803,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // 轉換為 {面額: 數量} 格式（與 customWalletDetails 相同）
             const details = {};
             for (const d of items) details[d] = (details[d] || 0) + 1;
-            Game.Debug.log('payment', `💰 [隨機錢包] ${amount}元 → ${items.length}張:`, details);
+
+            // 防止過多小面額積累（如 500→10×50）：超過 5 枚時兩兩合回較大面額
+            while ((details[50] || 0) >= 6) {
+                details[50] -= 2;
+                details[100] = (details[100] || 0) + 1;
+            }
+            while ((details[10] || 0) >= 6) {
+                details[10] -= 5;
+                details[50] = (details[50] || 0) + 1;
+            }
+
+            Game.Debug.log('payment', `💰 [隨機錢包] ${amount}元 → ${Object.values(details).reduce((a,b)=>a+b,0)}張:`, details);
             return details;
         },
 
@@ -9192,26 +9203,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto;box-sizing:border-box;">
 
                     <!-- 售票員對話框 -->
-                    <div class="ticket-window-combined" style="align-items:center;margin:0;padding:0;">
-                        <div class="clerk-section">
-                            <div class="npc-character">
-                                <img src="..\images\a6\train_clerk.png" alt="火車站售票員" style="width:100%;height:100%;object-fit:contain;">
-                            </div>
+                    <div style="display:flex;gap:16px;align-items:stretch;width:100%;">
+                        <!-- 左側：售票員圖示 -->
+                        <div style="flex-shrink:0;width:120px;display:flex;align-items:center;justify-content:center;">
+                            <img src="../images/a6/train_clerk.png" alt="火車站售票員"
+                                 style="width:120px;height:120px;object-fit:contain;border-radius:50%;border:3px solid #1976d2;background:linear-gradient(135deg,#e3f2fd,#bbdefb);box-shadow:0 4px 15px rgba(0,0,0,0.2);"
+                                 onerror="this.style.display='none'">
                         </div>
-                        <div class="right-section" style="gap:0;">
-                            <div class="npc-dialogue-box" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                                <div style="flex:1;text-align:center;">
-                                    <p class="npc-dialogue-text" style="margin:0;">找您 ${change} 元</p>
-                                    <div class="a6c-wallet-info-row" style="margin-top:6px;">
-                                        <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info" style="font-size:13px;color:#5b21b6;">
-                                            <span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）
-                                        </span>
-                                    </div>
+                        <!-- 右側：對話框（帶左側箭頭泡泡） -->
+                        <div style="flex:1;position:relative;background:#fff;border:3px solid #1976d2;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);min-width:0;">
+                            <!-- 左箭頭 -->
+                            <div style="position:absolute;left:-19px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-right:19px solid #1976d2;pointer-events:none;"></div>
+                            <div style="flex:1;text-align:center;">
+                                <p class="npc-dialogue-text" style="margin:0;">找您 ${change} 元</p>
+                                <div class="a6c-wallet-info-row" style="margin-top:6px;">
+                                    <span class="a6c-wallet-info a6c-hidden" id="a6c-wallet-info" style="font-size:13px;color:#5b21b6;">
+                                        <span id="a6c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a6c-placed-total">0</span>/${change} 元）
+                                    </span>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                                    <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
-                                    <button class="a6c-hint-btn" id="a6c-hint-btn">💡 提示</button>
-                                </div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
+                                <button class="a6c-hint-btn" id="a6c-hint-btn">💡 提示</button>
                             </div>
                         </div>
                     </div>
@@ -9262,7 +9275,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const hintBtn    = document.getElementById('a6c-hint-btn');
             if (!trayEl || !walletZone) return;
 
+            let _dropCooldown = false;
             const handleDrop = (denom) => {
+                if (_dropCooldown) return;
+                _dropCooldown = true;
+                setTimeout(() => { _dropCooldown = false; }, 300);
                 const face = gs.a6cTrayFaces?.[denom] || 'front';
                 const uid  = 'a6c' + Date.now() + Math.floor(Math.random() * 10000);
                 if (gs.a6cGhostMode) {
