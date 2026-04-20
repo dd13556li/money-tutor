@@ -7509,8 +7509,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const isNormalMode = this.state.settings.difficulty === 'normal';
             const isHardMode = this.state.settings.difficulty === 'hard';
 
-            // 普通模式或困難模式：顯示三選一找零選項
-            if (isNormalMode || isHardMode) {
+            // 困難模式：使用拖曳介面
+            if (isHardMode) {
+                this._a3ShowHardChangeDrag(changeAmount);
+                return;
+            }
+
+            // 普通模式：顯示三選一找零選項
+            if (isNormalMode) {
                 // 生成或使用已儲存的找零選項
                 if (!this.state.gameState.currentChangeOptions) {
                     this.state.gameState.currentChangeOptions = this.generateChangeOptions(changeAmount);
@@ -7568,7 +7574,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 簡單/困難模式：使用拖曳介面
+            // 簡單模式：使用拖曳介面
             app.innerHTML = `
                 <div class="mcdonalds-container" style="min-height: 100vh; display: flex; flex-direction: column;">
                     <!-- 標題列 -->
@@ -7637,6 +7643,535 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 400, 'hint');
             }
+        },
+
+        // ── A3 困難模式找零拖曳介面 ──────────────────────────────────
+
+        _a3ShowHardChangeDrag(changeAmount) {
+            const gs = this.state.gameState;
+
+            // 初始化狀態
+            gs.a3cGhostMode  = false;
+            gs.a3cHintSlots  = [];
+            gs.a3cErrorCount = 0;
+            gs.a3cPlaced     = [];
+            gs.a3cTotal      = changeAmount;
+
+            // 面額托盤（依找零金額）
+            let trayDenoms;
+            if (changeAmount <= 100)      { trayDenoms = [50, 10, 5, 1]; }
+            else if (changeAmount < 1000) { trayDenoms = [500, 100, 50, 10, 5, 1]; }
+            else                          { trayDenoms = [1000, 500, 100, 50, 10, 5, 1]; }
+
+            const trayFaces = {};
+            trayDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            gs.a3cTrayFaces = trayFaces;
+
+            // 貪婪最佳解
+            const greedySolution = {};
+            let remSol = changeAmount;
+            for (const d of [1000, 500, 100, 50, 10, 5, 1]) {
+                const cnt = Math.floor(remSol / d);
+                if (cnt > 0) { greedySolution[d] = cnt; remSol -= cnt * d; }
+            }
+            gs.a3cGreedySolution = greedySolution;
+
+            // 付款後錢包剩餘
+            const walletRemaining = (gs.walletTotal || 0) - (gs.paidAmount || gs.totalAmount || 0);
+            gs.a3cWalletBase = walletRemaining;
+
+            // 靜態錢包金幣（貪婪分解）
+            const walletCoins = [];
+            let _rem = walletRemaining;
+            for (const d of [1000, 500, 100, 50, 10, 5, 1]) {
+                const cnt = Math.floor(_rem / d);
+                for (let i = 0; i < cnt; i++) walletCoins.push(d);
+                _rem -= cnt * d;
+            }
+            const walletStaticHtml = walletCoins.map(d => {
+                const isBill = d >= 100;
+                const face = Math.random() < 0.5 ? 'back' : 'front';
+                const w = isBill ? 80 : 52;
+                return `<div class="a3c-wc-static">
+                    <img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a3c-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+
+            // 面額托盤 HTML（可重複拖曳）
+            const trayHtml = trayDenoms.map(d => {
+                const isBill = d >= 100;
+                return `<div class="a3c-denom-card" draggable="true" data-denom="${d}" data-face="${trayFaces[d]}" title="${d}元">
+                    <img src="../images/money/${d}_yuan_${trayFaces[d]}.png" alt="${d}元"
+                         class="${isBill ? 'a3c-banknote-img' : 'a3c-coin-img'}" draggable="false" onerror="this.style.display='none'">
+                    <span class="a3c-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+
+            const app = document.getElementById('app');
+            if (!app) return;
+
+            app.innerHTML = `
+            <div class="mcdonalds-container" style="min-height:100vh;display:flex;flex-direction:column;">
+                ${this.HTMLTemplates.titleBar(5, '確認找零')}
+                <div style="flex:1;display:flex;flex-direction:column;background:linear-gradient(135deg,#ffcc02,#ff8f00);padding:16px;gap:12px;overflow-y:auto;box-sizing:border-box;">
+
+                    <!-- 卡片1：找零金額 + 吉祥物 + 提示鈕 -->
+                    <div class="a3c-change-card a3c-info-card">
+                        <div class="a3c-info-left">
+                            <div class="a3c-change-title">💰 找零金額</div>
+                            <div class="a3c-change-amount">${changeAmount} 元</div>
+                            <div class="a3c-wallet-info a3c-hidden" id="a3c-wallet-info">
+                                <span id="a3c-wallet-balance">${walletRemaining}</span>元（已找回 <span id="a3c-placed-total">0</span>/${changeAmount} 元）
+                            </div>
+                        </div>
+                        <div class="a3c-info-right">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a3c-mascot" onerror="this.style.display='none'">
+                            <button class="a3c-hint-btn" id="a3c-hint-btn">💡 提示</button>
+                        </div>
+                    </div>
+
+                    <!-- 卡片2：拖曳金錢區 -->
+                    <div class="a3c-change-card">
+                        <div class="a3c-card-title">💰 找零面額（可重複拖曳）</div>
+                        <div class="a3c-tray-coins" id="a3c-tray-coins">${trayHtml}</div>
+                    </div>
+
+                    <!-- 卡片3：我的錢包 -->
+                    <div class="a3c-change-card">
+                        <div class="a3c-card-title">💼 我的錢包</div>
+                        <div class="a3c-wallet-split">
+                            <div class="a3c-wallet-left">
+                                ${walletStaticHtml || '<span class="a3c-empty-hint">（餘額為0）</span>'}
+                            </div>
+                            <div class="a3c-wallet-right a3c-drop-zone" id="a3c-wallet-zone">
+                                <div id="a3c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
+                                    <span class="a3c-empty-hint">把找零金錢拖曳到這裡</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:center;margin-top:12px;">
+                            <button class="a3c-confirm-btn" id="a3c-confirm-btn" disabled>✅ 確認找零</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>`;
+
+            if (this.state.settings.speechEnabled && this.speech) {
+                this.TimerManager.setTimeout(() => {
+                    this.speech.speakText(`找您${changeAmount}元，請把找回的金錢拖曳到我的錢包`);
+                }, 400, 'speechDelay');
+            }
+            this.TimerManager.setTimeout(() => this._a3SetupChangeDragInteraction(changeAmount), 100, 'uiAnimation');
+        },
+
+        _a3SetupChangeDragInteraction(change) {
+            const gs = this.state.gameState;
+            const trayEl     = document.getElementById('a3c-tray-coins');
+            const walletZone = document.getElementById('a3c-wallet-zone');
+            const confirmBtn = document.getElementById('a3c-confirm-btn');
+            const hintBtn    = document.getElementById('a3c-hint-btn');
+            if (!trayEl || !walletZone) return;
+
+            const handleDrop = (denom) => {
+                const face = gs.a3cTrayFaces?.[denom] || 'front';
+                const uid  = 'a3c' + Date.now() + Math.floor(Math.random() * 10000);
+                if (gs.a3cGhostMode) {
+                    const slotIdx = (gs.a3cHintSlots || []).findIndex(s => s.denom === denom && !s.filled);
+                    if (slotIdx === -1) { this.audio.playSound('error'); return; }
+                    this.audio.playSound('beep');
+                    gs.a3cHintSlots[slotIdx].filled = true;
+                    gs.a3cHintSlots[slotIdx].uid = uid;
+                    gs.a3cPlaced.push({ denom, uid, face });
+                } else {
+                    this.audio.playSound('beep');
+                    gs.a3cPlaced.push({ denom, uid, face });
+                }
+                this._a3UpdateChangeDisplay(change);
+                this._a3RenderWalletCoins(change);
+                if (gs.a3cGhostMode) this._a3UpdateChangeTrayHints();
+                const runningTotal = (gs.a3cPlaced || []).reduce((s, p) => s + p.denom, 0);
+                if (this.state.settings.speechEnabled && this.speech) {
+                    this.speech.speakText(`找為${runningTotal}元`);
+                }
+            };
+
+            // Desktop drag from tray
+            trayEl.querySelectorAll('.a3c-denom-card').forEach(card => {
+                const denom = parseInt(card.dataset.denom);
+                card.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', `a3cdenom:${denom}`);
+                    card.classList.add('a3c-dragging');
+                });
+                card.addEventListener('dragend', () => card.classList.remove('a3c-dragging'));
+            });
+            walletZone.addEventListener('dragover', e => { e.preventDefault(); walletZone.classList.add('a3c-drop-active'); });
+            walletZone.addEventListener('dragleave', e => {
+                if (!walletZone.contains(e.relatedTarget)) walletZone.classList.remove('a3c-drop-active');
+            });
+            walletZone.addEventListener('drop', e => {
+                e.preventDefault(); walletZone.classList.remove('a3c-drop-active');
+                const d = e.dataTransfer.getData('text/plain');
+                if (d.startsWith('a3cdenom:')) handleDrop(parseInt(d.replace('a3cdenom:', '')));
+            });
+
+            // Touch drag from tray
+            trayEl.querySelectorAll('.a3c-denom-card').forEach(card => {
+                const denom = parseInt(card.dataset.denom);
+                let ghostEl = null;
+                card.addEventListener('touchstart', e => {
+                    const t = e.touches[0];
+                    ghostEl = card.cloneNode(true);
+                    ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX - 35}px;top:${t.clientY - 50}px;`;
+                    document.body.appendChild(ghostEl);
+                }, { passive: true });
+                card.addEventListener('touchmove', e => {
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    if (ghostEl) { ghostEl.style.left = (t.clientX - 35) + 'px'; ghostEl.style.top = (t.clientY - 50) + 'px'; }
+                    const r = walletZone.getBoundingClientRect();
+                    walletZone.classList.toggle('a3c-drop-active',
+                        t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom);
+                }, { passive: false });
+                card.addEventListener('touchend', e => {
+                    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+                    walletZone.classList.remove('a3c-drop-active');
+                    const t = e.changedTouches[0];
+                    const r = walletZone.getBoundingClientRect();
+                    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) handleDrop(denom);
+                }, { passive: true });
+            });
+
+            // 移除錢包中的金幣（× 按鈕）
+            const walletCoinsEl = document.getElementById('a3c-wallet-coins');
+            if (walletCoinsEl) {
+                walletCoinsEl.addEventListener('click', e => {
+                    const btn = e.target.closest('.a3c-wc-remove');
+                    if (!btn) return;
+                    this.audio.playSound('beep');
+                    if (gs.a3cGhostMode) {
+                        const slotIdx = parseInt(btn.dataset.slotIdx);
+                        if (!isNaN(slotIdx) && gs.a3cHintSlots[slotIdx]) {
+                            const uid = gs.a3cHintSlots[slotIdx].uid;
+                            gs.a3cHintSlots[slotIdx].filled = false;
+                            gs.a3cHintSlots[slotIdx].uid = null;
+                            gs.a3cPlaced = gs.a3cPlaced.filter(p => p.uid !== uid);
+                        }
+                    } else {
+                        const uid = btn.dataset.uid;
+                        gs.a3cPlaced = gs.a3cPlaced.filter(p => p.uid !== uid);
+                    }
+                    this._a3UpdateChangeDisplay(change);
+                    this._a3RenderWalletCoins(change);
+                });
+
+                // Desktop 拖回托盤（拖出 wallet zone 即移除）
+                let _draggingWalletUid = null;
+                walletCoinsEl.addEventListener('dragstart', e => {
+                    const item = e.target.closest('.a3c-wc-item[data-uid]');
+                    if (!item) return;
+                    _draggingWalletUid = item.dataset.uid;
+                    e.dataTransfer.setData('text/plain', `a3cuid:${_draggingWalletUid}`);
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                document.addEventListener('dragend', function _a3DragEnd(e) {
+                    if (!_draggingWalletUid) return;
+                    const uid = _draggingWalletUid;
+                    _draggingWalletUid = null;
+                    if (e.dataTransfer.dropEffect === 'none') {
+                        if (gs.a3cGhostMode) {
+                            const slotIdx = (gs.a3cHintSlots || []).findIndex(s => s.uid === uid);
+                            if (slotIdx !== -1) { gs.a3cHintSlots[slotIdx].filled = false; gs.a3cHintSlots[slotIdx].uid = null; }
+                        }
+                        gs.a3cPlaced = (gs.a3cPlaced || []).filter(p => p.uid !== uid);
+                    }
+                });
+
+                // Touch 拖回
+                let _touchWalletUid = null;
+                let _touchGhostEl   = null;
+                walletCoinsEl.addEventListener('touchstart', e => {
+                    const item = e.target.closest('.a3c-wc-item[data-uid]');
+                    if (!item) return;
+                    _touchWalletUid = item.dataset.uid;
+                    const t = e.touches[0];
+                    _touchGhostEl = item.cloneNode(true);
+                    _touchGhostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.7;left:${t.clientX - 30}px;top:${t.clientY - 40}px;`;
+                    document.body.appendChild(_touchGhostEl);
+                }, { passive: true });
+                walletCoinsEl.addEventListener('touchmove', e => {
+                    if (!_touchGhostEl) return;
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    _touchGhostEl.style.left = (t.clientX - 30) + 'px';
+                    _touchGhostEl.style.top  = (t.clientY - 40) + 'px';
+                }, { passive: false });
+                walletCoinsEl.addEventListener('touchend', e => {
+                    if (_touchGhostEl) { _touchGhostEl.remove(); _touchGhostEl = null; }
+                    if (!_touchWalletUid) return;
+                    const uid = _touchWalletUid;
+                    _touchWalletUid = null;
+                    const t   = e.changedTouches[0];
+                    const zone = document.getElementById('a3c-wallet-zone');
+                    const r    = zone?.getBoundingClientRect();
+                    const inside = r && t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+                    if (!inside) {
+                        if (gs.a3cGhostMode) {
+                            const slotIdx = (gs.a3cHintSlots || []).findIndex(s => s.uid === uid);
+                            if (slotIdx !== -1) { gs.a3cHintSlots[slotIdx].filled = false; gs.a3cHintSlots[slotIdx].uid = null; }
+                        }
+                        gs.a3cPlaced = (gs.a3cPlaced || []).filter(p => p.uid !== uid);
+                        this._a3UpdateChangeDisplay(change);
+                        this._a3RenderWalletCoins(change);
+                    }
+                }, { passive: true });
+            }
+
+            // 確認找零按鈕
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (this.state.isProcessing) return;
+                    this.state.isProcessing = true;
+                    this._a3ConfirmChange(change);
+                });
+            }
+
+            // 提示按鈕（困難模式：揭露餘額 + 彈窗）
+            if (hintBtn) {
+                hintBtn.addEventListener('click', () => {
+                    this.audio.playSound('beep');
+                    const walletInfo = document.getElementById('a3c-wallet-info');
+                    if (walletInfo) walletInfo.classList.remove('a3c-hidden');
+                    this._a3ShowChangeHintModal(change);
+                });
+            }
+        },
+
+        _a3UpdateChangeDisplay(change) {
+            const gs = this.state.gameState;
+            const placedTotal = (gs.a3cPlaced || []).reduce((s, p) => s + p.denom, 0);
+            const exact = placedTotal === change;
+            const totalEl = document.getElementById('a3c-placed-total');
+            if (totalEl) totalEl.textContent = placedTotal;
+            const balanceEl = document.getElementById('a3c-wallet-balance');
+            if (balanceEl) balanceEl.textContent = (gs.a3cWalletBase || 0) + placedTotal;
+            const confirmBtn = document.getElementById('a3c-confirm-btn');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.toggle('a3c-confirm-ready', exact);
+            }
+        },
+
+        _a3RenderWalletCoins(change) {
+            const gs = this.state.gameState;
+            const walletCoinsEl = document.getElementById('a3c-wallet-coins');
+            if (!walletCoinsEl) return;
+
+            const _makeFilledSlot = (denom, face, uid, slotIdx) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'a3c-wc-item';
+                div.draggable = true;
+                div.dataset.uid = uid || '';
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a3c-denom-label">${denom}元</span>
+                    <button class="a3c-wc-remove" data-uid="${uid || ''}"${slotIdx != null ? ` data-slot-idx="${slotIdx}"` : ''} title="移除">×</button>`;
+                return div;
+            };
+            const _makeGhostSlot = (denom, face) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'a3c-ghost-slot';
+                div.dataset.denom = denom;
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;opacity:0.3;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a3c-denom-label" style="opacity:0.3;">${denom}元</span>`;
+                return div;
+            };
+
+            // Ghost slot 模式：DOM diff
+            if (gs.a3cGhostMode && gs.a3cHintSlots?.length > 0) {
+                if (gs.a3cHintSlots.every(s => s.filled)) {
+                    gs.a3cGhostMode = false;
+                    // fall through to normal render
+                } else {
+                    const kids = Array.from(walletCoinsEl.children);
+                    if (kids.length !== gs.a3cHintSlots.length) {
+                        walletCoinsEl.innerHTML = '';
+                        gs.a3cHintSlots.forEach((slot, idx) => {
+                            walletCoinsEl.appendChild(
+                                slot.filled
+                                    ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx)
+                                    : _makeGhostSlot(slot.denom, slot.face)
+                            );
+                        });
+                    } else {
+                        gs.a3cHintSlots.forEach((slot, idx) => {
+                            const el = kids[idx];
+                            const curFilled = el.classList.contains('a3c-wc-item');
+                            if (slot.filled === curFilled) return;
+                            walletCoinsEl.replaceChild(
+                                slot.filled
+                                    ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx)
+                                    : _makeGhostSlot(slot.denom, slot.face),
+                                el
+                            );
+                        });
+                    }
+                    return;
+                }
+            }
+
+            // 一般模式：DOM diff
+            if (!gs.a3cPlaced || gs.a3cPlaced.length === 0) {
+                walletCoinsEl.innerHTML = '<span class="a3c-empty-hint">把找零金錢拖曳到這裡</span>';
+                return;
+            }
+            const emptyEl = walletCoinsEl.querySelector('.a3c-empty-hint');
+            if (emptyEl) emptyEl.remove();
+            const existingMap = {};
+            walletCoinsEl.querySelectorAll('.a3c-wc-item').forEach(el => { existingMap[el.dataset.uid] = el; });
+            const desiredUids = new Set(gs.a3cPlaced.map(p => p.uid));
+            Object.entries(existingMap).forEach(([uid, el]) => { if (!desiredUids.has(uid)) el.remove(); });
+            gs.a3cPlaced.forEach(p => {
+                if (existingMap[p.uid]) return;
+                walletCoinsEl.appendChild(_makeFilledSlot(p.denom, p.face, p.uid, null));
+            });
+        },
+
+        _a3ConfirmChange(change) {
+            const gs = this.state.gameState;
+            const placedTotal = (gs.a3cPlaced || []).reduce((s, p) => s + p.denom, 0);
+
+            if (placedTotal !== change) {
+                this.state.isProcessing = false;
+                this.audio.playSound('error');
+                gs.a3cErrorCount = (gs.a3cErrorCount || 0) + 1;
+                const dir = placedTotal > change ? '太多了' : '太少了';
+                this.showToast(`找零金額${dir}！應找 ${change} 元，目前 ${placedTotal} 元`, 'error');
+                const walletZone = document.getElementById('a3c-wallet-zone');
+                if (walletZone) {
+                    walletZone.style.animation = 'a3cShake 0.4s ease';
+                    this.TimerManager.setTimeout(() => { if (walletZone) walletZone.style.animation = ''; }, 500, 'ui');
+                }
+                if (this.state.settings.speechEnabled && this.speech) {
+                    this.speech.speakText(`不對喔，找零算${dir}，請再試一次`);
+                }
+                // 清空錢包，重置 ghost 模式（困難模式保留）
+                gs.a3cPlaced    = [];
+                gs.a3cGhostMode = false;
+                gs.a3cHintSlots = [];
+                this._a3UpdateChangeDisplay(change);
+                this._a3RenderWalletCoins(change);
+                // 3次錯誤自動顯示 ghost slots
+                if (gs.a3cErrorCount >= 3) {
+                    gs.a3cErrorCount = 0;
+                    this.TimerManager.setTimeout(() => this._a3ShowChangeGhostSlots(change), 900, 'ui');
+                }
+                return;
+            }
+
+            // 找零正確
+            this.audio.playSound('success');
+            gs.changeErrorCount = 0;
+            gs.changeHintShown  = false;
+            if (this.state.settings.speechEnabled && this.speech) {
+                this.speech.speakText(`找回${change}元，找零完成！`);
+            }
+            this.TimerManager.setTimeout(() => {
+                gs.orderNumber = this.generateRandomOrderNumber();
+                gs.completedOrders++;
+                this.completeOrder();
+            }, 1200, 'screenTransition');
+        },
+
+        _a3ShowChangeGhostSlots(change) {
+            const gs = this.state.gameState;
+            gs.a3cPlaced    = [];
+            gs.a3cGhostMode = true;
+            const solution = gs.a3cGreedySolution || {};
+            const slots = [];
+            Object.entries(solution).sort(([a], [b]) => b - a).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                const face  = gs.a3cTrayFaces?.[denom] || 'front';
+                for (let i = 0; i < cnt; i++) slots.push({ denom, face, filled: false, uid: null });
+            });
+            gs.a3cHintSlots = slots;
+            this._a3UpdateChangeDisplay(change);
+            this._a3RenderWalletCoins(change);
+            this._a3UpdateChangeTrayHints();
+            const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
+            if (this.state.settings.speechEnabled && this.speech) {
+                this.speech.speakText(`可以用${parts.join('，')}`);
+            }
+        },
+
+        _a3UpdateChangeTrayHints() {
+            const gs = this.state.gameState;
+            document.querySelectorAll('.a3c-denom-card').forEach(el => el.classList.remove('b6-product-here-hint'));
+            if (!gs.a3cGhostMode) return;
+            const needed = {};
+            (gs.a3cHintSlots || []).filter(s => !s.filled).forEach(s => { needed[s.denom] = (needed[s.denom] || 0) + 1; });
+            document.querySelectorAll('.a3c-denom-card').forEach(el => {
+                const d = parseInt(el.dataset.denom);
+                if (needed[d]) el.classList.add('b6-product-here-hint');
+            });
+        },
+
+        _a3ShowChangeHintModal(change) {
+            const gs = this.state.gameState;
+            const solution = gs.a3cGreedySolution || {};
+            const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
+            const speechText = `找零${change}元，可以用${parts.join('，')}`;
+
+            let hintListHTML = '';
+            Object.entries(solution).sort(([a], [b]) => b - a).forEach(([d, cnt]) => {
+                const denom  = parseInt(d);
+                const face   = gs.a3cTrayFaces?.[denom] || 'front';
+                const isBill = denom >= 100;
+                const imgStyle = isBill ? 'width:80px;height:auto;max-height:50px;' : 'width:50px;height:50px;';
+                hintListHTML += `
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#fff8e7;border-radius:10px;border:1px solid #ffcc02;">
+                    <img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                         style="${imgStyle}object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                    <span style="font-size:18px;font-weight:700;color:#1f2937;">${denom}元</span>
+                    <span style="color:#9ca3af;font-size:16px;">×</span>
+                    <span style="font-size:18px;font-weight:700;color:#c62d42;">${cnt} 個</span>
+                </div>`;
+            });
+
+            const existing = document.getElementById('a3c-hint-modal');
+            if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'a3c-hint-modal';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:24px;max-width:420px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="text-align:center;font-size:20px;font-weight:700;color:#c62d42;margin-bottom:6px;">💡 找零提示</div>
+                    <div style="text-align:center;font-size:14px;color:#6b7280;margin-bottom:14px;">建議的找零方式：</div>
+                    <div>${hintListHTML}</div>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
+                        <button id="a3c-hm-replay" style="background:linear-gradient(135deg,#ffcc02,#ff8f00);color:#333;border:none;padding:10px 20px;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;">🔊 再播一次</button>
+                        <button id="a3c-hm-close" style="background:linear-gradient(135deg,#4caf50,#45a049);color:white;border:none;padding:10px 20px;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;">我知道了</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            if (this.state.settings.speechEnabled && this.speech) {
+                this.speech.speakText(speechText);
+            }
+            const closeModal = () => overlay.remove();
+            document.getElementById('a3c-hm-close')?.addEventListener('click', closeModal);
+            document.getElementById('a3c-hm-replay')?.addEventListener('click', () => {
+                this.audio.playSound('beep');
+                if (this.state.settings.speechEnabled && this.speech) this.speech.speakText(speechText);
+            });
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
         },
 
         calculateChange(amount) {

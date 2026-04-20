@@ -3899,3 +3899,286 @@ body.click-mode-active *:focus-visible {
 .reload-btn:hover {
     background: #5a67d8;
 }
+
+/* ================================================================
+ * A4 困難模式找零拖曳介面（a4c- 前綴）
+ * ================================================================ */
+
+.a4c-task-frame {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.a4c-task-left { flex: 1; }
+
+.a4c-task-item-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.a4c-change-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.a4c-change-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+}
+
+.a4c-change-num {
+    font-size: 26px;
+    font-weight: 900;
+    color: #059669;
+}
+
+.a4c-wallet-info {
+    font-size: 13px;
+    color: #5b21b6;
+}
+.a4c-wallet-info.a4c-hidden { display: none; }
+
+.a4c-task-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 76px;
+}
+
+.a4c-mascot { width: 56px; height: auto; }
+
+.a4c-hint-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+}
+
+.a4c-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.a4c-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 10px;
+}
+
+.a4c-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.a4c-denom-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-width: 68px;
+}
+.a4c-denom-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+}
+.a4c-denom-card.a4c-dragging { opacity: 0.5; }
+
+.a4c-coin-img  { width: 52px; height: 52px; object-fit: contain; }
+.a4c-banknote-img { width: 88px; height: auto; }
+
+.a4c-denom-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.a4c-wallet-split {
+    display: flex;
+    gap: 10px;
+    min-height: 110px;
+}
+
+.a4c-wallet-left {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.a4c-wallet-right {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+    padding: 10px;
+    border: 3px dashed #10b981;
+    border-radius: 10px;
+    background: #f0fdf4;
+    min-height: 100px;
+    transition: background 0.2s, border-color 0.2s;
+}
+.a4c-wallet-right.a4c-drop-active {
+    background: #d1fae5;
+    border-color: #059669;
+    border-style: solid;
+}
+
+.a4c-wc-static {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.a4c-wc-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: grab;
+    padding: 4px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.a4c-wc-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 700;
+}
+
+.a4c-ghost-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 8px;
+    background: white;
+    border: 2px dashed #9ca3af;
+    opacity: 0.6;
+}
+
+.a4c-empty-hint {
+    color: #9ca3af;
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 16px 0;
+}
+
+.a4c-confirm-btn {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.a4c-confirm-btn.a4c-confirm-ready {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+    animation: a4cConfirmPulse 1.5s infinite;
+}
+.a4c-confirm-btn:disabled { cursor: not-allowed; }
+
+@keyframes a4cConfirmPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes a4cShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+/* b6-product-here-hint（ghost slot 托盤高亮，A4 單獨定義）*/
+.a4c-denom-card.b6-product-here-hint {
+    outline: 3px solid #f59e0b;
+    outline-offset: 2px;
+    animation: b6HereHintPulseA4 1.2s ease-in-out infinite;
+    position: relative;
+}
+.a4c-denom-card.b6-product-here-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 100;
+    animation: b6HereBounceA4 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes b6HereHintPulseA4 {
+    0%, 100% { outline-color: #f59e0b; }
+    50% { outline-color: #ef4444; }
+}
+@keyframes b6HereBounceA4 {
+    from { transform: translateX(-50%) translateY(0); }
+    to   { transform: translateX(-50%) translateY(-4px); }
+}

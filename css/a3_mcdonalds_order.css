@@ -1908,3 +1908,270 @@ body.click-mode-enabled .fade-in {
                 min-width: 450px;
             }
         }
+
+/* ================================================================
+ * A3 困難模式找零拖曳介面（a3c- 前綴）
+ * ================================================================ */
+
+.a3c-change-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.a3c-info-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.a3c-info-left { flex: 1; }
+
+.a3c-info-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 80px;
+}
+
+.a3c-change-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #c62d42;
+    margin-bottom: 4px;
+}
+
+.a3c-change-amount {
+    font-size: 38px;
+    font-weight: 900;
+    color: #4caf50;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.a3c-wallet-info {
+    font-size: 13px;
+    color: #5b21b6;
+    margin-top: 6px;
+}
+.a3c-wallet-info.a3c-hidden { display: none; }
+
+.a3c-mascot { width: 60px; height: auto; }
+
+.a3c-hint-btn {
+    background: linear-gradient(135deg, #ffcc02, #ff8f00);
+    color: #333;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(255,204,2,0.4);
+}
+
+.a3c-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #c62d42;
+    margin-bottom: 10px;
+}
+
+.a3c-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.a3c-denom-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #fff8e7, #fffde7);
+    border: 2px solid #ffcc02;
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-width: 68px;
+}
+.a3c-denom-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(255,204,2,0.4);
+}
+.a3c-denom-card.a3c-dragging { opacity: 0.5; }
+
+.a3c-coin-img  { width: 52px; height: 52px; object-fit: contain; }
+.a3c-banknote-img { width: 88px; height: auto; }
+
+.a3c-denom-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #c62d42;
+}
+
+.a3c-wallet-split {
+    display: flex;
+    gap: 10px;
+    min-height: 110px;
+}
+
+.a3c-wallet-left {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.a3c-wallet-right {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+    padding: 10px;
+    border: 3px dashed #4caf50;
+    border-radius: 10px;
+    background: #f0fdf4;
+    min-height: 100px;
+    transition: background 0.2s, border-color 0.2s;
+}
+.a3c-wallet-right.a3c-drop-active {
+    background: #d1fae5;
+    border-color: #059669;
+    border-style: solid;
+}
+
+.a3c-wc-static {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.a3c-wc-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: grab;
+    padding: 4px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.a3c-wc-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 700;
+}
+
+.a3c-ghost-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 8px;
+    background: white;
+    border: 2px dashed #9ca3af;
+    opacity: 0.6;
+}
+
+.a3c-empty-hint {
+    color: #9ca3af;
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 16px 0;
+}
+
+.a3c-confirm-btn {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.a3c-confirm-btn.a3c-confirm-ready {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    box-shadow: 0 4px 15px rgba(76,175,80,0.4);
+    animation: a3cConfirmPulse 1.5s infinite;
+}
+.a3c-confirm-btn:disabled { cursor: not-allowed; }
+
+@keyframes a3cConfirmPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes a3cShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+/* b6-product-here-hint（ghost slot 托盤高亮，A3 沒有載入 b6 CSS 所以在此定義）*/
+.a3c-denom-card.b6-product-here-hint {
+    outline: 3px solid #f59e0b;
+    outline-offset: 2px;
+    animation: b6HereHintPulse 1.2s ease-in-out infinite;
+    position: relative;
+}
+.a3c-denom-card.b6-product-here-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 100;
+    animation: b6HereBounce 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes b6HereHintPulse {
+    0%, 100% { outline-color: #f59e0b; }
+    50% { outline-color: #ef4444; }
+}
+@keyframes b6HereBounce {
+    from { transform: translateX(-50%) translateY(0); }
+    to   { transform: translateX(-50%) translateY(-4px); }
+}

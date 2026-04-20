@@ -9008,6 +9008,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // 困難模式且需要找零：使用 B6 式拖曳介面
+            if (this.state.settings.difficulty === 'hard' && transaction.changeExpected > 0) {
+                this._a4ShowHardChangeDrag(app, transaction, selectedItem);
+                return;
+            }
+
             // 計算剩餘錢包內容（扣除已付款的錢幣）
             const remainingWallet = this.calculateRemainingWallet();
 
@@ -9202,6 +9208,528 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         
+        // ── A4 困難模式找零拖曳介面 ──────────────────────────────────
+
+        _a4ShowHardChangeDrag(app, transaction, selectedItem) {
+            const gs   = this.state.gameState;
+            const change = transaction.changeExpected;
+
+            // 初始化狀態
+            gs.a4cGhostMode  = false;
+            gs.a4cHintSlots  = [];
+            gs.a4cErrorCount = 0;
+            gs.a4cPlaced     = [];
+            gs.a4cTotal      = change;
+
+            // 面額托盤（依找零金額）
+            let trayDenoms;
+            if (change <= 100)      { trayDenoms = [50, 10, 5, 1]; }
+            else if (change < 1000) { trayDenoms = [500, 100, 50, 10, 5, 1]; }
+            else                    { trayDenoms = [1000, 500, 100, 50, 10, 5, 1]; }
+
+            const trayFaces = {};
+            trayDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            gs.a4cTrayFaces = trayFaces;
+
+            // 貪婪最佳解
+            const greedySolution = {};
+            let remSol = change;
+            for (const d of [1000, 500, 100, 50, 10, 5, 1]) {
+                const cnt = Math.floor(remSol / d);
+                if (cnt > 0) { greedySolution[d] = cnt; remSol -= cnt * d; }
+            }
+            gs.a4cGreedySolution = greedySolution;
+
+            // 付款後錢包剩餘
+            const walletRemaining = (gs.walletTotal || 0) - (transaction.amountPaid || 0);
+            gs.a4cWalletBase = walletRemaining;
+
+            // 靜態錢包金幣
+            const walletCoins = [];
+            let _rem = walletRemaining;
+            for (const d of [1000, 500, 100, 50, 10, 5, 1]) {
+                const cnt = Math.floor(_rem / d);
+                for (let i = 0; i < cnt; i++) walletCoins.push(d);
+                _rem -= cnt * d;
+            }
+            const walletStaticHtml = walletCoins.map(d => {
+                const isBill = d >= 100;
+                const face = Math.random() < 0.5 ? 'back' : 'front';
+                const w = isBill ? 80 : 52;
+                return `<div class="a4c-wc-static">
+                    <img src="../images/money/${d}_yuan_${face}.png" alt="${d}元"
+                         style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a4c-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+
+            // 面額托盤 HTML
+            const trayHtml = trayDenoms.map(d => {
+                const isBill = d >= 100;
+                return `<div class="a4c-denom-card" draggable="true" data-denom="${d}" data-face="${trayFaces[d]}" title="${d}元">
+                    <img src="../images/money/${d}_yuan_${trayFaces[d]}.png" alt="${d}元"
+                         class="${isBill ? 'a4c-banknote-img' : 'a4c-coin-img'}" draggable="false" onerror="this.style.display='none'">
+                    <span class="a4c-denom-label">${d}元</span>
+                </div>`;
+            }).join('');
+
+            // 商品顯示
+            let itemDisplayText = '';
+            if (selectedItem.category === 'multi-selection') {
+                itemDisplayText = selectedItem.items.map(item => {
+                    const productInfo = this.parseProductDisplay(item, 1);
+                    return `${this.getProductIconHTML(item, '5rem')}<span style="font-size:1.3em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
+                }).join('、');
+            } else {
+                const productInfo = this.parseProductDisplay(selectedItem, 1);
+                itemDisplayText = `${this.getProductIconHTML(selectedItem, '5rem')}<span style="font-size:1.3em;font-weight:bold;align-self:center;"> ${productInfo.name}</span>`;
+            }
+
+            app.innerHTML = `
+            <div class="store-layout">
+                <div class="title-bar">
+                    <div class="title-bar-left">
+                        <span class="store-icon-large">${this.getCurrentStoreInfo().emoji}</span>
+                        <span>${this.getCurrentStoreInfo().name}</span>
+                    </div>
+                    <div class="title-bar-center">第四步：確認有沒有需要找零錢</div>
+                    <div class="title-bar-right">
+                        <span>第 ${this.state.quiz.currentQuestion + 1} 題 / 共 ${this.state.settings.questionCount || 10} 題</span>
+                        <button class="back-to-menu-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                        <button class="back-to-menu-btn" onclick="location.reload()">返回設定</button>
+                    </div>
+                </div>
+
+                <div style="flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto;box-sizing:border-box;">
+
+                    <!-- 任務框：商品 + 找零金額 + 提示鈕 -->
+                    <div class="a4c-task-frame">
+                        <div class="a4c-task-left">
+                            <div class="a4c-task-item-row">${itemDisplayText}<span style="font-size:1.2em;font-weight:bold;align-self:center;color:#666;"> 共${transaction.totalCost}元</span></div>
+                            <div class="a4c-change-row">
+                                <span class="a4c-change-label">找零金額：</span>
+                                <span class="a4c-change-num">${change} 元</span>
+                                <span class="a4c-wallet-info a4c-hidden" id="a4c-wallet-info">
+                                    （<span id="a4c-wallet-balance">${walletRemaining}</span>元，已找回 <span id="a4c-placed-total">0</span>/${change} 元）
+                                </span>
+                            </div>
+                        </div>
+                        <div class="a4c-task-right">
+                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a4c-mascot" onerror="this.style.display='none'">
+                            <button class="a4c-hint-btn" id="a4c-hint-btn">💡 提示</button>
+                        </div>
+                    </div>
+
+                    <!-- 拖曳金錢區 -->
+                    <div class="a4c-card">
+                        <div class="a4c-card-title">💰 找零面額（可重複拖曳）</div>
+                        <div class="a4c-tray-coins" id="a4c-tray-coins">${trayHtml}</div>
+                    </div>
+
+                    <!-- 我的錢包 -->
+                    <div class="a4c-card">
+                        <div class="a4c-card-title">💼 我的錢包</div>
+                        <div class="a4c-wallet-split">
+                            <div class="a4c-wallet-left">
+                                ${walletStaticHtml || '<span class="a4c-empty-hint">（餘額為0）</span>'}
+                            </div>
+                            <div class="a4c-wallet-right a4c-drop-zone" id="a4c-wallet-zone">
+                                <div id="a4c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;min-height:60px;">
+                                    <span class="a4c-empty-hint">把找零金錢拖曳到這裡</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:center;margin-top:12px;">
+                            <button class="a4c-confirm-btn" id="a4c-confirm-btn" disabled>✅ 確認找零</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>`;
+
+            this.TimerManager.setTimeout(() => {
+                const changeAmt = transaction.changeExpected;
+                const speechText = `找您${this.convertToTraditionalCurrency(changeAmt)}，請把找回的金錢拖曳到我的錢包`;
+                this.speech.speak(speechText);
+            }, 400, 'speechDelay');
+
+            this.TimerManager.setTimeout(() => this._a4SetupChangeDragInteraction(transaction), 100, 'uiAnimation');
+        },
+
+        _a4SetupChangeDragInteraction(transaction) {
+            const gs     = this.state.gameState;
+            const change = transaction.changeExpected;
+            const trayEl     = document.getElementById('a4c-tray-coins');
+            const walletZone = document.getElementById('a4c-wallet-zone');
+            const confirmBtn = document.getElementById('a4c-confirm-btn');
+            const hintBtn    = document.getElementById('a4c-hint-btn');
+            if (!trayEl || !walletZone) return;
+
+            const handleDrop = (denom) => {
+                const face = gs.a4cTrayFaces?.[denom] || 'front';
+                const uid  = 'a4c' + Date.now() + Math.floor(Math.random() * 10000);
+                if (gs.a4cGhostMode) {
+                    const slotIdx = (gs.a4cHintSlots || []).findIndex(s => s.denom === denom && !s.filled);
+                    if (slotIdx === -1) { Game.TimerManager.setTimeout(() => {}, 0, 'sfx'); return; }
+                    gs.a4cHintSlots[slotIdx].filled = true;
+                    gs.a4cHintSlots[slotIdx].uid = uid;
+                    gs.a4cPlaced.push({ denom, uid, face });
+                } else {
+                    gs.a4cPlaced.push({ denom, uid, face });
+                }
+                this._a4UpdateChangeDisplay(change);
+                this._a4RenderWalletCoins(change);
+                if (gs.a4cGhostMode) this._a4UpdateChangeTrayHints();
+                const runningTotal = (gs.a4cPlaced || []).reduce((s, p) => s + p.denom, 0);
+                this.speech.speak(`找為${this.convertToTraditionalCurrency(runningTotal)}`);
+            };
+
+            // Desktop drag from tray
+            trayEl.querySelectorAll('.a4c-denom-card').forEach(card => {
+                const denom = parseInt(card.dataset.denom);
+                card.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', `a4cdenom:${denom}`);
+                    card.classList.add('a4c-dragging');
+                });
+                card.addEventListener('dragend', () => card.classList.remove('a4c-dragging'));
+            });
+            walletZone.addEventListener('dragover', e => { e.preventDefault(); walletZone.classList.add('a4c-drop-active'); });
+            walletZone.addEventListener('dragleave', e => {
+                if (!walletZone.contains(e.relatedTarget)) walletZone.classList.remove('a4c-drop-active');
+            });
+            walletZone.addEventListener('drop', e => {
+                e.preventDefault(); walletZone.classList.remove('a4c-drop-active');
+                const d = e.dataTransfer.getData('text/plain');
+                if (d.startsWith('a4cdenom:')) handleDrop(parseInt(d.replace('a4cdenom:', '')));
+            });
+
+            // Touch drag from tray
+            trayEl.querySelectorAll('.a4c-denom-card').forEach(card => {
+                const denom = parseInt(card.dataset.denom);
+                let ghostEl = null;
+                card.addEventListener('touchstart', e => {
+                    const t = e.touches[0];
+                    ghostEl = card.cloneNode(true);
+                    ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX - 35}px;top:${t.clientY - 50}px;`;
+                    document.body.appendChild(ghostEl);
+                }, { passive: true });
+                card.addEventListener('touchmove', e => {
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    if (ghostEl) { ghostEl.style.left = (t.clientX - 35) + 'px'; ghostEl.style.top = (t.clientY - 50) + 'px'; }
+                    const r = walletZone.getBoundingClientRect();
+                    walletZone.classList.toggle('a4c-drop-active',
+                        t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom);
+                }, { passive: false });
+                card.addEventListener('touchend', e => {
+                    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+                    walletZone.classList.remove('a4c-drop-active');
+                    const t = e.changedTouches[0];
+                    const r = walletZone.getBoundingClientRect();
+                    if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) handleDrop(denom);
+                }, { passive: true });
+            });
+
+            // × 移除按鈕
+            const walletCoinsEl = document.getElementById('a4c-wallet-coins');
+            if (walletCoinsEl) {
+                walletCoinsEl.addEventListener('click', e => {
+                    const btn = e.target.closest('.a4c-wc-remove');
+                    if (!btn) return;
+                    if (gs.a4cGhostMode) {
+                        const slotIdx = parseInt(btn.dataset.slotIdx);
+                        if (!isNaN(slotIdx) && gs.a4cHintSlots[slotIdx]) {
+                            const uid = gs.a4cHintSlots[slotIdx].uid;
+                            gs.a4cHintSlots[slotIdx].filled = false;
+                            gs.a4cHintSlots[slotIdx].uid = null;
+                            gs.a4cPlaced = gs.a4cPlaced.filter(p => p.uid !== uid);
+                        }
+                    } else {
+                        const uid = btn.dataset.uid;
+                        gs.a4cPlaced = gs.a4cPlaced.filter(p => p.uid !== uid);
+                    }
+                    this._a4UpdateChangeDisplay(change);
+                    this._a4RenderWalletCoins(change);
+                });
+
+                // Desktop 拖回托盤
+                let _draggingWalletUid = null;
+                walletCoinsEl.addEventListener('dragstart', e => {
+                    const item = e.target.closest('.a4c-wc-item[data-uid]');
+                    if (!item) return;
+                    _draggingWalletUid = item.dataset.uid;
+                    e.dataTransfer.setData('text/plain', `a4cuid:${_draggingWalletUid}`);
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                document.addEventListener('dragend', function _a4DragEnd(e) {
+                    if (!_draggingWalletUid) return;
+                    const uid = _draggingWalletUid;
+                    _draggingWalletUid = null;
+                    if (e.dataTransfer.dropEffect === 'none') {
+                        if (gs.a4cGhostMode) {
+                            const slotIdx = (gs.a4cHintSlots || []).findIndex(s => s.uid === uid);
+                            if (slotIdx !== -1) { gs.a4cHintSlots[slotIdx].filled = false; gs.a4cHintSlots[slotIdx].uid = null; }
+                        }
+                        gs.a4cPlaced = (gs.a4cPlaced || []).filter(p => p.uid !== uid);
+                    }
+                });
+
+                // Touch 拖回
+                let _touchWalletUid = null;
+                let _touchGhostEl   = null;
+                walletCoinsEl.addEventListener('touchstart', e => {
+                    const item = e.target.closest('.a4c-wc-item[data-uid]');
+                    if (!item) return;
+                    _touchWalletUid = item.dataset.uid;
+                    const t = e.touches[0];
+                    _touchGhostEl = item.cloneNode(true);
+                    _touchGhostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.7;left:${t.clientX - 30}px;top:${t.clientY - 40}px;`;
+                    document.body.appendChild(_touchGhostEl);
+                }, { passive: true });
+                walletCoinsEl.addEventListener('touchmove', e => {
+                    if (!_touchGhostEl) return;
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    _touchGhostEl.style.left = (t.clientX - 30) + 'px';
+                    _touchGhostEl.style.top  = (t.clientY - 40) + 'px';
+                }, { passive: false });
+                walletCoinsEl.addEventListener('touchend', e => {
+                    if (_touchGhostEl) { _touchGhostEl.remove(); _touchGhostEl = null; }
+                    if (!_touchWalletUid) return;
+                    const uid = _touchWalletUid;
+                    _touchWalletUid = null;
+                    const t   = e.changedTouches[0];
+                    const zone = document.getElementById('a4c-wallet-zone');
+                    const r    = zone?.getBoundingClientRect();
+                    const inside = r && t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+                    if (!inside) {
+                        if (gs.a4cGhostMode) {
+                            const slotIdx = (gs.a4cHintSlots || []).findIndex(s => s.uid === uid);
+                            if (slotIdx !== -1) { gs.a4cHintSlots[slotIdx].filled = false; gs.a4cHintSlots[slotIdx].uid = null; }
+                        }
+                        gs.a4cPlaced = (gs.a4cPlaced || []).filter(p => p.uid !== uid);
+                        this._a4UpdateChangeDisplay(change);
+                        this._a4RenderWalletCoins(change);
+                    }
+                }, { passive: true });
+            }
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (this.state.isProcessing) return;
+                    this.state.isProcessing = true;
+                    this._a4ConfirmChange(change);
+                });
+            }
+
+            if (hintBtn) {
+                hintBtn.addEventListener('click', () => {
+                    const walletInfo = document.getElementById('a4c-wallet-info');
+                    if (walletInfo) walletInfo.classList.remove('a4c-hidden');
+                    this._a4ShowChangeHintModal(change);
+                });
+            }
+        },
+
+        _a4UpdateChangeDisplay(change) {
+            const gs = this.state.gameState;
+            const placedTotal = (gs.a4cPlaced || []).reduce((s, p) => s + p.denom, 0);
+            const exact = placedTotal === change;
+            const totalEl = document.getElementById('a4c-placed-total');
+            if (totalEl) totalEl.textContent = placedTotal;
+            const balanceEl = document.getElementById('a4c-wallet-balance');
+            if (balanceEl) balanceEl.textContent = (gs.a4cWalletBase || 0) + placedTotal;
+            const confirmBtn = document.getElementById('a4c-confirm-btn');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.toggle('a4c-confirm-ready', exact);
+            }
+        },
+
+        _a4RenderWalletCoins(change) {
+            const gs = this.state.gameState;
+            const walletCoinsEl = document.getElementById('a4c-wallet-coins');
+            if (!walletCoinsEl) return;
+
+            const _makeFilledSlot = (denom, face, uid, slotIdx) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'a4c-wc-item';
+                div.draggable = true;
+                div.dataset.uid = uid || '';
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a4c-denom-label">${denom}元</span>
+                    <button class="a4c-wc-remove" data-uid="${uid || ''}"${slotIdx != null ? ` data-slot-idx="${slotIdx}"` : ''} title="移除">×</button>`;
+                return div;
+            };
+            const _makeGhostSlot = (denom, face) => {
+                const isBill = denom >= 100;
+                const w = isBill ? 80 : 52;
+                const div = document.createElement('div');
+                div.className = 'a4c-ghost-slot';
+                div.dataset.denom = denom;
+                div.innerHTML = `<img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                     style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};display:block;opacity:0.3;" draggable="false" onerror="this.style.display='none'">
+                    <span class="a4c-denom-label" style="opacity:0.3;">${denom}元</span>`;
+                return div;
+            };
+
+            if (gs.a4cGhostMode && gs.a4cHintSlots?.length > 0) {
+                if (gs.a4cHintSlots.every(s => s.filled)) {
+                    gs.a4cGhostMode = false;
+                } else {
+                    const kids = Array.from(walletCoinsEl.children);
+                    if (kids.length !== gs.a4cHintSlots.length) {
+                        walletCoinsEl.innerHTML = '';
+                        gs.a4cHintSlots.forEach((slot, idx) => {
+                            walletCoinsEl.appendChild(slot.filled ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx) : _makeGhostSlot(slot.denom, slot.face));
+                        });
+                    } else {
+                        gs.a4cHintSlots.forEach((slot, idx) => {
+                            const el = kids[idx];
+                            const curFilled = el.classList.contains('a4c-wc-item');
+                            if (slot.filled === curFilled) return;
+                            walletCoinsEl.replaceChild(slot.filled ? _makeFilledSlot(slot.denom, slot.face, slot.uid, idx) : _makeGhostSlot(slot.denom, slot.face), el);
+                        });
+                    }
+                    return;
+                }
+            }
+
+            if (!gs.a4cPlaced || gs.a4cPlaced.length === 0) {
+                walletCoinsEl.innerHTML = '<span class="a4c-empty-hint">把找零金錢拖曳到這裡</span>';
+                return;
+            }
+            const emptyEl = walletCoinsEl.querySelector('.a4c-empty-hint');
+            if (emptyEl) emptyEl.remove();
+            const existingMap = {};
+            walletCoinsEl.querySelectorAll('.a4c-wc-item').forEach(el => { existingMap[el.dataset.uid] = el; });
+            const desiredUids = new Set(gs.a4cPlaced.map(p => p.uid));
+            Object.entries(existingMap).forEach(([uid, el]) => { if (!desiredUids.has(uid)) el.remove(); });
+            gs.a4cPlaced.forEach(p => {
+                if (existingMap[p.uid]) return;
+                walletCoinsEl.appendChild(_makeFilledSlot(p.denom, p.face, p.uid, null));
+            });
+        },
+
+        _a4ConfirmChange(change) {
+            const gs = this.state.gameState;
+            const placedTotal = (gs.a4cPlaced || []).reduce((s, p) => s + p.denom, 0);
+
+            if (placedTotal !== change) {
+                this.state.isProcessing = false;
+                gs.a4cErrorCount = (gs.a4cErrorCount || 0) + 1;
+                const dir = placedTotal > change ? '太多了' : '太少了';
+                const walletZone = document.getElementById('a4c-wallet-zone');
+                if (walletZone) {
+                    walletZone.style.animation = 'a4cShake 0.4s ease';
+                    this.TimerManager.setTimeout(() => { if (walletZone) walletZone.style.animation = ''; }, 500, 'ui');
+                }
+                this.speech.speak(`不對喔，找零算${dir}，請再試一次`);
+                gs.a4cPlaced    = [];
+                gs.a4cGhostMode = false;
+                gs.a4cHintSlots = [];
+                this._a4UpdateChangeDisplay(change);
+                this._a4RenderWalletCoins(change);
+                if (gs.a4cErrorCount >= 3) {
+                    gs.a4cErrorCount = 0;
+                    this.TimerManager.setTimeout(() => this._a4ShowChangeGhostSlots(change), 900, 'ui');
+                }
+                return;
+            }
+
+            // 找零正確
+            this.state.gameState.isProcessingChange = false;
+            const speechText = `正確！應該找您${this.convertToTraditionalCurrency(change)}`;
+            this.speech.speak(speechText, {
+                callback: () => {
+                    this.state.isProcessing = false;
+                    Game.TimerManager.setTimeout(() => {
+                        Game.showGameComplete(true);
+                    }, 1000, 'screenTransition');
+                }
+            });
+        },
+
+        _a4ShowChangeGhostSlots(change) {
+            const gs = this.state.gameState;
+            gs.a4cPlaced    = [];
+            gs.a4cGhostMode = true;
+            const solution = gs.a4cGreedySolution || {};
+            const slots = [];
+            Object.entries(solution).sort(([a], [b]) => b - a).forEach(([d, cnt]) => {
+                const denom = parseInt(d);
+                const face  = gs.a4cTrayFaces?.[denom] || 'front';
+                for (let i = 0; i < cnt; i++) slots.push({ denom, face, filled: false, uid: null });
+            });
+            gs.a4cHintSlots = slots;
+            this._a4UpdateChangeDisplay(change);
+            this._a4RenderWalletCoins(change);
+            this._a4UpdateChangeTrayHints();
+            const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
+            this.speech.speak(`可以用${parts.join('，')}`);
+        },
+
+        _a4UpdateChangeTrayHints() {
+            const gs = this.state.gameState;
+            document.querySelectorAll('.a4c-denom-card').forEach(el => el.classList.remove('b6-product-here-hint'));
+            if (!gs.a4cGhostMode) return;
+            const needed = {};
+            (gs.a4cHintSlots || []).filter(s => !s.filled).forEach(s => { needed[s.denom] = (needed[s.denom] || 0) + 1; });
+            document.querySelectorAll('.a4c-denom-card').forEach(el => {
+                const d = parseInt(el.dataset.denom);
+                if (needed[d]) el.classList.add('b6-product-here-hint');
+            });
+        },
+
+        _a4ShowChangeHintModal(change) {
+            const gs = this.state.gameState;
+            const solution = gs.a4cGreedySolution || {};
+            const parts = Object.entries(solution).sort(([a], [b]) => b - a).map(([d, cnt]) => `${cnt}個${d}元`);
+            const speechText = `找零${this.convertToTraditionalCurrency(change)}，可以用${parts.join('，')}`;
+
+            let hintListHTML = '';
+            Object.entries(solution).sort(([a], [b]) => b - a).forEach(([d, cnt]) => {
+                const denom  = parseInt(d);
+                const face   = gs.a4cTrayFaces?.[denom] || 'front';
+                const isBill = denom >= 100;
+                const imgStyle = isBill ? 'width:80px;height:auto;max-height:50px;' : 'width:50px;height:50px;';
+                hintListHTML += `
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+                    <img src="../images/money/${denom}_yuan_${face}.png" alt="${denom}元"
+                         style="${imgStyle}object-fit:contain;" onerror="this.style.display='none'" draggable="false">
+                    <span style="font-size:18px;font-weight:700;color:#1f2937;">${denom}元</span>
+                    <span style="color:#9ca3af;font-size:16px;">×</span>
+                    <span style="font-size:18px;font-weight:700;color:#059669;">${cnt} 個</span>
+                </div>`;
+            });
+
+            const existing = document.getElementById('a4c-hint-modal');
+            if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'a4c-hint-modal';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:24px;max-width:420px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="text-align:center;font-size:20px;font-weight:700;color:#059669;margin-bottom:6px;">💡 找零提示</div>
+                    <div style="text-align:center;font-size:14px;color:#6b7280;margin-bottom:14px;">建議的找零方式：</div>
+                    <div>${hintListHTML}</div>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
+                        <button id="a4c-hm-replay" style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;padding:10px 20px;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;">🔊 再播一次</button>
+                        <button id="a4c-hm-close" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border:none;padding:10px 20px;border-radius:20px;font-size:15px;font-weight:700;cursor:pointer;">我知道了</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            this.speech.speak(speechText);
+            const closeModal = () => overlay.remove();
+            document.getElementById('a4c-hm-close')?.addEventListener('click', closeModal);
+            document.getElementById('a4c-hm-replay')?.addEventListener('click', () => { this.speech.speak(speechText); });
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+        },
+
         // 添加普通模式找零拖曳樣式
         addNormalChangeDragStyles() {
             if (!document.getElementById('normal-change-drag-styles')) {
