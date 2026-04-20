@@ -9305,15 +9305,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- 任務框：商品 + 找零金額 + 提示鈕 -->
                     <div class="a4c-task-frame">
-                        <div class="a4c-task-left">
-                            <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
-                                ${this.getProductIconHTML(selectedItem.category === 'multi-selection' ? selectedItem.items[0] : selectedItem, '4rem')}
-                                <div>
-                                    <div class="a4c-change-row">
-                                        <span class="a4c-change-label">找零金額：</span>
-                                        <span class="a4c-change-num">${change} 元</span>
-                                    </div>
-                                </div>
+                        <div class="a4c-task-left" style="flex-direction:column;align-items:center;gap:8px;">
+                            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;">
+                                ${itemDisplayText}
+                            </div>
+                            <div class="a4c-change-row">
+                                <span class="a4c-change-label">找零金額：</span>
+                                <span class="a4c-change-num">${change} 元</span>
                             </div>
                         </div>
                         <div class="a4c-task-right" style="flex-direction:row;min-width:unset;">
