@@ -676,6 +676,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const curr = q.questions[q.currentQuestion];
             // 重設自訂項目刪除旗標
             if (curr && curr.items) curr.items.forEach(it => { it._deleted = false; });
+            // 清空目前頁面內容，確保前一頁（Phase 2）先消失再顯示任務彈窗
+            const appEl = document.getElementById('app');
+            if (appEl) appEl.innerHTML = '';
             this._showTaskModal(curr, () => this._renderPhase1());
         },
 
@@ -2330,7 +2333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const toast = document.createElement('div');
             toast.id = 'b1-exact-toast';
             toast.className = 'b1-exact-toast';
-            toast.textContent = '💯 剛好！不需要找零';
+            toast.textContent = '✅ 答對！金額正確';
             document.body.appendChild(toast);
             Game.TimerManager.setTimeout(() => {
                 toast.classList.add('b1-toast-fade');

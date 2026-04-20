@@ -8,97 +8,106 @@
 // optA 永遠比 optB 貴；顯示時隨機左右交換（swapped 旗標）
 const B4_ITEMS = [
     { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  optA:{ store:'文具店',  storeIcon:'🏪', price:85  }, optB:{ store:'超市',   storeIcon:'🛒', price:65  } },
-    { cat:'food',       name:'蘋果（1斤）',  icon:'🍎',  optA:{ store:'超市',   storeIcon:'🛒', price:45  }, optB:{ store:'菜市場', storeIcon:'🥬', price:35  } },
-    { cat:'stationery', name:'原子筆',       icon:'🖊️', optA:{ store:'書局',   storeIcon:'📚', price:15  }, optB:{ store:'大賣場', storeIcon:'🏬', price:12  } },
+    { cat:'food',       name:'蘋果（1斤）',  icon:'🍎',  imageUrl:'../images/c6/icon-c6-apple.png',          optA:{ store:'超市',   storeIcon:'🛒', price:45  }, optB:{ store:'菜市場', storeIcon:'🥬', price:35  } },
+    { cat:'stationery', name:'原子筆',       icon:'🖊️', imageUrl:'../images/c6/icon-c6-ballpoint-pen.png',  optA:{ store:'書局',   storeIcon:'📚', price:15  }, optB:{ store:'大賣場', storeIcon:'🏬', price:12  } },
     { cat:'food',       name:'礦泉水',       icon:'💧',  optA:{ store:'超商',   storeIcon:'🏪', price:20  }, optB:{ store:'量販店', storeIcon:'🏬', price:13  } },
-    { cat:'daily',      name:'洗髮精',       icon:'🧴',  optA:{ store:'藥妝店', storeIcon:'💊', price:189 }, optB:{ store:'量販店', storeIcon:'🏬', price:149 } },
-    { cat:'food',       name:'巧克力',       icon:'🍫',  optA:{ store:'超商',   storeIcon:'🏪', price:55  }, optB:{ store:'超市',   storeIcon:'🛒', price:42  } },
-    { cat:'daily',      name:'毛巾',         icon:'🧣',  optA:{ store:'百貨',   storeIcon:'🏢', price:250 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
-    { cat:'stationery', name:'故事書',       icon:'📖',  optA:{ store:'書店',   storeIcon:'📚', price:280 }, optB:{ store:'二手店', storeIcon:'♻️', price:150 } },
-    { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  optA:{ store:'超商',   storeIcon:'🏪', price:65  }, optB:{ store:'超市',   storeIcon:'🛒', price:55  } },
-    { cat:'daily',      name:'面紙（一包）', icon:'🧻',  optA:{ store:'超商',   storeIcon:'🏪', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:25  } },
-    { cat:'clothing',   name:'雨傘',         icon:'☂️',  optA:{ store:'百貨',   storeIcon:'🏢', price:480 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
-    { cat:'food',       name:'餅乾（一盒）', icon:'🍪',  optA:{ store:'超商',   storeIcon:'🏪', price:45  }, optB:{ store:'超市',   storeIcon:'🛒', price:35  } },
+    { cat:'daily',      name:'洗髮精',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-shampoo-shop.png',   optA:{ store:'藥妝店', storeIcon:'💊', price:189 }, optB:{ store:'量販店', storeIcon:'🏬', price:149 } },
+    { cat:'food',       name:'巧克力',       icon:'🍫',  imageUrl:'../images/c6/icon-c6-chocolate.png',      optA:{ store:'超商',   storeIcon:'🏪', price:55  }, optB:{ store:'超市',   storeIcon:'🛒', price:42  } },
+    { cat:'daily',      name:'毛巾',         icon:'🧣',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:250 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
+    { cat:'stationery', name:'故事書',       icon:'📖',  imageUrl:'../images/c6/icon-c6-story-book.png',     optA:{ store:'書店',   storeIcon:'📚', price:280 }, optB:{ store:'二手店', storeIcon:'♻️', price:150 } },
+    { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  imageUrl:'../images/a4/icon-a4-milk-shop.png',      optA:{ store:'超商',   storeIcon:'🏪', price:65  }, optB:{ store:'超市',   storeIcon:'🛒', price:55  } },
+    { cat:'daily',      name:'面紙（一包）', icon:'🧻',  imageUrl:'../images/a4/icon-a4-box-of-tissues-shop.png', optA:{ store:'超商', storeIcon:'🏪', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:25  } },
+    { cat:'clothing',   name:'雨傘',         icon:'☂️',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:480 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
+    { cat:'food',       name:'餅乾（一盒）', icon:'🍪',  imageUrl:'../images/c6/icon-c6-cookie.png',         optA:{ store:'超商',   storeIcon:'🏪', price:45  }, optB:{ store:'超市',   storeIcon:'🛒', price:35  } },
     { cat:'daily',      name:'牙刷',         icon:'🪥',  optA:{ store:'藥局',   storeIcon:'💊', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:29  } },
-    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', optA:{ store:'文具店', storeIcon:'🏪', price:120 }, optB:{ store:'大賣場', storeIcon:'🏬', price:89  } },
-    { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
-    { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  optA:{ store:'超商',   storeIcon:'🏪', price:85  }, optB:{ store:'量販店', storeIcon:'🏬', price:59  } },
-    { cat:'daily',      name:'洗碗精',       icon:'🧼',  optA:{ store:'超市',   storeIcon:'🛒', price:59  }, optB:{ store:'量販店', storeIcon:'🏬', price:45  } },
-    { cat:'clothing',   name:'運動鞋',       icon:'👟',  optA:{ store:'品牌店', storeIcon:'👔', price:1580}, optB:{ store:'網購',   storeIcon:'💻', price:1200} },
-    { cat:'clothing',   name:'拖鞋',         icon:'🩴',  optA:{ store:'百貨',   storeIcon:'🏢', price:390 }, optB:{ store:'夜市',   storeIcon:'🌙', price:120 } },
-    { cat:'clothing',   name:'手套',         icon:'🧤',  optA:{ store:'百貨',   storeIcon:'🏢', price:320 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
-    { cat:'daily',      name:'洗手乳',       icon:'🧴',  optA:{ store:'藥局',   storeIcon:'💊', price:55  }, optB:{ store:'量販店', storeIcon:'🏬', price:39  } },
-    { cat:'food',       name:'奶茶',         icon:'🧋',  optA:{ store:'手搖店', storeIcon:'🥤', price:60  }, optB:{ store:'超商',   storeIcon:'🏪', price:50  } },
-    { cat:'daily',      name:'運動水壺',     icon:'🍶',  optA:{ store:'體育用品店',storeIcon:'⚽',price:350 }, optB:{ store:'量販店', storeIcon:'🏬', price:260 } },
-    { cat:'clothing',   name:'帽子',         icon:'🧢',  optA:{ store:'百貨',   storeIcon:'🏢', price:580 }, optB:{ store:'網購',   storeIcon:'💻', price:420 } },
-    { cat:'daily',      name:'便當盒',       icon:'🍱',  optA:{ store:'百貨',   storeIcon:'🏢', price:285 }, optB:{ store:'量販店', storeIcon:'🏬', price:199 } },
-    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  optA:{ store:'書局',   storeIcon:'📚', price:95  }, optB:{ store:'量販店', storeIcon:'🏬', price:69  } },
-    { cat:'food',       name:'口香糖',       icon:'🍬',  optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
-    { cat:'daily',      name:'浴巾',         icon:'🛁',  optA:{ store:'百貨',   storeIcon:'🏢', price:480 }, optB:{ store:'量販店', storeIcon:'🏬', price:320 } },
+    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    optA:{ store:'文具店', storeIcon:'🏪', price:120 }, optB:{ store:'大賣場', storeIcon:'🏬', price:89  } },
+    { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  imageUrl:'../images/a4/icon-a4-juice-shop.png',     optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
+    { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  imageUrl:'../images/a4/icon-a4-battery-shop.png',   optA:{ store:'超商',   storeIcon:'🏪', price:85  }, optB:{ store:'量販店', storeIcon:'🏬', price:59  } },
+    { cat:'daily',      name:'洗碗精',       icon:'🧼',  imageUrl:'../images/a4/icon-a4-dish-soap-shop.png', optA:{ store:'超市',   storeIcon:'🛒', price:59  }, optB:{ store:'量販店', storeIcon:'🏬', price:45  } },
+    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', optA:{ store:'運動用品店', storeIcon:'⚽', price:1200}, optB:{ store:'大賣場', storeIcon:'🏬', price:880 } },
+    { cat:'clothing',   name:'拖鞋',         icon:'🩴',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:390 }, optB:{ store:'夜市',   storeIcon:'🌙', price:120 } },
+    { cat:'clothing',   name:'手套',         icon:'🧤',  imageUrl:'../images/a4/icon-a4-gloves-shop.png',    optA:{ store:'百貨公司',   storeIcon:'🏢', price:320 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
+    { cat:'daily',      name:'洗手乳',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-body-wash-shop.png', optA:{ store:'藥局',   storeIcon:'💊', price:55  }, optB:{ store:'量販店', storeIcon:'🏬', price:39  } },
+    { cat:'food',       name:'奶茶',         icon:'🧋',  imageUrl:'../images/a4/icon-a4-milk-tea-shop.png',  optA:{ store:'手搖店', storeIcon:'🥤', price:60  }, optB:{ store:'超商',   storeIcon:'🏪', price:50  } },
+    { cat:'daily',      name:'運動水壺',     icon:'🍶',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'運動用品店', storeIcon:'⚽', price:350 }, optB:{ store:'大賣場', storeIcon:'🏬', price:260 } },
+    { cat:'clothing',   name:'帽子',         icon:'🧢',  imageUrl:'../images/a4/icon-a4-hat-shop.png',       optA:{ store:'百貨公司',   storeIcon:'🏢', price:580 }, optB:{ store:'網購',   storeIcon:'💻', price:420 } },
+    { cat:'daily',      name:'便當盒',       icon:'🍱',  imageUrl:'../images/c6/icon-c6-bento.png',          optA:{ store:'百貨公司',   storeIcon:'🏢', price:285 }, optB:{ store:'量販店', storeIcon:'🏬', price:199 } },
+    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       optA:{ store:'書局',   storeIcon:'📚', price:95  }, optB:{ store:'量販店', storeIcon:'🏬', price:69  } },
+    { cat:'food',       name:'口香糖',       icon:'🍬',  imageUrl:'../images/c6/icon-c6-gum.png',            optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
+    { cat:'daily',      name:'浴巾',         icon:'🛁',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:480 }, optB:{ store:'量販店', storeIcon:'🏬', price:320 } },
     { cat:'food',       name:'醬油（一瓶）', icon:'🫙',  optA:{ store:'超商',   storeIcon:'🏪', price:89  }, optB:{ store:'量販店', storeIcon:'🏬', price:65  } },
-    { cat:'daily',      name:'洗衣精',       icon:'🧺',  optA:{ store:'超市',   storeIcon:'🛒', price:159 }, optB:{ store:'量販店', storeIcon:'🏬', price:119 } },
+    { cat:'daily',      name:'洗衣精',       icon:'🧺',  imageUrl:'../images/a4/icon-a4-laundry-detergent-shop.png', optA:{ store:'超市', storeIcon:'🛒', price:159 }, optB:{ store:'量販店', storeIcon:'🏬', price:119 } },
     // 追加 10 組（2026-03-29）
-    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  optA:{ store:'文具店', storeIcon:'🏪', price:25  }, optB:{ store:'大賣場', storeIcon:'🏬', price:18  } },
+    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         optA:{ store:'文具店', storeIcon:'🏪', price:25  }, optB:{ store:'大賣場', storeIcon:'🏬', price:18  } },
     { cat:'food',       name:'果凍（一盒）', icon:'🍮',  optA:{ store:'超商',   storeIcon:'🏪', price:55  }, optB:{ store:'量販店', storeIcon:'🏬', price:38  } },
-    { cat:'food',       name:'麵包',         icon:'🍞',  optA:{ store:'咖啡廳', storeIcon:'☕', price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', price:45  } },
+    { cat:'food',       name:'麵包',         icon:'🍞',  imageUrl:'../images/a4/icon-a4-bread-shop.png',      optA:{ store:'咖啡廳', storeIcon:'☕', price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', price:45  } },
     { cat:'food',       name:'鮪魚罐頭',     icon:'🐟',  optA:{ store:'超商',   storeIcon:'🏪', price:45  }, optB:{ store:'量販店', storeIcon:'🏬', price:32  } },
-    { cat:'clothing',   name:'雨衣',         icon:'🌧️', optA:{ store:'百貨',   storeIcon:'🏢', price:280 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
-    { cat:'stationery', name:'剪刀',         icon:'✂️', optA:{ store:'文具店', storeIcon:'🏪', price:35  }, optB:{ store:'大賣場', storeIcon:'🏬', price:25  } },
-    { cat:'food',       name:'洋芋片（大包）',icon:'🥔', optA:{ store:'超商',   storeIcon:'🏪', price:49  }, optB:{ store:'量販店', storeIcon:'🏬', price:35  } },
+    { cat:'clothing',   name:'雨衣',         icon:'🌧️', optA:{ store:'百貨公司',   storeIcon:'🏢', price:280 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
+    { cat:'stationery', name:'剪刀',         icon:'✂️', imageUrl:'../images/c6/icon-c6-scissors.png',        optA:{ store:'文具店', storeIcon:'🏪', price:35  }, optB:{ store:'大賣場', storeIcon:'🏬', price:25  } },
+    { cat:'food',       name:'洋芋片（大包）',icon:'🥔', imageUrl:'../images/c6/icon-c6-chips.png',           optA:{ store:'超商',   storeIcon:'🏪', price:49  }, optB:{ store:'量販店', storeIcon:'🏬', price:35  } },
     { cat:'daily',      name:'眼藥水',       icon:'💊',  optA:{ store:'藥局',   storeIcon:'💊', price:89  }, optB:{ store:'網購',   storeIcon:'💻', price:65  } },
-    { cat:'daily',      name:'保溫瓶',       icon:'🫙',  optA:{ store:'品牌店', storeIcon:'👔', price:650 }, optB:{ store:'量販店', storeIcon:'🏬', price:480 } },
-    { cat:'food',       name:'零食禮盒',     icon:'🎁',  optA:{ store:'百貨',   storeIcon:'🏢', price:380 }, optB:{ store:'量販店', storeIcon:'🏬', price:260 } },
+    { cat:'daily',      name:'保溫瓶',       icon:'🫙',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'品牌店', storeIcon:'👔', price:650 }, optB:{ store:'量販店', storeIcon:'🏬', price:480 } },
+    { cat:'food',       name:'零食禮盒',     icon:'🎁',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:380 }, optB:{ store:'量販店', storeIcon:'🏬', price:260 } },
 ];
 
 // ── 三商店比一比題庫（15 組，每組 3 家店，參照 F4 排序設計）──────────────
 // stores[0]最貴、stores[1]中間、stores[2]最便宜（生成時再隨機打亂）
 const B4_TRIPLE_ITEMS = [
-    { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  stores:[{ store:'百貨',   storeIcon:'🏢', price:120 },{ store:'文具店', storeIcon:'🏪', price:85  },{ store:'大賣場', storeIcon:'🏬', price:65  }] },
-    { cat:'food',       name:'礦泉水',       icon:'💧',  stores:[{ store:'百貨餐廳',storeIcon:'🏢', price:50  },{ store:'超商',   storeIcon:'🏪', price:25  },{ store:'量販店', storeIcon:'🏬', price:13  }] },
-    { cat:'food',       name:'巧克力',       icon:'🍫',  stores:[{ store:'機場免稅',storeIcon:'✈️', price:120 },{ store:'超商',   storeIcon:'🏪', price:55  },{ store:'超市',   storeIcon:'🛒', price:42  }] },
-    { cat:'daily',      name:'洗髮精',       icon:'🧴',  stores:[{ store:'百貨',   storeIcon:'🏢', price:280 },{ store:'藥妝店', storeIcon:'💊', price:189 },{ store:'量販店', storeIcon:'🏬', price:149 }] },
-    { cat:'stationery', name:'故事書',       icon:'📖',  stores:[{ store:'書店',   storeIcon:'📚', price:320 },{ store:'書局',   storeIcon:'📚', price:280 },{ store:'二手店', storeIcon:'♻️', price:150 }] },
-    { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  stores:[{ store:'超商',   storeIcon:'🏪', price:80  },{ store:'超市',   storeIcon:'🛒', price:65  },{ store:'量販店', storeIcon:'🏬', price:50  }] },
-    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', stores:[{ store:'百貨',   storeIcon:'🏢', price:180 },{ store:'文具店', storeIcon:'🏪', price:120 },{ store:'大賣場', storeIcon:'🏬', price:89  }] },
-    { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  stores:[{ store:'機場',   storeIcon:'✈️', price:80  },{ store:'超商',   storeIcon:'🏪', price:35  },{ store:'超市',   storeIcon:'🛒', price:25  }] },
-    { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  stores:[{ store:'超商',   storeIcon:'🏪', price:120 },{ store:'藥局',   storeIcon:'💊', price:85  },{ store:'量販店', storeIcon:'🏬', price:59  }] },
-    { cat:'daily',      name:'毛巾',         icon:'🧣',  stores:[{ store:'百貨',   storeIcon:'🏢', price:350 },{ store:'超市',   storeIcon:'🛒', price:250 },{ store:'市場',   storeIcon:'🥬', price:180 }] },
-    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  stores:[{ store:'書局',   storeIcon:'📚', price:150 },{ store:'文具店', storeIcon:'🏪', price:95  },{ store:'量販店', storeIcon:'🏬', price:69  }] },
-    { cat:'daily',      name:'洗手乳',       icon:'🧴',  stores:[{ store:'百貨',   storeIcon:'🏢', price:120 },{ store:'藥局',   storeIcon:'💊', price:79  },{ store:'量販店', storeIcon:'🏬', price:55  }] },
-    { cat:'food',       name:'奶茶',         icon:'🧋',  stores:[{ store:'咖啡廳', storeIcon:'☕', price:150 },{ store:'手搖店', storeIcon:'🥤', price:60  },{ store:'超商',   storeIcon:'🏪', price:45  }] },
-    { cat:'clothing',   name:'運動鞋',       icon:'👟',  stores:[{ store:'品牌旗艦',storeIcon:'👔', price:2800},{ store:'品牌店', storeIcon:'👔', price:1580},{ store:'網購',   storeIcon:'💻', price:1200}] },
-    { cat:'daily',      name:'洗碗精',       icon:'🧼',  stores:[{ store:'超商',   storeIcon:'🏪', price:89  },{ store:'超市',   storeIcon:'🛒', price:59  },{ store:'量販店', storeIcon:'🏬', price:45  }] },
+    { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:120 },{ store:'文具店', storeIcon:'🏪', price:85  },{ store:'大賣場', storeIcon:'🏬', price:65  }] },
+    { cat:'food',       name:'礦泉水',       icon:'💧',  stores:[{ store:'高級餐廳',storeIcon:'🍽️', price:50  },{ store:'超商',   storeIcon:'🏪', price:25  },{ store:'量販店', storeIcon:'🏬', price:13  }] },
+    { cat:'food',       name:'巧克力',       icon:'🍫',  imageUrl:'../images/c6/icon-c6-chocolate.png',      stores:[{ store:'百貨公司', storeIcon:'🏢', price:120 },{ store:'超商',   storeIcon:'🏪', price:55  },{ store:'超市',   storeIcon:'🛒', price:42  }] },
+    { cat:'daily',      name:'洗髮精',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-shampoo-shop.png',   stores:[{ store:'百貨公司',   storeIcon:'🏢', price:280 },{ store:'藥妝店', storeIcon:'💊', price:189 },{ store:'量販店', storeIcon:'🏬', price:149 }] },
+    { cat:'stationery', name:'故事書',       icon:'📖',  imageUrl:'../images/c6/icon-c6-story-book.png',     stores:[{ store:'書店',   storeIcon:'📚', price:320 },{ store:'書局',   storeIcon:'📚', price:280 },{ store:'二手店', storeIcon:'♻️', price:150 }] },
+    { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  imageUrl:'../images/a4/icon-a4-milk-shop.png',      stores:[{ store:'超商',   storeIcon:'🏪', price:80  },{ store:'超市',   storeIcon:'🛒', price:65  },{ store:'量販店', storeIcon:'🏬', price:50  }] },
+    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    stores:[{ store:'百貨公司',   storeIcon:'🏢', price:180 },{ store:'文具店', storeIcon:'🏪', price:120 },{ store:'大賣場', storeIcon:'🏬', price:89  }] },
+    { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  imageUrl:'../images/a4/icon-a4-juice-shop.png',     stores:[{ store:'百貨公司', storeIcon:'🏢', price:80  },{ store:'超商',   storeIcon:'🏪', price:35  },{ store:'超市',   storeIcon:'🛒', price:25  }] },
+    { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  imageUrl:'../images/a4/icon-a4-battery-shop.png',   stores:[{ store:'超商',   storeIcon:'🏪', price:120 },{ store:'藥局',   storeIcon:'💊', price:85  },{ store:'量販店', storeIcon:'🏬', price:59  }] },
+    { cat:'daily',      name:'毛巾',         icon:'🧣',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:350 },{ store:'超市',   storeIcon:'🛒', price:250 },{ store:'市場',   storeIcon:'🥬', price:180 }] },
+    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       stores:[{ store:'書局',   storeIcon:'📚', price:150 },{ store:'文具店', storeIcon:'🏪', price:95  },{ store:'量販店', storeIcon:'🏬', price:69  }] },
+    { cat:'daily',      name:'洗手乳',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-body-wash-shop.png', stores:[{ store:'百貨公司',   storeIcon:'🏢', price:120 },{ store:'藥局',   storeIcon:'💊', price:79  },{ store:'量販店', storeIcon:'🏬', price:55  }] },
+    { cat:'food',       name:'奶茶',         icon:'🧋',  imageUrl:'../images/a4/icon-a4-milk-tea-shop.png',  stores:[{ store:'咖啡廳', storeIcon:'☕', price:150 },{ store:'手搖店', storeIcon:'🥤', price:60  },{ store:'超商',   storeIcon:'🏪', price:45  }] },
+    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', stores:[{ store:'品牌店', storeIcon:'👔', price:1580},{ store:'運動用品店', storeIcon:'⚽', price:1200},{ store:'大賣場', storeIcon:'🏬', price:880 }] },
+    { cat:'daily',      name:'洗碗精',       icon:'🧼',  imageUrl:'../images/a4/icon-a4-dish-soap-shop.png', stores:[{ store:'超商',   storeIcon:'🏪', price:89  },{ store:'超市',   storeIcon:'🛒', price:59  },{ store:'量販店', storeIcon:'🏬', price:45  }] },
     // 追加 5 組（2026-03-29）
-    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  stores:[{ store:'書局',   storeIcon:'📚', price:45  },{ store:'文具店', storeIcon:'🏪', price:25  },{ store:'大賣場', storeIcon:'🏬', price:18  }] },
+    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         stores:[{ store:'書局',   storeIcon:'📚', price:45  },{ store:'文具店', storeIcon:'🏪', price:25  },{ store:'大賣場', storeIcon:'🏬', price:18  }] },
     { cat:'food',       name:'果凍（一盒）', icon:'🍮',  stores:[{ store:'超商',   storeIcon:'🏪', price:75  },{ store:'超市',   storeIcon:'🛒', price:55  },{ store:'量販店', storeIcon:'🏬', price:38  }] },
-    { cat:'food',       name:'麵包',         icon:'🍞',  stores:[{ store:'連鎖咖啡', storeIcon:'☕', price:120 },{ store:'咖啡廳', storeIcon:'☕', price:60  },{ store:'麵包店', storeIcon:'🥐', price:45  }] },
-    { cat:'clothing',   name:'雨衣',         icon:'🌧️', stores:[{ store:'百貨',   storeIcon:'🏢', price:480 },{ store:'超市',   storeIcon:'🛒', price:280 },{ store:'夜市',   storeIcon:'🌙', price:150 }] },
-    { cat:'food',       name:'洋芋片（大包）',icon:'🥔', stores:[{ store:'超商',   storeIcon:'🏪', price:79  },{ store:'超市',   storeIcon:'🛒', price:49  },{ store:'量販店', storeIcon:'🏬', price:35  }] },
+    { cat:'food',       name:'麵包',         icon:'🍞',  imageUrl:'../images/a4/icon-a4-bread-shop.png',      stores:[{ store:'咖啡廳',   storeIcon:'☕', price:80  },{ store:'便利商店', storeIcon:'🏪', price:55  },{ store:'麵包店', storeIcon:'🥐', price:45  }] },
+    { cat:'clothing',   name:'雨衣',         icon:'🌧️', stores:[{ store:'百貨公司',   storeIcon:'🏢', price:480 },{ store:'超市',   storeIcon:'🛒', price:280 },{ store:'夜市',   storeIcon:'🌙', price:150 }] },
+    { cat:'food',       name:'洋芋片（大包）',icon:'🥔', imageUrl:'../images/c6/icon-c6-chips.png',           stores:[{ store:'超商',   storeIcon:'🏪', price:79  },{ store:'超市',   storeIcon:'🛒', price:49  },{ store:'量販店', storeIcon:'🏬', price:35  }] },
 ];
 
 // ── 單位比價題庫（12 組，optA 每單位較貴、optB 每單位較便宜）────────
 // unit: 商品計算單位；qty/price → perUnit = price/qty（整數）
 const B4_UNIT_ITEMS = [
     { cat:'food',       name:'糖果',     icon:'🍬', unit:'個', optA:{ store:'超商',    storeIcon:'🏪', qty:8,  price:56  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:50  } },
-    { cat:'stationery', name:'鉛筆',     icon:'✏️', unit:'支', optA:{ store:'文具店',  storeIcon:'🏪', qty:5,  price:40  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:6,  price:36  } },
-    { cat:'food',       name:'雞蛋',     icon:'🥚', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:6,  price:60  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:80  } },
-    { cat:'food',       name:'香蕉',     icon:'🍌', unit:'根', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:30  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:4,  price:32  } },
+    { cat:'stationery', name:'鉛筆',     icon:'✏️', imageUrl:'../images/c6/icon-c6-pencil.png',           unit:'支', optA:{ store:'文具店',  storeIcon:'🏪', qty:5,  price:40  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:6,  price:36  } },
+    { cat:'food',       name:'雞蛋',     icon:'🥚', imageUrl:'../images/a4/icon-a4-egg-shop.png',          unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:6,  price:60  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:80  } },
+    { cat:'food',       name:'香蕉',     icon:'🍌', imageUrl:'../images/c6/icon-c6-banana.png',            unit:'根', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:30  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:4,  price:32  } },
     { cat:'food',       name:'水餃',     icon:'🥟', unit:'個', optA:{ store:'冷凍食品',storeIcon:'🏪', qty:10, price:80  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:12, price:84  } },
-    { cat:'food',       name:'吐司',     icon:'🍞', unit:'片', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', qty:6,  price:72  } },
+    { cat:'food',       name:'吐司',     icon:'🍞', imageUrl:'../images/a4/icon-a4-toast-shop.png',        unit:'片', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', qty:6,  price:72  } },
     { cat:'food',       name:'小番茄',   icon:'🍅', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:5,  price:35  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:8,  price:40  } },
     { cat:'food',       name:'優格',     icon:'🫙', unit:'瓶', optA:{ store:'超商',    storeIcon:'🏪', qty:2,  price:50  }, optB:{ store:'超市',   storeIcon:'🛒', qty:4,  price:88  } },
-    { cat:'food',       name:'巧克力棒', icon:'🍫', unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:75  }, optB:{ store:'超市',   storeIcon:'🛒', qty:5,  price:110 } },
-    { cat:'daily',      name:'洗衣錠',   icon:'🧼', unit:'顆', optA:{ store:'藥局',    storeIcon:'💊', qty:10, price:120 }, optB:{ store:'量販店', storeIcon:'🏬', qty:15, price:150 } },
+    { cat:'food',       name:'巧克力棒', icon:'🍫', imageUrl:'../images/c6/icon-c6-chocolate.png',         unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:75  }, optB:{ store:'超市',   storeIcon:'🛒', qty:5,  price:110 } },
+    { cat:'daily',      name:'洗衣錠',   icon:'🧼', imageUrl:'../images/a4/icon-a4-laundry-detergent-shop.png', unit:'顆', optA:{ store:'藥局', storeIcon:'💊', qty:10, price:120 }, optB:{ store:'量販店', storeIcon:'🏬', qty:15, price:150 } },
     { cat:'food',       name:'果凍',     icon:'🍮', unit:'個', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:45  }, optB:{ store:'量販店', storeIcon:'🏬', qty:6,  price:72  } },
     { cat:'daily',      name:'抹布',     icon:'🧹', unit:'條', optA:{ store:'超市',    storeIcon:'🛒', qty:2,  price:30  }, optB:{ store:'量販店', storeIcon:'🏬', qty:4,  price:48  } },
     // 追加 3 組（2026-03-29）
-    { cat:'food',       name:'棒棒糖',   icon:'🍭', unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:48  }, optB:{ store:'量販店', storeIcon:'🏬', qty:6,  price:60  } },
+    { cat:'food',       name:'棒棒糖',   icon:'🍭', imageUrl:'../images/c6/icon-c6-lollipop.png',          unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:48  }, optB:{ store:'量販店', storeIcon:'🏬', qty:6,  price:60  } },
     { cat:'food',       name:'麵條',     icon:'🍜', unit:'包', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:90  }, optB:{ store:'量販店', storeIcon:'🏬', qty:5,  price:130 } },
-    { cat:'stationery', name:'橡皮擦',   icon:'📎', unit:'個', optA:{ store:'書局',    storeIcon:'📚', qty:3,  price:30  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:5,  price:40  } },
+    { cat:'stationery', name:'橡皮擦',   icon:'📎', imageUrl:'../images/c6/icon-c6-eraser.png',            unit:'個', optA:{ store:'書局',    storeIcon:'📚', qty:3,  price:30  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:5,  price:40  } },
 ];
 
 // ── 輔助函數 ────────────────────────────────────────────────────
 const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertToTraditionalCurrency(v) : `${v}元`;
+
+// 商品圖示 HTML：有 imageUrl 用圖片，否則用 emoji 備用
+function b4IconHTML(item) {
+    if (item && item.imageUrl) {
+        const esc = (item.icon || '').replace(/'/g, '&#39;');
+        return `<img src="${item.imageUrl}" alt="${item.name}" draggable="false" class="b4-icon-img" onerror="this.outerHTML='${esc}'">`;
+    }
+    return (item && item.icon) || '';
+}
 
 // ── 金錢圖示渲染（貪婪分解，每枚各顯示一張圖）────────────────
 const B4_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
@@ -811,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${this._renderHeader()}
             <div class="b-game-wrap">
                 <div class="b4-item-hero" style="position:relative;">
-                    <span class="b4-item-icon">${curr.icon}</span>
+                    <span class="b4-item-icon">${b4IconHTML(curr)}</span>
                     <div class="b4-item-name">${curr.name}</div>
                     <div class="b4-question-label">
                         ${questionLabel}
@@ -958,7 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);cursor:pointer;';
             modal.innerHTML = `
                 <div class="b4-intro-card">
-                    <div class="b4-intro-icon">${curr.icon}</div>
+                    <div class="b4-intro-icon">${b4IconHTML(curr)}</div>
                     <div class="b4-intro-name">${curr.name}</div>
                 </div>`;
             document.body.appendChild(modal);
@@ -989,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🏷️ 特賣比一比</span>
+                    <span class="b-header-unit">🏷️ 特賣比一比</span>
                 </div>
                 <div class="b-header-center">${centerTxt}</div>
                 <div class="b-header-right">
@@ -1080,12 +1089,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
                         img.style.outline = '3px solid #10b981';
-
-                        // 商店框點擊彈跳動畫
-                        if (card) {
-                            card.classList.add('b4-card-coin-bounce');
-                            Game.TimerManager.setTimeout(() => card.classList.remove('b4-card-coin-bounce'), 280, 'ui');
-                        }
 
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
@@ -1197,12 +1200,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
                         img.style.outline = '3px solid #10b981';
-
-                        // 商店框點擊彈跳動畫
-                        if (card) {
-                            card.classList.add('b4-card-coin-bounce');
-                            Game.TimerManager.setTimeout(() => card.classList.remove('b4-card-coin-bounce'), 280, 'ui');
-                        }
 
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
@@ -1627,7 +1624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${this._renderHeader()}
             <div class="b-game-wrap">
                 <div class="b4-item-hero" style="position:relative;">
-                    <span class="b4-item-icon">${curr.icon}</span>
+                    <span class="b4-item-icon">${b4IconHTML(curr)}</span>
                     <div class="b4-item-name">${curr.name}</div>
                     <div class="b4-question-label">
                         ${questionLabel}
@@ -1649,7 +1646,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 依難度揭露卡片
             if (diff === 'easy') {
-                this._revealTripleCardPrices(curr);
+                this._setupTripleEasyCoins(curr);
                 if (this.state.settings.clickMode === 'on') {
                     Game.TimerManager.setTimeout(() => AssistClick.activate(curr, null), 300, 'ui');
                 }
@@ -1711,19 +1708,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             }
 
-            // 簡單模式：卡片直接點選
-            if (diff === 'easy') {
-                curr.stores.forEach((_, idx) => {
-                    const card = document.getElementById(`tcard-${idx}`);
-                    Game.EventManager.on(card, 'click', () => {
-                        if (this.state.isProcessing) return;
-                        this.state.isProcessing = true;
-                        const isCorrect = (idx === curr.cheapestIdx);
-                        this._handleTripleSelectClick(isCorrect, idx, curr, diff);
-                    }, {}, 'gameUI');
-                });
-            }
-            // 普通/困難模式卡片不可點選（改用金幣點擊或輸入框）
+            // 簡單/普通/困難模式卡片本身不可點選（改用金幣點擊或輸入框）
 
             // 導覽
             const backBtn = document.getElementById('back-to-settings');
@@ -1906,12 +1891,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         img.style.opacity = '0.5';
                         img.style.outline = '3px solid #10b981';
 
-                        // 商店框點擊彈跳動畫
-                        if (card) {
-                            card.classList.add('b4-card-coin-bounce');
-                            Game.TimerManager.setTimeout(() => card.classList.remove('b4-card-coin-bounce'), 280, 'ui');
-                        }
-
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
                         if (priceEl) priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
@@ -1933,6 +1912,98 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }, {}, 'gameUI');
                 });
+            });
+        },
+
+        // ── 三商店簡單模式：點幣後自動比較（同二商店 easy pattern）─────
+        _setupTripleEasyCoins(curr) {
+            const storesData = curr.stores.map((store, idx) => ({
+                store, idx,
+                coins: this._getCoinsArray(store.price),
+                clickedCount: 0, done: false, runningTotal: 0
+            }));
+
+            storesData.forEach(data => {
+                const card = document.getElementById(`tcard-${data.idx}`);
+                const coinsEl = card?.querySelector('.b4-price-coins');
+                const priceEl = card?.querySelector('.b4-price');
+                if (!coinsEl) return;
+
+                coinsEl.classList.remove('b4-price-coins-hidden');
+                coinsEl.innerHTML = data.coins.map((d, i) => {
+                    const isBill = d >= 100;
+                    const w  = isBill ? '100px' : '60px';
+                    const h  = isBill ? '48.91px' : '60px';
+                    const br = isBill ? '4px' : '50%';
+                    return `<img src="../images/money/${d}_yuan_front.png"
+                        data-cidx="${i}" data-cval="${d}" data-tidx="${data.idx}"
+                        class="b4-easy-coin"
+                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
+                        draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+
+                if (priceEl) {
+                    priceEl.classList.remove('b4-price-hidden');
+                    priceEl.innerHTML = `0 <span class="b4-price-unit">元</span>`;
+                }
+
+                coinsEl.querySelectorAll('.b4-easy-coin').forEach(img => {
+                    Game.EventManager.on(img, 'click', () => {
+                        if (img.dataset.clicked || data.done) return;
+                        img.dataset.clicked = '1';
+                        img.style.opacity = '0.5';
+                        img.style.outline = '3px solid #10b981';
+
+                        data.runningTotal += parseInt(img.dataset.cval);
+                        data.clickedCount++;
+                        if (priceEl) priceEl.innerHTML = `${data.runningTotal} <span class="b4-price-unit">元</span>`;
+
+                        const isLast = data.clickedCount >= data.coins.length;
+                        if (isLast) {
+                            data.done = true;
+                            if (card) card.style.outline = '3px solid #10b981';
+                            Game.Speech.speak(`${data.runningTotal}元`, () => {
+                                if (storesData.every(s => s.done)) {
+                                    this._handleTripleEasyAllDone(curr);
+                                }
+                            });
+                        } else {
+                            Game.Speech.speak(`${data.runningTotal}元`);
+                        }
+                    }, {}, 'gameUI');
+                });
+            });
+        },
+
+        _handleTripleEasyAllDone(curr) {
+            if (this.state.isProcessing) return;
+            this.state.isProcessing = true;
+            this._clearSelectHintTimer();
+
+            this._revealTripleCardPrices(curr);
+            const correctCard = document.getElementById(`tcard-${curr.cheapestIdx}`);
+            if (correctCard) {
+                correctCard.classList.add('selected-correct', 'b4-card-glow');
+                correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>
+                    <div class="b4-cheaper-tag">最便宜！</div>`;
+            }
+            curr.stores.forEach((_, i) => {
+                if (i !== curr.cheapestIdx) {
+                    const c = document.getElementById(`tcard-${i}`);
+                    if (c) c.classList.add('selected-wrong');
+                }
+            });
+
+            this.audio.play('correct');
+            // correctCount 在 handleDiffAnswer 才計（避免雙重計分）
+            const cheapest = curr.stores[curr.cheapestIdx];
+            Game.Speech.speak(`${cheapest.store}最便宜！`, () => {
+                Game.TimerManager.setTimeout(() => {
+                    this.state.isProcessing = false;
+                    this.state.phase = 'diff';
+                    this.state.currentDiffItem = { ...curr, optA: curr.sortedAsc[2], optB: curr.sortedAsc[0] };
+                    this._renderTripleDiffSection(curr, 'easy');
+                }, 400, 'turnTransition');
             });
         },
 
@@ -2216,7 +2287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.state.quiz.correctCount++;
                         this.state.quiz.totalSaved += curr.diff;
                         this.state.quiz.comparisonHistory.push({
-                            name: curr.name, icon: curr.icon, isTriple: true,
+                            name: curr.name, icon: curr.icon, imageUrl: curr.imageUrl, isTriple: true,
                             cheapStore: curr.sortedAsc[0].store, cheapPrice: curr.sortedAsc[0].price,
                             expStore: curr.sortedAsc[2].store,   expPrice:  curr.sortedAsc[2].price,
                             saved: curr.diff
@@ -2313,7 +2384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const refCardHTML = `
             <div class="b4-ref-card-wrap">
                 <div class="b4-diff-ref-card">
-                    <span class="b4-diff-ref-icon">${curr.icon}</span>
+                    <span class="b4-diff-ref-icon">${b4IconHTML(curr)}</span>
                     <div class="b4-diff-ref-info">
                         <span class="b4-diff-ref-name">${curr.name}</span>
                     </div>
@@ -2329,47 +2400,91 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
 
             if (diff === 'easy') {
-                // 簡單：顯示正確答案（單一選項）
+                // 簡單：逐枚點幣（同二商店 easy diff pattern）
+                const diffCoins = this._getCoinsArray(correctDiff);
+                const coinsHtml = diffCoins.map((d, i) => {
+                    const isBill = d >= 100;
+                    const w  = isBill ? '100px' : '60px';
+                    const h  = isBill ? '48.91px' : '60px';
+                    const br = isBill ? '4px' : '50%';
+                    return `<img class="b4-easy-diff-coin" data-cidx="${i}" data-cval="${d}"
+                        src="../images/money/${d}_yuan_front.png"
+                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
+                        draggable="false" onerror="this.style.display='none'">`;
+                }).join('');
+                const tdiffQuestion = `${tripleCheapOpt.store}便宜了多少元？`;
+
                 app.innerHTML = `
                 ${this._renderHeader()}
                 <div class="b-game-wrap">
                     <div class="b4-item-hero" style="position:relative;">
                         ${refCardHTML}
                     </div>
-                    <div class="b4-diff-section b4-diff-normal-card">
-                        ${barsHTML}
-                        <div class="b4-diff-question b4-diff-question-below">
-                            最貴比最便宜貴多少元？
-                            <div class="b4-diff-sub">點選答案繼續</div>
+                    <div class="b4-diff-section b4-diff-normal-card b4-tsp-collapsible-card">
+                        <div class="b4-tsp-card-header">
+                            <span class="b4-tsp-card-title">各家價格</span>
+                            <button class="b4-tsp-corner-btn" id="b4-tsp-toggle">▼ 展開</button>
                         </div>
+                        <div id="b4-tsp-panel" style="display:none;">${barsHTML}</div>
                     </div>
                     <div class="b4-diff-section b4-diff-options-card">
-                        <div class="b4-diff-options b4-diff-options-easy">
-                            <button class="b4-diff-opt b4-diff-opt-solo" id="b4-easy-tdiff-btn" data-val="${correctDiff}">
-                                <div class="b4-diff-opt-coins">${b4PriceCoins(correctDiff)}</div>
-                                <span class="b4-diff-opt-label">${correctDiff} 元</span>
-                            </button>
+                        <div class="b4-diff-question" style="text-align:center;margin-bottom:12px;">
+                            ${tdiffQuestion}
+                            <div class="b4-diff-sub">👆 點擊每一枚金幣，點完後自動繼續</div>
                         </div>
+                        <div class="b4-easy-diff-coins-area" id="b4-easy-diff-coins" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;padding:12px;">${coinsHtml}</div>
+                        <div class="b4-easy-diff-total" id="b4-easy-diff-total" style="text-align:center;font-size:20px;font-weight:700;color:#16a34a;margin-top:8px;min-height:28px;"></div>
                     </div>
                 </div>`;
 
-                Game.EventManager.on(document.getElementById('b4-easy-tdiff-btn'), 'click', () => {
-                    if (this.state.isProcessing) return;
-                    this.state.isProcessing = true;
-                    this.audio.play('correct');
-                    document.getElementById('b4-easy-tdiff-btn')?.classList.add('correct-ans');
-                    this.state.quiz.totalSaved += correctDiff;
-                    this.state.quiz.comparisonHistory.push({
-                        name: curr.name, icon: curr.icon, cat: curr.cat || 'other',
-                        cheapStore: curr.sortedAsc[0].store, cheapPrice: curr.sortedAsc[0].price,
-                        expStore: curr.sortedAsc[2].store,   expPrice:  curr.sortedAsc[2].price,
-                        saved: correctDiff, isUnit: false, unit: ''
-                    });
-                    this._showSavingsToast(correctDiff);
-                    Game.Speech.speak(`最貴比最便宜貴了${correctDiff}元`, () => {
-                        Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
-                    });
-                }, {}, 'diffUI');
+                // 折疊按鈕
+                const tspToggle = document.getElementById('b4-tsp-toggle');
+                const tspPanel  = document.getElementById('b4-tsp-panel');
+                if (tspToggle && tspPanel) {
+                    Game.EventManager.on(tspToggle, 'click', () => {
+                        const open = tspPanel.style.display === 'none';
+                        tspPanel.style.display = open ? '' : 'none';
+                        tspToggle.textContent = open ? '▲ 折疊' : '▼ 展開';
+                        tspToggle.classList.toggle('b4-tsp-open', open);
+                    }, {}, 'diffUI');
+                }
+
+                // 逐枚點擊邏輯
+                let easyTDiffRunning = 0;
+                let easyTDiffClicked = 0;
+                document.querySelectorAll('.b4-easy-diff-coin').forEach(img => {
+                    Game.EventManager.on(img, 'click', () => {
+                        if (img.dataset.clicked || this.state.isProcessing) return;
+                        img.dataset.clicked = '1';
+                        img.style.opacity = '0.5';
+                        img.style.outline = '3px solid #10b981';
+
+                        easyTDiffRunning += parseInt(img.dataset.cval);
+                        easyTDiffClicked++;
+
+                        const totalEl = document.getElementById('b4-easy-diff-total');
+                        if (totalEl) totalEl.textContent = `${easyTDiffRunning} 元`;
+
+                        const isLast = easyTDiffClicked >= diffCoins.length;
+                        if (isLast) {
+                            this.state.isProcessing = true;
+                            this.audio.play('correct');
+                            this.state.quiz.totalSaved += correctDiff;
+                            this.state.quiz.comparisonHistory.push({
+                                name: curr.name, icon: curr.icon, imageUrl: curr.imageUrl, cat: curr.cat || 'other',
+                                cheapStore: tripleCheapOpt.store, cheapPrice: tripleCheapOpt.price,
+                                expStore:   tripleExpOpt.store,   expPrice:   tripleExpOpt.price,
+                                saved: correctDiff, isUnit: false, unit: ''
+                            });
+                            this._showSavingsToast(correctDiff);
+                            Game.Speech.speak(`${tripleCheapOpt.store}便宜了${correctDiff}元`, () => {
+                                Game.TimerManager.setTimeout(() => this.nextQuestion(), 400, 'turnTransition');
+                            });
+                        } else {
+                            Game.Speech.speak(`${easyTDiffRunning}元`);
+                        }
+                    }, {}, 'diffUI');
+                });
 
                 const backBtnTE = document.getElementById('back-to-settings');
                 if (backBtnTE) Game.EventManager.on(backBtnTE, 'click', () => this.showSettings(), {}, 'diffUI');
@@ -2378,7 +2493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
                     else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
                 }, {}, 'diffUI');
-                Game.Speech.speak(`最貴比最便宜貴了${correctDiff}元`);
+                Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，${tripleCheapOpt.store}便宜了多少元？請點擊金幣`);
                 return;
 
             } else if (diff === 'normal') {
@@ -2635,7 +2750,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const refCardHTML = `
             <div class="b4-ref-card-wrap">
                 <div class="b4-diff-ref-card">
-                    <span class="b4-diff-ref-icon">${curr.icon}</span>
+                    <span class="b4-diff-ref-icon">${b4IconHTML(curr)}</span>
                     <div class="b4-diff-ref-info">
                         <span class="b4-diff-ref-name">${curr.name}</span>
                     </div>
@@ -2673,7 +2788,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.audio.play('correct');
                         this.state.quiz.totalSaved += correctDiff;
                         const ci = this.state.currentDiffItem;
-                        if (ci) this.state.quiz.comparisonHistory.push({ name: ci.name, icon: ci.icon, cat: ci.cat || 'other', cheapStore: cheapOpt.store, cheapPrice: ci.perB, expStore: expOpt.store, expPrice: ci.perA, saved: correctDiff, isUnit: true, unit: ci.unit });
+                        if (ci) this.state.quiz.comparisonHistory.push({ name: ci.name, icon: ci.icon, imageUrl: ci.imageUrl, cat: ci.cat || 'other', cheapStore: cheapOpt.store, cheapPrice: ci.perB, expStore: expOpt.store, expPrice: ci.perA, saved: correctDiff, isUnit: true, unit: ci.unit });
                         Game.Speech.speak(`每${curr.unit}差${correctDiff}元`, () => { Game.TimerManager.setTimeout(() => this.nextQuestion(), 800, 'turnTransition'); });
                     }, {}, 'diffUI');
                     Game.Speech.speak(`${curr.name}，每${curr.unit}差${correctDiff}元，請選擇正確的答案`);
@@ -2725,7 +2840,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const ci = this.state.currentDiffItem;
                                 if (ci) {
                                     this.state.quiz.comparisonHistory.push({
-                                        name: ci.name, icon: ci.icon, cat: ci.cat || 'other',
+                                        name: ci.name, icon: ci.icon, imageUrl: ci.imageUrl, cat: ci.cat || 'other',
                                         cheapStore: cheapOpt.store, cheapPrice: cheapOpt.price,
                                         expStore: expOpt.store,     expPrice:  expOpt.price,
                                         saved: correctDiff, isUnit: false, unit: ''
@@ -3378,7 +3493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ci = this.state.currentDiffItem;
                 if (ci) {
                     this.state.quiz.comparisonHistory.push({
-                        name: ci.name, icon: ci.icon, cat: ci.cat || 'other',
+                        name: ci.name, icon: ci.icon, imageUrl: ci.imageUrl, cat: ci.cat || 'other',
                         cheapStore: ci.optB.store, cheapPrice: ci.isUnit ? ci.perB : ci.optB.price,
                         expStore: ci.optA.store,   expPrice:  ci.isUnit ? ci.perA : ci.optA.price,
                         saved: correctDiff,
@@ -3547,7 +3662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b4-sl-card2${medal === '🥇' ? ' b4-sl-card2-gold' : ''}">
                     ${medal ? `<div class="b4-sl2-medal-badge">${medal}</div>` : ''}
                     <div class="b4-sl2-top" style="background:${catColor};border-color:${catBorder};">
-                        <span class="b4-sl2-icon">${h.icon}</span>
+                        <span class="b4-sl2-icon">${b4IconHTML(h)}</span>
                         <span class="b4-sl2-name">${h.name}</span>
                     </div>
                     <div class="b4-sl2-body">
@@ -3574,7 +3689,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🏷️ 特賣比一比</span></div>
+    <div class="b-header-left"><span class="b-header-unit">🏷️ 特賣比一比</span></div>
     <div class="b-header-center">${diffLabel}模式 · 省錢清單</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b4-sl-reward-btn">🎁 獎勵</button>
@@ -3979,12 +4094,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (card && !card.classList.contains('ranked')) {
                         this._queue = [{ el: card, action: () => card.click() }];
                     }
-                } else {
-                    // easy/normal：點最便宜卡
+                } else if (diff === 'easy') {
+                    // 簡單：逐枚點幣（select 和 diff 階段均用點幣）
                     if (phase === 'select') {
-                        const card = document.getElementById(`tcard-${curr.cheapestIdx}`);
-                        if (card && !card.classList.contains('selected-correct')) {
-                            this._queue = [{ el: card, action: () => card.click() }];
+                        const coins = Array.from(document.querySelectorAll('.b4-easy-coin:not([data-clicked])'));
+                        this._queue = coins.map(coin => ({ el: coin, action: () => coin.click() }));
+                    } else if (phase === 'diff') {
+                        const coins = Array.from(document.querySelectorAll('.b4-easy-diff-coin:not([data-clicked])'));
+                        this._queue = coins.map(coin => ({ el: coin, action: () => coin.click() }));
+                    }
+                } else {
+                    // normal：點最便宜卡（輸入框模式，待幣點完後自動出現）
+                    if (phase === 'select') {
+                        const coins = Array.from(document.querySelectorAll('.b4-easy-coin:not([data-clicked])'));
+                        if (coins.length > 0) {
+                            this._queue = coins.map(coin => ({ el: coin, action: () => coin.click() }));
                         }
                     } else if (phase === 'diff') {
                         const correctDiff = curr.diff;
