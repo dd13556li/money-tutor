@@ -2317,17 +2317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.changeHintSlots  = [];
             g.changeTotal      = change;
 
-            // 面額托盤：依找零金額決定
-            let trayDenoms;
-            if (change <= 100)      { trayDenoms = [50, 10, 5, 1]; }
-            else if (change < 1000) { trayDenoms = [500, 100, 50, 10, 5, 1]; }
-            else                    { trayDenoms = [1000, 500, 100, 50, 10, 5, 1]; }
-
-            const trayFaces = {};
-            trayDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
-            g.changeTrayFaces = trayFaces;
-
-            // 貪婪最佳解（ghost slot 提示用）
+            // 貪婪最佳解（ghost slot 提示用，先算以確保托盤包含所需面額）
             const _allDenoms = [1000, 500, 100, 50, 10, 5, 1];
             const greedySolution = {};
             let remSol = change;
@@ -2336,6 +2326,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cnt > 0) { greedySolution[d] = cnt; remSol -= cnt * d; }
             }
             g.changeGreedySolution = greedySolution;
+
+            // 面額托盤：包含貪婪解用到的所有面額（避免 ghost slot 顯示托盤沒有的面額）
+            let trayDenoms;
+            if (change < 100)       { trayDenoms = [50, 10, 5, 1]; }
+            else if (change < 1000) { trayDenoms = [500, 100, 50, 10, 5, 1]; }
+            else                    { trayDenoms = [1000, 500, 100, 50, 10, 5, 1]; }
+            // 確保貪婪解用到的面額都在托盤中
+            Object.keys(greedySolution).map(Number).forEach(d => {
+                if (!trayDenoms.includes(d)) trayDenoms = [d, ...trayDenoms].sort((a, b) => b - a);
+            });
+
+            const trayFaces = {};
+            trayDenoms.forEach(d => { trayFaces[d] = Math.random() < 0.5 ? 'back' : 'front'; });
+            g.changeTrayFaces = trayFaces;
+
+            // （貪婪最佳解已在上方計算完畢，已存入 g.changeGreedySolution）
 
             const themeKey  = this.state.settings.partyTheme;
             const themeData = B5_THEMES[themeKey] || B5_THEMES.birthday;
@@ -2426,9 +2432,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="b5c-confirm-btn" id="b5c-confirm-btn" disabled>✅ 確認找零</button>
             </div>`;
 
-            Game.Speech.speak(`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`, diff === 'easy' ? () => {
-                this._b5P2ShowChangeGhostSlots(change);
-            } : null);
+            // 簡單模式：立即顯示 ghost slots（不等語音播完）
+            if (diff === 'easy') this._b5P2ShowChangeGhostSlots(change);
+            Game.Speech.speak(`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`);
             this._b5P2SetupChangeInteraction(change, paid);
 
             if (this.state.settings.clickMode === 'on') {
@@ -2775,8 +2781,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     walletZone.style.animation = 'b5p2Shake 0.4s ease';
                     Game.TimerManager.setTimeout(() => { walletZone.style.animation = ''; }, 500, 'ui');
                 }
-                // 簡單/普通模式：清空找零區；困難模式：保留錢包內容
-                if (diff !== 'hard') {
+                if (diff === 'easy' && g.changeGhostMode) {
+                    // 簡單模式 ghost slot 錯誤：保留 ghost slot 結構，只重置填入狀態
+                    g.changePlaced = [];
+                    g.changeHintSlots = g.changeHintSlots.map(s => ({ ...s, filled: false, uid: null }));
+                    this._b5P2UpdateChangeDisplay(change);
+                    this._b5P2RenderWalletCoins(change);
+                    this._b5P2UpdateChangeTrayHints();
+                } else if (diff !== 'hard') {
+                    // 普通模式：清空找零區
                     g.changePlaced    = [];
                     g.changeGhostMode = false;
                     g.changeHintSlots = [];

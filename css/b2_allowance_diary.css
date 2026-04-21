@@ -1745,6 +1745,26 @@ td.b2-st-expense-cell {
     border-radius: 10px;
     animation: b2HintPulse 1.4s ease-in-out infinite;
 }
+/* Phase 2 簡單模式：下一枚需拖曳的面額高亮 */
+.b2-coin-draggable.b2-coin-drag-hint {
+    border: 2.5px solid #f59e0b;
+    background: #fef3c7;
+    animation: b2DragCoinHint 1.4s ease-in-out infinite;
+}
+@keyframes b2DragCoinHint {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
+    50%       { box-shadow: 0 0 0 7px rgba(245,158,11,0); }
+}
+/* Phase 2 簡單模式：放置區高亮 */
+.b2-wallet-coins.b2-drop-zone-hint {
+    border-color: #3b82f6 !important;
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%) !important;
+    animation: b2DropZoneHint 1.4s ease-in-out infinite;
+}
+@keyframes b2DropZoneHint {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.3); }
+    50%       { box-shadow: 0 0 0 7px rgba(59,130,246,0); }
+}
 @keyframes b2HintPulse {
     0%,100% { box-shadow: 0 0 12px rgba(255,193,7,0.7); }
     50%     { box-shadow: 0 0 22px rgba(255,193,7,1); }
@@ -1984,18 +2004,6 @@ td.b2-st-expense-cell {
 .b2-coin-clickable.b2-coin-clicked {
     cursor: default;
     transform: none;
-}
-.b2-coin-clickable.b2-coin-clicked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.6rem;
-    font-weight: 900;
-    color: #16a34a;
-    text-shadow: 0 0 4px #fff, 0 0 8px #fff;
-    line-height: 1;
 }
 .b2-coin-clickable { position: relative; }
 /* 提示動畫狀態下金幣仍可點擊（覆寫 shared-game-base 的 pointer-events:none）*/

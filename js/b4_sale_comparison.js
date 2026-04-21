@@ -8,68 +8,68 @@
 // optA 永遠比 optB 貴；顯示時隨機左右交換（swapped 旗標）
 const B4_ITEMS = [
     { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  optA:{ store:'文具店',  storeIcon:'🏪', price:85  }, optB:{ store:'超市',   storeIcon:'🛒', price:65  } },
-    { cat:'food',       name:'蘋果（1斤）',  icon:'🍎',  imageUrl:'../images/c6/icon-c6-apple.png',          optA:{ store:'超市',   storeIcon:'🛒', price:45  }, optB:{ store:'菜市場', storeIcon:'🥬', price:35  } },
-    { cat:'stationery', name:'原子筆',       icon:'🖊️', imageUrl:'../images/c6/icon-c6-ballpoint-pen.png',  optA:{ store:'書局',   storeIcon:'📚', price:15  }, optB:{ store:'大賣場', storeIcon:'🏬', price:12  } },
+    { cat:'food',       name:'蘋果（1斤）',  icon:'🍎',  imageUrl:'../images/c6/icon-c6-apple.png',          optA:{ store:'超市',   storeIcon:'🛒', price:45  }, optB:{ store:'傳統市場', storeIcon:'🥬', price:35  } },
+    { cat:'stationery', name:'原子筆',       icon:'🖊️', imageUrl:'../images/c6/icon-c6-ballpoint-pen.png',  optA:{ store:'文具店', storeIcon:'🏪', price:15  }, optB:{ store:'生活百貨', storeIcon:'🧺', price:12  } },
     { cat:'food',       name:'礦泉水',       icon:'💧',  optA:{ store:'超商',   storeIcon:'🏪', price:20  }, optB:{ store:'量販店', storeIcon:'🏬', price:13  } },
     { cat:'daily',      name:'洗髮精',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-shampoo-shop.png',   optA:{ store:'藥妝店', storeIcon:'💊', price:189 }, optB:{ store:'量販店', storeIcon:'🏬', price:149 } },
     { cat:'food',       name:'巧克力',       icon:'🍫',  imageUrl:'../images/c6/icon-c6-chocolate.png',      optA:{ store:'超商',   storeIcon:'🏪', price:55  }, optB:{ store:'超市',   storeIcon:'🛒', price:42  } },
-    { cat:'daily',      name:'毛巾',         icon:'🧣',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:250 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
+    { cat:'daily',      name:'毛巾',         icon:'🧣',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:250 }, optB:{ store:'生活百貨', storeIcon:'🧺', price:180 } },
     { cat:'stationery', name:'故事書',       icon:'📖',  imageUrl:'../images/c6/icon-c6-story-book.png',     optA:{ store:'書店',   storeIcon:'📚', price:280 }, optB:{ store:'二手店', storeIcon:'♻️', price:150 } },
     { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  imageUrl:'../images/a4/icon-a4-milk-shop.png',      optA:{ store:'超商',   storeIcon:'🏪', price:65  }, optB:{ store:'超市',   storeIcon:'🛒', price:55  } },
-    { cat:'daily',      name:'面紙（一包）', icon:'🧻',  imageUrl:'../images/a4/icon-a4-box-of-tissues-shop.png', optA:{ store:'超商', storeIcon:'🏪', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:25  } },
+    { cat:'daily',      name:'面紙（一包）', icon:'🧻',  imageUrl:'../images/a4/icon-a4-box-of-tissues-shop.png', optA:{ store:'便利商店', storeIcon:'🏪', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:25  } },
     { cat:'clothing',   name:'雨傘',         icon:'☂️',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:480 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
     { cat:'food',       name:'餅乾（一盒）', icon:'🍪',  imageUrl:'../images/c6/icon-c6-cookie.png',         optA:{ store:'超商',   storeIcon:'🏪', price:45  }, optB:{ store:'超市',   storeIcon:'🛒', price:35  } },
     { cat:'daily',      name:'牙刷',         icon:'🪥',  optA:{ store:'藥局',   storeIcon:'💊', price:39  }, optB:{ store:'量販店', storeIcon:'🏬', price:29  } },
-    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    optA:{ store:'文具店', storeIcon:'🏪', price:120 }, optB:{ store:'大賣場', storeIcon:'🏬', price:89  } },
+    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    optA:{ store:'文具店', storeIcon:'🏪', price:120 }, optB:{ store:'生活百貨', storeIcon:'🧺', price:89  } },
     { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  imageUrl:'../images/a4/icon-a4-juice-shop.png',     optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
     { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  imageUrl:'../images/a4/icon-a4-battery-shop.png',   optA:{ store:'超商',   storeIcon:'🏪', price:85  }, optB:{ store:'量販店', storeIcon:'🏬', price:59  } },
     { cat:'daily',      name:'洗碗精',       icon:'🧼',  imageUrl:'../images/a4/icon-a4-dish-soap-shop.png', optA:{ store:'超市',   storeIcon:'🛒', price:59  }, optB:{ store:'量販店', storeIcon:'🏬', price:45  } },
-    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', optA:{ store:'運動用品店', storeIcon:'⚽', price:1200}, optB:{ store:'大賣場', storeIcon:'🏬', price:880 } },
+    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', optA:{ store:'體育用品店', storeIcon:'⚽', price:1200}, optB:{ store:'生活百貨', storeIcon:'🧺', price:880 } },
     { cat:'clothing',   name:'拖鞋',         icon:'🩴',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:390 }, optB:{ store:'夜市',   storeIcon:'🌙', price:120 } },
-    { cat:'clothing',   name:'手套',         icon:'🧤',  imageUrl:'../images/a4/icon-a4-gloves-shop.png',    optA:{ store:'百貨公司',   storeIcon:'🏢', price:320 }, optB:{ store:'市場',   storeIcon:'🥬', price:180 } },
+    { cat:'clothing',   name:'手套',         icon:'🧤',  imageUrl:'../images/a4/icon-a4-gloves-shop.png',    optA:{ store:'百貨公司',   storeIcon:'🏢', price:320 }, optB:{ store:'生活百貨', storeIcon:'🧺', price:180 } },
     { cat:'daily',      name:'洗手乳',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-body-wash-shop.png', optA:{ store:'藥局',   storeIcon:'💊', price:55  }, optB:{ store:'量販店', storeIcon:'🏬', price:39  } },
     { cat:'food',       name:'奶茶',         icon:'🧋',  imageUrl:'../images/a4/icon-a4-milk-tea-shop.png',  optA:{ store:'手搖店', storeIcon:'🥤', price:60  }, optB:{ store:'超商',   storeIcon:'🏪', price:50  } },
-    { cat:'daily',      name:'運動水壺',     icon:'🍶',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'運動用品店', storeIcon:'⚽', price:350 }, optB:{ store:'大賣場', storeIcon:'🏬', price:260 } },
+    { cat:'daily',      name:'運動水壺',     icon:'🍶',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'體育用品店', storeIcon:'⚽', price:350 }, optB:{ store:'生活百貨', storeIcon:'🧺', price:260 } },
     { cat:'clothing',   name:'帽子',         icon:'🧢',  imageUrl:'../images/a4/icon-a4-hat-shop.png',       optA:{ store:'百貨公司',   storeIcon:'🏢', price:580 }, optB:{ store:'網購',   storeIcon:'💻', price:420 } },
     { cat:'daily',      name:'便當盒',       icon:'🍱',  imageUrl:'../images/c6/icon-c6-bento.png',          optA:{ store:'百貨公司',   storeIcon:'🏢', price:285 }, optB:{ store:'量販店', storeIcon:'🏬', price:199 } },
-    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       optA:{ store:'書局',   storeIcon:'📚', price:95  }, optB:{ store:'量販店', storeIcon:'🏬', price:69  } },
+    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       optA:{ store:'文具店', storeIcon:'🏪', price:95  }, optB:{ store:'量販店', storeIcon:'🏬', price:69  } },
     { cat:'food',       name:'口香糖',       icon:'🍬',  imageUrl:'../images/c6/icon-c6-gum.png',            optA:{ store:'超商',   storeIcon:'🏪', price:35  }, optB:{ store:'超市',   storeIcon:'🛒', price:25  } },
     { cat:'daily',      name:'浴巾',         icon:'🛁',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:480 }, optB:{ store:'量販店', storeIcon:'🏬', price:320 } },
     { cat:'food',       name:'醬油（一瓶）', icon:'🫙',  optA:{ store:'超商',   storeIcon:'🏪', price:89  }, optB:{ store:'量販店', storeIcon:'🏬', price:65  } },
     { cat:'daily',      name:'洗衣精',       icon:'🧺',  imageUrl:'../images/a4/icon-a4-laundry-detergent-shop.png', optA:{ store:'超市', storeIcon:'🛒', price:159 }, optB:{ store:'量販店', storeIcon:'🏬', price:119 } },
     // 追加 10 組（2026-03-29）
-    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         optA:{ store:'文具店', storeIcon:'🏪', price:25  }, optB:{ store:'大賣場', storeIcon:'🏬', price:18  } },
+    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         optA:{ store:'文具店', storeIcon:'🏪', price:25  }, optB:{ store:'生活百貨', storeIcon:'🧺', price:18  } },
     { cat:'food',       name:'果凍（一盒）', icon:'🍮',  optA:{ store:'超商',   storeIcon:'🏪', price:55  }, optB:{ store:'量販店', storeIcon:'🏬', price:38  } },
     { cat:'food',       name:'麵包',         icon:'🍞',  imageUrl:'../images/a4/icon-a4-bread-shop.png',      optA:{ store:'咖啡廳', storeIcon:'☕', price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', price:45  } },
     { cat:'food',       name:'鮪魚罐頭',     icon:'🐟',  optA:{ store:'超商',   storeIcon:'🏪', price:45  }, optB:{ store:'量販店', storeIcon:'🏬', price:32  } },
     { cat:'clothing',   name:'雨衣',         icon:'🌧️', optA:{ store:'百貨公司',   storeIcon:'🏢', price:280 }, optB:{ store:'夜市',   storeIcon:'🌙', price:150 } },
-    { cat:'stationery', name:'剪刀',         icon:'✂️', imageUrl:'../images/c6/icon-c6-scissors.png',        optA:{ store:'文具店', storeIcon:'🏪', price:35  }, optB:{ store:'大賣場', storeIcon:'🏬', price:25  } },
+    { cat:'stationery', name:'剪刀',         icon:'✂️', imageUrl:'../images/c6/icon-c6-scissors.png',        optA:{ store:'文具店', storeIcon:'🏪', price:35  }, optB:{ store:'生活百貨', storeIcon:'🧺', price:25  } },
     { cat:'food',       name:'洋芋片（大包）',icon:'🥔', imageUrl:'../images/c6/icon-c6-chips.png',           optA:{ store:'超商',   storeIcon:'🏪', price:49  }, optB:{ store:'量販店', storeIcon:'🏬', price:35  } },
     { cat:'daily',      name:'眼藥水',       icon:'💊',  optA:{ store:'藥局',   storeIcon:'💊', price:89  }, optB:{ store:'網購',   storeIcon:'💻', price:65  } },
-    { cat:'daily',      name:'保溫瓶',       icon:'🫙',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'品牌店', storeIcon:'👔', price:650 }, optB:{ store:'量販店', storeIcon:'🏬', price:480 } },
+    { cat:'daily',      name:'保溫瓶',       icon:'🫙',  imageUrl:'../images/a4/icon-a4-water-bottle-shop.png', optA:{ store:'百貨公司', storeIcon:'🏢', price:650 }, optB:{ store:'量販店', storeIcon:'🏬', price:480 } },
     { cat:'food',       name:'零食禮盒',     icon:'🎁',  optA:{ store:'百貨公司',   storeIcon:'🏢', price:380 }, optB:{ store:'量販店', storeIcon:'🏬', price:260 } },
 ];
 
 // ── 三商店比一比題庫（15 組，每組 3 家店，參照 F4 排序設計）──────────────
 // stores[0]最貴、stores[1]中間、stores[2]最便宜（生成時再隨機打亂）
 const B4_TRIPLE_ITEMS = [
-    { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:120 },{ store:'文具店', storeIcon:'🏪', price:85  },{ store:'大賣場', storeIcon:'🏬', price:65  }] },
+    { cat:'stationery', name:'鉛筆盒',       icon:'✏️',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:120 },{ store:'文具店', storeIcon:'🏪', price:85  },{ store:'生活百貨', storeIcon:'🧺', price:65  }] },
     { cat:'food',       name:'礦泉水',       icon:'💧',  stores:[{ store:'高級餐廳',storeIcon:'🍽️', price:50  },{ store:'超商',   storeIcon:'🏪', price:25  },{ store:'量販店', storeIcon:'🏬', price:13  }] },
     { cat:'food',       name:'巧克力',       icon:'🍫',  imageUrl:'../images/c6/icon-c6-chocolate.png',      stores:[{ store:'百貨公司', storeIcon:'🏢', price:120 },{ store:'超商',   storeIcon:'🏪', price:55  },{ store:'超市',   storeIcon:'🛒', price:42  }] },
     { cat:'daily',      name:'洗髮精',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-shampoo-shop.png',   stores:[{ store:'百貨公司',   storeIcon:'🏢', price:280 },{ store:'藥妝店', storeIcon:'💊', price:189 },{ store:'量販店', storeIcon:'🏬', price:149 }] },
-    { cat:'stationery', name:'故事書',       icon:'📖',  imageUrl:'../images/c6/icon-c6-story-book.png',     stores:[{ store:'書店',   storeIcon:'📚', price:320 },{ store:'書局',   storeIcon:'📚', price:280 },{ store:'二手店', storeIcon:'♻️', price:150 }] },
+    { cat:'stationery', name:'故事書',       icon:'📖',  imageUrl:'../images/c6/icon-c6-story-book.png',     stores:[{ store:'書店',   storeIcon:'📚', price:320 },{ store:'網購', storeIcon:'💻', price:280 },{ store:'二手店', storeIcon:'♻️', price:150 }] },
     { cat:'food',       name:'牛奶（1公升）',icon:'🥛',  imageUrl:'../images/a4/icon-a4-milk-shop.png',      stores:[{ store:'超商',   storeIcon:'🏪', price:80  },{ store:'超市',   storeIcon:'🛒', price:65  },{ store:'量販店', storeIcon:'🏬', price:50  }] },
-    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    stores:[{ store:'百貨公司',   storeIcon:'🏢', price:180 },{ store:'文具店', storeIcon:'🏪', price:120 },{ store:'大賣場', storeIcon:'🏬', price:89  }] },
+    { cat:'stationery', name:'色鉛筆',       icon:'🖍️', imageUrl:'../images/c6/icon-c6-colored-pen.png',    stores:[{ store:'百貨公司',   storeIcon:'🏢', price:180 },{ store:'文具店', storeIcon:'🏪', price:120 },{ store:'生活百貨', storeIcon:'🧺', price:89  }] },
     { cat:'food',       name:'果汁（1瓶）',  icon:'🧃',  imageUrl:'../images/a4/icon-a4-juice-shop.png',     stores:[{ store:'百貨公司', storeIcon:'🏢', price:80  },{ store:'超商',   storeIcon:'🏪', price:35  },{ store:'超市',   storeIcon:'🛒', price:25  }] },
     { cat:'daily',      name:'電池（4顆）',  icon:'🔋',  imageUrl:'../images/a4/icon-a4-battery-shop.png',   stores:[{ store:'超商',   storeIcon:'🏪', price:120 },{ store:'藥局',   storeIcon:'💊', price:85  },{ store:'量販店', storeIcon:'🏬', price:59  }] },
-    { cat:'daily',      name:'毛巾',         icon:'🧣',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:350 },{ store:'超市',   storeIcon:'🛒', price:250 },{ store:'市場',   storeIcon:'🥬', price:180 }] },
-    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       stores:[{ store:'書局',   storeIcon:'📚', price:150 },{ store:'文具店', storeIcon:'🏪', price:95  },{ store:'量販店', storeIcon:'🏬', price:69  }] },
+    { cat:'daily',      name:'毛巾',         icon:'🧣',  stores:[{ store:'百貨公司',   storeIcon:'🏢', price:350 },{ store:'超市',   storeIcon:'🛒', price:250 },{ store:'生活百貨', storeIcon:'🧺', price:180 }] },
+    { cat:'stationery', name:'筆記本（3本）',icon:'📓',  imageUrl:'../images/c6/icon-c6-notebook.png',       stores:[{ store:'超市', storeIcon:'🛒', price:150 },{ store:'文具店', storeIcon:'🏪', price:95  },{ store:'量販店', storeIcon:'🏬', price:69  }] },
     { cat:'daily',      name:'洗手乳',       icon:'🧴',  imageUrl:'../images/a4/icon-a4-body-wash-shop.png', stores:[{ store:'百貨公司',   storeIcon:'🏢', price:120 },{ store:'藥局',   storeIcon:'💊', price:79  },{ store:'量販店', storeIcon:'🏬', price:55  }] },
     { cat:'food',       name:'奶茶',         icon:'🧋',  imageUrl:'../images/a4/icon-a4-milk-tea-shop.png',  stores:[{ store:'咖啡廳', storeIcon:'☕', price:150 },{ store:'手搖店', storeIcon:'🥤', price:60  },{ store:'超商',   storeIcon:'🏪', price:45  }] },
-    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', stores:[{ store:'品牌店', storeIcon:'👔', price:1580},{ store:'運動用品店', storeIcon:'⚽', price:1200},{ store:'大賣場', storeIcon:'🏬', price:880 }] },
+    { cat:'clothing',   name:'運動鞋',       icon:'👟',  imageUrl:'../images/c6/icon-c6-basketball-shoes.png', stores:[{ store:'百貨公司', storeIcon:'🏢', price:1580},{ store:'體育用品店', storeIcon:'⚽', price:1200},{ store:'生活百貨', storeIcon:'🧺', price:880 }] },
     { cat:'daily',      name:'洗碗精',       icon:'🧼',  imageUrl:'../images/a4/icon-a4-dish-soap-shop.png', stores:[{ store:'超商',   storeIcon:'🏪', price:89  },{ store:'超市',   storeIcon:'🛒', price:59  },{ store:'量販店', storeIcon:'🏬', price:45  }] },
     // 追加 5 組（2026-03-29）
-    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         stores:[{ store:'書局',   storeIcon:'📚', price:45  },{ store:'文具店', storeIcon:'🏪', price:25  },{ store:'大賣場', storeIcon:'🏬', price:18  }] },
+    { cat:'stationery', name:'橡皮擦（2個）',icon:'📎',  imageUrl:'../images/c6/icon-c6-eraser.png',         stores:[{ store:'超市', storeIcon:'🛒', price:45  },{ store:'文具店', storeIcon:'🏪', price:25  },{ store:'生活百貨', storeIcon:'🧺', price:18  }] },
     { cat:'food',       name:'果凍（一盒）', icon:'🍮',  stores:[{ store:'超商',   storeIcon:'🏪', price:75  },{ store:'超市',   storeIcon:'🛒', price:55  },{ store:'量販店', storeIcon:'🏬', price:38  }] },
     { cat:'food',       name:'麵包',         icon:'🍞',  imageUrl:'../images/a4/icon-a4-bread-shop.png',      stores:[{ store:'咖啡廳',   storeIcon:'☕', price:80  },{ store:'便利商店', storeIcon:'🏪', price:55  },{ store:'麵包店', storeIcon:'🥐', price:45  }] },
     { cat:'clothing',   name:'雨衣',         icon:'🌧️', stores:[{ store:'百貨公司',   storeIcon:'🏢', price:480 },{ store:'超市',   storeIcon:'🛒', price:280 },{ store:'夜市',   storeIcon:'🌙', price:150 }] },
@@ -80,12 +80,12 @@ const B4_TRIPLE_ITEMS = [
 // unit: 商品計算單位；qty/price → perUnit = price/qty（整數）
 const B4_UNIT_ITEMS = [
     { cat:'food',       name:'糖果',     icon:'🍬', unit:'個', optA:{ store:'超商',    storeIcon:'🏪', qty:8,  price:56  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:50  } },
-    { cat:'stationery', name:'鉛筆',     icon:'✏️', imageUrl:'../images/c6/icon-c6-pencil.png',           unit:'支', optA:{ store:'文具店',  storeIcon:'🏪', qty:5,  price:40  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:6,  price:36  } },
+    { cat:'stationery', name:'鉛筆',     icon:'✏️', imageUrl:'../images/c6/icon-c6-pencil.png',           unit:'支', optA:{ store:'文具店',  storeIcon:'🏪', qty:5,  price:40  }, optB:{ store:'生活百貨', storeIcon:'🧺', qty:6,  price:36  } },
     { cat:'food',       name:'雞蛋',     icon:'🥚', imageUrl:'../images/a4/icon-a4-egg-shop.png',          unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:6,  price:60  }, optB:{ store:'超市',   storeIcon:'🛒', qty:10, price:80  } },
-    { cat:'food',       name:'香蕉',     icon:'🍌', imageUrl:'../images/c6/icon-c6-banana.png',            unit:'根', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:30  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:4,  price:32  } },
-    { cat:'food',       name:'水餃',     icon:'🥟', unit:'個', optA:{ store:'冷凍食品',storeIcon:'🏪', qty:10, price:80  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:12, price:84  } },
+    { cat:'food',       name:'香蕉',     icon:'🍌', imageUrl:'../images/c6/icon-c6-banana.png',            unit:'根', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:30  }, optB:{ store:'傳統市場', storeIcon:'🥬', qty:4,  price:32  } },
+    { cat:'food',       name:'水餃',     icon:'🥟', unit:'個', optA:{ store:'超市', storeIcon:'🛒', qty:10, price:80  }, optB:{ store:'生活百貨', storeIcon:'🧺', qty:12, price:84  } },
     { cat:'food',       name:'吐司',     icon:'🍞', imageUrl:'../images/a4/icon-a4-toast-shop.png',        unit:'片', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:60  }, optB:{ store:'麵包店', storeIcon:'🥐', qty:6,  price:72  } },
-    { cat:'food',       name:'小番茄',   icon:'🍅', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:5,  price:35  }, optB:{ store:'菜市場', storeIcon:'🥬', qty:8,  price:40  } },
+    { cat:'food',       name:'小番茄',   icon:'🍅', unit:'顆', optA:{ store:'超商',    storeIcon:'🏪', qty:5,  price:35  }, optB:{ store:'傳統市場', storeIcon:'🥬', qty:8,  price:40  } },
     { cat:'food',       name:'優格',     icon:'🫙', unit:'瓶', optA:{ store:'超商',    storeIcon:'🏪', qty:2,  price:50  }, optB:{ store:'超市',   storeIcon:'🛒', qty:4,  price:88  } },
     { cat:'food',       name:'巧克力棒', icon:'🍫', imageUrl:'../images/c6/icon-c6-chocolate.png',         unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:3,  price:75  }, optB:{ store:'超市',   storeIcon:'🛒', qty:5,  price:110 } },
     { cat:'daily',      name:'洗衣錠',   icon:'🧼', imageUrl:'../images/a4/icon-a4-laundry-detergent-shop.png', unit:'顆', optA:{ store:'藥局', storeIcon:'💊', qty:10, price:120 }, optB:{ store:'量販店', storeIcon:'🏬', qty:15, price:150 } },
@@ -94,7 +94,7 @@ const B4_UNIT_ITEMS = [
     // 追加 3 組（2026-03-29）
     { cat:'food',       name:'棒棒糖',   icon:'🍭', imageUrl:'../images/c6/icon-c6-lollipop.png',          unit:'支', optA:{ store:'超商',    storeIcon:'🏪', qty:4,  price:48  }, optB:{ store:'量販店', storeIcon:'🏬', qty:6,  price:60  } },
     { cat:'food',       name:'麵條',     icon:'🍜', unit:'包', optA:{ store:'超市',    storeIcon:'🛒', qty:3,  price:90  }, optB:{ store:'量販店', storeIcon:'🏬', qty:5,  price:130 } },
-    { cat:'stationery', name:'橡皮擦',   icon:'📎', imageUrl:'../images/c6/icon-c6-eraser.png',            unit:'個', optA:{ store:'書局',    storeIcon:'📚', qty:3,  price:30  }, optB:{ store:'大賣場', storeIcon:'🏬', qty:5,  price:40  } },
+    { cat:'stationery', name:'橡皮擦',   icon:'📎', imageUrl:'../images/c6/icon-c6-eraser.png',            unit:'個', optA:{ store:'文具店', storeIcon:'🏪', qty:3,  price:30  }, optB:{ store:'生活百貨', storeIcon:'🧺', qty:5,  price:40  } },
 ];
 
 // ── 輔助函數 ────────────────────────────────────────────────────
@@ -104,9 +104,39 @@ const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertT
 function b4IconHTML(item) {
     if (item && item.imageUrl) {
         const esc = (item.icon || '').replace(/'/g, '&#39;');
-        return `<img src="${item.imageUrl}" alt="${item.name}" draggable="false" class="b4-icon-img" onerror="this.outerHTML='${esc}'">`;
+        return `<img src="${item.imageUrl}" alt="${item.name}" draggable="false" class="b4-icon-img" data-b4zoom="${item.imageUrl}" data-b4name="${item.name}" onerror="this.outerHTML='${esc}'">`;
     }
     return (item && item.icon) || '';
+}
+
+// ── 商店圖示：有圖用圖，否則 emoji 備用 ─────────────────────────
+const B4_STORE_IMAGES = {
+    '便利商店': '../images/b4/icon-b4-store-convenience.png',
+    '超市':     '../images/b4/icon-b4-store-supermarket.png',
+    '量販店':   '../images/b4/icon-b4-store-wholesale.png',
+    '生活百貨': '../images/b4/icon-b4-store-variety.png',
+    '文具店':   '../images/b4/icon-b4-store-stationery.png',
+    '書店':     '../images/b4/icon-b4-store-bookstore.png',
+    '二手店':   '../images/b4/icon-b4-store-secondhand.png',
+    '百貨公司': '../images/b4/icon-b4-store-department.png',
+    '傳統市場': '../images/b4/icon-b4-store-traditional-market.png',
+    '夜市':     '../images/b4/icon-b4-store-nightmarket.png',
+    '藥妝店':   '../images/b4/icon-b4-store-pharmacy.png',
+    '藥局':     '../images/b4/icon-b4-store-drugstore.png',
+    '體育用品店':'../images/b4/icon-b4-store-sports.png',
+    '手搖店':   '../images/b4/icon-b4-store-drinkshop.png',
+    '咖啡廳':   '../images/b4/icon-b4-store-cafe.png',
+    '麵包店':   '../images/b4/icon-b4-store-bakery.png',
+    '網購':     '../images/b4/icon-b4-store-online.png',
+    '高級餐廳': '../images/b4/icon-b4-store-restaurant.png',
+};
+function b4StoreIconHTML(storeName, storeEmoji) {
+    const url = B4_STORE_IMAGES[storeName];
+    if (url) {
+        const esc = (storeEmoji || '').replace(/'/g, '&#39;');
+        return `<img src="${url}" alt="${storeName}" draggable="false" class="b4-store-icon-img" data-b4zoom="${url}" data-b4name="${storeName}" onerror="this.outerHTML='${esc}'">`;
+    }
+    return storeEmoji || '';
 }
 
 // ── 金錢圖示渲染（貪婪分解，每枚各顯示一張圖）────────────────
@@ -330,13 +360,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     from { opacity:0; transform:translateY(20px); }
                     to   { opacity:1; transform:translateY(0); }
                 }
-                /* 三商店比一比（F4 排序 pattern）*/
+                /* 三商店比一比：等寬三欄滿版 */
                 .b4-triple-grid {
-                    display: flex; flex-wrap: wrap; gap: 12px;
-                    justify-content: center; padding: 8px 16px;
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 12px;
+                    align-items: stretch;
                 }
                 .b4-triple-card {
-                    flex: 1; min-width: 100px; max-width: 200px;
                     position: relative; padding-bottom: 36px;
                 }
                 .b4-price-hidden { color: #94a3b8; font-size: 1.1em; }
@@ -826,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${questionLabel}
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
-                    ${diff === 'easy' && !curr.isUnit ? `<div class="b4-easy-coin-hint">👆 點擊每一枚金幣，點完後自動比較</div>` : ''}
+                    ${diff === 'easy' && !curr.isUnit ? `<div class="b4-easy-coin-hint">✋ 點擊金幣計算金額</div>` : ''}
                     ${diff !== 'easy' ? `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
@@ -964,15 +995,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const modal = document.createElement('div');
             modal.id = 'b4-item-intro-modal';
-            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);cursor:pointer;';
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);animation:b4IntroOverlayIn 0.3s ease-out;';
             modal.innerHTML = `
-                <div class="b4-intro-card">
-                    <div class="b4-intro-icon">${b4IconHTML(curr)}</div>
-                    <div class="b4-intro-name">${curr.name}</div>
+                <div class="b4-intro-card" onclick="event.stopPropagation()">
+                    <div class="b4-intro-header">
+                        <span class="b4-intro-title">🆚 今日比較商品</span>
+                        <button class="b4-intro-close-x" id="b4-intro-close-x">✕</button>
+                    </div>
+                    <div class="b4-intro-body">
+                        <div class="b4-intro-icon">${b4IconHTML(curr)}</div>
+                        <div class="b4-intro-name">${curr.name}</div>
+                    </div>
+                    <div class="b4-intro-footer">
+                        <button class="b4-intro-start-btn" id="b4-intro-start-btn">開始比較！</button>
+                    </div>
                 </div>`;
             document.body.appendChild(modal);
 
-            // afterClose pattern（B1/B2/B5/B6 pattern）
             let closed = false;
             const closeModal = () => {
                 if (closed) return;
@@ -980,12 +1019,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (modal.parentNode) modal.remove();
                 afterClose?.();
             };
-            // 朗讀商品名稱，語音結束後自動關閉（closed guard 防重複）
             Game.TimerManager.setTimeout(() => {
-                Game.Speech.speak(curr.name, closeModal);
+                Game.Speech.speak(curr.name);
             }, 300, 'ui');
-            const t = Game.TimerManager.setTimeout(closeModal, 2200, 'ui'); // fallback
-            modal.addEventListener('click', () => { Game.TimerManager.clearTimeout(t); closeModal(); });
+            modal.querySelector('#b4-intro-start-btn').addEventListener('click', closeModal);
+            modal.querySelector('#b4-intro-close-x').addEventListener('click', closeModal);
         },
 
         _renderHeader() {
@@ -1016,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                 <div class="b4-option-card b4-unit-card" id="card-${side}" data-side="${side}">
                     <div class="b4-store-label">商店</div>
-                    <div class="b4-store-icon">${opt.storeIcon}</div>
+                    <div class="b4-store-icon">${b4StoreIconHTML(opt.store, opt.storeIcon)}</div>
                     <div class="b4-store-name">${opt.store}</div>
                     <div class="b4-unit-qty">${opt.qty}${unitCurr.unit} / ${opt.price}元</div>
                     <div class="b4-unit-per">每${unitCurr.unit} <span class="b4-unit-per-val">${per}</span>元</div>
@@ -1026,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b4-option-card" id="card-${side}" data-side="${side}" data-price="${opt.price}">
                 <div class="b4-store-label">商店</div>
-                <div class="b4-store-icon">${opt.storeIcon}</div>
+                <div class="b4-store-icon">${b4StoreIconHTML(opt.store, opt.storeIcon)}</div>
                 <div class="b4-store-name">${opt.store}</div>
                 <div class="b4-price b4-price-hidden">? <span class="b4-price-unit">元</span></div>
                 <div class="b4-price-coins b4-price-coins-hidden"></div>
@@ -1047,14 +1085,13 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _setupEasyModeCoins(curr, left, right, correctSide) {
-            const state = this.state;
             const coinsData = {
                 left:  { opt: left,  coins: this._getCoinsArray(left.price),  clickedCount: 0, done: false },
                 right: { opt: right, coins: this._getCoinsArray(right.price), clickedCount: 0, done: false }
             };
 
             ['left', 'right'].forEach(side => {
-                const card = document.getElementById(`card-${side}`);
+                const card    = document.getElementById(`card-${side}`);
                 const coinsEl = card?.querySelector('.b4-price-coins');
                 const priceEl = card?.querySelector('.b4-price');
                 if (!coinsEl) return;
@@ -1062,46 +1099,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = coinsData[side];
                 let runningTotal = 0;
 
-                // Show coins as clickable, price starts at 0
                 coinsEl.classList.remove('b4-price-coins-hidden');
                 coinsEl.innerHTML = data.coins.map((d, i) => {
                     const isBill = d >= 100;
                     const w  = isBill ? '100px' : '60px';
                     const h  = isBill ? '48.91px' : '60px';
                     const br = isBill ? '4px' : '50%';
-                    return `<img src="../images/money/${d}_yuan_front.png"
-                        data-cidx="${i}" data-cval="${d}" data-cside="${side}"
-                        class="b4-easy-coin"
-                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
-                        draggable="false" onerror="this.style.display='none'">`;
+                    return `<span class="b4-coin-wrap" style="position:relative;display:inline-block;border-radius:${br};vertical-align:middle;">
+                        <img src="../images/money/${d}_yuan_front.png"
+                            data-cidx="${i}" data-cval="${d}" data-cside="${side}"
+                            class="b4-easy-coin"
+                            style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s;"
+                            draggable="false" onerror="this.style.display='none'">
+                    </span>`;
                 }).join('');
 
-                // Show price as 0 元 (visible, not hidden)
                 if (priceEl) {
                     priceEl.classList.remove('b4-price-hidden');
                     priceEl.innerHTML = `0 <span class="b4-price-unit">元</span>`;
                 }
 
-                // Attach per-coin click handlers
                 coinsEl.querySelectorAll('.b4-easy-coin').forEach(img => {
                     Game.EventManager.on(img, 'click', () => {
                         if (img.dataset.clicked || data.done) return;
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
-                        img.style.outline = '3px solid #10b981';
-
+                        const wrap = img.parentElement;
+                        if (wrap?.classList.contains('b4-coin-wrap')) {
+                            wrap.style.outline = '2.5px solid #10b981';
+                            wrap.style.outlineOffset = '2px';
+                            const ck = document.createElement('span');
+                            ck.className = 'b4-coin-check';
+                            ck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                            ck.textContent = '✓';
+                            wrap.appendChild(ck);
+                        }
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
-
-                        if (priceEl) {
-                            priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
-                        }
+                        if (priceEl) priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
 
                         const isLast = data.clickedCount >= data.coins.length;
                         if (isLast) {
                             data.done = true;
                             if (card) card.style.outline = '3px solid #10b981';
-                            // Wait for speech to complete before checking if both sides done
                             Game.Speech.speak(`${runningTotal}元`, () => {
                                 const other = side === 'left' ? 'right' : 'left';
                                 if (coinsData[other].done) {
@@ -1115,7 +1155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // Store reference so we can check completion
             this.state._easyCoinsDone = coinsData;
         },
 
@@ -1180,11 +1219,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const w  = isBill ? '100px' : '60px';
                     const h  = isBill ? '48.91px' : '60px';
                     const br = isBill ? '4px' : '50%';
-                    return `<img src="../images/money/${d}_yuan_front.png"
-                        data-cidx="${i}" data-cval="${d}" data-cside="${side}"
-                        class="b4-easy-coin"
-                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
-                        draggable="false" onerror="this.style.display='none'">`;
+                    return `<span class="b4-coin-wrap" style="position:relative;display:inline-block;border-radius:${br};vertical-align:middle;">
+                        <img src="../images/money/${d}_yuan_front.png"
+                            data-cidx="${i}" data-cval="${d}" data-cside="${side}"
+                            class="b4-easy-coin"
+                            style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s;"
+                            draggable="false" onerror="this.style.display='none'">
+                    </span>`;
                 }).join('');
 
                 if (priceEl) {
@@ -1199,7 +1240,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (img.dataset.clicked || data.done) return;
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
-                        img.style.outline = '3px solid #10b981';
+                        const wrap = img.parentElement;
+                        if (wrap?.classList.contains('b4-coin-wrap')) {
+                            wrap.style.outline = '2.5px solid #10b981';
+                            wrap.style.outlineOffset = '2px';
+                            const ck = document.createElement('span');
+                            ck.className = 'b4-coin-check';
+                            ck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                            ck.textContent = '✓';
+                            wrap.appendChild(ck);
+                        }
 
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
@@ -1614,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                 <div class="b4-option-card b4-triple-card" id="tcard-${idx}" data-idx="${idx}">
                     <div class="b4-store-label">商店</div>
-                    <div class="b4-store-icon">${store.storeIcon}</div>
+                    <div class="b4-store-icon">${b4StoreIconHTML(store.store, store.storeIcon)}</div>
                     <div class="b4-store-name">${store.store}</div>
                     ${priceDisplay}
                 </div>`;
@@ -1630,10 +1680,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${questionLabel}
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                     </div>
-                    ${diff !== 'easy' ? `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
+                    ${diff === 'easy' ? `<div class="b4-easy-coin-hint">✋ 點擊金幣計算金額</div>` : `<div class="b4-hero-hint-wrap" id="b4-hero-hint-wrap">
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
-                    </div>` : ''}
+                    </div>`}
                     ${showTripleCpp ? this._cppInlineHTML(curr.stores.map((s, i) => ({ id: i, store: s.store, price: s.price }))) : ''}
                 </div>
                 <div class="b4-triple-grid" id="triple-grid">
@@ -1871,11 +1921,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const w  = isBill ? '100px' : '60px';
                     const h  = isBill ? '48.91px' : '60px';
                     const br = isBill ? '4px' : '50%';
-                    return `<img src="../images/money/${d}_yuan_front.png"
-                        data-cidx="${i}" data-cval="${d}" data-tidx="${data.idx}"
-                        class="b4-easy-coin"
-                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
-                        draggable="false" onerror="this.style.display='none'">`;
+                    return `<span class="b4-coin-wrap" style="position:relative;display:inline-block;border-radius:${br};vertical-align:middle;">
+                        <img src="../images/money/${d}_yuan_front.png"
+                            data-cidx="${i}" data-cval="${d}" data-tidx="${data.idx}"
+                            class="b4-easy-coin"
+                            style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s;"
+                            draggable="false" onerror="this.style.display='none'">
+                    </span>`;
                 }).join('');
 
                 if (priceEl) {
@@ -1889,7 +1941,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (img.dataset.clicked || data.done) return;
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
-                        img.style.outline = '3px solid #10b981';
+                        const wrap = img.parentElement;
+                        if (wrap?.classList.contains('b4-coin-wrap')) {
+                            wrap.style.outline = '2.5px solid #10b981';
+                            wrap.style.outlineOffset = '2px';
+                            const ck = document.createElement('span');
+                            ck.className = 'b4-coin-check';
+                            ck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                            ck.textContent = '✓';
+                            wrap.appendChild(ck);
+                        }
 
                         runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
@@ -1915,16 +1976,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        // ── 三商店簡單模式：點幣後自動比較（同二商店 easy pattern）─────
+        // ── 三商店簡單模式：點擊金幣計算金額後自動比較 ─────────────────
         _setupTripleEasyCoins(curr) {
             const storesData = curr.stores.map((store, idx) => ({
                 store, idx,
                 coins: this._getCoinsArray(store.price),
-                clickedCount: 0, done: false, runningTotal: 0
+                clickedCount: 0, done: false
             }));
 
             storesData.forEach(data => {
-                const card = document.getElementById(`tcard-${data.idx}`);
+                const card    = document.getElementById(`tcard-${data.idx}`);
                 const coinsEl = card?.querySelector('.b4-price-coins');
                 const priceEl = card?.querySelector('.b4-price');
                 if (!coinsEl) return;
@@ -1935,11 +1996,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const w  = isBill ? '100px' : '60px';
                     const h  = isBill ? '48.91px' : '60px';
                     const br = isBill ? '4px' : '50%';
-                    return `<img src="../images/money/${d}_yuan_front.png"
-                        data-cidx="${i}" data-cval="${d}" data-tidx="${data.idx}"
-                        class="b4-easy-coin"
-                        style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
-                        draggable="false" onerror="this.style.display='none'">`;
+                    return `<span class="b4-coin-wrap" style="position:relative;display:inline-block;border-radius:${br};vertical-align:middle;">
+                        <img src="../images/money/${d}_yuan_front.png"
+                            data-cidx="${i}" data-cval="${d}" data-tidx="${data.idx}"
+                            class="b4-easy-coin"
+                            style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s;"
+                            draggable="false" onerror="this.style.display='none'">
+                    </span>`;
                 }).join('');
 
                 if (priceEl) {
@@ -1947,28 +2010,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     priceEl.innerHTML = `0 <span class="b4-price-unit">元</span>`;
                 }
 
+                let runningTotal = 0;
                 coinsEl.querySelectorAll('.b4-easy-coin').forEach(img => {
                     Game.EventManager.on(img, 'click', () => {
                         if (img.dataset.clicked || data.done) return;
                         img.dataset.clicked = '1';
                         img.style.opacity = '0.5';
-                        img.style.outline = '3px solid #10b981';
-
-                        data.runningTotal += parseInt(img.dataset.cval);
+                        const wrap = img.parentElement;
+                        if (wrap?.classList.contains('b4-coin-wrap')) {
+                            wrap.style.outline = '2.5px solid #10b981';
+                            wrap.style.outlineOffset = '2px';
+                            const ck = document.createElement('span');
+                            ck.className = 'b4-coin-check';
+                            ck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                            ck.textContent = '✓';
+                            wrap.appendChild(ck);
+                        }
+                        runningTotal += parseInt(img.dataset.cval);
                         data.clickedCount++;
-                        if (priceEl) priceEl.innerHTML = `${data.runningTotal} <span class="b4-price-unit">元</span>`;
+                        if (priceEl) priceEl.innerHTML = `${runningTotal} <span class="b4-price-unit">元</span>`;
 
                         const isLast = data.clickedCount >= data.coins.length;
                         if (isLast) {
                             data.done = true;
                             if (card) card.style.outline = '3px solid #10b981';
-                            Game.Speech.speak(`${data.runningTotal}元`, () => {
+                            Game.Speech.speak(`${runningTotal}元`, () => {
                                 if (storesData.every(s => s.done)) {
                                     this._handleTripleEasyAllDone(curr);
                                 }
                             });
                         } else {
-                            Game.Speech.speak(`${data.runningTotal}元`);
+                            Game.Speech.speak(`${runningTotal}元`);
                         }
                     }, {}, 'gameUI');
                 });
@@ -2793,70 +2865,171 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'diffUI');
                     Game.Speech.speak(`${curr.name}，每${curr.unit}差${correctDiff}元，請選擇正確的答案`);
                 } else {
-                    // 一般型：逐枚點擊金錢圖示，金額預設隱藏，點完後自動前進
+                    // 一般型：拖曳金幣到「便宜了多少錢」區（B1 wallet pattern）
                     const diffCoins = this._getCoinsArray(correctDiff);
-                    const coinsHtml = diffCoins.map((d, i) => {
+                    const trayHtml = diffCoins.map((d, i) => {
                         const isBill = d >= 100;
-                        const w = isBill ? '100px' : '60px';
-                        const h = isBill ? '48.91px' : '60px';
-                        const br = isBill ? '4px' : '50%';
-                        return `<img class="b4-easy-diff-coin" data-cidx="${i}" data-cval="${d}"
-                            src="../images/money/${d}_yuan_front.png"
-                            style="width:${w};height:${h};border-radius:${br};vertical-align:middle;object-fit:cover;cursor:pointer;transition:opacity 0.2s,outline 0.1s;"
-                            draggable="false" onerror="this.style.display='none'">`;
+                        const w = isBill ? 80 : 52;
+                        return `<div class="b4-diff-denom-card" draggable="true" data-cidx="${i}" data-cval="${d}" title="${d}元">
+                            <img src="../images/money/${d}_yuan_front.png" alt="${d}元"
+                                 class="${isBill ? 'banknote-img' : 'coin-img'}"
+                                 style="width:${w}px;height:${isBill ? 'auto' : w+'px'};display:block;"
+                                 draggable="false" onerror="this.style.display='none'">
+                            <span class="b1-denom-label">${d}元</span>
+                        </div>`;
                     }).join('');
+
                     app.innerHTML = `
                     ${this._renderHeader()}
                     <div class="b-game-wrap">
                         <div class="b4-item-hero" style="position:relative;">${refCardHTML}</div>
-                        <div class="b4-diff-section b4-diff-options-card">
-                            <div class="b4-diff-question" style="text-align:center;margin-bottom:12px;">${diffQuestion}<div class="b4-diff-sub">👆 點擊每一枚金幣，點完後自動繼續</div></div>
-                            <div class="b4-easy-diff-coins-area" id="b4-easy-diff-coins" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;padding:12px;">${coinsHtml}</div>
-                            <div class="b4-easy-diff-total" id="b4-easy-diff-total" style="text-align:center;font-size:20px;font-weight:700;color:#16a34a;margin-top:8px;min-height:28px;"></div>
+                        <div class="b4-diff-section">
+                            <div class="b4-diff-zone-card">
+                                <div class="b4-diff-zone-title">💰 總共便宜是多少錢？</div>
+                                <div class="b4-easy-drop-zone b4-diff-drop-zone" id="b4-diff-drop-zone">
+                                    <div id="b4-diff-placed-coins" style="display:flex;flex-wrap:wrap;gap:8px;width:100%;align-items:flex-end;min-height:60px;justify-content:center;">
+                                        <span class="b4-diff-zone-hint">拖曳正確的金額數字</span>
+                                    </div>
+                                </div>
+                                <div id="b4-diff-total" style="text-align:center;font-size:18px;font-weight:700;color:#16a34a;margin-top:8px;min-height:24px;"></div>
+                            </div>
+                            <div class="b4-diff-tray-card">
+                                <div class="b4-diff-tray-label">👆 拖曳金幣到上方</div>
+                                <div class="b4-diff-tray" id="b4-diff-tray">${trayHtml}</div>
+                            </div>
                         </div>
                     </div>`;
 
-                    // 逐枚點擊邏輯
-                    let easyDiffRunning = 0;
-                    let easyDiffClicked = 0;
-                    document.querySelectorAll('.b4-easy-diff-coin').forEach(img => {
-                        Game.EventManager.on(img, 'click', () => {
-                            if (img.dataset.clicked || this.state.isProcessing) return;
-                            img.dataset.clicked = '1';
-                            img.style.opacity = '0.5';
-                            img.style.outline = '3px solid #10b981';
+                    const hintSlots = diffCoins.map(d => ({ denom: d, filled: false }));
 
-                            easyDiffRunning += parseInt(img.dataset.cval);
-                            easyDiffClicked++;
+                    const renderDropZone = () => {
+                        const zone = document.getElementById('b4-diff-placed-coins');
+                        if (!zone) return;
+                        zone.innerHTML = '';
+                        hintSlots.forEach(slot => {
+                            const isBill = slot.denom >= 100;
+                            const w = isBill ? 80 : 52;
+                            const div = document.createElement('div');
+                            div.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;';
+                            if (slot.filled) {
+                                div.innerHTML = `<img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                                    style="width:${w}px;height:${isBill ? 'auto' : w+'px'};" draggable="false" onerror="this.style.display='none'">
+                                    <span class="b1-denom-label">${slot.denom}元</span>`;
+                            } else {
+                                div.innerHTML = `<img src="../images/money/${slot.denom}_yuan_front.png" alt="${slot.denom}元"
+                                    style="width:${w}px;height:${isBill ? 'auto' : w+'px'};opacity:0.3;" draggable="false" onerror="this.style.display='none'">
+                                    <span class="b1-denom-label" style="opacity:0.3;">${slot.denom}元</span>`;
+                            }
+                            zone.appendChild(div);
+                        });
+                    };
+                    renderDropZone();
 
-                            const totalEl = document.getElementById('b4-easy-diff-total');
-                            if (totalEl) totalEl.textContent = `${easyDiffRunning} ${diffUnit}`;
+                    const updateTrayHints = () => {
+                        const needed = {};
+                        hintSlots.filter(s => !s.filled).forEach(s => { needed[s.denom] = (needed[s.denom] || 0) + 1; });
+                        document.querySelectorAll('.b4-diff-denom-card').forEach(card => {
+                            card.classList.toggle('b4-diff-here-hint', !!needed[parseInt(card.dataset.cval)]);
+                        });
+                    };
+                    updateTrayHints();
 
-                            const isLast = easyDiffClicked >= diffCoins.length;
-                            if (isLast) {
+                    const handleDrop = (coinIdx) => {
+                        const card = document.querySelector(`.b4-diff-denom-card[data-cidx="${coinIdx}"]:not([data-placed])`);
+                        if (!card || this.state.isProcessing) return;
+                        const denom = parseInt(card.dataset.cval);
+                        const slotIdx = hintSlots.findIndex(s => s.denom === denom && !s.filled);
+                        if (slotIdx === -1) { this.audio.play('error'); return; }
+                        card.dataset.placed = '1';
+                        card.style.opacity = '0.4';
+                        card.draggable = false;
+                        hintSlots[slotIdx].filled = true;
+                        renderDropZone();
+                        updateTrayHints();
+                        this.audio.play('coin');
+                        const runningTotal = hintSlots.filter(s => s.filled).reduce((sum, s) => sum + s.denom, 0);
+                        const totalEl = document.getElementById('b4-diff-total');
+                        if (totalEl) totalEl.textContent = `${runningTotal} ${diffUnit}`;
+
+                        if (hintSlots.every(s => s.filled)) {
+                            Game.TimerManager.setTimeout(() => {
+                                if (this.state.isProcessing) return;
                                 this.state.isProcessing = true;
                                 this.audio.play('correct');
                                 this.state.quiz.totalSaved += correctDiff;
                                 const ci = this.state.currentDiffItem;
-                                if (ci) {
-                                    this.state.quiz.comparisonHistory.push({
-                                        name: ci.name, icon: ci.icon, imageUrl: ci.imageUrl, cat: ci.cat || 'other',
-                                        cheapStore: cheapOpt.store, cheapPrice: cheapOpt.price,
-                                        expStore: expOpt.store,     expPrice:  expOpt.price,
-                                        saved: correctDiff, isUnit: false, unit: ''
-                                    });
-                                }
+                                if (ci) this.state.quiz.comparisonHistory.push({
+                                    name: ci.name, icon: ci.icon, imageUrl: ci.imageUrl, cat: ci.cat || 'other',
+                                    cheapStore: cheapOpt.store, cheapPrice: cheapOpt.price,
+                                    expStore: expOpt.store, expPrice: expOpt.price,
+                                    saved: correctDiff, isUnit: false, unit: ''
+                                });
                                 Game.Speech.speak(`便宜了${correctDiff}元`, () => {
                                     Game.TimerManager.setTimeout(() => this.nextQuestion(), 800, 'turnTransition');
                                 });
-                            } else {
-                                Game.Speech.speak(`${easyDiffRunning}元`);
-                            }
+                            }, 300, 'ui');
+                        } else {
+                            Game.Speech.speak(`${runningTotal}元`);
+                        }
+                    };
+
+                    const trayEl2 = document.getElementById('b4-diff-tray');
+                    const dropZoneEl = document.getElementById('b4-diff-drop-zone');
+
+                    // Desktop drag
+                    trayEl2?.querySelectorAll('.b4-diff-denom-card').forEach(card => {
+                        Game.EventManager.on(card, 'dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', `b4diff:${card.dataset.cidx}`);
+                            card.classList.add('b4-coin-dragging');
                         }, {}, 'diffUI');
+                        Game.EventManager.on(card, 'dragend', () => card.classList.remove('b4-coin-dragging'), {}, 'diffUI');
+                    });
+                    if (dropZoneEl) {
+                        Game.EventManager.on(dropZoneEl, 'dragover', (e) => { e.preventDefault(); dropZoneEl.classList.add('b4-drop-active'); }, {}, 'diffUI');
+                        Game.EventManager.on(dropZoneEl, 'dragleave', () => dropZoneEl.classList.remove('b4-drop-active'), {}, 'diffUI');
+                        Game.EventManager.on(dropZoneEl, 'drop', (e) => {
+                            e.preventDefault(); dropZoneEl.classList.remove('b4-drop-active');
+                            const d = e.dataTransfer.getData('text/plain');
+                            if (d.startsWith('b4diff:')) handleDrop(parseInt(d.replace('b4diff:', '')));
+                        }, {}, 'diffUI');
+                    }
+
+                    // Touch drag
+                    trayEl2?.querySelectorAll('.b4-diff-denom-card').forEach(card => {
+                        let ghostEl = null;
+                        Game.EventManager.on(card, 'touchstart', (e) => {
+                            if (card.dataset.placed) return;
+                            const t = e.touches[0];
+                            ghostEl = card.cloneNode(true);
+                            ghostEl.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);left:${t.clientX - 35}px;top:${t.clientY - 50}px;`;
+                            document.body.appendChild(ghostEl);
+                        }, { passive: true }, 'diffUI');
+                        Game.EventManager.on(card, 'touchmove', (e) => {
+                            if (!ghostEl) return;
+                            e.preventDefault();
+                            const t = e.touches[0];
+                            ghostEl.style.left = (t.clientX - 35) + 'px';
+                            ghostEl.style.top  = (t.clientY - 50) + 'px';
+                            if (dropZoneEl) {
+                                const r = dropZoneEl.getBoundingClientRect();
+                                dropZoneEl.classList.toggle('b4-drop-active',
+                                    t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom);
+                            }
+                        }, { passive: false }, 'diffUI');
+                        Game.EventManager.on(card, 'touchend', (e) => {
+                            if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+                            if (dropZoneEl) dropZoneEl.classList.remove('b4-drop-active');
+                            if (card.dataset.placed) return;
+                            const t = e.changedTouches[0];
+                            const r = dropZoneEl?.getBoundingClientRect();
+                            if (r && t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+                                handleDrop(parseInt(card.dataset.cidx));
+                            }
+                        }, { passive: true }, 'diffUI');
                     });
 
                     // 進入頁面語音
-                    Game.Speech.speak(`${curr.name}，${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，便宜了多少元？請點擊金幣`);
+                    Game.Speech.speak(`${curr.name}，${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，便宜了多少元？請放置正確的金額`);
                 }
 
                 const backBtnE = document.getElementById('back-to-settings');
@@ -4106,7 +4279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // normal：點最便宜卡（輸入框模式，待幣點完後自動出現）
                     if (phase === 'select') {
-                        const coins = Array.from(document.querySelectorAll('.b4-easy-coin:not([data-clicked])'));
+                        const coins = Array.from(document.querySelectorAll('.b4-easy-coin:not([data-clicked]):not([data-placed])'));
                         if (coins.length > 0) {
                             this._queue = coins.map(coin => ({ el: coin, action: () => coin.click() }));
                         }
@@ -4207,4 +4380,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     Game.init();
+
+    // ── 商店圖示放大檢視 ───────────────────────────────────────────
+    document.addEventListener('click', e => {
+        const img = e.target.closest('[data-b4zoom]');
+        if (!img) return;
+        e.stopPropagation();
+        const existing = document.getElementById('b4-store-zoom-overlay');
+        if (existing) { existing.remove(); return; }
+        const overlay = document.createElement('div');
+        overlay.id = 'b4-store-zoom-overlay';
+        overlay.innerHTML = `
+            <div class="b4-szoom-card">
+                <img src="${img.dataset.b4zoom}" alt="${img.dataset.b4name}" class="b4-szoom-img">
+                <div class="b4-szoom-name">${img.dataset.b4name}</div>
+            </div>`;
+        overlay.addEventListener('click', () => overlay.remove());
+        document.body.appendChild(overlay);
+    });
 });

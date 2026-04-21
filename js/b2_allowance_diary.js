@@ -1088,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 68 : 44;
                 return `<button class="b2-coin-clickable"
                     data-event-idx="${eventIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
-                    aria-label="${item.denom}元" style="position:relative;">
+                    aria-label="${item.denom}元" style="position:relative;overflow:visible;">
                     <img src="../images/money/${item.denom}_yuan_${item.face}.png" alt="${item.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;pointer-events:none;"
                          onerror="this.style.display='none'" draggable="false">
@@ -1654,6 +1654,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('b2-coin-clicked');
                     btn.classList.remove('assist-click-hint');
                     btn.disabled = true;
+                    btn.style.outline = '2.5px solid #10b981';
+                    btn.style.outlineOffset = '2px';
+                    const bck = document.createElement('span');
+                    bck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                    bck.textContent = '✓';
+                    btn.appendChild(bck);
                     q.easyCoinsClicked[evIdx]++;
                     q.easyRunningTotal += denom;
                     q.easyEventTotals[evIdx] = (q.easyEventTotals[evIdx] || 0) + denom;
@@ -2179,7 +2185,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 150, 'ui');
             // 輔助點擊：_startObserver 只監聽 childList，無法偵測 style.display 的屬性變更。
             // 新列顯示後主動重建 queue，讓 AssistClick 繼續高亮下一列的金幣。
-            if (this.state.settings.clickMode === 'on' && AssistClick._enabled) {
+            // 注意：簡單模式永遠啟動 AssistClick，不能以 clickMode 為條件判斷
+            if (AssistClick._enabled) {
                 Game.TimerManager.setTimeout(() => AssistClick.buildQueue(question), 250, 'ui');
             }
         },
@@ -2504,6 +2511,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const q    = this.state.quiz;
             const diff = this.state.settings.difficulty;
             const isEasy = diff === 'easy';
+            // 簡單模式：停用 AssistClick 覆蓋層，讓使用者能真正拖曳（不再點擊放置）
+            if (isEasy) AssistClick.deactivate();
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
 
             // 重置錢包
@@ -2559,6 +2568,22 @@ document.addEventListener('DOMContentLoaded', () => {
             q.showHint  = true;
             q.hintSlots = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             this._updateB2WalletDisplay(effectiveAnswer);
+            if (diff === 'easy') this._b2UpdateDragHints(effectiveAnswer);
+        },
+
+        // ── 簡單模式 Phase 2 拖曳提示：高亮下一枚需拖曳的面額 + 放置區 ──
+        _b2UpdateDragHints(requiredTotal) {
+            document.querySelectorAll('.b2-coin-draggable').forEach(el => el.classList.remove('b2-coin-drag-hint'));
+            const walletEl = document.getElementById('b2-wallet-coins');
+            if (walletEl) walletEl.classList.remove('b2-drop-zone-hint');
+            if (this.state.settings.difficulty !== 'easy') return;
+            const q = this.state.quiz;
+            if (!q.walletPhaseActive) return;
+            const nextSlot = q.hintSlots?.find(s => !s.filled);
+            if (!nextSlot) return;
+            const coinEl = document.querySelector(`.b2-coin-draggable[data-denom="${nextSlot.denom}"]`);
+            if (coinEl) coinEl.classList.add('b2-coin-drag-hint');
+            if (walletEl) walletEl.classList.add('b2-drop-zone-hint');
         },
 
         _renderB2Phase2RefCard(question, effectiveAnswer) {
@@ -2715,6 +2740,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const slotEl = document.querySelector(`[data-b2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b2-wallet-ghost-slot');
                 this._updateB2WalletStatusOnly(requiredTotal);
+                if (this.state.settings.difficulty === 'easy') this._b2UpdateDragHints(requiredTotal);
                 const walletNow1 = this._getB2WalletTotal();
                 if (!isHardNotRevealed) {
                     Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow1)), 80, 'ui');
@@ -3685,18 +3711,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'easy') {
                 const qState = Game.state.quiz;
                 if (qState.walletPhaseActive) {
-                    // Phase 2：依序點擊零錢盤對應 ghost slot 面額
-                    const requiredTotal = qState.p2RequiredTotal;
-                    const walletTotal = Game.state.wallet.reduce((s, c) => s + c.denom, 0);
-                    const remaining = requiredTotal - walletTotal;
-                    if (remaining <= 0) { this._queue = []; return; }
-                    const nextSlot = qState.hintSlots?.find(s => !s.filled);
-                    if (nextSlot) {
-                        const coinEl = document.querySelector(`.b2-coin-draggable[data-denom="${nextSlot.denom}"]`);
-                        if (coinEl) {
-                            this._queue = [{ el: coinEl, action: () => Game._b2AddCoin(nextSlot.denom, requiredTotal) }];
-                        }
-                    }
+                    // Phase 2 簡單模式：AssistClick 已在進入 Phase 2 時停用，
+                    // 拖曳提示改由 _b2UpdateDragHints 以 CSS class 驅動，此分支不應被觸及
+                    this._queue = [];
+                    return;
                 } else {
                     // Phase 1：依序點擊各事件的金幣按鈕
                     // 只取「已顯示列」的金幣；隱藏列的 click 會被 _bindB2EasyModeCoins 的

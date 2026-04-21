@@ -26,7 +26,7 @@ const B1_SCENARIOS = {
         { icon:'🎮', label:'電玩體驗',  cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',               items:[{ name:'遊戲費',   min:30,  max:60  }, { name:'零食費',  min:10, max:20 }] },
         { icon:'🌸', label:'賞花展',    cat:'outdoor',       imageFile:'icon-b1-easy-flower-show.png',               items:[{ name:'門票費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
         // ── 國高中生常見場景 ──
-        { icon:'🧋', label:'買手搖飲',  cat:'food',          imageFile:'icon-b1-easy-buy-bubble-tea.png',            items:[{ name:'飲料費',   min:40,  max:70  }, { name:'零食費',  min:15, max:30 }] },
+        { icon:'🧋', label:'買手搖飲',  cat:'food',          imageFile:'icon-b1-easy-buy-bubble-tea.png',            items:[{ name:'飲料費',   min:40,  max:70  }, { name:'零食費',  min:15, max:30 }] }, // TODO: 圖片待新增（目前 onerror 自動顯示 🧋 emoji）
         { icon:'📓', label:'買筆記本',  cat:'shopping',      imageFile:'icon-b1-easy-buy-stationery.png',            items:[{ name:'筆記本費', min:25,  max:45  }, { name:'鉛筆費',  min:10, max:20 }] },
         { icon:'🍳', label:'早餐店',    cat:'food',          imageFile:'icon-b1-easy-buy-breakfast.png',             items:[{ name:'早餐費',   min:35,  max:60  }, { name:'公車票',  min:15, max:30 }] },
         { icon:'🎮', label:'買遊戲點數', cat:'entertainment', imageFile:'icon-b1-easy-arcade-game.png',              items:[{ name:'點數費',   min:50,  max:100 }, { name:'零食費',  min:10, max:20 }] },
@@ -771,10 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Game.Speech.speak(`請準備${toTWD(effectiveTotal)}`);
 
-            // 簡單模式：自動顯示 ghost slot 提示（靜默，無語音/彈窗）
-            if (isEasy) {
-                Game.TimerManager.setTimeout(() => this._autoSetGhostSlots(curr), 300, 'ui');
-            }
+            // 簡單模式：自由拖曳任意金幣，湊到精確金額後自動確認（透過 _updateWalletDisplay 驅動）
         },
 
         // ── 靜默設定 ghost slots（簡單模式自動提示）──────────────
@@ -2204,6 +2201,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 行程卡綠光（剛好符合時）
                 const card = document.querySelector('.b1-schedule-card');
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
+                // 簡單模式（無 ghost slot）：湊到精確金額後自動確認
+                if (this.state.settings.difficulty === 'easy' && !this.state.quiz.showHint && total === required && total > 0) {
+                    Game.TimerManager.setTimeout(() => this.handleConfirm(required), 700, 'ui');
+                }
             }
 
             // 面額計數摘要已隱藏（不顯示）
