@@ -1,7 +1,8 @@
-# B3 存錢計畫 — 各模式語音列表
+# B3 存錢計畫 — 語音內容
 
-> 產生日期：2026-04-03  
-> 依觸發時機排列；`${變數}` 為執行時動態替換的內容。
+> 資料來源：`js/b3_savings_plan.js`
+> 匯出日期：2026-04-20（原檔：B3_Speech_List.md，2026-04-03）
+> 相關資料：`report/B3_data_export.md`（商品目標 / 每週存款選項）
 
 ---
 
@@ -96,6 +97,8 @@ B3 有兩大遊戲流程：
 |------|---------|
 | 點擊兌換按鈕 | `{N}個{原面額}元換成1個{新面額}元` |
 
+> 搜尋 `.b3-pig-exch-btn`、`_handleExchange`、`EXCHANGE_RULES`
+
 ---
 
 ### 1-9 達標（100%）
@@ -112,6 +115,26 @@ B3 有兩大遊戲流程：
 |------|---------|------|
 | 結算頁顯示後（800ms）| `太棒了！你只用了{天數}天就存到了{金額}元，買到了{物品名稱}！` | 自動播放 |
 | 按下「獲得獎勵 🎁」| `存錢成功，繼續加油！` | 點擊後播放 |
+
+---
+
+### 1-11 普通/困難模式提示鈕（_toggleDepositHint / _showHardModeHintModal）
+
+**普通模式：**
+```
+Ghost slot 引導（淡化面額圖示），並播語音：
+「可以存入N個X元，M個Y元，…」
+（永遠顯示數量，含 1 個；分隔符號為「，」）
+```
+
+**困難模式：**
+```
+彈窗顯示金錢圖示＋語音：
+「今天要存X元，可以用N個X元，M個Y元，…」
+```
+
+> 搜尋 `b3-daily-hint-btn`、`hintSlots`、`data-hint-idx`、`b3NDenomInGhost`
+> 搜尋 `_showHardModeHintModal`、`b3-hint-modal-overlay`
 
 ---
 
@@ -202,8 +225,44 @@ B3 有兩大遊戲流程：
 
 ---
 
-## 四、語音格式說明
+## 四、輔助點擊語音（AssistClick，2026-04-12 修正）
+
+| 模式 | 狀態 | 輔助點擊目標 |
+|------|------|-------------|
+| 月曆模式 | 達成目標頁 | `b3-view-summary-btn` |
+| 月曆模式（簡單）| 拖曳硬幣 | `.b3-drag-coin:not(.b3-coin-placed)` 逐枚（MutationObserver 驅動）|
+| 月曆模式（普通/困難）| 拖曳面額 tile + 確認 | `b3-ndrag-denom`（剩餘量 > 0）→ `b3-normal-confirm-btn` |
+| 月曆模式 | 兌換優先 | `.b3-pig-exch-btn`（優先於日期點擊）|
+| 月曆模式 | 等待點擊日期 | `.b3-cal-active` |
+
+> 搜尋 `b3-pig-exch-btn`、`b3-drag-coin:not.*b3-coin-placed`、`b3-ndrag-denom.*remaining`
+
+---
+
+## 五、語音格式說明
 
 - 金額：以 `toTWD()` 函數轉換，例如 `300` → `「三百元」`（中文朗讀）
 - 語音引擎：`Game.Speech.speak(text, callback)` — 使用 Web Speech API，優先選用「Microsoft Yating」（台灣中文）
 - 重播機制：每個工作階段記錄 `lastSpeech` / `lastSpeechText`，點擊 🔊 按鈕可重播
+- 正反面：所有金錢圖示使用 `b3Rf()` 隨機決定正反面（`const b3Rf = () => Math.random() < 0.5 ? 'back' : 'front'`）
+
+---
+
+## 六、搜尋關鍵字速查
+
+| 語音內容 | 搜尋關鍵字 |
+|---------|-----------|
+| 任務彈窗 | `_showCalendarTaskPopup`、`存錢目標` |
+| 日期點擊 | `_handleDayClick`、`月.*日，第.*天` |
+| 存款完成語音 | `存入.*元！還差`、`太棒了！存到` |
+| 里程碑徽章 | `四分之一`、`存了一半了` |
+| 撲滿兌換 | `_handleExchange`、`換成1個` |
+| 達標語音 | `達標了！` |
+| 月曆完成 | `showResults`、`你只用了.*天` |
+| 普通提示 ghost | `b3-daily-hint-btn`、`hintSlots`、`可以存入` |
+| 困難提示彈窗 | `_showHardModeHintModal`、`b3-hint-modal-overlay` |
+| 測驗開題 | `_startQuizMode`、`存錢目標：` |
+| 測驗答對 | `答對了！每週存` |
+| 測驗答錯 | `不對喔，再想想看`、`不對喔，參考提示` |
+| 連勝 | `三連勝`、`五連勝` |
+| 測驗完成 | `太棒了！.*買到了`、`showResults` |

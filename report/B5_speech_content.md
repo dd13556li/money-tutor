@@ -1,7 +1,7 @@
 # B5 生日派對預算 — 語音內容
 
 > 資料來源：`js/b5_party_budget.js`
-> 匯出日期：2026-04-19
+> 匯出日期：2026-04-23
 
 ---
 
@@ -16,13 +16,12 @@
 
 ### 第2頁
 ```javascript
-// 顯示預算 + 商品 emoji
-`本關預算${scenario.budget}元，從${items.length}個商品中選購，在預算內就可以！`
+// 顯示預算金額圖示（大面額紙鈔）後自動播放
+`今天帶了${toTWD(budget)}去採購！`
 
-// 點「開始挑選！」按鈕
-`開始挑選！`  // 語音結束後進入 renderRound()
+// 點「出發採購！ 🎉」按鈕 → 取消語音，直接進入 renderRound()（無語音）
 ```
-搜尋 `showWelcomeScreen`、`b5-wc2-start-btn`、`_skipIntroModal`
+搜尋 `showWelcomeScreen`、`b5-wc2-start-btn`、`今天帶了`
 
 ---
 
@@ -188,9 +187,11 @@ const speechMap = {
 
 ### 進入找零頁
 ```javascript
-// 頁面標題顯示找零金額，無獨立語音
-// 普通模式拖入一枚金幣後：
-`找為${toTWD(runningTotal)}`  // 累加語音
+// 進入找零頁時
+`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`
+
+// 普通/困難模式拖入一枚金幣後（簡單模式靜音）：
+`找回${toTWD(runningTotal)}`  // 累加語音（diff !== 'easy'）
 ```
 
 ### Ghost slot 提示（普通模式3次錯誤 / 提示按鈕）
@@ -245,7 +246,8 @@ const b5ChangeDir = placedTotal > change ? '太多了' : '太少了';
 
 | 語音類型 | 搜尋關鍵字 |
 |---------|-----------|
-| 歡迎畫面 | `showWelcomeScreen`、`今天要舉辦`、`b5-wc2-start-btn` |
+| 歡迎畫面第1頁 | `showWelcomeScreen`、`今天要舉辦`、`_b5ThemeImgMap` |
+| 歡迎畫面第2頁 | `今天帶了.*去採購`、`b5-wc2-start-btn` |
 | 關卡介紹 | `_showRoundIntroCard`、`speechMap`、`afterClose` |
 | 必買朗讀 | `_speakMustItemsOneByOne`、`必買：` |
 | 商品選取 | `派對採購任務`、`取消${item.name}` |
@@ -254,6 +256,8 @@ const b5ChangeDir = placedTotal > change ? '太多了' : '太少了';
 | 預算提示語音 | `_showBudgetHint`、`還剩.*可以加選` |
 | 困難提示彈窗 | `_showHardModeHintModal`、`b5-hint-modal-overlay` |
 | Phase 2 付款 | `共消費.*請拖曳`、`_b5P2HandleConfirm` |
+| 找零進入語音 | `找您.*請把找回的金錢` |
+| 找零累加語音 | `找回${toTWD`、`diff !== 'easy'` |
 | 找零錯誤 | `b5ChangeDir`、`不對喔，找零算` |
 | 找零提示 | `_b5P2ShowChangeGhostSlots`、`可以用` |
 | 完成畫面 | `太棒了！完成挑戰` |

@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="game-buttons">
                         <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
-                        <button class="start-btn" id="start-btn" disabled>開始練習</button>
+                        <button class="start-btn" id="start-btn" disabled>▶ 開始練習</button>
                     </div>
                 </div>
             </div>`;
@@ -1035,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
             <div class="b-header">
-                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${diffLabel}${themeText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
@@ -2468,7 +2468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
@@ -2511,8 +2511,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const q    = this.state.quiz;
             const diff = this.state.settings.difficulty;
             const isEasy = diff === 'easy';
-            // 簡單模式：停用 AssistClick 覆蓋層，讓使用者能真正拖曳（不再點擊放置）
-            if (isEasy) AssistClick.deactivate();
+            // 簡單模式：停用 AssistClick 覆蓋層，讓使用者能真正拖曳（輔助點擊模式除外）
+            if (isEasy && this.state.settings.clickMode !== 'on') AssistClick.deactivate();
             const pct  = Math.round((q.currentQuestion / q.totalQuestions) * 100);
 
             // 重置錢包
@@ -2532,7 +2532,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">📒 零用錢日記</span></div>
+                <div class="b-header-left"><span class="b-header-unit">📒 零用錢日記</span></div>
                 <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${q.currentQuestion + 1} 題 / 共 ${q.totalQuestions} 題</span>
@@ -2742,11 +2742,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._updateB2WalletStatusOnly(requiredTotal);
                 if (this.state.settings.difficulty === 'easy') this._b2UpdateDragHints(requiredTotal);
                 const walletNow1 = this._getB2WalletTotal();
+                const isEasyLastSlot = this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled);
                 if (!isHardNotRevealed) {
-                    Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow1)), 80, 'ui');
-                }
-                // 簡單模式：所有 ghost slot 填滿後自動確認（同 B1 pattern）
-                if (this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled)) {
+                    if (isEasyLastSlot) {
+                        this.state.isProcessing = true;
+                        Game.Speech.speak(toTWD(walletNow1), () => {
+                            this.state.isProcessing = false;
+                            this._handleB2WalletConfirm(requiredTotal, null);
+                        });
+                    } else {
+                        Game.TimerManager.setTimeout(() => Game.Speech.speak(toTWD(walletNow1)), 80, 'ui');
+                    }
+                } else if (isEasyLastSlot) {
                     Game.TimerManager.setTimeout(() => this._handleB2WalletConfirm(requiredTotal, null), 400, 'ui');
                 }
             } else {
@@ -3213,8 +3220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
-            const _reactivateForSummary = this.state.settings.difficulty === 'easy'
-                && this.state.settings.clickMode === 'on';
+            const _reactivateForSummary = this.state.settings.clickMode === 'on';
 
             const q        = this.state.quiz;
             const elapsed  = q.startTime ? (Date.now() - q.startTime) : 0;
@@ -3708,22 +3714,54 @@ document.addEventListener('DOMContentLoaded', () => {
             const q    = question || Game.state.quiz.questions[Game.state.quiz.currentQuestion];
             if (!q) return;
 
-            if (diff === 'easy') {
-                const qState = Game.state.quiz;
-                if (qState.walletPhaseActive) {
-                    // Phase 2 簡單模式：AssistClick 已在進入 Phase 2 時停用，
-                    // 拖曳提示改由 _b2UpdateDragHints 以 CSS class 驅動，此分支不應被觸及
-                    this._queue = [];
-                    return;
+            // Phase 2 錢包付款（所有難度）
+            const qState = Game.state.quiz;
+            if (qState.walletPhaseActive) {
+                // 所有難度：先放入所有硬幣，再點確認（簡單模式輔助點擊同樣適用）
+                const requiredTotal = qState.p2RequiredTotal || 0;
+                const walletTotal   = Game._getB2WalletTotal ? Game._getB2WalletTotal() :
+                    (Game.state.wallet || []).reduce((s, c) => s + c.denom, 0);
+                const remaining = requiredTotal - walletTotal;
+
+                if (remaining > 0) {
+                    // 還有未放的面額 → 引導放幣
+                    if (qState.showHint && qState.hintSlots?.length) {
+                        const nextSlot = qState.hintSlots.find(s => !s.filled);
+                        if (nextSlot) {
+                            const coinEl = document.querySelector(`.b2-coin-draggable[data-denom="${nextSlot.denom}"]`);
+                            if (coinEl) {
+                                this._queue = [{ el: coinEl, action: () => Game._b2AddCoin(nextSlot.denom, requiredTotal) }];
+                                this._highlight(coinEl);
+                            }
+                        }
+                    } else {
+                        const B2_DENOMS = [1000, 500, 100, 50, 10, 5, 1];
+                        const nextDenom = B2_DENOMS.find(d => d <= remaining) || B2_DENOMS[0];
+                        const coinEl = document.querySelector(`.b2-coin-draggable[data-denom="${nextDenom}"]`);
+                        if (coinEl) {
+                            this._queue = [{ el: coinEl, action: () => Game._b2AddCoin(nextDenom, requiredTotal) }];
+                            this._highlight(coinEl);
+                        }
+                    }
                 } else {
-                    // Phase 1：依序點擊各事件的金幣按鈕
-                    // 只取「已顯示列」的金幣；隱藏列的 click 會被 _bindB2EasyModeCoins 的
-                    // `evIdx > easyRevealedUpTo` guard 無聲拒絕，必須排除以免佔住 queue
-                    const revealedUpTo = qState.easyRevealedUpTo ?? 0;
-                    const coins = Array.from(document.querySelectorAll('.b2-coin-clickable:not(.b2-coin-clicked):not(:disabled)'))
-                        .filter(btn => parseInt(btn.dataset.eventIdx) <= revealedUpTo);
-                    this._queue = coins.map(btn => ({ el: btn, action: () => btn.click() }));
+                    // 金額足夠 → 高亮確認按鈕
+                    const confirmBtn2 = document.getElementById('b2-wallet-confirm-btn');
+                    if (confirmBtn2 && !confirmBtn2.disabled) {
+                        this._queue = [{ el: confirmBtn2, action: () => confirmBtn2.click() }];
+                        this._highlight(this._queue[0].el);
+                    }
                 }
+                return;
+            }
+
+            if (diff === 'easy') {
+                // Phase 1：依序點擊各事件的金幣按鈕
+                // 只取「已顯示列」的金幣；隱藏列的 click 會被 _bindB2EasyModeCoins 的
+                // `evIdx > easyRevealedUpTo` guard 無聲拒絕，必須排除以免佔住 queue
+                const revealedUpTo = qState.easyRevealedUpTo ?? 0;
+                const coins = Array.from(document.querySelectorAll('.b2-coin-clickable:not(.b2-coin-clicked):not(:disabled)'))
+                    .filter(btn => parseInt(btn.dataset.eventIdx) <= revealedUpTo);
+                this._queue = coins.map(btn => ({ el: btn, action: () => btn.click() }));
             } else if (diff === 'normal') {
                 // Normal：點擊各輸入框 → 正確選項 → 總計輸入框 → 正確選項
                 const steps = [];

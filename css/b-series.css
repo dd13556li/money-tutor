@@ -821,3 +821,6 @@
     100% { transform: scale(1); }
 }
 .b1-total-pop { animation: b1TotalPop 0.5s ease; }
+
+/* B 系列「開始練習」按鈕不顯示火箭圖示 */
+.b-series .start-btn::before { content: ''; }

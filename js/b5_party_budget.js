@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="game-buttons">
                         <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
-                        <button class="start-btn" id="start-btn" disabled>開始練習</button>
+                        <button class="start-btn" id="start-btn" disabled>▶ 開始練習</button>
                     </div>
                 </div>
             </div>`;
@@ -700,6 +700,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const renderPage = (page) => {
                 if (page === 1) {
                     // ── 第1頁：派對主題歡迎 ──────────────────────────────────
+                    const _b5ThemeImgMap = { birthday: '001', halloween: '002', picnic: '003' };
+                    const _b5ThemeImgNum = _b5ThemeImgMap[round0.themeKey] || '001';
+                    const _b5ThemeImgSrc = `../images/b5/${_b5ThemeImgNum}.png`;
+
                     app.innerHTML = `
                         <style>
                             .b5-wc-container {
@@ -738,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="b5-wc-icon">${themeData.icon}</div>
                                 <h1 class="b5-wc-title">今天要舉辦${themeData.name}！</h1>
                                 <p class="b5-wc-sub">讓我們一起規劃派對預算吧！</p>
-                                <img src="../images/index/icon-index-b5.png" alt="生日派對預算"
+                                <img src="${_b5ThemeImgSrc}" alt="${themeData.name}"
                                      class="b5-wc-unit-img" onerror="this.style.display='none'">
                             </div>
                         </div>`;
@@ -865,7 +869,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const diff = this.state.settings.difficulty;
             this._showRoundIntroCard(g.currentRound + 1, g.budget, () => {
                 if (diff === 'easy') {
-                    Game.TimerManager.setTimeout(() => this._speakTargetItemsOneByOne(), 200, 'speech');
                     this._b5P1ActivateHintMode();
                 }
             });
@@ -974,7 +977,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
                     <span class="b-header-unit">${themeIcon} 生日派對預算</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
@@ -1379,15 +1381,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     g.selectedIds.add(id);
                     card.classList.add('selected');
                     this.audio.play('correct');
-                    Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
                     this._showItemFlyout(item, card);
                     this._updateTotalBar();
                     this._updateTargetChecklist(g);
 
-                    // 所有目標商品已選完 → 高亮確認按鈕
-                    if (g.selectedIds.size === g.targetIds.size) {
-                        Game.Speech.speak('所有商品選購完成，可以確認購買了！');
-                        document.getElementById('b5-confirm-btn')?.classList.add('b5-hint-here');
+                    if (diff === 'easy' && g.p1HintMode) {
+                        // 簡單模式：語音播完後才進行下一步
+                        if (g.selectedIds.size === g.targetIds.size) {
+                            // 最後一個商品：語音完成後顯示確認提示
+                            this.state.isProcessing = true;
+                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                                document.getElementById('b5-confirm-btn')?.classList.add('b5-hint-here');
+                                Game.Speech.speak('所有商品選購完成，可以確認購買了！', () => {
+                                    this.state.isProcessing = false;
+                                    AssistClick.buildQueue();
+                                });
+                            });
+                        } else {
+                            // 還有下一個提示商品
+                            const nextHintId = (g.p1HintItems || []).find(hid => !g.selectedIds.has(hid));
+                            const nextCat = nextHintId ? B5_ITEM_CATEGORIES[nextHintId] : null;
+                            if (nextCat && nextCat !== g.activeCategory) {
+                                // 下一個在不同類別：切換類別並朗讀類別名稱
+                                this.state.isProcessing = true;
+                                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                                    this._switchB5Category(nextCat);
+                                    const meta = B5_CATEGORY_META[nextCat];
+                                    Game.Speech.speak(meta ? meta.name : '', () => {
+                                        this.state.isProcessing = false;
+                                        AssistClick.buildQueue();
+                                    });
+                                });
+                            } else {
+                                // 同類別：語音完成後高亮下一個提示商品
+                                this.state.isProcessing = true;
+                                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                                    this.state.isProcessing = false;
+                                    AssistClick.buildQueue();
+                                });
+                            }
+                        }
+                    } else {
+                        // 普通/困難模式
+                        if (g.selectedIds.size === g.targetIds.size) {
+                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                            Game.Speech.speak('所有商品選購完成，可以確認購買了！');
+                            document.getElementById('b5-confirm-btn')?.classList.add('b5-hint-here');
+                        } else {
+                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                        }
                     }
                 }, {}, 'gameUI');
             }
@@ -1557,6 +1599,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!g.p1HintItems || g.p1HintItems.length === 0) {
                 g.p1HintItems = this._b5P1GenerateHintItems();
             }
+            // 自動切換到第一個提示商品的類別
+            const firstId = g.p1HintItems.find(hid => !g.selectedIds.has(hid));
+            if (firstId) {
+                const cat = B5_ITEM_CATEGORIES[firstId];
+                if (cat && cat !== g.activeCategory) this._switchB5Category(cat);
+            }
             this._b5P1UpdateHintHighlights();
         },
 
@@ -1703,7 +1751,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     resultArea2.appendChild(retryBtn);
                     const skipBtn = document.createElement('button');
                     skipBtn.className = 'b5-next-btn';
-                    skipBtn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
+                    skipBtn.textContent = '下一關 →';
                     skipBtn.style.cssText = 'background:#9ca3af;margin-top:8px;';
                     Game.EventManager.on(skipBtn, 'click', () => this.nextRound(), {}, 'gameUI');
                     resultArea2.appendChild(skipBtn);
@@ -1768,6 +1816,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'easy') {
                 this._b5P2AutoSetGhostSlots();
                 this._b5P2UpdateWalletDisplay();
+                this._b5P2UpdatePayTrayHints();
             }
 
             if (this.state.settings.clickMode === 'on') {
@@ -1893,6 +1942,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         g.p2ShowHint = true;
                         this._b5P2AutoSetGhostSlots();
                         this._b5P2UpdateWalletDisplay();
+                        this._b5P2UpdatePayTrayHints();
                         Game.Speech.speak('請按照提示放入正確的金錢');
                     } else {
                         this._showB5HardModeHintModal(total);
@@ -2049,6 +2099,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const slotEl = document.querySelector(`[data-b5p2-hint-idx="${slotIdx}"]`);
                 if (slotEl) slotEl.classList.remove('b5p2-ghost-slot');
                 this._b5P2UpdateStatusOnly();
+                if (diff === 'easy') this._b5P2UpdatePayTrayHints();
             } else {
                 this.audio.play('coin');
                 const uid = ++g.p2UidCtr;
@@ -2470,9 +2521,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._b5P2UpdateChangeDisplay(change);
                 this._b5P2RenderWalletCoins(change);
                 if (g.changeGhostMode) this._b5P2UpdateChangeTrayHints();
-                if (diff !== 'hard') {
+                if (diff !== 'easy') {
                     const runningTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
-                    Game.Speech.speak(`找為${toTWD(runningTotal)}`);
+                    Game.Speech.speak(`找回${toTWD(runningTotal)}`);
                 }
             };
 
@@ -2835,20 +2886,31 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Speech.speak(`可以用${parts.join('，')}`);
         },
 
+        // 付款托盤「點這裡」依序提示（每次只高亮下一個）
+        _b5P2UpdatePayTrayHints() {
+            const g = this.state.game;
+            document.querySelectorAll('.b5p2-coin-drag').forEach(el => el.classList.remove('b6-product-here-hint'));
+            if (this.state.settings.difficulty !== 'easy') return;
+            const nextSlot = (g.p2HintSlots || []).find(s => !s.filled);
+            if (!nextSlot) return;
+            const coinEl = Array.from(document.querySelectorAll('.b5p2-coin-drag')).find(el =>
+                el.dataset.inUse !== 'true' && el.style.display !== 'none' &&
+                parseInt(el.dataset.denom) === nextSlot.denom
+            );
+            if (coinEl) coinEl.classList.add('b6-product-here-hint');
+        },
+
+        // 找零托盤「點這裡」依序提示（每次只高亮下一個）
         _b5P2UpdateChangeTrayHints() {
             const g = this.state.game;
-            document.querySelectorAll('.b5c-denom-card').forEach(el => {
-                el.classList.remove('b6-product-here-hint');
-            });
+            document.querySelectorAll('.b5c-denom-card').forEach(el => el.classList.remove('b6-product-here-hint'));
             if (!g.changeGhostMode) return;
-            const needed = {};
-            (g.changeHintSlots || []).filter(s => !s.filled).forEach(s => {
-                needed[s.denom] = (needed[s.denom] || 0) + 1;
-            });
-            document.querySelectorAll('.b5c-denom-card').forEach(el => {
-                const d = parseInt(el.dataset.denom);
-                if (needed[d]) el.classList.add('b6-product-here-hint');
-            });
+            const nextSlot = (g.changeHintSlots || []).find(s => !s.filled);
+            if (!nextSlot) return;
+            const coinEl = Array.from(document.querySelectorAll('.b5c-denom-card')).find(el =>
+                parseInt(el.dataset.denom) === nextSlot.denom
+            );
+            if (coinEl) coinEl.classList.add('b6-product-here-hint');
         },
 
         _b5P2ShowChangeHintModal(change) {
@@ -2900,28 +2962,15 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) closeModal(); }, {}, 'gameUI');
         },
 
-        // ── 付款後顯示結果（下一關按鈕）─────────────────────────
+        // ── 付款後顯示結果（直接導航，無下一關按鈕）─────────────────────────
         _b5P2ShowResult(paid, change) {
             const g = this.state.game;
-            // 防重複
-            if (document.getElementById('b5-p2-next-btn')) return;
+            g.currentRound++;
             Game.TimerManager.setTimeout(() => {
-                if (document.getElementById('b5-p2-next-btn')) return;
-                const btn = document.createElement('button');
-                btn.id = 'b5-p2-next-btn';
-                btn.className = 'b5-next-btn';
-                btn.textContent = g.currentRound + 1 >= g.totalRounds ? '查看結果 →' : '下一關 →';
-                Game.EventManager.on(btn, 'click', () => this.nextRound(), {}, 'gameUI');
-                const anchor = document.getElementById('b5c-confirm-btn')
-                             || document.getElementById('b5p2-wallet-area')
-                             || document.querySelector('.game-container');
-                if (anchor) {
-                    anchor.after(btn);
+                if (g.currentRound >= g.totalRounds) {
+                    this.showResults();
                 } else {
-                    document.getElementById('app')?.appendChild(btn);
-                }
-                if (this.state.settings.clickMode === 'on') {
-                    Game.TimerManager.setTimeout(() => AssistClick.activate(), 200, 'ui');
+                    this.showWelcomeScreen();
                 }
             }, 400, 'turnTransition');
         },
@@ -3185,7 +3234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b-res-title-row">
                 <img src="../images/index/educated_money_bag_character.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
-                <h1 class="b-res-title">🎉 派對規劃師 🎉</h1>
+                <h1 class="b-res-title">🎉 派對規劃大師 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>
             </div>
         </div>
@@ -3318,9 +3367,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         buildQueue() {
             if (!this._enabled) return;
-            if (document.getElementById('b5-round-intro') || document.getElementById('b5-round-transition')) return;
+            if (Game.state.isProcessing) return;
+            // b5-round-transition 是非互動動畫，直接跳過
+            if (document.getElementById('b5-round-transition')) return;
+            // 提示彈窗（z-index 10200，高於輔助遮罩）開啟時使用者需自行關閉，跳過 buildQueue 避免在彈窗下方誤標記高亮
+            if (document.getElementById('b5-hard-hint-modal') || document.getElementById('b5c-hint-modal')) return;
+
+            // 派對回顧頁：偵測「查看測驗總結」按鈕
+            const viewSummaryBtn = document.getElementById('b5-view-summary-btn');
+            if (viewSummaryBtn && viewSummaryBtn.style.display !== 'none') {
+                this._clearHighlight();
+                this._queue = [{ el: viewSummaryBtn, action: () => viewSummaryBtn.click() }];
+                this._highlight(this._queue[0].el);
+                return;
+            }
+
             this._clearHighlight();
             this._queue = [];
+
+            // b5-round-intro 有關閉按鈕 → 高亮並排隊點擊
+            const roundIntroEl = document.getElementById('b5-round-intro');
+            if (roundIntroEl) {
+                const closeBtn = document.getElementById('b5-ri-cancel');
+                if (closeBtn) {
+                    this._highlight(closeBtn);
+                    this._queue = [{ el: closeBtn, action: () => closeBtn.click() }];
+                }
+                return;
+            }
 
             const g = Game.state.game;
             if (!g) return;
@@ -3406,18 +3480,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (g.p1HintMode) {
                 const nextHintId = (g.p1HintItems || []).find(id => !g.selectedIds.has(id));
                 if (nextHintId) {
-                    // 提示商品在當前可見類別
+                    // 若提示商品不在當前類別 → 系統自動切換（不需使用者點擊標籤）
+                    const hintCat = B5_ITEM_CATEGORIES[nextHintId];
+                    if (hintCat && hintCat !== g.activeCategory) {
+                        Game._switchB5Category(hintCat);
+                    }
+                    // 切換後直接找到商品卡並高亮
                     const hintCard = document.querySelector(`.b5-item-card[data-id="${nextHintId}"]`);
                     if (hintCard) {
                         this._highlight(hintCard);
                         this._queue = [{ el: hintCard, action: () => hintCard.click() }];
-                    } else {
-                        // 提示商品在其他類別 → 先切換類別標籤
-                        const hintCat = B5_ITEM_CATEGORIES[nextHintId];
-                        if (hintCat) {
-                            const tab = document.querySelector(`.b5-cat-tab[data-cat="${hintCat}"]`);
-                            if (tab) { this._highlight(tab); this._queue = [{ el: tab, action: () => tab.click() }]; }
-                        }
                     }
                     return;
                 }

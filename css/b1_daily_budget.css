@@ -1834,18 +1834,8 @@
 .b1-coin-clickable.b1-coin-clicked {
     cursor: default;
     transform: none;
-}
-.b1-coin-clickable.b1-coin-clicked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.6rem;
-    font-weight: 900;
-    color: #16a34a;
-    text-shadow: 0 0 4px #fff, 0 0 8px #fff;
-    line-height: 1;
+    outline: 2.5px solid #10b981;
+    outline-offset: 2px;
 }
 
 /* ── 簡單模式：3個選項按鈕 ── */
@@ -2118,5 +2108,41 @@
 @media (max-width: 480px) {
     .b1-task-modal-icon .b1-scene-img,
     .b1-task-modal-img { height: 180px; width: 180px; }
+}
+
+/* ── Phase 2 簡單模式：拖曳盤「點這裡」提示 ── */
+.b1-coin-draggable.b1-tray-here-hint {
+    outline: 2.5px solid #f58025 !important;
+    outline-offset: 2px !important;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 1;
+    animation: b1TrayHereHintPulse 0.9s ease infinite !important;
+}
+@keyframes b1TrayHereHintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,128,37,0.5); }
+    50%       { box-shadow: 0 0 0 7px rgba(245,128,37,0); }
+}
+.b1-coin-draggable.b1-tray-here-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -46px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f58025 0%, #ffa040 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 13px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(245,128,37,0.55);
+    pointer-events: none;
+    z-index: 9999;
+    animation: b1TrayHereBounce 1s ease-in-out infinite;
+}
+@keyframes b1TrayHereBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(-5px); }
 }
 

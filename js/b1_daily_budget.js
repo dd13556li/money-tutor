@@ -769,9 +769,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this._bindPhase2Events(curr);
 
-            Game.Speech.speak(`請準備${toTWD(effectiveTotal)}`);
+            if (diff === 'easy') {
+                this._autoSetGhostSlots(curr);
+            }
 
-            // 簡單模式：自由拖曳任意金幣，湊到精確金額後自動確認（透過 _updateWalletDisplay 驅動）
+            Game.Speech.speak(`請準備${toTWD(effectiveTotal)}`);
         },
 
         // ── 靜默設定 ghost slots（簡單模式自動提示）──────────────
@@ -782,6 +784,17 @@ document.addEventListener('DOMContentLoaded', () => {
             q.showHint   = true;
             q.hintSlots  = optimal.map(d => ({ denom: d, filled: false, face: q.trayFaces?.[d] || 'front' }));
             this._updateWalletDisplay();
+            this._b1UpdateTrayHint();
+        },
+
+        _b1UpdateTrayHint() {
+            document.querySelectorAll('.b1-coin-draggable').forEach(el => el.classList.remove('b1-tray-here-hint'));
+            if (this.state.settings.difficulty !== 'easy') return;
+            const q = this.state.quiz;
+            const nextSlot = q.hintSlots?.find(s => !s.filled);
+            if (!nextSlot) return;
+            const coinEl = document.querySelector(`.b1-coin-draggable[data-denom="${nextSlot.denom}"]`);
+            if (coinEl) coinEl.classList.add('b1-tray-here-hint');
         },
 
         // ── Phase 2 迷你參考卡 ──────────────────────────────────────
@@ -1155,8 +1168,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'easy') {
                 // 簡單模式：綁定可點擊金幣，逐項揭露後自動進入 Phase 2
                 this._bindB1EasyModeCoins(curr);
-                // 簡單模式永遠啟動輔助點擊提示動畫
-                Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
+                if (this.state.settings.clickMode === 'on') {
+                    Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
+                }
             } else if (diff === 'normal') {
                 // 普通模式：逐項點選金額（3選1 中央彈窗）
                 this._bindB1NormalItemChoices(curr);
@@ -1193,16 +1207,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     btn.classList.add('b1-coin-clicked');
                     btn.disabled = true;
+                    const bck = document.createElement('span');
+                    bck.style.cssText = 'position:absolute;top:-4px;right:-4px;background:#10b981;color:white;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;z-index:2;pointer-events:none;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.3);';
+                    bck.textContent = '✓';
+                    btn.appendChild(bck);
                     q.easyCoinsClicked[itemIdx] = (q.easyCoinsClicked[itemIdx] || 0) + 1;
                     q.easyRunningTotal += denom;
                     q.easyEventTotals[itemIdx] = (q.easyEventTotals[itemIdx] || 0) + denom;
-
-                    // 商店框點擊彈跳動畫
-                    const itemCard = btn.closest('.b1-schedule-item');
-                    if (itemCard) {
-                        itemCard.classList.add('b1-item-bounce');
-                        Game.TimerManager.setTimeout(() => itemCard.classList.remove('b1-item-bounce'), 300, 'ui');
-                    }
 
                     // 隨著點擊更新該項目的金額顯示
                     const costEl = document.getElementById(`b1-item-cost-${itemIdx}`);
@@ -1819,8 +1830,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
             }, {}, 'gameUI');
 
-            // 簡單模式永遠啟動；其他難度依 clickMode 設定
-            if (this.state.settings.difficulty === 'easy' || this.state.settings.clickMode === 'on') {
+            if (this.state.settings.clickMode === 'on') {
                 Game.TimerManager.setTimeout(() => AssistClick.activate(curr), 600, 'ui');
             }
         },
@@ -1853,7 +1863,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">💰 今天帶多少錢</span>
+                    <span class="b-header-unit">💰 今天帶多少錢</span>
                 </div>
                 <div class="b-header-center">${centerText}</div>
                 <div class="b-header-right">
@@ -2044,6 +2054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slotEl) slotEl.classList.remove('b1-wallet-ghost-slot');
                 // 更新確認按鈕與進度條（不全量重繪 coinsEl）
                 this._updateWalletStatusOnly();
+                this._b1UpdateTrayHint();
                 // 簡單模式：所有 ghost slot 填滿後自動確認
                 if (this.state.settings.difficulty === 'easy' && q.hintSlots.every(s => s.filled)) {
                     const currQ = this.state.quiz.questions[this.state.quiz.currentQuestion];
@@ -2201,10 +2212,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 行程卡綠光（剛好符合時）
                 const card = document.querySelector('.b1-schedule-card');
                 if (card) card.classList.toggle('exact-match', total === required && total > 0);
-                // 簡單模式（無 ghost slot）：湊到精確金額後自動確認
-                if (this.state.settings.difficulty === 'easy' && !this.state.quiz.showHint && total === required && total > 0) {
-                    Game.TimerManager.setTimeout(() => this.handleConfirm(required), 700, 'ui');
-                }
+            }
+            // 簡單模式（無 ghost slot）：湊到精確金額後自動確認
+            // 注意：簡單模式不渲染 confirm-btn，需移出按鈕檢查區塊才能正常執行
+            if (this.state.settings.difficulty === 'easy' && !this.state.quiz.showHint && total >= required && required > 0) {
+                Game.TimerManager.setTimeout(() => this.handleConfirm(required), 700, 'ui');
             }
 
             // 面額計數摘要已隱藏（不顯示）
@@ -2424,8 +2436,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.TimerManager.setTimeout(() => this._showStreakBadge(this.state.quiz.streak), 200, 'ui');
                 }
                 this.state.quiz.solvedSchedules.push(this.state.quiz.questions[this.state.quiz.currentQuestion]);
-                // 最少張數提示（C4/C6 最佳付款 pattern）
-                this._showMinCoinsHint(walletTotal, requiredTotal);
                 // 找零說明動畫（Round 25）
                 if (diff > 0) {
                     Game.TimerManager.setTimeout(() => this._showChangeTip(walletTotal, requiredTotal, diff), 300, 'ui');
@@ -2761,8 +2771,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.TimerManager.clearByCategory('turnTransition');
             Game.EventManager.removeByCategory('gameUI');
 
-            const _reactivateForSummary = this.state.settings.difficulty === 'easy'
-                && this.state.settings.clickMode === 'on';
+            const _reactivateForSummary = this.state.settings.clickMode === 'on';
 
             const q       = this.state.quiz;
             const endTime = Date.now();
@@ -3120,12 +3129,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const remaining   = Game._getEffectiveTotal(curr) - walletTotal;
 
             if (remaining <= 0) {
-                // 簡單模式：Ghost slot が全て埋まると addCoin() が auto-confirm する。
-                // confirm-btn は easy モードに存在しないため、overlay を即座に停用して
-                // 「何もハイライトされない死んだ状態」を防ぐ。
                 if (Game.state.settings.difficulty === 'easy') {
-                    this.deactivate();
-                    return;
+                    return; // 等待 auto-confirm 計時器；保持 overlay 存在以便下一題繼續引導
                 }
                 // 普通/困難モード → 高亮確認按鈕
                 const btn = document.getElementById('confirm-btn');

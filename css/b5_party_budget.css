@@ -450,8 +450,8 @@
 
 /* ── B5 Round Intro Card (Round 24) ── */
 .b5-round-intro {
-    position: fixed; inset: 0; z-index: 9800;
-    background: transparent;
+    position: fixed; inset: 0; z-index: 10050;
+    background: rgba(0,0,0,0.55);
     display: flex; align-items: center; justify-content: center;
     animation: b5RiIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
 }

@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="game-buttons">
                 <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
-                <button class="start-btn" id="start-btn" disabled>開始練習</button>
+                <button class="start-btn" id="start-btn" disabled>▶ 開始練習</button>
             </div>
         </div>
     </div>

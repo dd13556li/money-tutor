@@ -1749,11 +1749,36 @@ td.b2-st-expense-cell {
 .b2-coin-draggable.b2-coin-drag-hint {
     border: 2.5px solid #f59e0b;
     background: #fef3c7;
+    position: relative;
+    overflow: visible;
+    z-index: 1;
     animation: b2DragCoinHint 1.4s ease-in-out infinite;
 }
 @keyframes b2DragCoinHint {
     0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
     50%       { box-shadow: 0 0 0 7px rgba(245,158,11,0); }
+}
+.b2-coin-draggable.b2-coin-drag-hint::after {
+    content: '👇 點這裡';
+    position: absolute;
+    top: -46px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f58025 0%, #ffa040 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 13px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(245,128,37,0.55);
+    pointer-events: none;
+    z-index: 9999;
+    animation: b2TrayHereBounce 1s ease-in-out infinite;
+}
+@keyframes b2TrayHereBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(-5px); }
 }
 /* Phase 2 簡單模式：放置區高亮 */
 .b2-wallet-coins.b2-drop-zone-hint {

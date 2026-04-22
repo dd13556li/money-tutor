@@ -1,7 +1,7 @@
 # B6 菜市場買菜 — 語音內容
 
 > 資料來源：`js/b6_market_shopping.js`
-> 匯出日期：2026-04-19
+> 匯出日期：2026-04-23
 
 ---
 
@@ -9,7 +9,7 @@
 
 ### 第1頁
 ```javascript
-// 市場動畫後自動播放
+// 市場動畫後自動播放（圖示使用 B4 商店圖示：icon-b4-store-traditional-market.png / icon-b4-store-supermarket.png / icon-b4-store-nightmarket.png）
 `歡迎來到${mkt.name}！`
 // 語音結束後 500ms → 轉第2頁
 ```
@@ -141,9 +141,15 @@
 
 ## 六、找零階段語音（_b6P2ShowChangeReturn / _b6P2ConfirmChange）
 
-### 普通模式拖入一枚金幣時
+### 進入找零頁
 ```javascript
-`找為${toTWD(runningTotal)}`
+// 進入找零頁時
+`找您${toTWD(change)}，請把找回的金錢，拖曳到我的錢包`
+```
+
+### 普通/困難模式拖入一枚金幣時（簡單模式靜音，diff !== 'easy'）
+```javascript
+`找回${toTWD(runningTotal)}`
 ```
 
 ### Ghost slot 提示（普通模式3次錯誤 / 提示按鈕）
@@ -206,7 +212,8 @@ else                    trayDenoms = [1000, 500, 100, 50, 10, 5, 1];
 | 提示商品錯誤 | `不對喔，請選擇提示的商品` |
 | Phase 2 付款 | `共消費.*請拖曳`、`_b6P2HandleConfirm` |
 | 付款提示 | `剛好！可以確認付款了`、`金額足夠，可以確認付款了` |
-| 找零累加語音 | `找為${toTWD` |
+| 找零進入語音 | `找您.*請把找回的金錢` |
+| 找零累加語音 | `找回${toTWD`、`diff !== 'easy'` |
 | 找零錯誤 | `b6ChangeDir`、`不對喔，找零算` |
 | 找零提示 ghost | `_b6P2ShowChangeGhostSlots`、`可以用` |
 | 找零彈窗提示 | `_b6P2ShowChangeHintModal`、`找零.*可以用` |

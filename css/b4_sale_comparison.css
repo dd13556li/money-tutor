@@ -117,6 +117,7 @@
     padding: 8px 14px;
 }
 .b4-diff-ref-icon { font-size: 28px; }
+.b4-diff-ref-icon .b4-icon-img { width: 128px; height: 128px; object-fit: contain; }
 .b4-diff-ref-info {
     display: flex;
     flex-direction: column;
@@ -444,6 +445,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 3px;
     min-height: 24px;
 }
@@ -666,9 +668,9 @@
     .b4-store-icon-img     { width: 72px; height: 72px; }
     .b4-price              { font-size: 1.4rem; }
     .b4-item-icon          { font-size: 64px; }
-    .b4-item-icon .b4-icon-img { width: 80px; height: 80px; }
+    .b4-item-icon .b4-icon-img { width: 128px; height: 128px; }
     .b4-intro-icon         { font-size: 64px; }
-    .b4-intro-icon .b4-icon-img { width: 80px; height: 80px; }
+    .b4-intro-icon .b4-icon-img { width: 128px; height: 128px; }
     .b4-item-name          { font-size: 18px; }
     .b4-diff-opt           { padding: 10px 16px; font-size: 18px; }
     .b4-numpad-btn         { padding: 10px 4px; font-size: 1rem; }
@@ -2650,4 +2652,300 @@
     font-weight: bold;
     color: #92400e;
     white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   困難模式差額拖曳區（_renderHardDiffDragHTML）
+   ══════════════════════════════════════════════════════════════ */
+.b4-hd-wallet-area {
+    background: #fff;
+    border: 2px solid #fde68a;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    animation: bFadeIn 0.4s ease;
+}
+.b4-hd-wallet-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.b4-hd-wallet-title {
+    flex: 2;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+}
+.b4-hd-wallet-total {
+    flex: 1;
+    text-align: right;
+    font-size: 16px;
+    font-weight: 700;
+    color: #d97706;
+    white-space: nowrap;
+}
+.b4-hd-drop-zone {
+    border: 2.5px dashed #10b981;
+    border-radius: 10px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    transition: background 0.15s, border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.b4-hd-drop-zone.b4-drop-active {
+    background: #d1fae5;
+    border-color: #059669;
+    border-style: solid;
+}
+.b4-hd-tray-card {
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: 16px;
+    padding: 12px 16px;
+    animation: bFadeIn 0.4s ease;
+}
+.b4-hd-tray-coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+.b4-hd-coin-drag {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: grab;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    user-select: none;
+}
+.b4-hd-coin-drag:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+.b4-hd-coin-drag.b4-coin-dragging { opacity: 0.5; }
+.b4-hd-confirm-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.3);
+}
+.b4-hd-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16,185,129,0.4);
+}
+.b4-hd-clear-btn {
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.b4-hd-clear-btn:hover { background: #d1d5db; }
+
+.b4-hd-header-spacer { flex: 1; }
+
+/* ── 困難模式差額區 已放置錢幣 ────────────────────────────────── */
+.b4-hd-placed-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+}
+.b4-hd-placed-coin.b4-coin-dragging { opacity: 0.5; }
+.b4-hd-remove-x {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.15s, transform 0.1s;
+}
+.b4-hd-remove-x:hover { background: #dc2626; transform: scale(1.15); }
+.b4-hd-tray-card.b4-drop-active {
+    background: #fef9c3;
+    border-color: #f59e0b;
+    border-style: solid;
+}
+
+/* ── 困難模式第一頁：商店卡價格輸入按鈕 ─────────────────────── */
+.b4-price-input-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3f4f6;
+    border: 2px dashed #9ca3af;
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #9ca3af;
+    cursor: default;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+.b4-price-input-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.b4-price-input-btn.b4-pic-active {
+    background: #fff7ed;
+    border: 2px solid #f97316;
+    color: #c2410c;
+    cursor: pointer;
+    animation: b4PicPulse 1.4s ease-in-out infinite;
+}
+@keyframes b4PicPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249,115,22,0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(249,115,22,0); }
+}
+.b4-pic-hint {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* ── 困難模式第一頁：卡片下方提示文字 ──────────────────────── */
+.b4-pi-prompt-below {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    padding: 12px 16px;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 12px;
+    margin-top: 10px;
+    animation: bFadeIn 0.3s ease;
+}
+
+/* ── 第二頁差額區 查看各家價格 + 計算機 同列 ─────────────────── */
+.b4-tsp-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.b4-tsp-toggle-row .b4-tsp-toggle {
+    flex: 1;
+    margin-bottom: 0;
+}
+.b4-calc-toggle-inline {
+    flex-shrink: 0;
+    background: #f3f4f6;
+    border: 1.5px solid #d1d5db;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+.b4-calc-toggle-inline:hover { background: #e5e7eb; border-color: #9ca3af; }
+.b4-calc-toggle-inline.b4-calc-open { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+
+/* ── 查看各家價格面板：自適應卡片尺寸 ──────────────────────── */
+#b4-tsp-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+#b4-tsp-panel .b4-store-bar-card {
+    width: auto;
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+/* ── 算式 + 計算機按鈕 同列 ──────────────────────────────── */
+.b4-formula-calc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.b4-formula-calc-row .b4-diff-formula {
+    flex: 1;
+    min-width: 0;
+}
+.b4-calc-toggle-side {
+    flex-shrink: 0;
+    align-self: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #d1d5db;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.b4-calc-toggle-side:hover { background: #f3f4f6; border-color: #9ca3af; transform: scale(1.08); }
+.b4-calc-toggle-side.b4-calc-open { background: #eff6ff; border-color: #93c5fd; }
+
+/* ── 浮動計算機面板 ────────────────────────────────────────── */
+.b4-calc-panel-float {
+    position: fixed;
+    bottom: 72px;
+    right: 16px;
+    z-index: 400;
+    width: 250px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: bFadeIn 0.18s ease;
+}
+.b4-calc-panel-float .b4-calculator {
+    border-radius: 15px;
+    padding: 12px;
+}
+.b4-calc-panel-float .b4-calc-buttons {
+    gap: 7px;
+}
+.b4-calc-panel-float .b4-calc-btn {
+    padding: 13px 0;
+    font-size: 15px;
+}
+@media (max-width: 480px) {
+    .b4-calc-panel-float {
+        right: 8px;
+        bottom: 60px;
+        width: 220px;
+    }
 }

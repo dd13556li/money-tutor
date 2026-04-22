@@ -1,7 +1,7 @@
 # B6 菜市場買菜 — 商品資料匯出
 
 > 資料來源：`js/b6_market_shopping.js`（B6_STALLS / B6_MISSIONS / B6_MARKETS）
-> 匯出日期：2026-04-19
+> 匯出日期：2026-04-23
 
 ---
 
@@ -146,14 +146,14 @@
 | pudding | 布丁 | 個 | 25 |
 | ice_coffee | 咖啡凍 | 杯 | 30 |
 | milk_tea_b | 奶茶 | 瓶 | 45 |
-| custard | 卡士達 | 個 | 55 |
+| custard | 優酪乳 | 個 | 55 |
 
 #### 冷凍區 frozen 🧊
 
 | id | 名稱 | 單位 | 單價 |
 |----|------|------|------|
 | dumpling | 水餃 | 包 | 75 |
-| sausage | 香腸 | 包 | 60 |
+| sausage | 薯餅 | 包 | 60 |
 | ice_cream | 冰淇淋 | 支 | 45 |
 | nugget | 雞塊 | 包 | 80 |
 | fish_ball | 魚丸 | 包 | 50 |
@@ -162,8 +162,8 @@
 | shrimp | 蝦仁 | 包 | 90 |
 | pizza | 披薩 | 片 | 55 |
 | corn_dog | 熱狗 | 條 | 40 |
-| pork_bun | 刈包 | 個 | 50 |
-| spring_roll | 春捲 | 條 | 35 |
+| pork_bun | 炒飯 | 個 | 50 |
+| spring_roll | 貢丸 | 條 | 35 |
 
 **超市任務預算範圍**：easy 80–100、normal 130–200、hard 220–300
 
@@ -194,8 +194,8 @@
 | lemon_tea | 檸檬茶 | 杯 | 40 |
 | sugarcane | 甘蔗汁 | 杯 | 30 |
 | milk_tea | 奶茶 | 杯 | 45 |
-| smoothie | 果汁 | 杯 | 50 |
-| soymilk | 豆花 | 碗 | 35 |
+| smoothie | 西瓜汁 | 杯 | 50 |
+| soymilk | 烏龍茶 | 碗 | 35 |
 | papaya_milk | 木瓜牛奶 | 杯 | 50 |
 | iced_tea | 紅茶 | 杯 | 30 |
 | taro_milk | 芋頭牛奶 | 杯 | 55 |
@@ -217,7 +217,7 @@
 | sticker | 貼紙組 | 包 | 20 |
 | charm | 吊飾 | 個 | 55 |
 | plush | 可愛布偶 | 個 | 90 |
-| badge_pin | 徽章 | 個 | 30 |
+| badge_pin |  | 個 | 30 |
 | fan | 摺扇 | 把 | 50 |
 | lanyard | 掛繩 | 條 | 40 |
 | tote_bag | 帆布袋 | 個 | 75 |
@@ -286,3 +286,176 @@
   - 找零 ≤ 100 → [50, 10, 5, 1]
   - 找零 < 1000 → [500, 100, 50, 10, 5, 1]
   - 找零 ≥ 1000 → [1000, 500, 100, 50, 10, 5, 1]
+
+---
+
+## 十、進入畫面市場圖示（引用 B4 商店圖示）
+
+> 歡迎畫面第1頁依市場類型顯示，路徑：`images/b4/`；Emoji 作為圖片載入失敗備用
+
+| 市場 key | 中文名稱 | 引用圖示檔名 | Emoji 備用 |
+|---------|---------|------------|-----------|
+| traditional | 傳統市場 | icon-b4-store-traditional-market.png | 🏪 |
+| supermarket | 超市 | icon-b4-store-supermarket.png | 🛒 |
+| nightmarket | 夜市美食 | icon-b4-store-nightmarket.png | 🏮 |
+
+---
+
+## 十一、商品圖示英文檔名（`images/b6/`，待製作）
+
+> 路徑：`images/b6/`；格式建議 PNG 透明背景，尺寸 128×128；Emoji 作為備用
+
+### 傳統市場 — 蔬菜攤 vegetable
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| cabbage | 高麗菜 | icon-b6-cabbage.png | 🥬 |
+| tomato | 番茄 | icon-b6-tomato.png | 🍅 |
+| scallion | 青蔥 | icon-b6-scallion.png | 🌿 |
+| sweetpot | 地瓜 | icon-b6-sweet-potato.png | 🍠 |
+| spinach | 菠菜 | icon-b6-spinach.png | 🥗 |
+| carrot | 紅蘿蔔 | icon-b6-carrot.png | 🥕 |
+| corn | 玉米 | icon-b6-corn.png | 🌽 |
+| cucumber | 小黃瓜 | icon-b6-cucumber.png | 🥒 |
+| broccoli | 花椰菜 | icon-b6-broccoli.png | 🥦 |
+| pumpkin | 南瓜 | icon-b6-pumpkin.png | 🎃 |
+| daikon | 白蘿蔔 | icon-b6-daikon.png | 🥬 |
+| pakchoi | 青江菜 | icon-b6-pakchoi.png | 🌱 |
+
+### 傳統市場 — 水果攤 fruit
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| apple | 蘋果 | icon-b6-apple.png | 🍎 |
+| banana | 香蕉 | icon-b6-banana.png | 🍌 |
+| grape | 葡萄 | icon-b6-grape.png | 🍇 |
+| orange | 柳橙 | icon-b6-orange.png | 🍊 |
+| melon | 哈密瓜 | icon-b6-melon.png | 🍈 |
+| mango | 芒果 | icon-b6-mango.png | 🥭 |
+| watermelon | 西瓜 | icon-b6-watermelon.png | 🍉 |
+| pineapple | 鳳梨 | icon-b6-pineapple.png | 🍍 |
+| strawberry | 草莓 | icon-b6-strawberry.png | 🍓 |
+| peach | 桃子 | icon-b6-peach.png | 🍑 |
+| papaya | 木瓜 | icon-b6-papaya.png | 🧡 |
+| guava | 芭樂 | icon-b6-guava.png | 🍏 |
+
+### 傳統市場 — 雜貨攤 grocery
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| egg | 雞蛋 | icon-b6-egg.png | 🥚 |
+| tofu | 豆腐 | icon-b6-tofu.png | 🫙 |
+| soy | 醬油 | icon-b6-soy-sauce.png | 🍶 |
+| rice | 白米 | icon-b6-rice.png | 🌾 |
+| noodle | 麵條 | icon-b6-noodle.png | 🍜 |
+| salt | 食鹽 | icon-b6-salt.png | 🧂 |
+| sugar | 砂糖 | icon-b6-sugar.png | 🍬 |
+| miso | 味噌 | icon-b6-miso.png | 🟡 |
+| oil | 沙拉油 | icon-b6-cooking-oil.png | 🫙 |
+| canned | 罐頭 | icon-b6-canned-food.png | 🥫 |
+| soap | 洗碗精 | icon-b6-dish-soap.png | 🧴 |
+| tissue | 衛生紙 | icon-b6-tissue.png | 🧻 |
+
+### 超市 — 烘焙區 bakery
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| bread | 麵包 | icon-b6-bread.png | 🍞 |
+| croissant | 可頌 | icon-b6-croissant.png | 🥐 |
+| toast | 吐司 | icon-b6-toast.png | 🍞 |
+| muffin | 馬芬 | icon-b6-muffin.png | 🧁 |
+| bun | 小餐包 | icon-b6-dinner-bun.png | 🥖 |
+| cake_slice | 蛋糕 | icon-b6-cake-slice.png | 🎂 |
+| bagel | 貝果 | icon-b6-bagel.png | 🥯 |
+| waffle | 鬆餅 | icon-b6-waffle.png | 🧇 |
+| donut | 甜甜圈 | icon-b6-donut.png | 🍩 |
+| cookie | 餅乾 | icon-b6-cookie.png | 🍪 |
+| brownie | 布朗尼 | icon-b6-brownie.png | 🍫 |
+| eclair | 閃電泡芙 | icon-b6-eclair.png | 🥧 |
+
+### 超市 — 乳品區 dairy
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| milk | 牛奶 | icon-b6-milk.png | 🥛 |
+| yogurt | 優格 | icon-b6-yogurt.png | 🫙 |
+| cheese | 起司 | icon-b6-cheese.png | 🧀 |
+| butter | 奶油 | icon-b6-butter.png | 🧈 |
+| cream | 鮮奶油 | icon-b6-whipping-cream.png | 🫙 |
+| sm_egg | 雞蛋 | icon-b6-sm-egg.png | 🥚 |
+| soy_milk | 豆漿 | icon-b6-soy-milk.png | 🥛 |
+| oat_milk | 燕麥奶 | icon-b6-oat-milk.png | 🌾 |
+| pudding | 布丁 | icon-b6-pudding.png | 🍮 |
+| ice_coffee | 咖啡凍 | icon-b6-coffee-jelly.png | ☕ |
+| milk_tea_b | 奶茶 | icon-b6-milk-tea-bottle.png | 🍵 |
+| custard | 優酪乳 | icon-b6-custard-yogurt.png | 🥛 |
+
+### 超市 — 冷凍區 frozen
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| dumpling | 水餃 | icon-b6-dumpling.png | 🥟 |
+| sausage | 薯餅 | icon-b6-hash-brown.png | 🌭 |
+| ice_cream | 冰淇淋 | icon-b6-ice-cream.png | 🍦 |
+| nugget | 雞塊 | icon-b6-chicken-nugget.png | 🍗 |
+| fish_ball | 魚丸 | icon-b6-fish-ball.png | 🫙 |
+| edamame | 毛豆 | icon-b6-edamame.png | 🫘 |
+| wonton | 餛飩 | icon-b6-wonton.png | 🥟 |
+| shrimp | 蝦仁 | icon-b6-shrimp.png | 🦐 |
+| pizza | 披薩 | icon-b6-pizza.png | 🍕 |
+| corn_dog | 熱狗 | icon-b6-corn-dog.png | 🌽 |
+| pork_bun | 炒飯 | icon-b6-fried-rice.png | 🥙 |
+| spring_roll | 貢丸 | icon-b6-fish-cake-ball.png | 🌯 |
+
+### 夜市 — 小吃攤 snack
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| oysternoodle | 蚵仔麵線 | icon-b6-oyster-noodle.png | 🍜 |
+| beefnoodle | 牛肉麵 | icon-b6-beef-noodle.png | 🍲 |
+| pancake | 蔥抓餅 | icon-b6-scallion-pancake.png | 🥞 |
+| popcorn_chk | 鹹酥雞 | icon-b6-popcorn-chicken.png | 🍗 |
+| stinky_tofu | 臭豆腐 | icon-b6-stinky-tofu.png | 🫙 |
+| takoyaki | 章魚燒 | icon-b6-takoyaki.png | 🐙 |
+| chicken_chop | 雞排 | icon-b6-chicken-chop.png | 🍖 |
+| oyster_omelet | 蚵仔煎 | icon-b6-oyster-omelet.png | 🍳 |
+| sweet_potato_ball | 地瓜球 | icon-b6-sweet-potato-ball.png | 🟠 |
+| fishball_soup | 魚丸湯 | icon-b6-fishball-soup.png | 🍥 |
+| scallion_egg | 蔥油餅 | icon-b6-scallion-egg-pancake.png | 🥚 |
+| pork_pepper | 胡椒餅 | icon-b6-pork-pepper-bun.png | 🫔 |
+
+### 夜市 — 飲料攤 drink
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| bubble_tea | 珍珠奶茶 | icon-b6-bubble-tea.png | 🧋 |
+| lemon_tea | 檸檬茶 | icon-b6-lemon-tea.png | 🍋 |
+| sugarcane | 甘蔗汁 | icon-b6-sugarcane-juice.png | 🌿 |
+| milk_tea | 奶茶 | icon-b6-milk-tea.png | 🍵 |
+| smoothie | 西瓜汁 | icon-b6-watermelon-juice.png | 🍹 |
+| soymilk | 烏龍茶 | icon-b6-oolong-tea.png | 🥛 |
+| papaya_milk | 木瓜牛奶 | icon-b6-papaya-milk.png | 🥛 |
+| iced_tea | 紅茶 | icon-b6-iced-black-tea.png | 🍶 |
+| taro_milk | 芋頭牛奶 | icon-b6-taro-milk.png | 🫗 |
+| winter_melon | 冬瓜茶 | icon-b6-winter-melon-tea.png | 🍵 |
+| mango_ice | 芒果冰 | icon-b6-mango-shaved-ice.png | 🥭 |
+| plum_juice | 梅子汁 | icon-b6-plum-juice.png | 🫙 |
+
+### 夜市 — 紀念品攤 souvenir
+
+| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
+|----|---------|-------------|-----------|
+| phone_case | 手機殼 | icon-b6-phone-case.png | 📱 |
+| keychain | 鑰匙圈 | icon-b6-keychain.png | 🔑 |
+| hairpin | 髮夾 | icon-b6-hairpin.png | 💎 |
+| bookmark | 書籤 | icon-b6-bookmark.png | 📖 |
+| magnet | 冰箱磁鐵 | icon-b6-fridge-magnet.png | 🧲 |
+| wristband | 手環 | icon-b6-wristband.png | 🪬 |
+| postcard | 明信片 | icon-b6-postcard.png | 📮 |
+| sticker | 貼紙組 | icon-b6-sticker-set.png | 🌟 |
+| charm | 吊飾 | icon-b6-charm.png | 🔮 |
+| plush | 可愛布偶 | icon-b6-plush-toy.png | 🧸 |
+| badge_pin | 徽章 | icon-b6-badge-pin.png | 🏅 |
+| fan | 摺扇 | icon-b6-folding-fan.png | 🪭 |
+| lanyard | 掛繩 | icon-b6-lanyard.png | 🎀 |
+| tote_bag | 帆布袋 | icon-b6-tote-bag.png | 👜 |

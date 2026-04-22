@@ -134,14 +134,14 @@ const B6_MARKETS = {
                     { id: 'pudding',    name: '布丁',   price: 25,  unit: '個', icon: '🍮' },
                     { id: 'ice_coffee', name: '咖啡凍', price: 30,  unit: '杯', icon: '☕' },
                     { id: 'milk_tea_b', name: '奶茶',   price: 45,  unit: '瓶', icon: '🍵' },
-                    { id: 'custard',    name: '卡士達', price: 55,  unit: '個', icon: '🥛' },
+                    { id: 'custard',    name: '優酪乳', price: 55,  unit: '個', icon: '🥛' },
                 ],
             },
             frozen: {
                 name: '冷凍區', icon: '🧊',
                 items: [
                     { id: 'dumpling',   name: '水餃',   price: 75,  unit: '包', icon: '🥟' },
-                    { id: 'sausage',    name: '香腸',   price: 60,  unit: '包', icon: '🌭' },
+                    { id: 'sausage',    name: '薯餅',   price: 60,  unit: '包', icon: '🌭' },
                     { id: 'ice_cream',  name: '冰淇淋', price: 45,  unit: '支', icon: '🍦' },
                     { id: 'nugget',     name: '雞塊',   price: 80,  unit: '包', icon: '🍗' },
                     { id: 'fish_ball',  name: '魚丸',   price: 50,  unit: '包', icon: '🫙' },
@@ -150,8 +150,8 @@ const B6_MARKETS = {
                     { id: 'shrimp',     name: '蝦仁',   price: 90,  unit: '包', icon: '🦐' },
                     { id: 'pizza',      name: '披薩',   price: 55,  unit: '片', icon: '🍕' },
                     { id: 'corn_dog',   name: '熱狗',   price: 40,  unit: '條', icon: '🌽' },
-                    { id: 'pork_bun',   name: '刈包',   price: 50,  unit: '個', icon: '🥙' },
-                    { id: 'spring_roll',name: '春捲',   price: 35,  unit: '條', icon: '🌯' },
+                    { id: 'pork_bun',   name: '炒飯',   price: 50,  unit: '個', icon: '🥙' },
+                    { id: 'spring_roll',name: '貢丸',   price: 35,  unit: '條', icon: '🌯' },
                 ],
             },
         },
@@ -215,8 +215,8 @@ const B6_MARKETS = {
                     { id: 'lemon_tea',   name: '檸檬茶',   price: 40, unit: '杯', icon: '🍋' },
                     { id: 'sugarcane',   name: '甘蔗汁',   price: 30, unit: '杯', icon: '🌿' },
                     { id: 'milk_tea',    name: '奶茶',     price: 45, unit: '杯', icon: '🍵' },
-                    { id: 'smoothie',    name: '果汁',     price: 50, unit: '杯', icon: '🍹' },
-                    { id: 'soymilk',     name: '豆花',     price: 35, unit: '碗', icon: '🥛' },
+                    { id: 'smoothie',    name: '西瓜汁',   price: 50, unit: '杯', icon: '🍹' },
+                    { id: 'soymilk',     name: '烏龍茶',   price: 35, unit: '碗', icon: '🥛' },
                     { id: 'papaya_milk', name: '木瓜牛奶', price: 50, unit: '杯', icon: '🥛' },
                     { id: 'iced_tea',    name: '紅茶',     price: 30, unit: '杯', icon: '🍶' },
                     { id: 'taro_milk',   name: '芋頭牛奶', price: 55, unit: '杯', icon: '🫗' },
@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="game-buttons">
                         <button class="back-btn" onclick="Game.backToMenu()">返回主選單</button>
-                        <button class="start-btn" id="start-btn" disabled>開始練習</button>
+                        <button class="start-btn" id="start-btn" disabled>▶ 開始練習</button>
                     </div>
                 </div>
             </div>`;
@@ -795,6 +795,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const renderPage = (page) => {
                 if (page === 1) {
                     // ── 第1頁：市場歡迎 ──────────────────────────────────
+                    const _b6MktImgMap = {
+                        traditional: '../images/b4/icon-b4-store-traditional-market.png',
+                        supermarket:  '../images/b4/icon-b4-store-supermarket.png',
+                        nightmarket:  '../images/b4/icon-b4-store-nightmarket.png',
+                    };
+                    const _b6MktImgSrc = _b6MktImgMap[mktKey] || _b6MktImgMap.traditional;
+
                     app.innerHTML = `
                         <style>
                             .b6-wc-container {
@@ -828,14 +835,20 @@ document.addEventListener('DOMContentLoaded', () => {
                                 object-fit: contain;
                                 border-radius: 16px;
                             }
+                            .b6-wc-unit-emoji-fallback {
+                                display: none;
+                                font-size: 100px;
+                                line-height: 1;
+                            }
                         </style>
                         <div class="b6-wc-container">
                             <div class="b6-wc-box">
                                 <div class="b6-wc-icon">${mkt.icon}</div>
                                 <h1 class="b6-wc-title">歡迎來到${mkt.name}！</h1>
-                                <img src="../images/icon-index-b6.png" alt="菜市場買菜"
+                                <img src="${_b6MktImgSrc}" alt="${mkt.name}"
                                      class="b6-wc-unit-img"
-                                     onerror="this.style.display='none'">
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                                <div class="b6-wc-unit-emoji-fallback">${mkt.icon}</div>
                             </div>
                         </div>`;
 
@@ -1274,10 +1287,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 啟動提示模式（生成 + 高亮）─────────────────────────
         _b6P1ActivateHintMode() {
-            const g = this.state.game;
+            const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
             g.p1HintMode = true;
             if (!g.p1HintItems || g.p1HintItems.length === 0) {
                 g.p1HintItems = this._b6P1GenerateHintItems();
+            }
+            // 簡單模式：自動切換到第一個提示商品所在的攤位並只播攤位名
+            if (diff === 'easy' && g.p1HintItems.length > 0) {
+                const firstHint = g.p1HintItems.find(h =>
+                    !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+                );
+                if (firstHint) {
+                    if (firstHint.stall !== g.activeStall) {
+                        g.activeStall = firstHint.stall;
+                        this._b6RefreshPanel?.(); // 更新面板 + 提示高亮
+                    } else {
+                        this._b6P1UpdateHintHighlights();
+                    }
+                    const stallName = (_currentStalls[firstHint.stall] || {}).name || '';
+                    if (stallName) Game.Speech.speak(stallName);
+                    return;
+                }
             }
             this._b6P1UpdateHintHighlights();
         },
@@ -1690,6 +1721,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 _refreshStallPanel();
             };
 
+            // 供外部（_b6P1ActivateHintMode）呼叫攤位切換
+            g._switchStall = _switchStall;
+
             const prevBtn = document.getElementById('b6-stall-prev');
             const nextBtn = document.getElementById('b6-stall-next');
             if (prevBtn) {
@@ -1711,6 +1745,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.b6-product-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
                     if (document.getElementById('b6-mission-intro')) return;
+                    if (this.state.isProcessing) return;
                     const itemId = btn.dataset.itemId;
                     const stall  = btn.dataset.stall;
                     const price  = parseInt(btn.dataset.price) || 0;
@@ -1837,7 +1872,42 @@ document.addEventListener('DOMContentLoaded', () => {
                         this._updateShoppingUIPartial(suppressCompletion ? { suppressCompletion: true } : {});
                     };
 
-                    if (isMissionDone) {
+                    if (diff === 'easy' && g.p1HintMode) {
+                        // 簡單提示模式：商品語音 → 攤位切換語音 串接
+                        this.state.isProcessing = true;
+                        if (isMissionDone) {
+                            doUIUpdate(true);
+                            Game.Speech.speak(`${itemName}，${price}元`, () => {
+                                document.getElementById('b6-checkout-btn')?.classList.add('b6-product-here-hint');
+                                this._showAllCollectedFlash();
+                                Game.Speech.speak('所有商品選購完成，可以去結帳了！', () => {
+                                    this.state.isProcessing = false;
+                                    AssistClick.buildQueue();
+                                });
+                            });
+                        } else {
+                            doUIUpdate();
+                            const nextHint = (g.p1HintItems || []).find(h =>
+                                !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+                            );
+                            const nextStall = nextHint?.stall;
+                            Game.Speech.speak(`${itemName}，${price}元`, () => {
+                                if (nextStall && nextStall !== g.activeStall && this._b6RefreshPanel) {
+                                    g.activeStall = nextStall;
+                                    this._b6RefreshPanel();
+                                    const stallName = (_currentStalls[nextStall] || {}).name || '';
+                                    Game.Speech.speak(stallName, () => {
+                                        this.state.isProcessing = false;
+                                        AssistClick.buildQueue();
+                                    });
+                                } else {
+                                    this._b6P1UpdateHintHighlights();
+                                    this.state.isProcessing = false;
+                                    AssistClick.buildQueue();
+                                }
+                            });
+                        }
+                    } else if (isMissionDone) {
                         // 立即更新 UI（壓制完成語音），待商品名語音播完再播完成提示
                         doUIUpdate(true);
                         Game.Speech.speak(`${itemName}，${price}元`, () => {
@@ -1850,26 +1920,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         Game.Speech.speak(`${itemName}，${price}元`);
                         doUIUpdate();
-
-                        // 簡單模式：當前攤位配額已滿 → 自動切換到下一個待買攤位
-                        if (this.state.settings.difficulty === 'easy' && g.p1HintMode) {
-                            const req = (g.mission.stalls || []).find(r => r.stall === stall);
-                            const nowCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
-                            if (req && nowCount >= req.count) {
-                                const nextReq = (g.mission.stalls || []).find(r => {
-                                    if (r.stall === stall) return false;
-                                    return (g.selectedItems || []).filter(i => i.stall === r.stall).length < r.count;
-                                });
-                                if (nextReq && g.activeStall !== nextReq.stall) {
-                                    Game.TimerManager.setTimeout(() => {
-                                        g.activeStall = nextReq.stall;
-                                        this._b6RefreshPanel?.();
-                                        const newStallInfo = _currentStalls[nextReq.stall];
-                                        Game.Speech.speak(`前往${newStallInfo.name}`);
-                                    }, 700, 'ui');
-                                }
-                            }
-                        }
                     }
                 }, {}, 'gameUI');
             });
@@ -2750,7 +2800,7 @@ document.addEventListener('DOMContentLoaded', () => {
             g.p2ShowHint  = true;
         },
 
-        // 簡單模式：在付款托盤幣上顯示「點這裡」提示
+        // 簡單模式：在付款托盤幣上依序顯示「點這裡」提示（每次只高亮下一個）
         _b6P2UpdateTrayHints() {
             const g    = this.state.game;
             const diff = this.state.settings.difficulty;
@@ -2758,20 +2808,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.classList.remove('b6-product-here-hint');
             });
             if (diff !== 'easy') return;
-            // 計算每個面額還需多少個（根據未填 ghost slots）
-            const needed = {};
-            (g.p2HintSlots || []).filter(s => !s.filled).forEach(s => {
-                needed[s.denom] = (needed[s.denom] || 0) + 1;
-            });
-            // 對托盤中可用的幣，按面額逐一標記
-            const usedCount = {};
-            document.querySelectorAll('.b6p2-coin-drag').forEach(el => {
-                if (el.dataset.inUse === 'true' || el.style.display === 'none') return;
-                const d = parseInt(el.dataset.denom);
-                if (!needed[d]) return;
-                usedCount[d] = (usedCount[d] || 0) + 1;
-                if (usedCount[d] <= needed[d]) el.classList.add('b6-product-here-hint');
-            });
+            const nextSlot = (g.p2HintSlots || []).find(s => !s.filled);
+            if (!nextSlot) return;
+            const coinEl = Array.from(document.querySelectorAll('.b6p2-coin-drag')).find(el =>
+                el.dataset.inUse !== 'true' && el.style.display !== 'none' &&
+                parseInt(el.dataset.denom) === nextSlot.denom
+            );
+            if (coinEl) coinEl.classList.add('b6-product-here-hint');
         },
 
         // ── 最小超額子集搜尋 ─────────────────────────────────────
@@ -3028,10 +3071,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._b6P2UpdateChangeDisplay(change);
                 this._b6P2RenderWalletCoins(change);
                 if (g.changeGhostMode) this._b6P2UpdateChangeTrayHints();
-                // 簡單/普通模式：播放累加金額語音
-                if (diff !== 'hard') {
+                // 普通/困難模式：播放累加金額語音
+                if (diff !== 'easy') {
                     const runningTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
-                    Game.Speech.speak(`找為${toTWD(runningTotal)}`);
+                    Game.Speech.speak(`找回${toTWD(runningTotal)}`);
                 }
             };
 
@@ -3317,6 +3360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 輔助點擊：直接加入找零金幣（不需拖曳）
         _b6P2AddChangeCoin(denom) {
             const g    = this.state.game;
+            const diff = this.state.settings.difficulty;
             const face = g.changeTrayFaces?.[denom] || 'front';
             const uid  = 'ch' + Date.now() + Math.floor(Math.random() * 10000);
             if (g.changeGhostMode) {
@@ -3333,6 +3377,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalChange = g.changeTotal || 0;
             this._b6P2UpdateChangeDisplay(totalChange);
             this._b6P2RenderWalletCoins(totalChange);
+
+            if (diff !== 'easy') {
+                const runningTotal = (g.changePlaced || []).reduce((s, p) => s + p.denom, 0);
+                const isLast = runningTotal >= totalChange && totalChange > 0;
+                if (isLast) {
+                    this.state.isProcessing = true;
+                    Game.Speech.speak(`找回${toTWD(runningTotal)}`, () => {
+                        this.state.isProcessing = false;
+                        AssistClick.buildQueue();
+                    });
+                } else {
+                    Game.Speech.speak(`找回${toTWD(runningTotal)}`);
+                }
+            }
         },
 
         _b6P2ConfirmChange(change, paid) {
@@ -4193,6 +4251,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nextBtn) {
                 this._highlight(nextBtn);
                 this._queue = [{ el: nextBtn, action: () => nextBtn.click() }];
+                return;
+            }
+
+            // 付款/找零處理中 → 清空 queue，避免重複觸發舊按鈕
+            if (Game.state.isProcessing) {
+                this._clearHighlight();
+                this._queue = [];
                 return;
             }
 
