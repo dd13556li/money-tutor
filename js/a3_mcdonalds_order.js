@@ -7509,8 +7509,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isNormalMode = this.state.settings.difficulty === 'normal';
             const isHardMode = this.state.settings.difficulty === 'hard';
 
-            // 困難模式：使用拖曳介面
-            if (isHardMode) {
+            // 困難模式且需要找零：使用拖曳介面
+            if (isHardMode && changeAmount > 0) {
                 this._a3ShowHardChangeDrag(changeAmount);
                 return;
             }
@@ -7633,15 +7633,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // 初始化找零拖曳功能
             this.TimerManager.setTimeout(() => this.initializeChangeDragAndDrop(), 100, 'uiAnimation');
 
-            // 🎯 簡單模式：無需找零時，立即顯示「完成交易」按鈕提示
-            if (changeAmount === 0 && this.state.settings.difficulty === 'easy') {
+            // 無需找零時：高亮「完成交易」按鈕；困難模式額外播語音
+            if (changeAmount === 0) {
+                if (isHardMode && this.state.settings.speechEnabled && this.speech) {
+                    this.TimerManager.setTimeout(() => {
+                        this.speech.speakText('剛好付款，不需要找零');
+                    }, 300, 'speechDelay');
+                }
                 this.TimerManager.setTimeout(() => {
                     const btn = document.getElementById('complete-change-btn');
                     if (btn && !btn.classList.contains('checkout-btn-hint')) {
                         btn.classList.add('checkout-btn-hint');
                         this.Debug.log('assist', '[A3-Step5] 顯示「完成交易」按鈕提示動畫');
                     }
-                }, 400, 'hint');
+                }, isHardMode ? 1200 : 400, 'hint');
             }
         },
 

@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             .b5-wc-box {
                                 background:linear-gradient(135deg,#faf5ff 0%,#ede9fe 100%);
                                 border:3px solid #a78bfa;border-radius:24px;
-                                padding:50px 60px;text-align:center;
+                                padding:50px 20px;text-align:center;
                                 max-width:560px;width:100%;
                             }
                             .b5-wc-icon { font-size:80px;margin-bottom:16px;line-height:1; }
@@ -727,27 +727,26 @@ document.addEventListener('DOMContentLoaded', () => {
                                 font-size:17px;color:#6d28d9;margin-bottom:24px;
                             }
                             .b5-wc-unit-img {
-                                width:180px;height:180px;object-fit:contain;
-                                border-radius:16px;
+                                width:min(480px,72vw);height:min(480px,72vw);
+                                object-fit:contain;border-radius:16px;
                             }
                             @media(max-width:480px){
-                                .b5-wc-box{padding:32px 20px;}
+                                .b5-wc-box{padding:32px 12px;}
                                 .b5-wc-icon{font-size:60px;}
                                 .b5-wc-title{font-size:22px;}
-                                .b5-wc-unit-img{width:130px;height:130px;}
                             }
                         </style>
                         <div class="b5-wc-container">
                             <div class="b5-wc-box">
                                 <div class="b5-wc-icon">${themeData.icon}</div>
                                 <h1 class="b5-wc-title">今天要舉辦${themeData.name}！</h1>
-                                <p class="b5-wc-sub">讓我們一起規劃派對預算吧！</p>
+                                <p class="b5-wc-sub">在預算金額內完成採購！</p>
                                 <img src="${_b5ThemeImgSrc}" alt="${themeData.name}"
                                      class="b5-wc-unit-img" onerror="this.style.display='none'">
                             </div>
                         </div>`;
 
-                    Game.Speech.speak(`今天要舉辦${themeData.name}，讓我們一起規劃派對預算吧！`, () => {
+                    Game.Speech.speak(`今天要舉辦${themeData.name}，在預算金額內完成採購！`, () => {
                         Game.TimerManager.setTimeout(() => { currentPage = 2; renderPage(2); }, 500, 'screenTransition');
                     });
 

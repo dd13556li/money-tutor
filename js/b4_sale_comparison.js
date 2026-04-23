@@ -1877,10 +1877,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.lastSpeechText = `${curr.name}，${tripleText}`;
             this._showItemIntroModal(curr, () => {
                 if (diff === 'hard') {
-                    // 困難：語音結束後在商店卡片中輸入金額
-                    Game.Speech.speak(tripleText, () => {
-                        this._activateTripleHardCardInputs(curr);
-                    });
+                    this._activateTripleHardCardInputs(curr);
                 } else {
                     Game.Speech.speak(tripleText);
                 }
@@ -2959,9 +2956,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.EventManager.on(unknownCell, 'click', () => {
                             if (this.state.isProcessing) return;
                             this._showHardDiffNumpadModal(correctDiff, diffUnit, () => {
-                                const dragSection = document.getElementById('b4-hd-drag-section');
-                                if (dragSection) dragSection.style.display = '';
-                                this._bindHardDiffDragDrop(correctDiff, diffUnit);
+                                Game.Speech.speak('請拿出正確的金額', () => {
+                                    const dragSection = document.getElementById('b4-hd-drag-section');
+                                    if (dragSection) dragSection.style.display = '';
+                                    this._bindHardDiffDragDrop(correctDiff, diffUnit);
+                                });
                             });
                         }, {}, 'diffUI');
                     }
@@ -2981,7 +2980,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, {}, 'diffUI');
                 }
 
-                Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，點擊問號輸入差額`);
+                Game.Speech.speak(`${tripleExpOpt.store}${tripleExpOpt.price}元，${tripleCheapOpt.store}${tripleCheapOpt.price}元，點擊問號框輸入正確的差額`);
             }
 
             // 三商店參考面板折疊按鈕
@@ -3413,9 +3412,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.EventManager.on(unknownCell, 'click', () => {
                             if (this.state.isProcessing) return;
                             this._showHardDiffNumpadModal(correctDiff, diffUnit, () => {
-                                const dragSection = document.getElementById('b4-hd-drag-section');
-                                if (dragSection) dragSection.style.display = '';
-                                this._bindHardDiffDragDrop(correctDiff, diffUnit);
+                                Game.Speech.speak('請拿出正確的金額', () => {
+                                    const dragSection = document.getElementById('b4-hd-drag-section');
+                                    if (dragSection) dragSection.style.display = '';
+                                    this._bindHardDiffDragDrop(correctDiff, diffUnit);
+                                });
                             });
                         }, {}, 'diffUI');
                     }
@@ -3484,7 +3485,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 diffSpeech = curr.isUnit
                     ? `請計算每${curr.unit}差多少元，放入正確的金額`
-                    : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，請拖曳金錢放入差額`;
+                    : `${expOpt.store}${expOpt.price}元，${cheapOpt.store}${cheapOpt.price}元，點擊問號框輸入正確的差額`;
             }
             Game.Speech.speak(diffSpeech);
         },
@@ -3511,7 +3512,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(el, 'click', (e) => {
                     e.stopPropagation();
                     Game.Speech.speak(storeName);
-                    this._showB4ZoomModal(imgEl ? imgEl.src : null, el.textContent.trim(), storeName);
+                    document.getElementById('b4-store-zoom-overlay')?.remove();
+                    const zOverlay = document.createElement('div');
+                    zOverlay.id = 'b4-store-zoom-overlay';
+                    zOverlay.innerHTML = `<div class="b4-szoom-card"><img src="${imgEl ? imgEl.src : ''}" alt="${storeName}" class="b4-szoom-img"><div class="b4-szoom-name">${storeName}</div></div>`;
+                    zOverlay.addEventListener('click', () => zOverlay.remove());
+                    document.body.appendChild(zOverlay);
                 }, {}, 'gameUI');
             });
         },
@@ -3599,32 +3605,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 const promptText = isUnit
                     ? `請輸入${curr.name}每${curr.unit}最划算的價格是多少錢`
                     : `請輸入${curr.name}最便宜的價格是多少錢`;
-                setPrompt(promptText);
+
+                if (section) section.innerHTML = `
+                <div class="b4-pi-card">
+                    <div class="b4-pi-label">${title}</div>
+                    <div class="b4-input-display b4-pi-input-box" id="b4-pic-cheap-display" style="cursor:pointer;" title="點我輸入">
+                        <span id="b4-pic-cheap-val">？</span><span class="b4-unit-text"> ${unit}</span>
+                    </div>
+                    <div class="b4-pi-tap-hint">👆 點擊輸入</div>
+                </div>`;
+
                 Game.Speech.speak(promptText);
-                Game.TimerManager.setTimeout(() => {
-                    this._openCardPriceNumpad(title, cheapOpt.price, unit, () => {
-                        if (section) section.innerHTML = '';
-                        this._revealCardPrices(left, right);
-                        const correctCard = document.getElementById(`card-${cheapSide}`);
-                        const delta = Math.abs(left.price - right.price);
-                        if (correctCard) {
-                            correctCard.classList.add('selected-correct', 'b4-card-glow');
-                            const savingsTag = (!isUnit && delta > 0) ? `<div class="b4-card-savings-amount">省了 ${delta} 元</div>` : '';
-                            correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>${savingsTag}<div class="b4-cheaper-tag">比較便宜！</div>`;
-                        }
-                        const wrongSide = correctSide === 'left' ? 'right' : 'left';
-                        const wrongCard = document.getElementById(`card-${wrongSide}`);
-                        if (wrongCard && !isUnit) { wrongCard.classList.add('selected-wrong'); wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴</div>`; }
-                        const speech = isUnit
-                            ? `答對了！${cheapOpt.store}每${curr.unit}${cheapOpt.price}元，比較划算`
-                            : `答對了！${cheapOpt.store}${cheapOpt.price}元，比較便宜`;
-                        Game.Speech.speak(speech, () => {
-                            this.state.phase = 'diff';
-                            this.state.currentDiffItem = curr;
-                            this._renderDiffSection(curr, 'hard');
-                        });
+
+                const onCheapCorrect = () => {
+                    if (section) section.innerHTML = '';
+                    this._revealCardPrices(left, right);
+                    const correctCard = document.getElementById(`card-${cheapSide}`);
+                    const delta = Math.abs(left.price - right.price);
+                    if (correctCard) {
+                        correctCard.classList.add('selected-correct', 'b4-card-glow');
+                        const savingsTag = (!isUnit && delta > 0) ? `<div class="b4-card-savings-amount">省了 ${delta} 元</div>` : '';
+                        correctCard.innerHTML += `<div class="b4-result-mark correct">✓</div>${savingsTag}<div class="b4-cheaper-tag">比較便宜！</div>`;
+                    }
+                    const wrongSide = correctSide === 'left' ? 'right' : 'left';
+                    const wrongCard = document.getElementById(`card-${wrongSide}`);
+                    if (wrongCard && !isUnit) { wrongCard.classList.add('selected-wrong'); wrongCard.innerHTML += `<div class="b4-exp-delta">比較貴</div>`; }
+                    const speech = isUnit
+                        ? `答對了！${cheapOpt.store}每${curr.unit}${cheapOpt.price}元，比較划算`
+                        : `答對了！${cheapOpt.store}${cheapOpt.price}元，比較便宜`;
+                    Game.Speech.speak(speech, () => {
+                        this.state.phase = 'diff';
+                        this.state.currentDiffItem = curr;
+                        this._renderDiffSection(curr, 'hard');
                     });
-                });
+                };
+
+                const cheapDisplayBox = document.getElementById('b4-pic-cheap-display');
+                if (cheapDisplayBox) {
+                    Game.EventManager.on(cheapDisplayBox, 'click', () => {
+                        this._openCardPriceNumpad(title, cheapOpt.price, unit, onCheapCorrect);
+                    }, {}, 'gameUI');
+                }
             };
 
             const activateCard = (side, opt, price) => {
@@ -3641,7 +3662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.disabled = true;
                         btn.classList.remove('b4-pic-active');
                         filled[side] = true;
-                        checkAllFilled();
+                        Game.Speech.speak(`答對，${price}元`, () => { checkAllFilled(); });
                     });
                 };
                 Game.EventManager.on(btn, 'click', openNumpad, {}, 'gameUI');
@@ -3684,24 +3705,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkAllFilled = () => {
                 if (!curr.stores.every((_, i) => filled[i])) return;
                 this.state._tripleHardCardHintFill = null;
-                setPrompt(`請輸入最便宜的商店 <strong>${cheapStore.store}</strong> 所販售的 <strong>${curr.name}</strong> 商品價格`);
-                Game.Speech.speak(`請輸入最便宜的商店：${cheapStore.store}`, () => {
-                    this._openCardPriceNumpad(`最便宜：${cheapStore.store} 的商品價格`, cheapStore.price, '元', () => {
-                        if (section) section.innerHTML = '';
-                        this._revealTripleCardPrices(curr);
-                        const cheapIdx2 = curr.stores.findIndex(s => s === cheapStore);
-                        const cheapCard = document.getElementById(`tcard-${cheapIdx2}`);
-                        if (cheapCard) {
-                            cheapCard.classList.add('selected-correct', 'b4-card-glow');
-                            cheapCard.innerHTML += `<div class="b4-result-mark correct">✓</div><div class="b4-cheaper-tag">最便宜！</div>`;
-                        }
-                        Game.Speech.speak(`答對了！${cheapStore.store}${cheapStore.price}元，最便宜`, () => {
-                            this.state.phase = 'diff';
-                            this.state.currentDiffItem = { ...curr, optA: curr.sortedAsc[2], optB: curr.sortedAsc[0] };
-                            this._renderTripleDiffSection(curr, 'hard');
-                        });
+                const tTitle = `請輸入${curr.name}最便宜的價格`;
+                const tPromptText = `請輸入${curr.name}最便宜的價格`;
+
+                if (section) section.innerHTML = `
+                <div class="b4-pi-card">
+                    <div class="b4-pi-label">${tTitle}</div>
+                    <div class="b4-input-display b4-pi-input-box" id="b4-tpic-cheap-display" style="cursor:pointer;" title="點我輸入">
+                        <span id="b4-tpic-cheap-val">？</span><span class="b4-unit-text"> 元</span>
+                    </div>
+                    <div class="b4-pi-tap-hint">👆 點擊輸入</div>
+                </div>`;
+
+                Game.Speech.speak(tPromptText);
+
+                const onTripleCheapCorrect = () => {
+                    if (section) section.innerHTML = '';
+                    this._revealTripleCardPrices(curr);
+                    const cheapIdx2 = curr.stores.findIndex(s => s === cheapStore);
+                    const cheapCard = document.getElementById(`tcard-${cheapIdx2}`);
+                    if (cheapCard) {
+                        cheapCard.classList.add('selected-correct', 'b4-card-glow');
+                        cheapCard.innerHTML += `<div class="b4-result-mark correct">✓</div><div class="b4-cheaper-tag">最便宜！</div>`;
+                    }
+                    Game.Speech.speak(`答對了！${cheapStore.store}${cheapStore.price}元，最便宜`, () => {
+                        this.state.phase = 'diff';
+                        this.state.currentDiffItem = { ...curr, optA: curr.sortedAsc[2], optB: curr.sortedAsc[0] };
+                        this._renderTripleDiffSection(curr, 'hard');
                     });
-                });
+                };
+
+                const tCheapDisplayBox = document.getElementById('b4-tpic-cheap-display');
+                if (tCheapDisplayBox) {
+                    Game.EventManager.on(tCheapDisplayBox, 'click', () => {
+                        this._openCardPriceNumpad(tTitle, cheapStore.price, '元', onTripleCheapCorrect);
+                    }, {}, 'gameUI');
+                }
             };
 
             const activateCard = (idx, store, price) => {
@@ -3717,7 +3756,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.disabled = true;
                         btn.classList.remove('b4-pic-active');
                         filled[idx] = true;
-                        checkAllFilled();
+                        Game.Speech.speak(`答對，${price}元`, () => { checkAllFilled(); });
                     });
                 };
                 Game.EventManager.on(btn, 'click', openNumpad, {}, 'gameUI');
@@ -3740,7 +3779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Activate all cards at once
             curr.stores.forEach((store, idx) => activateCard(idx, store, store.price));
             setPrompt('請點擊各商店的價格框，輸入商品金額');
-            Game.Speech.speak('請輸入各商店的商品價格');
+            Game.Speech.speak(`請輸入各商店${curr.name}的商品價格`);
         },
 
         _updateNumpadDisplay() {

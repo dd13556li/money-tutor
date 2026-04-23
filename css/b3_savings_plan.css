@@ -13,11 +13,12 @@
 }
 
 .b3-goal-icon {
-    font-size: 64px;
+    font-size: 72px;
     line-height: 1;
     display: block;
     margin-bottom: 8px;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+    cursor: pointer;
 }
 
 .b3-goal-name {
@@ -366,8 +367,11 @@
     text-align: center;
     box-shadow: 0 8px 32px rgba(0,0,0,0.22);
     min-width: 200px;
+    max-width: min(420px, 88vw);
+    width: auto;
+    overflow: hidden;
 }
-.b3-goal-modal-icon  { margin-bottom: 8px; }
+.b3-goal-modal-icon  { margin-bottom: 8px; font-size: 96px; line-height: 1; }
 .b3-goal-modal-name  {
     font-size: 1.25rem; font-weight: bold;
     color: #1e293b; margin-bottom: 4px;
@@ -379,7 +383,6 @@
 
 /* ── RWD ───────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-    .b3-goal-icon   { font-size: 48px; }
     .b3-goal-name   { font-size: 18px; }
     .b3-goal-price  { font-size: 1.6rem; }
     .b3-choice-btn  { padding: 12px 20px; font-size: 22px; min-width: 84px; }
@@ -1001,13 +1004,14 @@
 .b3-task-popup {
     background: #fff;
     border-radius: 20px;
-    padding: 32px 28px 24px;
-    max-width: 340px;
-    width: 90%;
+    padding: 20px 20px 20px;
+    max-width: min(560px, 92vw);
+    width: 92%;
     text-align: center;
     box-shadow: 0 20px 40px rgba(0,0,0,0.25);
     border-top: 6px solid #f59e0b;
     animation: b3SlotPop 0.4s ease;
+    overflow: hidden;
 }
 .b3-task-popup-title {
     font-size: 18px;
@@ -1016,11 +1020,19 @@
     margin-bottom: 16px;
 }
 .b3-task-item-icon-wrap {
-    font-size: 72px;
+    font-size: min(480px, 72vw);
     line-height: 1;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     display: block;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.12));
+}
+.b3-task-item-icon-wrap img {
+    width: min(480px, 72vw) !important;
+    height: auto !important;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 .b3-task-item-name {
     font-size: 22px;
@@ -1092,11 +1104,16 @@
     text-align: center;
 }
 .b3-cal-item-icon-lg {
-    font-size: 64px;
+    font-size: 96px;
     line-height: 1;
     display: block;
     margin-bottom: 6px;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.12));
+}
+.b3-cal-item-icon-lg img {
+    max-width: 100px;
+    height: auto;
+    object-fit: contain;
 }
 .b3-cal-item-title {
     font-size: 22px;
@@ -1609,6 +1626,7 @@
     font-size: 13px;
 }
 .b3-goal-icon  { font-size: 24px; flex-shrink: 0; }
+#b3-goal-icon-click { font-size: 72px; line-height: 1; display: block; margin-bottom: 8px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12)); cursor: pointer; }
 .b3-goal-name  { font-weight: bold; color: #581c87; flex: 1; }
 .b3-goal-price { font-weight: bold; color: #d97706; min-width: 52px; text-align: right; }
 .b3-goal-weeks { font-size: 12px; color: #6b7280; min-width: 110px; text-align: right; }
@@ -2088,4 +2106,49 @@
 @media (max-width: 340px) {
     .b3-goals-grid { grid-template-columns: 1fr; }
     .b3-res-stats-row { grid-template-columns: 1fr; }
+}
+
+/* ── 圖示放大彈窗 ──────────────────────────────────────────────── */
+.b3-icon-zoom-trigger { cursor: pointer; }
+.b3-icon-zoom-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9500;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    animation: bFadeIn 0.2s ease;
+}
+.b3-icon-zoom-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    text-align: center;
+    box-sizing: border-box;
+    max-width: 88vw;
+}
+.b3-zoom-img {
+    width: min(480px, 72vw);
+    height: min(480px, 72vw);
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto;
+}
+.b3-zoom-emoji {
+    font-size: min(200px, 52vw);
+    line-height: 1;
+    display: block;
+}
+.b3-zoom-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 12px;
+    color: #1f2937;
+}
+.b3-zoom-tap {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 8px;
 }

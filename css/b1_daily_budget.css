@@ -1153,17 +1153,6 @@
 .b1-exact-toast.b1-toast-fade { opacity: 0; transition: opacity 0.4s ease; }
 @keyframes b1ToastPop { from { opacity:0; transform:translate(-50%,-50%) scale(0.7); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
 
-/* ── B1 Min Coins Toast (Round 25) ── */
-.b1-min-coins-toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    z-index: 9900; pointer-events: none;
-    background: linear-gradient(135deg, #92400e, #d97706);
-    color: white; font-size: 16px; font-weight: 600;
-    padding: 11px 24px; border-radius: 40px; text-align: center;
-    box-shadow: 0 6px 24px rgba(217,119,6,0.4);
-    animation: b1ToastUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-.b1-min-coins-toast.b1-toast-fade { opacity: 0; transition: opacity 0.4s ease; }
 
 /* ── B1 Schedule Breakdown Hint (Round 20) ── */
 .b1-breakdown {
@@ -2144,5 +2133,50 @@
 @keyframes b1TrayHereBounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
     50%       { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* ── 圖示放大彈窗 ──────────────────────────────────────────────── */
+.b1-icon-zoom-trigger { cursor: pointer; }
+.b1-icon-zoom-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9500;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    animation: bFadeIn 0.2s ease;
+}
+.b1-icon-zoom-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    text-align: center;
+    box-sizing: border-box;
+    max-width: 88vw;
+}
+.b1-zoom-img {
+    width: min(480px, 72vw);
+    height: min(480px, 72vw);
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto;
+}
+.b1-zoom-emoji {
+    font-size: min(200px, 52vw);
+    line-height: 1;
+    display: block;
+}
+.b1-zoom-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 12px;
+    color: #1f2937;
+}
+.b1-zoom-tap {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 8px;
 }
 

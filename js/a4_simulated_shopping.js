@@ -9023,6 +9023,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // 困難模式且不需找零：顯示「剛好付款」確認畫面
+            if (this.state.settings.difficulty === 'hard' && transaction.changeExpected === 0) {
+                this.state.isProcessing = false;
+                app.innerHTML = `
+                <div class="store-layout">
+                    <div class="title-bar">
+                        <div class="title-bar-left">
+                            <span class="store-icon-large">${this.getCurrentStoreInfo().emoji}</span>
+                            <span>${this.getCurrentStoreInfo().name}</span>
+                        </div>
+                        <div class="title-bar-center">第四步：確認有沒有需要找零錢</div>
+                        <div class="title-bar-right">
+                            <span>第 ${this.state.quiz.currentQuestion + 1} 題 / 共 ${this.state.settings.questionCount || 10} 題</span>
+                            <button class="back-to-menu-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
+                            <button class="back-to-menu-btn" onclick="location.reload()">返回設定</button>
+                        </div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;gap:24px;">
+                        <div style="background:#fff;border-radius:20px;padding:40px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:480px;width:100%;">
+                            <div style="font-size:80px;margin-bottom:16px;">✅</div>
+                            <div style="font-size:28px;font-weight:800;color:#4caf50;margin-bottom:8px;">剛好付款！</div>
+                            <div style="font-size:18px;color:#666;margin-bottom:32px;">付款金額剛剛好，不需要找零。</div>
+                            <button id="a4-exact-pay-btn" style="background:linear-gradient(135deg,#4caf50,#45a049);color:#fff;border:none;padding:18px 50px;border-radius:25px;font-size:1.3em;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(76,175,80,0.3);">
+                                ✅ 完成交易
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                this.TimerManager.setTimeout(() => {
+                    this.speech.speak('剛好付款，不需要找零');
+                }, 300, 'speechDelay');
+                const exactBtn = document.getElementById('a4-exact-pay-btn');
+                if (exactBtn) {
+                    exactBtn.addEventListener('click', () => {
+                        if (this.state.isProcessing) return;
+                        this.state.isProcessing = true;
+                        Game.TimerManager.setTimeout(() => Game.showGameComplete(true), 400, 'screenTransition');
+                    });
+                }
+                return;
+            }
+
             // 計算剩餘錢包內容（扣除已付款的錢幣）
             const remainingWallet = this.calculateRemainingWallet();
 

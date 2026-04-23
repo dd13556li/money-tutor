@@ -1264,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.innerHTML = `
         <div class="b3-task-popup">
             <div class="b3-task-popup-title">🎯 存錢目標</div>
-            <div class="b3-task-item-icon-wrap">${this._itemIconHTML(c.item, '128px')}</div>
+            <div class="b3-task-item-icon-wrap">${this._itemIconHTML(c.item, 'min(480px, 72vw)')}</div>
             <div class="b3-task-item-name">${c.item.name}</div>
             <div class="b3-task-item-price">需要 <strong>${c.item.price}</strong> 元</div>
             <div class="b3-task-meta">${metaHTML}</div>
@@ -1317,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="b-inline-replay b3-cal-replay-btn" id="replay-speech-btn" title="重播語音">🔊</button>
             <div class="b3-cal-item-section">
                 <div class="b3-cal-item-center-col">
-                    <span class="b3-cal-item-icon-lg">${this._itemIconHTML(c.item, '128px')}</span>
+                    <span class="b3-cal-item-icon-lg b3-icon-zoom-trigger" id="b3-cal-icon-trigger">${this._itemIconHTML(c.item, '96px')}</span>
                     <div class="b3-cal-item-title">${c.item.name}</div>
                     <div class="b3-cal-item-target">目標：${c.item.price} 元</div>
                 </div>
@@ -1612,6 +1612,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.EventManager.on(replayBtn, 'click', () => {
                     const text = this.state.calendar.lastSpeech;
                     if (text) Game.Speech.speak(text);
+                }, {}, 'gameUI');
+            }
+            // 存錢目標圖示點擊放大（月曆模式）
+            const calIconEl = document.getElementById('b3-cal-icon-trigger');
+            if (calIconEl) {
+                Game.EventManager.on(calIconEl, 'click', () => {
+                    const item = this.state.calendar.item;
+                    if (item) this._showIconZoomModal(item);
                 }, {}, 'gameUI');
             }
             // 兌換按鈕：委派監聽（pig-content 重繪後仍有效）
@@ -2362,7 +2370,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._updateCalendarUI(true); // pig already updated
                 const remaining = Math.max(0, c.item.price - c.accumulated);
                 const daysLeft  = Math.ceil(remaining / (c.dailyAmount || 1));
-                const speechText = `存入${toTWD(savedAmount)}！還差${toTWD(remaining)}，再存${daysLeft}天就達標了！`;
+                const _dlCh = [,'一','兩','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十'][daysLeft] || String(daysLeft);
+                const speechText = `存入${toTWD(savedAmount)}！還差${toTWD(remaining)}，再存${_dlCh}天就達標了！`;
                 c.lastSpeech = speechText;
                 Game.Speech.speak(speechText);
                 this._showCountdownHint(remaining, daysLeft);
@@ -2629,7 +2638,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.className = 'b3-goal-modal';
             modal.innerHTML = `
                 <div class="b3-goal-modal-inner">
-                    <div class="b3-goal-modal-icon">${this._itemIconHTML(question.item, '80px')}</div>
+                    <div class="b3-goal-modal-icon">${this._itemIconHTML(question.item, 'min(200px, 48vw)')}</div>
                     <div class="b3-goal-modal-name">${question.item.name}</div>
                     <div class="b3-goal-modal-price">${question.item.price} 元</div>
                     <div class="b3-goal-modal-tap">點任意處繼續</div>
@@ -2716,7 +2725,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="progress-text">${q.currentQuestion + 1} / ${q.totalQuestions}</div>
 
                 <div class="b3-goal-card">
-                    <span class="b3-goal-icon">${this._itemIconHTML(question.item, '128px')}</span>
+                    <span class="b3-goal-icon" id="b3-goal-icon-click">${this._itemIconHTML(question.item, '72px')}</span>
                     <div class="b3-goal-name">${question.item.name}</div>
                     <div class="b3-goal-price-label">目標價格</div>
                     <div class="b3-goal-price">${question.item.price} 元</div>
@@ -2799,9 +2808,41 @@ document.addEventListener('DOMContentLoaded', () => {
             preview.innerHTML = `<div class="b3-week-blocks">${blocks.join('')}${extra}</div>${label}${remTag}`;
         },
 
+        // ── 圖示放大彈窗 ──────────────────────────────────────────
+        _showIconZoomModal(item) {
+            document.getElementById('b3-icon-zoom-modal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'b3-icon-zoom-modal';
+            modal.className = 'b3-icon-zoom-overlay';
+            let content;
+            if (item.imageData) {
+                content = `<img src="${item.imageData}" alt="${item.name}" class="b3-zoom-img">`;
+            } else if (item.img) {
+                const fallback = item.icon || '🎁';
+                content = `<img src="../images/${item.img}" alt="${item.name}" class="b3-zoom-img" onerror="this.replaceWith(document.createTextNode('${fallback}'))">`;
+            } else {
+                content = `<span class="b3-zoom-emoji">${item.icon || '🎁'}</span>`;
+            }
+            modal.innerHTML = `
+                <div class="b3-icon-zoom-box">
+                    ${content}
+                    <div class="b3-zoom-label">${item.name}</div>
+                    <div class="b3-zoom-tap">點任意處關閉</div>
+                </div>`;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', () => modal.remove());
+            Game.Speech.speak(item.name);
+        },
+
         // ── 12. 事件綁定 ──────────────────────────────────────
         _bindQuestionEvents(question) {
             const diff = this.state.settings.difficulty;
+
+            // 存錢目標圖示點擊放大
+            const goalIconEl = document.getElementById('b3-goal-icon-click');
+            if (goalIconEl) {
+                Game.EventManager.on(goalIconEl, 'click', () => this._showIconZoomModal(question.item), {}, 'gameUI');
+            }
             if (diff === 'easy') {
                 document.querySelectorAll('.b3-choice-btn').forEach(btn => {
                     Game.EventManager.on(btn, 'click', () => {

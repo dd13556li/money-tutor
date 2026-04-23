@@ -838,7 +838,7 @@
 .b4-intro-card {
     background: #fff;
     border-radius: 20px;
-    max-width: 460px;
+    max-width: min(560px, 96vw);
     width: 90%;
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     animation: b4IntroIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
@@ -884,10 +884,9 @@
     line-height: 1;
     margin-bottom: 12px;
 }
-/* 彈窗圖示固定 128×128 */
 .b4-intro-icon .b4-icon-img {
-    width: 128px;
-    height: 128px;
+    width: min(480px, 72vw);
+    height: min(480px, 72vw);
     object-fit: contain;
 }
 .b4-intro-name {

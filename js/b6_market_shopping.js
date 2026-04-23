@@ -830,8 +830,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 margin-bottom: 20px;
                             }
                             .b6-wc-unit-img {
-                                width: 200px;
-                                height: 200px;
+                                width: min(480px, 72vw);
+                                height: min(480px, 72vw);
                                 object-fit: contain;
                                 border-radius: 16px;
                             }
@@ -843,7 +843,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </style>
                         <div class="b6-wc-container">
                             <div class="b6-wc-box">
-                                <div class="b6-wc-icon">${mkt.icon}</div>
                                 <h1 class="b6-wc-title">歡迎來到${mkt.name}！</h1>
                                 <img src="${_b6MktImgSrc}" alt="${mkt.name}"
                                      class="b6-wc-unit-img"

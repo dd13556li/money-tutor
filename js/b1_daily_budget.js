@@ -810,8 +810,8 @@ document.addEventListener('DOMContentLoaded', () => {
                    </div>`
                 : '';
             const imgBlock = curr.imageFile
-                ? `<div class="b1-scene-img-center"><img src="../images/b1/${curr.imageFile}" alt="${curr.label}" class="b1-scene-img-lg" onerror="this.parentElement.remove()"></div>`
-                : `<div class="b1-scene-img-center"><span style="font-size:64px">${curr.icon}</span></div>`;
+                ? `<div class="b1-scene-img-center b1-icon-zoom-trigger" id="b1-scene-icon-trigger"><img src="../images/b1/${curr.imageFile}" alt="${curr.label}" class="b1-scene-img-lg" onerror="this.parentElement.remove()"></div>`
+                : `<div class="b1-scene-img-center b1-icon-zoom-trigger" id="b1-scene-icon-trigger"><span style="font-size:64px">${curr.icon}</span></div>`;
             const itemsList = effectiveItems.map(it =>
                 `<div class="b1-pr-item-row">${it.name} ${it.cost}元</div>`
             ).join('');
@@ -1139,6 +1139,25 @@ document.addEventListener('DOMContentLoaded', () => {
             next();
         },
 
+        // ── 圖示放大彈窗 ──────────────────────────────────────────
+        _showIconZoomModal(curr) {
+            document.getElementById('b1-icon-zoom-modal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'b1-icon-zoom-modal';
+            modal.className = 'b1-icon-zoom-overlay';
+            const content = curr.imageFile
+                ? `<img src="../images/b1/${curr.imageFile}" alt="${curr.label}" class="b1-zoom-img" onerror="this.style.display='none'">`
+                : `<span class="b1-zoom-emoji">${curr.icon}</span>`;
+            modal.innerHTML = `
+                <div class="b1-icon-zoom-box">
+                    ${content}
+                    <div class="b1-zoom-label">今天去：${fmtLabel(curr.label)}</div>
+                    <div class="b1-zoom-tap">點任意處關閉</div>
+                </div>`;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', () => modal.remove());
+        },
+
         // ── Phase 1 事件繫結 ──────────────────────────────────────
         _bindPhase1Events(curr, diff) {
             const isHard = diff === 'hard';
@@ -1156,6 +1175,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof RewardLauncher !== 'undefined') RewardLauncher.open();
                 else window.open('../reward/index.html', 'RewardSystem', 'width=1200,height=800');
             }, {}, 'gameUI');
+
+            // 圖示點擊放大
+            const iconTrigger = document.getElementById('b1-scene-icon-trigger');
+            if (iconTrigger) {
+                Game.EventManager.on(iconTrigger, 'click', () => this._showIconZoomModal(curr), {}, 'gameUI');
+            }
 
             // 提示鈕（行程卡右側，普通/困難顯示）
             const hintBtn = document.getElementById('hint-btn');
@@ -1759,6 +1784,12 @@ document.addEventListener('DOMContentLoaded', () => {
         _bindPhase2Events(curr) {
             this._setupDragDrop();
 
+            // 圖示點擊放大
+            const iconTrigger = document.getElementById('b1-scene-icon-trigger');
+            if (iconTrigger) {
+                Game.EventManager.on(iconTrigger, 'click', () => this._showIconZoomModal(curr), {}, 'gameUI');
+            }
+
             Game.EventManager.on(document.getElementById('confirm-btn'), 'click', () => {
                 this.handleConfirm(this._getEffectiveTotal(curr));
             }, {}, 'gameUI');
@@ -1961,7 +1992,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b1-schedule-card ${catClass}${useCustom ? ' b1-custom-mode' : ''}">
                 ${hintWrap}
                 <div class="b1-sch-hdr">
-                    <div class="b1-sch-hdr-img">${imgContent}</div>
+                    <div class="b1-sch-hdr-img b1-icon-zoom-trigger" id="b1-scene-icon-trigger">${imgContent}</div>
                     <div class="b1-sch-hdr-text">
                         <div class="b1-sch-hdr-row1">
                             <span class="b1-schedule-label">今天要去：${fmtLabel(q.label)}</span>
@@ -2317,26 +2348,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.classList.add('b1-bd-fade');
                 Game.TimerManager.setTimeout(() => { if (div.parentNode) div.remove(); }, 400, 'ui');
             }, 4000, 'ui');
-        },
-
-        // ── 最少張數提示（C4/C6 最佳付款 pattern）──────────────
-        _showMinCoinsHint(walletTotal, requiredTotal) {
-            const used    = this.state.wallet.length;
-            const denoms  = DENOM_BY_DIFF[this.state.settings.difficulty] || DENOM_BY_DIFF.easy;
-            const optimal = this._calcOptimalCoins(requiredTotal, denoms);
-            const minCount = optimal.length;
-            if (used <= minCount) return; // 已達最佳，不顯示
-            const existing = document.getElementById('b1-min-coins-toast');
-            if (existing) existing.remove();
-            const toast = document.createElement('div');
-            toast.id = 'b1-min-coins-toast';
-            toast.className = 'b1-min-coins-toast';
-            toast.innerHTML = `💡 你用了 <b>${used}</b> 張，其實最少只需要 <b>${minCount}</b> 張！`;
-            document.body.appendChild(toast);
-            Game.TimerManager.setTimeout(() => {
-                toast.classList.add('b1-toast-fade');
-                Game.TimerManager.setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400, 'ui');
-            }, 1800, 'ui');
         },
 
         // ── 剛好浮動提示 ────────────────────────────────────────
