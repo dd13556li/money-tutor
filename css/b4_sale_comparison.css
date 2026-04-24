@@ -87,6 +87,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 4px;
     margin-top: 4px;
     min-height: 60px;

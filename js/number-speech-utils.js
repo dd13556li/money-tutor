@@ -114,6 +114,7 @@ const NumberSpeechUtils = {
 
         // 特殊情況處理 - 常見金額組合
         const specialCases = {
+            0: '零元',
             1: '壹元',
             2: '兩元',
             5: '伍元',

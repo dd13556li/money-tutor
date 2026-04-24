@@ -7812,6 +7812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._a3UpdateChangeDisplay(change);
                 this._a3RenderWalletCoins(change);
                 const runningTotal = (gs.a3cPlaced || []).reduce((s, p) => s + p.denom, 0);
+                // 設計意圖：只在按過提示後才播拖曳語音，避免干擾；數字直接傳 TTS（唸四十七元），效果與大寫相同
                 if (gs.a3cHintShown && this.state.settings.speechEnabled && this.speech) {
                     this.speech.speakText(`找回${runningTotal}元`);
                 }
@@ -8108,6 +8109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 找零正確
+            this.state.isProcessing = false;
             this.audio.playSound('success');
             this.playStepSuccess(true); // success 已播放 correct02.mp3，只需煙火
             gs.changeErrorCount = 0;
@@ -10921,6 +10923,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startOver() {
             // 重置防重複旗標（新一輪開始）
             this._completionSummaryShown = false;
+            this.state.isProcessing = false;
             // 注意：不在此重置 _pickupNavigating。
             // _pickupNavigating 由 showPickupComplete() 在建立新一輪時重置（line ~9505）。
             // 若此處提前重置，speakChunk 備援計時器（category:'speech'，10秒後觸發）

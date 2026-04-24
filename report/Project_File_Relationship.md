@@ -1,7 +1,7 @@
 # 專案檔案關聯表
 
 建立日期：2026-02-24
-最後更新：2026-04-18
+最後更新：2026-04-23（B1~B6 個別 Unit Completion Report 建立；B 系列 JS/CSS 行數更新；images/b4、images/b6 圖片目錄新增；A3/A4/A6 JS 行數同步）
 專案路徑：`money_tutor/`
 
 ---
@@ -332,16 +332,16 @@ css/ai-theme.css
 |------|------|---------|---------|
 | `a1_vending_machine.js` | 7,588 | A1 自動販賣機 | `VendingMachine` |
 | `a2_barber_shop_kiosk.js` | 9,553 | A2 理髮廳 | `BarberKiosk` |
-| `a3_mcdonalds_order.js` | 10,591 | A3 麥當勞 | `McDonald` |
-| `a4_simulated_shopping.js` | 14,761 | A4 超市 | `Game` |
+| `a3_mcdonalds_order.js` | 11,383 | A3 麥當勞 | `McDonald` |
+| `a4_simulated_shopping.js` | 15,693 | A4 超市 | `Game` |
 | `a5_atm_simulator.js` | 16,093 | A5 ATM | `ATM` |
-| `a6_train_ticket.js` | 10,830 | A6 火車票 | `Game` |
-| `b1_daily_budget.js` | 3,144 | B1 今天帶多少錢 | `Game`（2026-03-14 新增）|
-| `b2_allowance_diary.js` | 3,746 | B2 零用錢日記 | `Game` |
-| `b3_savings_plan.js` | 3,583 | B3 存錢計畫 | `Game` |
-| `b4_sale_comparison.js` | 3,281 | B4 特賣比一比 | `Game` |
-| `b5_party_budget.js` | 3,530 | B5 生日派對預算 | `Game` |
-| `b6_market_shopping.js` | 4,234 | B6 菜市場買菜 | `Game` |
+| `a6_train_ticket.js` | 11,710 | A6 火車票 | `Game` |
+| `b1_daily_budget.js` | 3,208 | B1 今天帶多少錢 | `Game`（2026-03-14 新增）|
+| `b2_allowance_diary.js` | 3,795 | B2 零用錢日記 | `Game` |
+| `b3_savings_plan.js` | 3,630 | B3 存錢計畫 | `Game` |
+| `b4_sale_comparison.js` | 5,210 | B4 特賣比一比 | `Game` |
+| `b5_party_budget.js` | 3,556 | B5 生日派對預算 | `Game` |
+| `b6_market_shopping.js` | 4,441 | B6 菜市場買菜 | `Game` |
 | `c1_money_types.js` | 1,786 | C1 認識錢幣 | `Game` |
 | `c2_money_counting.js` | 2,299 | C2 數錢 | `Game` |
 | `c3_money_exchange.js` | 10,430 | C3 換錢 | `Game` |
@@ -442,12 +442,12 @@ css/ai-theme.css
 
 | 檔案 | 行數 | 對應單元 |
 |------|------|---------|
-| `b1_daily_budget.css` | 906 | B1（含 `.b1-coin-tray`、`.b1-drop-zone`、`.b1-wallet-goal-tag` 拖曳放置樣式；`b-res-denom-stats`/`b1-stat-grid`/`b1-stat-item` 面額統計；`.b1-res-schedules`/`.b1-sch-*` 行程費用清單；`.b1-exact-toast`/`b1ToastUp` 投幣剛好 toast）|
-| `b2_allowance_diary.css` | 547 | B2（含 `.b2-answer-card`、`.b2-answer-prompt`；`.b2-res-diary`/`.b2-hist-table`/`.b2-hist-ev` 記帳回顧；`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income/.expense` 計算過程；`.b2-res-totals`/`.b2-res-max-records`；`.b2-entry-active` 逐項動畫；`.b2-running-total`/`b2RtPop`/`b2-task-intro-*` 開題彈窗）|
-| `b3_savings_plan.css` | 1,574 | B3（含 `.b3-answer-card`；`b3-cal-*` 月曆系統；`b3-drag-coin`/`b3-drop-slot`/`b3-slot-filled`/`b3-slot-check`/`b3-drop-wrong` 拖曳存錢；`b3-pig-*` 撲滿卡片；`b3-pig-exch-btn`/`b3MilestonePop`/`b3MilestoneFade` 里程碑；`b3-streak-badge`/`b3SbPop` 連勝徽章；`b3-goal-modal*` 開題彈窗；`b3-res-goals`/`b3-goal-summary` 完成畫面）|
-| `b4_sale_comparison.css` | 583 | B4（含 `.b4-vs-divider` VS 分隔圖示；`.b4-pbar-*` 視覺比例條；`.b4-diff-hint-formula`/`.b4-hint-*` 差額算式提示；`.b4-res-compare`/`.b4-cmp-table`/`.b4-cmp-*` 比價歷程；`.b4-res-ranking`/`.b4-rank-row`/`.b4-rank-medal` 省錢排行；`b4ToastUp`/省錢 toast；`b4SelectHint`/`.b4-diff-hint-btn` 高亮提示）|
-| `b5_party_budget.css` | 2,135 | B5（含 `.b5-round-intro`/`b5RiIn`/`.b5-ri-*` 每關開場介紹卡；`.b5-res-budget-stats`/`.b5-budget-bars`/`.b5-bar-fill` 預算橫條圖；`.b5-res-party-review`/`.b5-party-tags`/`.b5-party-tag` 物品回顧；`.b5-hint-btn`/`.b5-hint-glow` 預算提示；`b5RtIn` 轉場卡；**2026-04-18 新增**：`.b5-task-card`（紫色漸層任務卡）/`.b5-p1-hint-btn`（吉祥物+提示按鈕）/`.b5-hint-here`（橘色「👇 點這裡」高亮泡泡，`@keyframes b5HereHintPulse/b5HereBounce`）轉場歡迎畫面 `.b5-wc1-card`/`.b5-wc2-card`；找零階段 `.b5c-change-page`/`.b5c-denom-card`/`.b5c-wallet-zone`/`.b5c-confirm-btn`/`.b5c-hint-btn`（B6 pattern 同步）；第二頁 Ghost slot 模式 `.b5c-ghost-slot`）|
-| `b6_market_shopping.css` | 3,002 | B6（**第一頁版面**：`.b6-task-card`/`.b6-task-hdr`/`.b6-task-budget` 任務卡；`.b6-market-checkout-row` 三欄容器（攤位進度卡＋市場卡＋結帳卡）；`.b6-stall-card`/`.b6-sc-header` 攤位進度卡；`.b6-market-card`/`.b6-stall-nav`/`.b6-snav-btn`/`.b6-snav-dot`/`.b6-snav-label` 市場卡+左右導航；`.b6-checkout-strip`/`.b6-cstrip-count`/`.b6-cstrip-total`/`.b6-cart-items`/`.b6-cart-item`/`.b6-cart-empty` 結帳卡+商品清單；`.b6-products-grid`/`.b6-product-btn`/`.b6-product-icon`/`.b6-product-here-hint`（`@keyframes b6HereHintPulse/b6HereBounce`，橘色「👇 點這裡」泡泡）；**提示系統**：`.b6-p1hh-overlay`/`.b6-p1hh-modal`/`.b6-p1hh-item`/`.b6-p1hh-item-done`（opacity 0.45）/`.b6-p1hh-done-badge` 困難模式購物建議彈窗；**第二頁付款**：`.b6p2-ref-card`/`.b6p2-wallet-area`/`.b6p2-wallet-coins`（`justify-content:center`）/`.b6p2-ghost-slot`/`.b6p2-coin-drag`/`.b6p2-tray`；**響應式**：`@media (min-width:900px)` 平板三欄布局（auto-fill columns，overflow scroll），`@media (min-width:1200px)` 桌面 2 列水平格（`grid-template-rows:repeat(2,auto); grid-auto-flow:column`，`max-width:min(1800px,100vw-40px)`）；`b6RcIn`/`b6WtIn` 動畫；`#b6-wrong-tip` 錯誤浮層；**2026-04-17 新增找零階段**：`.b6c-change-page`/`.b6c-denom-card`/`.b6c-wallet-zone`/`.b6c-confirm-btn`/`.b6c-hint-btn`（吉祥物+提示按鈕）；Ghost slot 模式 `.b6c-ghost-slot`；進度條 `.b6c-progress-bar`）|
+| `b1_daily_budget.css` | 2,182 | B1（含兩段式流程 CSS；`.b1-coin-tray`/`.b1-drop-zone`/`.b1-wallet-goal-tag` 拖曳放置；Ghost Slot `.b1-wallet-ghost-slot`/`b1WalletGhostIn`；Phase 1 數字泡泡 `b1-cost-hint-tip`/`@keyframes b1CostHintIn`；Phase 2 白底放置區 `.b1-wallet-coins`；`b-res-denom-stats` 面額統計；行程費用清單 `.b1-res-schedules`；`.b1-exact-toast`/`b1ToastUp` 投幣剛好 toast）|
+| `b2_allowance_diary.css` | 2,258 | B2（含兩段式流程 CSS；`.b2-answer-card`/`.b2-answer-prompt`；`.b2-res-diary`/`.b2-hist-table`/`.b2-hist-ev` 記帳回顧；`.b2-calc-breakdown`/`.b2-bd-row`/`.b2-bd-op.income/.expense` 計算過程；`.b2-entry-active` 逐項動畫；Phase 2 金幣 `b2-p2-coin`/`b2-phase2-card`；`.b2-mic-wrap`/`.b2-cic-wrap` 個別圖示；`b2-cost-hint-tip` 數字泡泡）|
+| `b3_savings_plan.css` | 2,154 | B3（含 `b3-cal-*` 月曆系統；`b3-drag-coin`/`b3-nplaced-item`（每枚顯示）；`b3-pig-*` 撲滿卡片；`b3-pig-exch-btn`/`b3MilestonePop` 里程碑；`b3-nplaced-ghost-slot`/`b3NDenomInGhost` Ghost Slot；`b3-goal-modal*` 開題彈窗；`b3-hint-modal-overlay`/`.b3-hint-modal` 困難提示彈窗；省錢清單 `b3-goals-grid`/`b3-goal-result-card`/`b3-res-stats-row`）|
+| `b4_sale_comparison.css` | 2,950 | B4（含 `.b4-icon-img`/`.b4-store-icon-img` 商品/商店圖片（2026-04-23）；`.b4-vs-divider`；`.b4-pbar-*` 視覺比例條；`b4-diff-normal-card`/`b4-diff-options-card` 重構後差額頁；`b4-price-unknown`/`b4-pi-modal`/`b4-pi-tap-hint` 輸入框彈窗；`b4-hnp-card`/`b4-hfh-card` 困難差額；`b4-sl-page`/`b4-sl-card2`/`b4-sl-summary-card` 省錢清單重設計；`48.91px` 紙鈔高度）|
+| `b5_party_budget.css` | 2,438 | B5（含 `.b5-task-card`（紫色漸層任務卡）/`.b5-p1-hint-btn`（吉祥物+提示按鈕）/`.b5-hint-here`（橘色高亮泡泡，`@keyframes b5HereHintPulse/b5HereBounce`）；轉場歡迎畫面 `.b5-wc1-card`/`.b5-wc2-card`；找零階段 `.b5c-change-page`/`.b5c-denom-card`/`.b5c-wallet-zone`/`.b5c-confirm-btn`/`.b5c-hint-btn`/`.b5c-wallet-info`；Ghost slot `.b5c-ghost-slot`；`b5-item-flyout`/`b5FlyoutUp` 選商品浮動標籤）|
+| `b6_market_shopping.css` | 3,045 | B6（含 `.b6-task-card`/`.b6-stall-nav`/`.b6-snav-btn`/`.b6-snav-dot` 攤位左右導航；`.b6-checkout-strip`/`.b6-cstrip-count`/`.b6-cstrip-total` 結帳列；`.b6-products-grid`/`.b6-product-btn`/`.b6-product-icon`/`.b6-icon-img`（2026-04-23）/`.b6-product-here-hint`；困難提示彈窗 `.b6-p1hh-overlay`/`.b6-p1hh-modal`；付款區 `.b6p2-ref-card`/`.b6p2-wallet-area`/`.b6p2-ghost-slot`；找零階段 `.b6c-change-page`/`.b6c-denom-card`/`.b6c-wallet-zone`/`.b6c-confirm-btn`/`.b6c-hint-btn`/`.b6c-ghost-slot`；付款提示彈窗 `.b6-hint-modal-overlay`/`.b6-hm-close-btn`）|
 
 #### A 系列（css/ 目錄，6 個）
 
@@ -544,6 +544,9 @@ css/ai-theme.css
 | `common/` | 1 | ✅ **使用中**（2026-03-16 新增）| 跨系列共用圖示；`icons_wallet.png`（A/C 系列「我的錢包」標題圖示）|
 | `index/` | 18 | ✅ 使用中 | 首頁各單元入口縮圖（含 F/C/A 系列，B 系列另計）|
 | `money/` | 19 | ✅ 使用中 | 硬幣/紙鈔圖片（1~1000 元正面）|
+| `b1/` | 60+ | ✅ 使用中（2026-03-14 新增）| B1 場景圖（`icon-b1-easy/normal/hard-*.png`）|
+| `b4/` | **39** | ✅ 使用中（2026-04-21 新增，2026-04-23 更新）| B4 商品圖（21 種，含牙刷/雨衣/糖果）+ 商店圖（18 種），已移除「- 已編輯」後綴；另有 `b4IconHTML`/`b4StoreIconHTML` 圖示輔助函數 |
+| `b6/` | **63** | ✅ 使用中（2026-04-23 新增）| B6 商品圖：超市（烘焙/乳品/冷凍大部分 ✅）、夜市（小吃/飲料大部分 ✅）、紀念品（7種 ✅）、傳統市場（雜貨 4 種 ✅）；`b6IconHTML` 輔助函數顯示圖片，無圖退回 emoji；詳見 `B6_data_export.md` 十二節缺少清單 |
 | `c1/` | 0 | ⚠️ 空目錄 | C1~C4 使用 emoji，無圖片需求 |
 | `c2/` | 0 | ⚠️ 空目錄 | 同上 |
 | `c3/` | 0 | ⚠️ 空目錄 | 同上 |
@@ -557,7 +560,7 @@ css/ai-theme.css
 | `f5/` | 0 | ⚠️ 空目錄 | 同上 |
 | `f6/` | 0 | ⚠️ 空目錄 | 同上 |
 
-> **B 系列**：B 系列單元使用 emoji 及 CSS 吉祥物圖示（`educated_money_bag_character`），不需要 `images/b1/` 等子目錄，故未建立。
+> **B 系列圖片目錄**：B1~B3/B5 使用 emoji；B4 有 `images/b4/`（21 個商品圖 + 18 個商店圖）；B6 有 `images/b6/`（63 個商品圖，涵蓋超市/夜市大部分、傳統市場部分）。B1/B2/B3 場景圖在 `images/b1/`；B3 商品圖借用 `images/c5/`。
 >
 > **C5 圖檔說明**：C5 `images/c5/` 中目前無 `icon-c5-toy-car.png`（玩具車），但 JS 中 `game_toy_car` 項目定義此圖，實際遊戲顯示時無圖。
 
@@ -600,7 +603,13 @@ css/ai-theme.css
 | A 系列 | `A2_Unit_Completion_Report.md` | A2 理髮廳完成報告 |
 | A 系列 | `A5_Unit_Completion_Report.md` | A5 ATM 完成報告 |
 | A 系列（未建）| ~~A3, A4, A6 個別完成報告~~ | 尚未建立（相關修復記錄已整合至 CLAUDE.md）|
-| B 系列總覽 | `B_Series_Unit_Completion_Report.md` | B 系列功能總覽報告（2026-03-30 新增）|
+| B 系列總覽 | `B_Series_Unit_Completion_Report.md` | B 系列功能總覽報告（2026-03-30 新增；含 Round 1~45 所有修復記錄）|
+| B 系列 | `B1_Unit_Completion_Report.md` | B1 今天帶多少錢完成報告（2026-04-23 新增）|
+| B 系列 | `B2_Unit_Completion_Report.md` | B2 零用錢日記完成報告（2026-04-23 新增）|
+| B 系列 | `B3_Unit_Completion_Report.md` | B3 存錢計畫完成報告（2026-04-23 新增）|
+| B 系列 | `B4_Unit_Completion_Report.md` | B4 特賣比一比完成報告（2026-04-23 新增；含圖片引用更新）|
+| B 系列 | `B5_Unit_Completion_Report.md` | B5 生日派對預算完成報告（2026-04-23 新增）|
+| B 系列 | `B6_Unit_Completion_Report.md` | B6 菜市場買菜完成報告（2026-04-23 新增；含商品圖片引用更新）|
 | C 系列 | `C1_Unit_Completion_Report.md` | C1 認識錢幣完成報告 |
 | C 系列 | `C2_Unit_Completion_Report.md` | C2 數錢完成報告 |
 | C 系列 | `C3_Unit_Completion_Report.md` | C3 換錢完成報告 |
@@ -632,12 +641,20 @@ css/ai-theme.css
 | `B_Series_Teaching_Design_Report.md` | B 系列教學設計報告 |
 | `B_Series_Comprehensive_Analysis.md` | B 系列綜合分析報告 |
 | `B1_Image_Audit_Report.md` | B1 圖片稽核報告 |
-| `B2_data_export.md` | B2 資料匯出記錄 |
+| `B1_data_export.md` | B1 場景資料匯出（2026-04-20）|
+| `B1_Image_Audit_Report.md` | B1 圖片稽核報告 |
+| `B1_speech_content.md` | B1 語音內容清單 |
+| `B2_data_export.md` | B2 題庫資料匯出（2026-04-11）|
 | `B2_speech_content.md` | B2 語音內容清單 |
+| `B3_data_export.md` | B3 題庫資料匯出（2026-04-20）|
 | `B3_Items_Image_Filenames.md` | B3 物品圖片檔名對照表 |
-| `B3_Speech_List.md` | B3 語音清單 |
-| `B4_data_export.md` | B4 資料匯出記錄 |
+| `B3_speech_content.md` | B3 語音清單 |
+| `B4_data_export.md` | B4 商品資料匯出（2026-04-23 更新；移除已編輯後綴、新增三種圖片）|
 | `B4_speech_content.md` | B4 語音內容清單 |
+| `B5_data_export.md` | B5 商品/關卡資料匯出（2026-04-23）|
+| `B5_speech_content.md` | B5 語音內容清單 |
+| `B6_data_export.md` | B6 市場/商品資料匯出（2026-04-23 更新；含圖片狀態與缺少清單）|
+| `B6_speech_content.md` | B6 語音內容清單 |
 | `Expansion_Planning_20260314.md` | B 系列擴充規劃（2026-03-14）|
 | `CLAUDE_md_Token_Cost_Analysis.md` | CLAUDE.md Token 成本分析 |
 | `AI_Video_Production_Plan_20260316_1400.md` | AI 影片製作計畫（2026-03-16）|

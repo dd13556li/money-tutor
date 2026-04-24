@@ -25,10 +25,10 @@
 | tablecloth | 派對桌巾 | 🎪 | 75 | decor |
 | wand | 魔法棒 | 🪄 | 45 | decor |
 | gift | 小禮物 | 🎁 | 200 | activity |
-| photo | 拍立得相機 | 📸 | 150 | activity |
-| popper | 噴彩拉炮 | 🎆 | 55 | activity |
-| speaker | 藍牙喇叭 | 🔊 | 280 | activity |
-| game | 桌遊卡片 | 🃏 | 120 | activity |
+| photo | 拍立得相機 | 📸 | 150 | activity |  刪除
+| popper | 噴彩拉炮 | 🎆 | 55 | activity |  改為 彩帶拉炮
+| speaker | 藍牙喇叭 | 🔊 | 280 | activity | 刪除
+| game | 桌遊卡片 | 🃏 | 120 | activity | 刪除
 
 ---
 

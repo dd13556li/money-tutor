@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="settings-title-row">
                         <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
-                        <h1>單元B5：生日派對預算</h1>
+                        <h1>單元B5：派對活動採購</h1>
                     </div>
                     <div class="game-settings">
                         <div class="b-setting-group">
@@ -976,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">${themeIcon} 生日派對預算</span>
+                    <span class="b-header-unit">${themeIcon} 派對活動採購</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
@@ -1789,7 +1789,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">${themeData.icon} 生日派對預算</span>
+                    <span class="b-header-unit">${themeData.icon} 派對活動採購</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
@@ -2433,7 +2433,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <span class="b-header-unit">${themeData.icon} 生日派對預算</span>
+                    <span class="b-header-unit">${themeData.icon} 派對活動採購</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
                 <div class="b-header-right">
@@ -2464,16 +2464,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5c-tray-coins" id="b5c-tray-coins">${trayHtml}</div>
                 </div>
                 <div class="b5p2-wallet-area b5c-change-area">
-                    <div class="b5p2-wallet-coins-label b5c-change-title">
-                        💼 我的錢包
-                        <span class="b5c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b5c-wallet-info"><span id="b5c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b5c-placed-total">0</span>/${change} 元）</span>
+                    <div class="b5c-change-title b5c-change-title-bar">
+                        <div style="flex:1;"></div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            💼 我的錢包
+                            <span class="b5c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b5c-wallet-info"><span id="b5c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b5c-placed-total">0</span>/${change} 元）</span>
+                        </div>
+                        <div style="flex:1;display:flex;justify-content:flex-end;">
+                            <button class="b5c-wallet-toggle-btn" id="b5c-wallet-toggle">▶ 展開</button>
+                        </div>
                     </div>
                     <div class="b5c-wallet-split">
-                        <div class="b5c-wallet-split-left">
+                        <div class="b5c-wallet-split-left" id="b5c-wallet-left" style="display:none;">
                             ${walletStaticHtml || '<span class="b5p2-wallet-empty" style="font-size:12px;">（餘額為0）</span>'}
                         </div>
                         <div class="b5c-wallet-split-right b5p2-drop-zone b5c-drop-zone" id="b5c-wallet-zone">
-                            <div id="b5c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;">
+                            <div id="b5c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:center;justify-content:center;min-height:60px;">
                                 <span class="b5p2-wallet-empty">把找零金錢拖曳到這裡</span>
                             </div>
                         </div>
@@ -2500,6 +2506,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('b5c-confirm-btn');
             const hintBtn    = document.getElementById('b5c-hint-btn');
             if (!trayEl || !walletZone) return;
+
+            // ── 展開/收起付款後餘額（左側錢包面板）──────────────────
+            const walletToggleBtn = document.getElementById('b5c-wallet-toggle');
+            const walletLeftPanel = document.getElementById('b5c-wallet-left');
+            if (walletToggleBtn && walletLeftPanel) {
+                Game.EventManager.on(walletToggleBtn, 'click', () => {
+                    const isOpen = walletLeftPanel.style.display !== 'none';
+                    walletLeftPanel.style.display = isOpen ? 'none' : 'block';
+                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▲ 收起';
+                }, {}, 'gameUI');
+            }
 
             // 放置一枚金幣到錢包
             const handleDrop = (denom) => {

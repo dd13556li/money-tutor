@@ -1828,6 +1828,25 @@
 .b5c-change-title {
     color: #065f46;
 }
+.b5c-change-title-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+}
+.b5c-wallet-toggle-btn {
+    font-size: 12px;
+    padding: 3px 10px;
+    border: 1.5px solid #6ee7b7;
+    border-radius: 20px;
+    background: #f0fdf4;
+    color: #065f46;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+.b5c-wallet-toggle-btn:hover { background: #d1fae5; }
 .b5c-wallet-bal-badge {
     font-size: 12px;
     font-weight: 700;

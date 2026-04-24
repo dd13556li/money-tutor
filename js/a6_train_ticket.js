@@ -3503,6 +3503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // [Phase 2/3] 開始遊戲時清除計時器和事件監聽器
             this.TimerManager.clearAll();
             this.EventManager.removeAll();
+            this.state.isProcessing = false;
 
             // 🎫 重置已使用的座位記錄
             this.state.quiz.usedSeats = [];
@@ -9297,6 +9298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._a6UpdateChangeDisplay(change);
                 this._a6RenderWalletCoins(change);
                 const runningTotal = (gs.a6cPlaced || []).reduce((s, p) => s + p.denom, 0);
+                // 設計意圖：只在按過提示後才播拖曳語音，避免干擾；數字直接傳 TTS（唸四十七元），效果與大寫相同
                 if (gs.a6cHintShown) this.Speech.speak(`找回${runningTotal}元`, { interrupt: true });
             };
 
@@ -9575,6 +9577,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 找零正確
+            this.state.isProcessing = false;
             this.playSound('correct');
             this.startFireworksAnimation();
             gs.currentChangeOptions = null;
@@ -9582,7 +9585,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gs.isProcessingChange   = false;
             this.TimerManager.setTimeout(() => {
                 this.Speech.speak(`正確，應該找你${change}元`, () => {
-                    this.state.isProcessing = false;
                     this.SceneManager.switchScene('ticketResult', this);
                 });
             }, 500, 'speech');

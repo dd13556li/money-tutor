@@ -1102,7 +1102,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const w = isBill ? 72 : 50;
                 return `<button class="b1-coin-clickable"
                     data-item-idx="${itemIdx}" data-coin-idx="${item.coinIdx}" data-denom="${item.denom}"
-                    aria-label="${item.denom}元">
+                    aria-label="${item.denom}元"
+                    style="${isBill ? 'border-radius:4px' : 'border-radius:50%'}">
                     <img src="../images/money/${item.denom}_yuan_${item.face}.png" alt="${item.denom}元"
                          style="width:${w}px;height:${isBill ? 'auto' : w + 'px'};${isBill ? 'border-radius:4px' : 'border-radius:50%'};display:block;pointer-events:none;"
                          onerror="this.style.display='none'" draggable="false">

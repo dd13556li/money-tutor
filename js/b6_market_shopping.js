@@ -43,13 +43,13 @@ const B6_STALLS = {
         name: '雜貨攤', icon: '🛒',
         items: [
             { id: 'egg',        name: '雞蛋',   price: 65,  unit: '盒', icon: '🥚' },
-            { id: 'tofu',       name: '豆腐',   price: 25,  unit: '塊', icon: '🫙' },
+            { id: 'tofu',       name: '豆腐',   price: 25,  unit: '塊', icon: '🫙', imageUrl: '../images/b6/icon-b6-tofu.png' },
             { id: 'soy',        name: '醬油',   price: 45,  unit: '瓶', icon: '🍶' },
-            { id: 'rice',       name: '白米',   price: 90,  unit: '包', icon: '🌾' },
-            { id: 'noodle',     name: '麵條',   price: 35,  unit: '包', icon: '🍜' },
+            { id: 'rice',       name: '白米',   price: 90,  unit: '包', icon: '🌾', imageUrl: '../images/b6/icon-b6-rice.png' },
+            { id: 'noodle',     name: '麵條',   price: 35,  unit: '包', icon: '🍜', imageUrl: '../images/b6/icon-b6-noodle.png' },
             { id: 'salt',       name: '食鹽',   price: 20,  unit: '包', icon: '🧂' },
             { id: 'sugar',      name: '砂糖',   price: 30,  unit: '包', icon: '🍬' },
-            { id: 'miso',       name: '味噌',   price: 40,  unit: '包', icon: '🟡' },
+            { id: 'miso',       name: '味噌',   price: 40,  unit: '包', icon: '🟡', imageUrl: '../images/b6/icon-b6-miso.png' },
             { id: 'oil',        name: '沙拉油', price: 75,  unit: '瓶', icon: '🫙' },
             { id: 'canned',     name: '罐頭',   price: 35,  unit: '罐', icon: '🥫' },
             { id: 'soap',       name: '洗碗精', price: 45,  unit: '瓶', icon: '🧴' },
@@ -106,52 +106,52 @@ const B6_MARKETS = {
             bakery: {
                 name: '烘焙區', icon: '🥖',
                 items: [
-                    { id: 'bread',      name: '麵包',   price: 30,  unit: '個', icon: '🍞' },
-                    { id: 'croissant',  name: '可頌',   price: 45,  unit: '個', icon: '🥐' },
-                    { id: 'toast',      name: '吐司',   price: 35,  unit: '條', icon: '🍞' },
+                    { id: 'bread',      name: '麵包',   price: 30,  unit: '個', icon: '🍞', imageUrl: '../images/b6/icon-b6-bread.png' },
+                    { id: 'croissant',  name: '可頌',   price: 45,  unit: '個', icon: '🥐', imageUrl: '../images/b6/icon-b6-croissant.png' },
+                    { id: 'toast',      name: '吐司',   price: 35,  unit: '條', icon: '🍞', imageUrl: '../images/b6/icon-b6-toast.png' },
                     { id: 'muffin',     name: '馬芬',   price: 25,  unit: '個', icon: '🧁' },
-                    { id: 'bun',        name: '小餐包', price: 20,  unit: '包', icon: '🥖' },
-                    { id: 'cake_slice', name: '蛋糕',   price: 60,  unit: '片', icon: '🎂' },
-                    { id: 'bagel',      name: '貝果',   price: 40,  unit: '個', icon: '🥯' },
-                    { id: 'waffle',     name: '鬆餅',   price: 50,  unit: '片', icon: '🧇' },
-                    { id: 'donut',      name: '甜甜圈', price: 30,  unit: '個', icon: '🍩' },
+                    { id: 'bun',        name: '小餐包', price: 20,  unit: '包', icon: '🥖', imageUrl: '../images/b6/icon-b6-dinner-bun.png' },
+                    { id: 'cake_slice', name: '蛋糕',   price: 60,  unit: '片', icon: '🎂', imageUrl: '../images/b6/icon-b6-cake-slice.png' },
+                    { id: 'bagel',      name: '貝果',   price: 40,  unit: '個', icon: '🥯', imageUrl: '../images/b6/icon-b6-bagel.png' },
+                    { id: 'waffle',     name: '鬆餅',   price: 50,  unit: '片', icon: '🧇', imageUrl: '../images/b6/icon-b6-waffle.png' },
+                    { id: 'donut',      name: '甜甜圈', price: 30,  unit: '個', icon: '🍩', imageUrl: '../images/b6/icon-b6-donut.png' },
                     { id: 'cookie',     name: '餅乾',   price: 45,  unit: '包', icon: '🍪' },
-                    { id: 'brownie',    name: '布朗尼', price: 35,  unit: '塊', icon: '🍫' },
-                    { id: 'eclair',     name: '閃電泡芙', price: 55, unit: '個', icon: '🥧' },
+                    { id: 'brownie',    name: '布朗尼', price: 35,  unit: '塊', icon: '🍫', imageUrl: '../images/b6/icon-b6-brownie.png' },
+                    { id: 'eclair',     name: '閃電泡芙', price: 55, unit: '個', icon: '🥧', imageUrl: '../images/b6/icon-b6-eclair.png' },
                 ],
             },
             dairy: {
                 name: '乳品區', icon: '🥛',
                 items: [
-                    { id: 'milk',       name: '牛奶',   price: 50,  unit: '瓶', icon: '🥛' },
-                    { id: 'yogurt',     name: '優格',   price: 40,  unit: '杯', icon: '🫙' },
-                    { id: 'cheese',     name: '起司',   price: 80,  unit: '片', icon: '🧀' },
+                    { id: 'milk',       name: '牛奶',   price: 50,  unit: '瓶', icon: '🥛', imageUrl: '../images/b6/icon-b6-milk.png' },
+                    { id: 'yogurt',     name: '優格',   price: 40,  unit: '杯', icon: '🫙', imageUrl: '../images/b6/icon-b6-yogurt.png' },
+                    { id: 'cheese',     name: '起司',   price: 80,  unit: '片', icon: '🧀', imageUrl: '../images/b6/icon-b6-cheese.png' },
                     { id: 'butter',     name: '奶油',   price: 65,  unit: '盒', icon: '🧈' },
-                    { id: 'cream',      name: '鮮奶油', price: 45,  unit: '瓶', icon: '🫙' },
+                    { id: 'cream',      name: '鮮奶油', price: 45,  unit: '瓶', icon: '🫙', imageUrl: '../images/b6/icon-b6-whipping-cream.png' },
                     { id: 'sm_egg',     name: '雞蛋',   price: 55,  unit: '盒', icon: '🥚' },
-                    { id: 'soy_milk',   name: '豆漿',   price: 35,  unit: '瓶', icon: '🥛' },
-                    { id: 'oat_milk',   name: '燕麥奶', price: 60,  unit: '瓶', icon: '🌾' },
-                    { id: 'pudding',    name: '布丁',   price: 25,  unit: '個', icon: '🍮' },
-                    { id: 'ice_coffee', name: '咖啡凍', price: 30,  unit: '杯', icon: '☕' },
-                    { id: 'milk_tea_b', name: '奶茶',   price: 45,  unit: '瓶', icon: '🍵' },
-                    { id: 'custard',    name: '優酪乳', price: 55,  unit: '個', icon: '🥛' },
+                    { id: 'soy_milk',   name: '豆漿',   price: 35,  unit: '瓶', icon: '🥛', imageUrl: '../images/b6/icon-b6-soy-milk.png' },
+                    { id: 'oat_milk',   name: '燕麥奶', price: 60,  unit: '瓶', icon: '🌾', imageUrl: '../images/b6/icon-b6-oat-milk.png' },
+                    { id: 'pudding',    name: '布丁',   price: 25,  unit: '個', icon: '🍮', imageUrl: '../images/b6/icon-b6-pudding.png' },
+                    { id: 'ice_coffee', name: '咖啡凍', price: 30,  unit: '杯', icon: '☕', imageUrl: '../images/b6/icon-b6-coffee-jelly.png' },
+                    { id: 'milk_tea_b', name: '奶茶',   price: 45,  unit: '瓶', icon: '🍵', imageUrl: '../images/b6/icon-b6-milk-tea.png' },
+                    { id: 'custard',    name: '優酪乳', price: 55,  unit: '個', icon: '🥛', imageUrl: '../images/b6/icon-b6-custard-yogurt.png' },
                 ],
             },
             frozen: {
                 name: '冷凍區', icon: '🧊',
                 items: [
-                    { id: 'dumpling',   name: '水餃',   price: 75,  unit: '包', icon: '🥟' },
-                    { id: 'sausage',    name: '薯餅',   price: 60,  unit: '包', icon: '🌭' },
+                    { id: 'dumpling',   name: '水餃',   price: 75,  unit: '包', icon: '🥟', imageUrl: '../images/b6/icon-b6-dumpling.png' },
+                    { id: 'sausage',    name: '薯餅',   price: 60,  unit: '包', icon: '🌭', imageUrl: '../images/b6/icon-b6-hash-brown.png' },
                     { id: 'ice_cream',  name: '冰淇淋', price: 45,  unit: '支', icon: '🍦' },
-                    { id: 'nugget',     name: '雞塊',   price: 80,  unit: '包', icon: '🍗' },
-                    { id: 'fish_ball',  name: '魚丸',   price: 50,  unit: '包', icon: '🫙' },
-                    { id: 'edamame',    name: '毛豆',   price: 35,  unit: '包', icon: '🫘' },
-                    { id: 'wonton',     name: '餛飩',   price: 65,  unit: '包', icon: '🥟' },
-                    { id: 'shrimp',     name: '蝦仁',   price: 90,  unit: '包', icon: '🦐' },
-                    { id: 'pizza',      name: '披薩',   price: 55,  unit: '片', icon: '🍕' },
-                    { id: 'corn_dog',   name: '熱狗',   price: 40,  unit: '條', icon: '🌽' },
-                    { id: 'pork_bun',   name: '炒飯',   price: 50,  unit: '個', icon: '🥙' },
-                    { id: 'spring_roll',name: '貢丸',   price: 35,  unit: '條', icon: '🌯' },
+                    { id: 'nugget',     name: '雞塊',   price: 80,  unit: '包', icon: '🍗', imageUrl: '../images/b6/icon-b6-chicken-nugget.png' },
+                    { id: 'fish_ball',  name: '魚丸',   price: 50,  unit: '包', icon: '🫙', imageUrl: '../images/b6/icon-b6-fish-ball.png' },
+                    { id: 'edamame',    name: '毛豆',   price: 35,  unit: '包', icon: '🫘', imageUrl: '../images/b6/icon-b6-edamame.png' },
+                    { id: 'wonton',     name: '餛飩',   price: 65,  unit: '包', icon: '🥟', imageUrl: '../images/b6/icon-b6-wonton.png' },
+                    { id: 'shrimp',     name: '蝦仁',   price: 90,  unit: '包', icon: '🦐', imageUrl: '../images/b6/icon-b6-shrimp.png' },
+                    { id: 'pizza',      name: '披薩',   price: 55,  unit: '片', icon: '🍕', imageUrl: '../images/b6/icon-b6-pizza.png' },
+                    { id: 'corn_dog',   name: '熱狗',   price: 40,  unit: '條', icon: '🌽', imageUrl: '../images/b6/icon-b6-corn-dog.png' },
+                    { id: 'pork_bun',   name: '炒飯',   price: 50,  unit: '個', icon: '🥙', imageUrl: '../images/b6/icon-b6-fried-rice.png' },
+                    { id: 'spring_roll',name: '貢丸',   price: 35,  unit: '條', icon: '🌯', imageUrl: '../images/b6/icon-b6-fish-cake-ball.png' },
                 ],
             },
         },
@@ -194,47 +194,47 @@ const B6_MARKETS = {
             snack: {
                 name: '小吃攤', icon: '🍜',
                 items: [
-                    { id: 'oysternoodle',  name: '蚵仔麵線', price: 50,  unit: '碗', icon: '🍜' },
+                    { id: 'oysternoodle',  name: '蚵仔麵線', price: 50,  unit: '碗', icon: '🍜', imageUrl: '../images/b6/icon-b6-oyster-noodle.png' },
                     { id: 'beefnoodle',    name: '牛肉麵',   price: 80,  unit: '碗', icon: '🍲' },
-                    { id: 'pancake',       name: '蔥抓餅',   price: 35,  unit: '份', icon: '🥞' },
-                    { id: 'popcorn_chk',   name: '鹹酥雞',   price: 60,  unit: '份', icon: '🍗' },
-                    { id: 'stinky_tofu',   name: '臭豆腐',   price: 45,  unit: '份', icon: '🫙' },
-                    { id: 'takoyaki',      name: '章魚燒',   price: 50,  unit: '份', icon: '🐙' },
-                    { id: 'chicken_chop',  name: '雞排',     price: 65,  unit: '份', icon: '🍖' },
-                    { id: 'oyster_omelet', name: '蚵仔煎',   price: 60,  unit: '份', icon: '🍳' },
-                    { id: 'sweet_potato_ball', name: '地瓜球', price: 30, unit: '份', icon: '🟠' },
-                    { id: 'fishball_soup', name: '魚丸湯',   price: 40,  unit: '碗', icon: '🍥' },
-                    { id: 'scallion_egg',  name: '蔥油餅',   price: 35,  unit: '份', icon: '🥚' },
-                    { id: 'pork_pepper',   name: '胡椒餅',   price: 45,  unit: '個', icon: '🫔' },
+                    { id: 'pancake',       name: '蔥抓餅',   price: 35,  unit: '份', icon: '🥞', imageUrl: '../images/b6/icon-b6-scallion-pancake.png' },
+                    { id: 'popcorn_chk',   name: '鹹酥雞',   price: 60,  unit: '份', icon: '🍗', imageUrl: '../images/b6/icon-b6-popcorn-chicken.png' },
+                    { id: 'stinky_tofu',   name: '臭豆腐',   price: 45,  unit: '份', icon: '🫙', imageUrl: '../images/b6/icon-b6-stinky-tofu.png' },
+                    { id: 'takoyaki',      name: '章魚燒',   price: 50,  unit: '份', icon: '🐙', imageUrl: '../images/b6/icon-b6-takoyaki.png' },
+                    { id: 'chicken_chop',  name: '雞排',     price: 65,  unit: '份', icon: '🍖', imageUrl: '../images/b6/icon-b6-chicken-chop.png' },
+                    { id: 'oyster_omelet', name: '蚵仔煎',   price: 60,  unit: '份', icon: '🍳', imageUrl: '../images/b6/icon-b6-oyster-omelet.png' },
+                    { id: 'sweet_potato_ball', name: '地瓜球', price: 30, unit: '份', icon: '🟠', imageUrl: '../images/b6/icon-b6-sweet-potato-ball.png' },
+                    { id: 'fishball_soup', name: '魚丸湯',   price: 40,  unit: '碗', icon: '🍥', imageUrl: '../images/b6/icon-b6-fishball-soup.png' },
+                    { id: 'scallion_egg',  name: '蔥油餅',   price: 35,  unit: '份', icon: '🥚', imageUrl: '../images/b6/icon-b6-scallion-egg-pancake.png' },
+                    { id: 'pork_pepper',   name: '胡椒餅',   price: 45,  unit: '個', icon: '🫔', imageUrl: '../images/b6/icon-b6-pork-pepper-bun.png' },
                 ],
             },
             drink: {
                 name: '飲料攤', icon: '🧋',
                 items: [
-                    { id: 'bubble_tea',  name: '珍珠奶茶', price: 55, unit: '杯', icon: '🧋' },
-                    { id: 'lemon_tea',   name: '檸檬茶',   price: 40, unit: '杯', icon: '🍋' },
-                    { id: 'sugarcane',   name: '甘蔗汁',   price: 30, unit: '杯', icon: '🌿' },
-                    { id: 'milk_tea',    name: '奶茶',     price: 45, unit: '杯', icon: '🍵' },
-                    { id: 'smoothie',    name: '西瓜汁',   price: 50, unit: '杯', icon: '🍹' },
-                    { id: 'soymilk',     name: '烏龍茶',   price: 35, unit: '碗', icon: '🥛' },
-                    { id: 'papaya_milk', name: '木瓜牛奶', price: 50, unit: '杯', icon: '🥛' },
-                    { id: 'iced_tea',    name: '紅茶',     price: 30, unit: '杯', icon: '🍶' },
+                    { id: 'bubble_tea',  name: '珍珠奶茶', price: 55, unit: '杯', icon: '🧋', imageUrl: '../images/b6/icon-b6-bubble-tea.png' },
+                    { id: 'lemon_tea',   name: '檸檬茶',   price: 40, unit: '杯', icon: '🍋', imageUrl: '../images/b6/icon-b6-lemon-tea.png' },
+                    { id: 'sugarcane',   name: '甘蔗汁',   price: 30, unit: '杯', icon: '🌿', imageUrl: '../images/b6/icon-b6-sugarcane-juice.png' },
+                    { id: 'milk_tea',    name: '奶茶',     price: 45, unit: '杯', icon: '🍵', imageUrl: '../images/b6/icon-b6-milk-tea.png' },
+                    { id: 'smoothie',    name: '西瓜汁',   price: 50, unit: '杯', icon: '🍹', imageUrl: '../images/b6/icon-b6-watermelon-juice.png' },
+                    { id: 'soymilk',     name: '烏龍茶',   price: 35, unit: '碗', icon: '🥛', imageUrl: '../images/b6/icon-b6-oolong-tea.png' },
+                    { id: 'papaya_milk', name: '木瓜牛奶', price: 50, unit: '杯', icon: '🥛', imageUrl: '../images/b6/icon-b6-papaya-milk.png' },
+                    { id: 'iced_tea',    name: '紅茶',     price: 30, unit: '杯', icon: '🍶', imageUrl: '../images/b6/icon-b6-iced-black-tea.png' },
                     { id: 'taro_milk',   name: '芋頭牛奶', price: 55, unit: '杯', icon: '🫗' },
-                    { id: 'winter_melon',name: '冬瓜茶',   price: 25, unit: '杯', icon: '🍵' },
-                    { id: 'mango_ice',   name: '芒果冰',   price: 60, unit: '杯', icon: '🥭' },
-                    { id: 'plum_juice',  name: '梅子汁',   price: 30, unit: '杯', icon: '🫙' },
+                    { id: 'winter_melon',name: '冬瓜茶',   price: 25, unit: '杯', icon: '🍵', imageUrl: '../images/b6/icon-b6-winter-melon-tea.png' },
+                    { id: 'mango_ice',   name: '芒果冰',   price: 60, unit: '杯', icon: '🥭', imageUrl: '../images/b6/icon-b6-mango-shaved-ice.png' },
+                    { id: 'plum_juice',  name: '梅子汁',   price: 30, unit: '杯', icon: '🫙', imageUrl: '../images/b6/icon-b6-plum-juice.png' },
                 ],
             },
             souvenir: {
                 name: '紀念品攤', icon: '🎁',
                 items: [
-                    { id: 'phone_case',  name: '手機殼',   price: 80,  unit: '個', icon: '📱' },
-                    { id: 'keychain',    name: '鑰匙圈',   price: 45,  unit: '個', icon: '🔑' },
-                    { id: 'hairpin',     name: '髮夾',     price: 30,  unit: '個', icon: '💎' },
-                    { id: 'bookmark',    name: '書籤',     price: 20,  unit: '個', icon: '📖' },
-                    { id: 'magnet',      name: '冰箱磁鐵', price: 35,  unit: '個', icon: '🧲' },
-                    { id: 'wristband',   name: '手環',     price: 60,  unit: '個', icon: '🪬' },
-                    { id: 'postcard',    name: '明信片',   price: 25,  unit: '張', icon: '📮' },
+                    { id: 'phone_case',  name: '手機殼',   price: 80,  unit: '個', icon: '📱', imageUrl: '../images/b6/icon-b6-phone-case.png' },
+                    { id: 'keychain',    name: '鑰匙圈',   price: 45,  unit: '個', icon: '🔑', imageUrl: '../images/b6/icon-b6-keychain.png' },
+                    { id: 'hairpin',     name: '髮夾',     price: 30,  unit: '個', icon: '💎', imageUrl: '../images/b6/icon-b6-hairpin.png' },
+                    { id: 'bookmark',    name: '書籤',     price: 20,  unit: '個', icon: '📖', imageUrl: '../images/b6/icon-b6-bookmark.png' },
+                    { id: 'magnet',      name: '冰箱磁鐵', price: 35,  unit: '個', icon: '🧲', imageUrl: '../images/b6/icon-b6-fridge-magnet.png' },
+                    { id: 'wristband',   name: '手環',     price: 60,  unit: '個', icon: '🪬', imageUrl: '../images/b6/icon-b6-wristband.png' },
+                    { id: 'postcard',    name: '明信片',   price: 25,  unit: '張', icon: '📮', imageUrl: '../images/b6/icon-b6-postcard.png' },
                     { id: 'sticker',     name: '貼紙組',   price: 20,  unit: '包', icon: '🌟' },
                     { id: 'charm',       name: '吊飾',     price: 55,  unit: '個', icon: '🔮' },
                     { id: 'plush',       name: '可愛布偶', price: 90,  unit: '個', icon: '🧸' },
@@ -300,6 +300,13 @@ let _currentMissions = B6_MISSIONS;
 const toTWD = v => typeof convertToTraditionalCurrency === 'function' ? convertToTraditionalCurrency(v) : `${v}元`;
 // 數量語音：2 讀作「兩」，避免 TTS 唸成「貳」
 const toCountSpeech = n => n === 2 ? '兩' : String(n);
+const b6IconHTML = item => {
+    if (item.imageUrl) {
+        const esc = (item.icon || '🛒').replace(/'/g, "\\'");
+        return `<img src="${item.imageUrl}" alt="${item.name}" draggable="false" class="b6-icon-img" onerror="this.outerHTML='${esc}'">`;
+    }
+    return item.icon || '🛒';
+};
 
 let Game;
 
@@ -1330,7 +1337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const speechText = `${stallInfo?.name || ''}，${item.name}，${item.price}元`;
                 return `<div class="b6-p1hh-item${alreadySel ? ' b6-p1hh-item-done' : ''}">
                     <span class="b6-p1hh-stall-name">${stallInfo?.name || ''}</span>
-                    <span class="b6-p1hh-icon">${item.icon}</span>
+                    <span class="b6-p1hh-icon">${b6IconHTML(item)}</span>
                     <span class="b6-p1hh-name">${item.name}</span>
                     <span class="b6-p1hh-price">${item.price} 元</span>
                     ${alreadySel ? '<span class="b6-p1hh-done-badge">✅ 已選</span>' : ''}
@@ -1411,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 列出已選商品名稱
                 const selectedNames = selected.map(si => {
                     const item = stallInfo.items.find(i => i.id === si.id);
-                    return item ? `<span class="b6-sr-sel-item">${item.icon} ${item.name}</span>` : '';
+                    return item ? `<span class="b6-sr-sel-item">${b6IconHTML(item)} ${item.name}</span>` : '';
                 }).join('');
                 return `
                 <div class="b6-stall-req${done ? ' done' : ''}${active ? ' active' : ''}" data-req-stall="${stall}">
@@ -1455,7 +1462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                 <button class="b6-product-btn${extraClass ? ' ' + extraClass : ''}"
                         data-item-id="${item.id}" data-stall="${g.activeStall}" data-price="${item.price}">
-                    <span class="b6-product-icon">${item.icon}</span>
+                    <span class="b6-product-icon">${b6IconHTML(item)}</span>
                     <span class="b6-product-name">${item.name}</span>
                     <span class="b6-product-price">${item.price} 元</span>
                     <span class="b6-product-unit">/ ${item.unit}</span>
@@ -1476,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                     if (!item) return '';
                     return `<div class="b6-cart-item">
-                        <span class="b6-ci-icon">${item.icon}</span>
+                        <span class="b6-ci-icon">${b6IconHTML(item)}</span>
                         <span class="b6-ci-name">${item.name}</span>
                         <span class="b6-ci-price">${item.price} 元</span>
                     </div>`;
@@ -1660,7 +1667,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     else if (isQuotaFull) extraClass = 'quota-full';
                     return `<button class="b6-product-btn${extraClass ? ' ' + extraClass : ''}"
                         data-item-id="${item.id}" data-stall="${g.activeStall}" data-price="${item.price}">
-                        <span class="b6-product-icon">${item.icon}</span>
+                        <span class="b6-product-icon">${b6IconHTML(item)}</span>
                         <span class="b6-product-name">${item.name}</span>
                         <span class="b6-product-price">${item.price} 元</span>
                         <span class="b6-product-unit">/ ${item.unit}</span>
@@ -2002,7 +2009,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const stallInfo = _currentStalls[stall];
                 const selectedNames = selected.map(si => {
                     const item = stallInfo?.items.find(i => i.id === si.id);
-                    return item ? `<span class="b6-sr-sel-item">${item.icon} ${item.name}</span>` : '';
+                    return item ? `<span class="b6-sr-sel-item">${b6IconHTML(item)} ${item.name}</span>` : '';
                 }).join('');
                 let itemsEl = reqEl.querySelector('.b6-sr-items');
                 if (selectedNames) {
@@ -2078,7 +2085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                         if (!item) return '';
                         return `<div class="b6-cart-item">
-                            <span class="b6-ci-icon">${item.icon}</span>
+                            <span class="b6-ci-icon">${b6IconHTML(item)}</span>
                             <span class="b6-ci-name">${item.name}</span>
                             <span class="b6-ci-price">${item.price} 元</span>
                         </div>`;
@@ -2120,7 +2127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean);
             const total = items.reduce((sum, item) => sum + item.price, 0);
             const itemRows = items.map(item => {
-                return `<div class="b6-cc-row"><span>${item.icon || ''} ${item.name}</span><span>${item.price} 元</span></div>`;
+                return `<div class="b6-cc-row"><span>${b6IconHTML(item)} ${item.name}</span><span>${item.price} 元</span></div>`;
             }).join('');
             const modal = document.createElement('div');
             modal.id = 'b6-checkout-confirm';
@@ -2158,7 +2165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.className = `b6-collect-flash${isAll ? ' all-done' : ''}`;
             el.innerHTML = `
                 <div class="b6-cf-item">
-                    <span class="b6-cf-icon">${item.icon || '🛒'}</span>
+                    <span class="b6-cf-icon">${b6IconHTML(item)}</span>
                     <span class="b6-cf-name">${item.name}</span>
                 </div>
                 <div class="b6-cf-price">+${item.price}元</div>
@@ -2331,9 +2338,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _b6RefFormulaHtml(items, total) {
             const parts = items.map(item =>
-                `<span class="b6c-rf-item">${item.icon}&nbsp;${item.name}&nbsp;<strong>${item.price}元</strong></span>`
+                `<span class="b6c-rf-item"><span class="b6c-rf-item-icon">${b6IconHTML(item)}</span><span class="b6c-rf-item-label">${item.name}&nbsp;<strong>${item.price}元</strong></span></span>`
             );
-            const tokens = parts.flatMap((p, i) => [p, '<span class="b6c-rf-sep">+</span>']);
+            const tokens = parts.flatMap((p, i) => i < parts.length - 1 ? [p, '<span class="b6c-rf-sep">+</span>'] : [p]);
             tokens.push(`<span class="b6c-rf-eq">= 合計</span>`);
             tokens.push(`<span class="b6c-rf-total">${total}元</span>`);
             return `<div class="b6c-ref-formula">${tokens.join('')}</div>`;
@@ -2344,7 +2351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const allItems = [];
             (g.selectedItems || []).forEach(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
-                if (item) allItems.push({ icon: item.icon || '', name: item.name, price: item.price });
+                if (item) allItems.push({ icon: item.icon || '', imageUrl: item.imageUrl, name: item.name, price: item.price });
             });
             (g.customItems || []).filter(i => !i._deleted).forEach(i => {
                 allItems.push({ icon: '📦', name: i.name, price: i.price });
@@ -2979,7 +2986,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const _changeAllItems = [];
             (g.selectedItems || []).forEach(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
-                if (item) _changeAllItems.push({ icon: item.icon || '', name: item.name, price: item.price });
+                if (item) _changeAllItems.push({ icon: item.icon || '', imageUrl: item.imageUrl, name: item.name, price: item.price });
             });
             (g.customItems || []).filter(i => !i._deleted).forEach(i => {
                 _changeAllItems.push({ icon: '📦', name: i.name, price: i.price });
@@ -3017,16 +3024,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b6c-tray-coins" id="b6c-tray-coins">${trayHtml}</div>
                 </div>
                 <div class="b6p2-wallet-area b6c-change-area">
-                    <div class="b6p2-wallet-coins-label b6c-change-title">
-                        💼 我的錢包
-                        <span class="b6c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b6c-wallet-info"><span id="b6c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b6c-placed-total">0</span>/${change} 元）</span>
+                    <div class="b6c-change-title b6c-change-title-bar">
+                        <div style="flex:1;"></div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            💼 我的錢包
+                            <span class="b6c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b6c-wallet-info"><span id="b6c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b6c-placed-total">0</span>/${change} 元）</span>
+                        </div>
+                        <div style="flex:1;display:flex;justify-content:flex-end;">
+                            <button class="b6c-wallet-toggle-btn" id="b6c-wallet-toggle">▶ 展開</button>
+                        </div>
                     </div>
                     <div class="b6c-wallet-split">
-                        <div class="b6c-wallet-split-left">
+                        <div class="b6c-wallet-split-left" id="b6c-wallet-left" style="display:none;">
                             ${walletStaticHtml || '<span class="b6p2-wallet-empty" style="font-size:12px;">（餘額為0）</span>'}
                         </div>
                         <div class="b6c-wallet-split-right b6p2-drop-zone b6c-drop-zone" id="b6c-wallet-zone">
-                            <div id="b6c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:flex-end;">
+                            <div id="b6c-wallet-coins" style="display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:center;justify-content:center;min-height:60px;">
                                 <span class="b6p2-wallet-empty">把找零金錢拖曳到這裡</span>
                             </div>
                         </div>
@@ -3049,6 +3062,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('b6c-confirm-btn');
             const hintBtn    = document.getElementById('b6c-hint-btn');
             if (!trayEl || !walletZone) return;
+
+            // ── 展開/收起付款後餘額（左側錢包面板）──────────────────
+            const walletToggleBtn  = document.getElementById('b6c-wallet-toggle');
+            const walletLeftPanel  = document.getElementById('b6c-wallet-left');
+            if (walletToggleBtn && walletLeftPanel) {
+                Game.EventManager.on(walletToggleBtn, 'click', () => {
+                    const isOpen = walletLeftPanel.style.display !== 'none';
+                    walletLeftPanel.style.display = isOpen ? 'none' : 'block';
+                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▲ 收起';
+                }, {}, 'gameUI');
+            }
 
             // ── 放置一枚金幣到錢包 ──────────────────────────────────
             const handleDrop = (denom) => {
@@ -3814,7 +3838,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = (g.selectedItems || []).map(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (item) g.stallStats[stall] = (g.stallStats[stall] || 0) + item.price;
-                return item ? { name: item.name, price: item.price, icon: item.icon || '🛒' } : null;
+                return item ? { name: item.name, price: item.price, icon: item.icon || '🛒', imageUrl: item.imageUrl } : null;
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
 
@@ -3862,11 +3886,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const r = receipts[idx];
                 const itemRows = r.items.map(it => `
                     <div class="b6-rcpt-item-row">
-                        <span class="b6-rcpt-item-icon">${it.icon || '🛒'}</span>
+                        <span class="b6-rcpt-item-icon">${b6IconHTML(it)}</span>
                         <span class="b6-rcpt-item-name">${it.name}</span>
                         <span class="b6-rcpt-item-price">${it.price}元</span>
                     </div>`).join('');
-                return `${itemRows}
+                return `<div class="b6-rcpt-items-grid">${itemRows}</div>
                     <div class="b6-rcpt-divider"></div>
                     <div class="b6-rcpt-sum-row">
                         <span class="b6-rcpt-sum-label">付款</span>

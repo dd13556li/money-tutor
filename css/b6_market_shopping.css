@@ -187,6 +187,24 @@
 }
 
 .b6-product-icon { font-size: 28px; }
+.b6-icon-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    vertical-align: middle;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+/* 各情境圖示尺寸覆寫 */
+.b6-product-btn  .b6-icon-img { width: 128px; height: 128px; }
+.b6-p1hh-icon    .b6-icon-img { width: 32px; height: 32px; }
+.b6-sr-sel-item  .b6-icon-img { width: 20px; height: 20px; filter: none; }
+.b6-ci-icon      .b6-icon-img { width: 24px; height: 24px; filter: none; }
+.b6-cc-row       .b6-icon-img { width: 22px; height: 22px; filter: none; }
+.b6-cf-icon      .b6-icon-img { width: 128px; height: 128px; }
+/* Phase 2 第一張卡片商品圖示 */
+.b6c-rf-item-icon .b6-icon-img { width: 128px; height: 128px; }
+/* 買菜成功頁採購清單商品圖示 */
+.b6-rcpt-item-icon .b6-icon-img { width: 128px; height: 128px; }
 
 .b6-product-name {
     font-size: 12px;
@@ -835,15 +853,15 @@
     pointer-events: none;
     animation: b6CollectFlashIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
     box-shadow: 0 8px 28px rgba(29,78,216,0.4);
-    min-width: 170px;
+    min-width: 200px;
 }
 .b6-collect-flash.all-done {
     background: linear-gradient(135deg, #d97706, #f59e0b);
     box-shadow: 0 8px 28px rgba(217,119,6,0.45);
 }
-.b6-cf-item { display: flex; align-items: center; gap: 10px; }
-.b6-cf-icon  { font-size: 30px; line-height: 1; }
-.b6-cf-name  { font-size: 22px; font-weight: 800; }
+.b6-cf-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.b6-cf-icon  { font-size: 80px; line-height: 1; }
+.b6-cf-name  { font-size: 20px; font-weight: 800; text-align: center; }
 .b6-cf-price { font-size: 18px; font-weight: 700; color: #bfdbfe; }
 .b6-collect-flash.all-done .b6-cf-price { color: #fef3c7; }
 .b6-cf-progress {
@@ -1228,16 +1246,20 @@
 }
 .b6c-rf-item {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 8px;
     font-size: 13px;
     color: #374151;
     background: rgba(255,255,255,0.7);
     border: 1px solid #a7f3d0;
     border-radius: 16px;
-    padding: 3px 9px;
-    white-space: nowrap;
+    padding: 12px 16px;
+    text-align: center;
+    white-space: normal;
 }
+.b6c-rf-item-icon { font-size: 80px; line-height: 1; }
+.b6c-rf-item-label { font-size: 13px; }
 .b6c-rf-item strong { color: #047857; }
 .b6c-rf-sep { font-size: 15px; font-weight: 700; color: #9ca3af; }
 .b6c-rf-eq  { font-size: 14px; font-weight: 700; color: #065f46; white-space: nowrap; }
@@ -2569,16 +2591,32 @@
 .b6-rcpt-page, .b6-rcpt-single-page {
     font-size: 12px; color: #b45309; font-weight: 600;
 }
+/* Grid 容器：桌面 3 欄、平板 2 欄、手機 1 欄 */
+.b6-rcpt-items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 8px 0 4px;
+}
+@media (max-width: 600px) {
+    .b6-rcpt-items-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 380px) {
+    .b6-rcpt-items-grid { grid-template-columns: 1fr; }
+}
 .b6-rcpt-item-row {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 6px 4px;
-    border-bottom: 1px dashed #e5e7eb;
+    gap: 6px;
+    padding: 12px 8px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    text-align: center;
 }
-.b6-rcpt-item-row:last-of-type { border-bottom: none; }
-.b6-rcpt-item-icon { font-size: 20px; flex-shrink: 0; }
-.b6-rcpt-item-name { flex: 1; font-size: 14px; color: #374151; font-weight: 500; }
+.b6-rcpt-item-icon { font-size: 80px; line-height: 1; flex-shrink: 0; }
+.b6-rcpt-item-name { font-size: 13px; color: #374151; font-weight: 600; }
 .b6-rcpt-item-price { font-size: 14px; font-weight: 700; color: #047857; }
 .b6-rcpt-divider {
     height: 2px;
@@ -2876,6 +2914,25 @@
 .b6c-change-title {
     color: #065f46;
 }
+.b6c-change-title-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+}
+.b6c-wallet-toggle-btn {
+    font-size: 12px;
+    padding: 3px 10px;
+    border: 1.5px solid #6ee7b7;
+    border-radius: 20px;
+    background: #f0fdf4;
+    color: #065f46;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+.b6c-wallet-toggle-btn:hover { background: #d1fae5; }
 .b6c-change-need {
     color: #059669 !important;
 }

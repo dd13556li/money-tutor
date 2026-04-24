@@ -398,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Game.Debug.log('flow', '🎬 [場景管理] 進入 paying 場景');
 
                     // 重置狀態標誌
+                    context.state.isProcessing = false;
                     context.state.gameState.isProcessingPrice = false;
                     context.state.gameState.isProcessingPayment = false;
                     context.state.gameState.isProcessingChange = false;
@@ -499,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'calculation': {
                 onEnter: (context) => {
                     Game.Debug.log('flow', '🎬 [場景管理] 進入 calculation 場景');
+                    context.state.isProcessing = false;
 
                     // 🔧 [新增] 困難模式計算找零場景
                     context.renderCalculationSceneUI();
@@ -3135,6 +3137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Debug.log('product', '🎯 [價格系統] 已為', this.state.settings.difficulty, '難度重設價格');
 
             // 🔧 [新增] 重置遊戲狀態標誌
+            this.state.isProcessing = false;
             this.state.gameState.hasUserSelectedProduct = false;
             this.state.gameState.isProcessingProductSelection = false;
             this.state.gameState.selectedItem = null;
@@ -9446,6 +9449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this._a4UpdateChangeDisplay(change);
                 this._a4RenderWalletCoins(change);
                 const runningTotal = (gs.a4cPlaced || []).reduce((s, p) => s + p.denom, 0);
+                // 設計意圖：只在按過提示後才播拖曳語音，避免干擾
                 if (gs.a4cHintShown) this.speech.speak(`找回${this.convertToTraditionalCurrency(runningTotal)}`);
             };
 
@@ -10022,6 +10026,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         font-size: 18px;
                         font-weight: 500;
                         margin-bottom: 10px;
+                        text-align: center;
                         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
                     }
 
@@ -10030,6 +10035,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         font-size: 42px;
                         font-weight: bold;
                         margin: 0;
+                        text-align: center;
+                        width: 100%;
+                        display: block;
                         text-shadow: 0 3px 6px rgba(0,0,0,0.4);
                         animation: pulse-glow 2s ease-in-out infinite alternate;
                     }
@@ -10839,7 +10847,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     this.audio.playCorrect02Sound();
 
-                    const speechText = `答對了！找零${this.convertToTraditionalCurrency(transaction.changeExpected)}`;
+                    const speechText = `答對了！找回${this.convertToTraditionalCurrency(transaction.changeExpected)}`;
                     this.speech.speak(speechText, {
                         callback: () => {
                             // 生成找零
@@ -11475,7 +11483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 答對了，關閉彈窗，進入找零驗證頁面
                     this.audio.playCorrect02Sound();
 
-                    const speechText = `答對了！找零${transaction.changeExpected}元`;
+                    const speechText = `答對了！找回${this.convertToTraditionalCurrency(transaction.changeExpected)}`;
                     this.speech.speak(speechText, {
                         callback: () => {
                             document.getElementById('calculation-modal-overlay').remove();
@@ -13751,6 +13759,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // =====================================================
         showTransactionSummaryScreenWithData(selectedItem, transaction, callback) {
             const app = document.getElementById('app');
+            const _prevBodyBg = document.body.style.background;
+            document.body.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
 
             const mkMoneyIcons = (amount) => {
                 if (!amount || amount <= 0) return '';
@@ -13825,7 +13835,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <style>
                     .transaction-summary-screen {
-                        height: 100vh;
+                        min-height: 100vh;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -13948,7 +13958,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 單一商品
                 itemName = selectedItem ? this.parseProductDisplay(selectedItem, 1).speechText : '未知商品';
             }
-            const speechText = `購買商品：${itemName}，商品價格：${transaction.totalCost}元，已付金額：${transaction.amountPaid}元，應找零錢：${transaction.changeExpected}元`;
+            const _changeSpeech = transaction.changeExpected === 0 ? '找回零元' : `找回${this.convertToTraditionalCurrency(transaction.changeExpected)}`;
+            const speechText = `購買商品：${itemName}，商品價格：${this.convertToTraditionalCurrency(transaction.totalCost)}，已付金額：${this.convertToTraditionalCurrency(transaction.amountPaid)}，${_changeSpeech}`;
 
             Game.Debug.log('speech', '🎙️ [A4-摘要] 播放交易摘要語音:', speechText);
 
@@ -13959,6 +13970,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         Game.Debug.log('flow', '🎙️ [A4-摘要] 交易摘要語音完成，準備進入下一輪');
                         // 2秒後進入下一輪
                         Game.TimerManager.setTimeout(() => {
+                            document.body.style.background = _prevBodyBg;
                             if (callback) {
                                 Game.Debug.log('flow', '🔧 [A4-摘要] 執行回調函數，進入下一題');
                                 callback();
@@ -13972,6 +13984,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Game.Debug.warn('speech', '⚠️ [A4-摘要] 語音播放失敗，但繼續流程:', error);
                 // 語音失敗時，仍然執行回調以確保流程繼續
                 this.TimerManager.setTimeout(() => {
+                    document.body.style.background = _prevBodyBg;
                     if (callback) {
                         Game.Debug.log('flow', '🔧 [A4-摘要] 語音失敗，直接執行回調函數');
                         callback();

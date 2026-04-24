@@ -3915,7 +3915,7 @@ body.click-mode-active *:focus-visible {
     gap: 12px;
 }
 
-.a4c-task-left { flex: 1; }
+.a4c-task-left { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
 .a4c-task-item-row {
     display: flex;
@@ -3928,6 +3928,7 @@ body.click-mode-active *:focus-visible {
 .a4c-change-row {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
 }

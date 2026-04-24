@@ -1,6 +1,6 @@
-// B5 生日派對預算 作業單
+// B5 派對活動採購 作業單
 WorksheetRegistry.register('b5', {
-    name: 'B5 生日派對預算',
+    name: 'B5 派對活動採購',
     icon: '🎂',
     defaultCount: 10,
     subtitle(opts) {
