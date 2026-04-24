@@ -8,9 +8,9 @@
 |------|---------|
 | 架構說明、常用模式、程式碼模板 | **CLAUDE.md**（本文件，每輪對話都載入） |
 | 修復記錄：搜尋關鍵字 | **CLAUDE.md 修復記錄速查表**（只留關鍵字） |
-| 修復記錄：詳細說明、根因分析 | **`report/XX_Unit_Completion_Report.md`** |
-| 廢棄程式碼稽核 | **`report/Deprecated_Code_Audit.md`** |
-| 架構設計與成本分析 | **`report/` 其他文件** |
+| 修復記錄：詳細說明、根因分析 | **`report/unit_reports/XX_Unit_Completion_Report.md`** |
+| 廢棄程式碼稽核 | **`report/audit/Deprecated_Code_Audit.md`** |
+| 架構設計與成本分析 | **`report/architecture/` 或 `report/analysis/` 其他文件** |
 
 **為什麼這樣分**：CLAUDE.md 是系統提示的一部分，每輪對話都計費；report 文件只在需要時才讀取（單次計費）。目標：CLAUDE.md 控制在 40~60 KB 以內。
 
@@ -99,7 +99,7 @@ money_tutor/
 
 ## 常用修改模式
 
-> 獎勵系統按鈕 / 設定選項 / 完成畫面連結 HTML 模板：Grep `reward-btn` 定位現有單元複製；完整模板見 `report/Code_Templates.md`。
+> 獎勵系統按鈕 / 設定選項 / 完成畫面連結 HTML 模板：Grep `reward-btn` 定位現有單元複製；完整模板見 `report/architecture/Code_Templates.md`。
 
 ### 統一測驗結束畫面樣式
 
@@ -111,13 +111,13 @@ money_tutor/
 
 **HTML 依賴**：`<audio id="success-sound" src="../audio/success.mp3">` + confetti.browser.min.js
 
-**煙火觸發**：Grep `fireConfetti` / `TimerManager.setTimeout.*confetti` 定位；完整模板見 `report/Code_Templates.md`。
+**煙火觸發**：Grep `fireConfetti` / `TimerManager.setTimeout.*confetti` 定位；完整模板見 `report/architecture/Code_Templates.md`。
 
 **完成畫面滾動修復**：Grep `document.body.style.overflow` 定位。
 
 ### TimerManager / EventManager 模式（記憶體管理）
 
-所有單元已實現。Grep `TimerManager.setTimeout` / `EventManager.on` 定位；**完整模板見 `report/Code_Templates.md`**。
+所有單元已實現。Grep `TimerManager.setTimeout` / `EventManager.on` 定位；**完整模板見 `report/architecture/Code_Templates.md`**。
 
 **呼叫點規範**：
 - `init()`：`TimerManager.clearAll()` + `EventManager.removeAll()` + `injectGlobalAnimationStyles()`
@@ -180,7 +180,7 @@ reward/index.html / script.js / styles.css / sound/ / png/1.png~5.png / CLAUDE.m
 
 ## A3 特殊說明
 
-> 詳細說明見 `report/A3_Unit_Completion_Report.md §十一`
+> 詳細說明見 `report/unit_reports/A3_Unit_Completion_Report.md §十一`
 
 - 餐盤 CSS：Grep `tray`（黃色漸層 + ::before/after 把手）
 - Debug 物件：`McDonald.Debug`；A1=`VendingMachine.Debug`；A2=`BarberKiosk.Debug`；A4/A6/C/F=`Game.Debug`；A5=`ATM.Debug`；F5/F6=`GameDebug`
@@ -191,7 +191,7 @@ reward/index.html / script.js / styles.css / sound/ / png/1.png~5.png / CLAUDE.m
 
 ## 作業單系統 (worksheet/)
 
-> 詳細說明見 `report/Worksheet_Unit_Completion_Report.md`
+> 詳細說明見 `report/unit_reports/Worksheet_Unit_Completion_Report.md`
 
 ```
 worksheet/index.html / worksheet-generator.js / worksheet-styles.css / units/（18個JS）
@@ -230,7 +230,7 @@ window.open('../worksheet/index.html?' + params.toString(), 'Worksheet', 'width=
 **重要規則**：
 - base64 檔宣告必須用 `window.X = window.X || {...}`（不可用 `const`，`const` 不掛 `window`）
 - `_inlineImages()` 三段策略：①base64 lookup → ②fetch（http 環境）→ ③透明 GIF fallback（防 canvas taint）
-- 重新生成指令（Python+Pillow）：見 `report/Worksheet_Unit_Completion_Report.md` 十、
+- 重新生成指令（Python+Pillow）：見 `report/unit_reports/Worksheet_Unit_Completion_Report.md` 十、
 
 ### 工具列 toolbarConfig
 
@@ -248,7 +248,7 @@ toolbarConfig: {
 
 ### 各單元作業單配置摘要
 
-> 完整配置表見 `report/Worksheet_Unit_Completion_Report.md §五`；特殊記憶點：
+> 完整配置表見 `report/unit_reports/Worksheet_Unit_Completion_Report.md §五`；特殊記憶點：
 
 - A1：`_selectDrinksWithUniquePrice()` + `_getSmartPayment()`；adjustCount=圖示類型
 - A2：僅 6 種 price-* 題型（無找零）；`_serviceImg()`（`icon-a2-*.png`）
@@ -262,7 +262,7 @@ toolbarConfig: {
 
 ## 修復記錄速查（最新狀態）
 
-> 詳細說明見各單元 `report/XX_Unit_Completion_Report.md`。本表僅列搜尋關鍵字。
+> 詳細說明見各單元 `report/unit_reports/XX_Unit_Completion_Report.md`。本表僅列搜尋關鍵字。
 
 | 項目 | 單元 | 搜尋關鍵字 |
 |------|------|------------|
@@ -280,13 +280,13 @@ toolbarConfig: {
 | canvas taint 透明 GIF fallback | worksheet/ | `R0lGODlhAQABAIAAAAAAAP///` |
 | A4 作業單商品改用圖片 | A4 作業單 | `_productImg`, `item.icon` |
 | base64 WebP 透明背景 | worksheet/ | `data:image/webp;base64` |
-| *(B系列 03-14~03-18 及更早修復已歸檔)* | — | 見 `report/Fix_History.md` |
+| *(B系列 03-14~03-18 及更早修復已歸檔)* | — | 見 `report/audit/Fix_History.md` |
 | A6 easy-change-money 觸控拖曳修正（2026-03-16）| A6 + `touch-drag-utility.js` | `cleanupAll()` before change drag；`_DRAG_SEL` 常數；`let target` + 父元素回退；`?v=2.3` 快取清除（A3/A4/A6/F1/F2/F6）|
 | A6 預設任務錢包分層上限（2026-03-16）| A6 | `walletCap`：≤100→300、≤300→700、≤600→1300、其他→+500；`minWallet = totalPrice + 10`；`generatePresetQuestion` + `renderPaymentSceneUI` fallback |
 | A6 500/1000/2000 錢包隨機組成（2026-03-16）| A6 | `generateRandomWalletDecomposition`：貪婪起點→隨機拆解→≤10張；`breakRules`；`initializeWallet` 三路分支；每題重新計算 |
 | A6 找零驗證普通模式加 ✗（2026-03-16）| A6 | `wrong-answer-overlay` 加入普通模式 else 分支；timing 對齊困難模式（300ms+1000ms）|
 | A6 找零驗證正確答案加 ✓（2026-03-16）| A6 | `correct-answer-overlay`、`correct-mark`、`correctMarkAppear`；與 ✗ 結構完全對稱 |
-| *(C/F/A 系列較舊系統修復已歸檔)* | — | 見 `report/Fix_History.md` |
+| *(C/F/A 系列較舊系統修復已歸檔)* | — | 見 `report/audit/Fix_History.md` |
 | A2 coinFirst 灰暗 CSS cascade | A2 | `transition: none !important`, `requestAnimationFrame setProperty.*important`, `serviceItemFadeIn :not(.coin-first-unlocking)` |
 | A2 coinFirst 指示燈放大+紅色 | A2 | `.indicator-light 18px`, `light.classList.add('active')`, `redLightPulse` |
 | A2 coinFirst 需要金額顯示修復 | A2 | `_cfSvc`, `_displayReq`, `easyMode.assignedService \|\| normalMode.assignedService` |
@@ -518,7 +518,7 @@ toolbarConfig: {
 
 ## 廢棄程式碼稽核
 
-> 詳細記錄見 `report/Deprecated_Code_Audit.md`
+> 詳細記錄見 `report/audit/Deprecated_Code_Audit.md`
 
 | 搜尋關鍵字 | 單元 | 說明 |
 |-----------|------|------|
