@@ -100,6 +100,14 @@ WorksheetRegistry.register('b6', {
         ],
     },
 
+    _itemEmoji: {
+        '高麗菜': '🥬', '青蔥': '🌿', '番茄': '🍅', '蘋果': '🍎',
+        '香蕉': '🍌', '食鹽': '🧂', '地瓜': '🍠', '菠菜': '🥬',
+        '柳橙': '🍊', '麵條': '🍜', '紅蘿蔔': '🥕', '醬油': '🍶',
+        '雞蛋': '🥚', '葡萄': '🍇', '芒果': '🥭', '白米': '🌾',
+        '哈密瓜': '🍈',
+    },
+
     _coinsDisplay(amount, renderCoin) {
         const coins     = walletToCoins(amount);
         const displayed = coins.slice(0, 6);
@@ -131,10 +139,12 @@ WorksheetRegistry.register('b6', {
 
         return chosen.map(scenario => {
             const total     = scenario.items.reduce((s, it) => s + it.cost, 0);
+            const getIcon = name => { const e = this._itemEmoji[name]; return e ? `<span class="ws-emoji-icon">${e}</span>` : ''; };
             const itemsText = scenario.items
-                .map(it => `${it.name}（1${it.unit}）<strong>${it.cost}</strong> 元`)
+                .map(it => `${getIcon(it.name)}${it.name}（1${it.unit}）<strong>${it.cost}</strong> 元`)
                 .join('、');
-            const basePrompt = `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>買菜，需要買：${itemsText}`;
+            const basePromptFact = `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買 ${itemsText}`;
+            const basePrompt = `${basePromptFact}，總共要多少錢？`;
 
             // ── 數字填空 ───────────────────────────────────────────────
             if (questionType === 'fill') {
@@ -145,7 +155,7 @@ WorksheetRegistry.register('b6', {
                     _key: `b6_${scenario.label}`,
                     prompt: basePrompt,
                     visual: '',
-                    answerArea: `至少要帶：${ans} 元`,
+                    answerArea: `答：${ans} 元`,
                     answerDisplay: ''
                 };
 
@@ -153,16 +163,16 @@ WorksheetRegistry.register('b6', {
             } else if (questionType === 'img-fill') {
                 const itemsWithCoins = scenario.items.map(it => {
                     const coinRow = this._coinsDisplay(it.cost, renderCoin);
-                    return `${it.name}（1${it.unit}）（<strong>${it.cost}</strong> 元）<span style="vertical-align:middle;">${coinRow}</span>`;
+                    return `${getIcon(it.name)}${it.name}（1${it.unit}）（<strong>${it.cost}</strong> 元）<span style="vertical-align:middle;">${coinRow}</span>`;
                 }).join('&emsp;');
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${total}</span>`
                     : blankLine();
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>買菜，需要買：`,
+                    prompt: `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買：`,
                     visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
-                    answerArea: `至少要帶：${ans} 元`,
+                    answerArea: `共需 ${ans} 元`,
                     answerDisplay: ''
                 };
 
@@ -170,8 +180,8 @@ WorksheetRegistry.register('b6', {
             } else if (questionType === 'fill-select') {
                 const opts      = this._coinOptions(total);
                 const fillArea  = showAnswers
-                    ? `至少要帶：<span style="color:red;font-weight:bold;">${total}</span> 元`
-                    : `至少要帶：${blankLine()} 元`;
+                    ? `共需帶：<span style="color:red;font-weight:bold;">${total}</span> 元`
+                    : `共需帶：${blankLine()} 元`;
                 const choicesHtml = opts.map((opt, i) => {
                     const label     = String.fromCharCode(9312 + i);
                     const isCorrect = opt.total === total;
@@ -188,7 +198,7 @@ WorksheetRegistry.register('b6', {
                 }).join('');
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: basePrompt,
+                    prompt: basePromptFact,
                     visual: `<div style="margin-bottom:6px;">${fillArea}</div>
                              <div style="margin-bottom:4px;">請選出正確的錢幣組合：</div>
                              <div class="coin-choice-options">${choicesHtml}</div>`,
@@ -213,7 +223,7 @@ WorksheetRegistry.register('b6', {
                 }).join('');
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>買菜，需要買：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `${basePromptFact}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -239,7 +249,7 @@ WorksheetRegistry.register('b6', {
                 }).join('');
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>買菜，需要買：${itemsText}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
+                    prompt: `${basePromptFact}，共需 <strong>${total}</strong> 元，請選出正確的錢幣組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -259,7 +269,7 @@ WorksheetRegistry.register('b6', {
                 const totalHint = `<span style="margin-left:8px;">共 <span style="color:#ccc;font-weight:bold;">${total}</span> 元</span>`;
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: basePrompt,
+                    prompt: basePromptFact,
                     visual: `<div style="margin:4px 0;">需帶：${partsHtml}${totalHint}</div>`,
                     answerArea: '',
                     answerDisplay: ''

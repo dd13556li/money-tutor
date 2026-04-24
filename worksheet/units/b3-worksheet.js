@@ -93,36 +93,35 @@ WorksheetRegistry.register('b3', {
         hard:   [25, 35, 50, 65, 80, 100, 125, 150, 175, 200],
     },
 
-    // 月曆模式：含每日存款金額的題目資料
+    // 月曆模式：含每日存款金額的題目資料（商品與價格與 _items 對齊）
     // daysNeeded = ceil(price/daily)；設計使所有題目皆 ≤ 21 天（3 週內完成）
     _calItems: {
         easy: [
-            { name: '繪畫工具組', price: 300, icon: '🎨', daily:  50 }, //  6天
+            { name: '繪畫工具組', price: 280, icon: '🎨', daily:  50 }, //  6天
             { name: '故事書',    price: 200, icon: '📕', daily:  50 }, //  4天
             { name: '玩具車',    price: 300, icon: '🚗', daily: 100 }, //  3天
-            { name: '玩具機器人', price: 200, icon: '🤖', daily:  40 }, //  5天
+            { name: '玩具機器人', price: 300, icon: '🤖', daily:  50 }, //  6天
             { name: '漫畫書',    price: 180, icon: '📚', daily:  30 }, //  6天
             { name: '望遠鏡',    price: 350, icon: '🔭', daily:  50 }, //  7天
-            { name: '娃娃',      price: 280, icon: '🪆', daily:  40 }, //  7天
+            { name: '娃娃',      price: 350, icon: '🪆', daily:  50 }, //  7天
         ],
         normal: [
-            { name: '烹飪玩具組', price: 500, icon: '🍳', daily:  50 }, // 10天
+            { name: '望遠鏡',    price: 350, icon: '🔭', daily:  50 }, //  7天
+            { name: '烹飪玩具組', price: 420, icon: '🍳', daily:  60 }, //  7天
             { name: '故事書套組', price: 450, icon: '📚', daily:  50 }, //  9天
             { name: '科學實驗組', price: 480, icon: '🔬', daily:  60 }, //  8天
             { name: '遊樂園門票', price: 500, icon: '🎡', daily: 100 }, //  5天
             { name: '魔術道具組', price: 550, icon: '🎩', daily:  50 }, // 11天
-            { name: '運動鞋',    price: 800, icon: '👟', daily: 100 }, //  8天
             { name: '生日蛋糕',  price: 600, icon: '🎂', daily:  50 }, // 12天
-            { name: '望遠鏡',    price: 700, icon: '🔭', daily: 100 }, //  7天
+            { name: '運動鞋',    price: 800, icon: '👟', daily: 100 }, //  8天
         ],
         hard: [
-            { name: '音樂盒',     price:  650, icon: '🎵', daily:  50 }, // 13天
-            { name: '運動鞋',     price:  800, icon: '👟', daily:  50 }, // 16天
-            { name: '水族箱',     price: 1200, icon: '🐠', daily: 100 }, // 12天
-            { name: '電動遊戲機',  price: 1500, icon: '🎮', daily: 100 }, // 15天
-            { name: '腳踏車',     price: 2400, icon: '🚴', daily: 200 }, // 12天
-            { name: '魔術道具組',  price: 1050, icon: '🎩', daily: 150 }, //  7天
-            { name: '生日套餐',   price: 1200, icon: '🎂', daily: 100 }, // 12天
+            { name: '魔術道具組', price:  550, icon: '🎩', daily:  50 }, // 11天
+            { name: '音樂盒',    price:  650, icon: '🎵', daily:  50 }, // 13天
+            { name: '運動鞋',    price:  800, icon: '👟', daily: 100 }, //  8天
+            { name: '水族箱',    price: 1200, icon: '🐠', daily: 100 }, // 12天
+            { name: '電動遊戲機', price: 1500, icon: '🎮', daily: 150 }, // 10天
+            { name: '腳踏車',    price: 2400, icon: '🚴', daily: 200 }, // 12天
         ],
     },
 
@@ -151,7 +150,7 @@ WorksheetRegistry.register('b3', {
         if (questionType === 'calendar-hint' || questionType === 'calendar-fill') {
             const calItems  = this._calItems[diff];
             const isHint    = questionType === 'calendar-hint';
-            const calCount  = Math.min(count, 4);
+            const calCount  = Math.min(count, 4); // 每個 entry = 4 題（2×2），最多 4 頁
             const calQs     = [];
             let calTries    = 0;
             const CAL_YEAR  = 2025;
@@ -184,9 +183,9 @@ WorksheetRegistry.register('b3', {
 
                     const numRows = Math.ceil((firstDayOfWeek + daysInMonth) / 7);
                     const DAY_LABELS = ['日','一','二','三','四','五','六'];
-                    // 並排模式縮小字體與格高，確保兩欄都能完整顯示
-                    const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:3px 1px;font-size:8.5pt;font-weight:bold;border:1px solid #bcd;';
-                    const tdBase  = 'text-align:center;border:1px solid #ccc;padding:2px 1px;vertical-align:top;height:34px;width:14.28%;';
+                    // 2×2 格線模式：縮小字體與格高，確保四個月曆能在同一頁顯示
+                    const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:2px 0;font-size:7.5pt;font-weight:bold;border:1px solid #bcd;';
+                    const tdBase  = 'text-align:center;border:1px solid #ccc;padding:1px 0;vertical-align:top;height:26px;width:14.28%;';
                     const tdEmpty = 'background:#f0f0f0;border:1px solid #ddd;';
 
                     const headerRow = DAY_LABELS.map(d => `<th style="${thStyle}">${d}</th>`).join('');
@@ -205,21 +204,21 @@ WorksheetRegistry.register('b3', {
 
                                 if (isHint) {
                                     const daySpan = (showAnswers && isSaving)
-                                        ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;border:2px solid red;color:red;font-weight:bold;font-size:9pt;">${dayNum}</span>`
-                                        : `<span style="font-size:9pt;font-weight:bold;">${dayNum}</span>`;
+                                        ? `<span style="display:inline-block;width:18px;height:18px;line-height:18px;border-radius:50%;border:2px solid red;color:red;font-weight:bold;font-size:7.5pt;">${dayNum}</span>`
+                                        : `<span style="font-size:8pt;font-weight:bold;">${dayNum}</span>`;
                                     const hintDiv = isSaving
-                                        ? `<div style="color:#999;font-size:7pt;margin-top:0;">${periodDay * item.daily}元</div>`
-                                        : `<div style="font-size:7pt;">&nbsp;</div>`;
+                                        ? `<div style="color:#999;font-size:6pt;margin-top:0;">${periodDay * item.daily}元</div>`
+                                        : '';
                                     cells += `<td style="${tdBase}">${daySpan}${hintDiv}</td>`;
                                 } else {
-                                    const dayDiv = `<div style="font-size:9pt;font-weight:bold;">${dayNum}</div>`;
+                                    const dayDiv = `<div style="font-size:8pt;font-weight:bold;">${dayNum}</div>`;
                                     let writeArea;
                                     if (isSaving) {
                                         writeArea = showAnswers
-                                            ? `<div style="color:red;font-weight:bold;font-size:7pt;">${periodDay * item.daily}元</div>`
-                                            : `<div style="border-bottom:1px solid #999;margin:1px 3px 0;min-height:12px;"></div>`;
+                                            ? `<div style="color:red;font-weight:bold;font-size:6.5pt;">${periodDay * item.daily}元</div>`
+                                            : `<div style="border-bottom:1px solid #999;margin:1px 2px 0;min-height:9px;"></div>`;
                                     } else {
-                                        writeArea = `<div style="min-height:12px;"></div>`;
+                                        writeArea = `<div style="min-height:9px;"></div>`;
                                     }
                                     cells += `<td style="${tdBase}">${dayDiv}${writeArea}</td>`;
                                 }
@@ -233,12 +232,12 @@ WorksheetRegistry.register('b3', {
                         : blankLine();
 
                     const subPrompt = isHint
-                        ? `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請圈出存錢的日期：`
-                        : `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，每天存 <strong>${item.daily}</strong> 元，請填寫每天的累計存款：`;
+                        ? `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，從 <strong>${MONTH_NAMES[month - 1]}${startDay}號</strong>開始，每天存 <strong>${item.daily}</strong> 元，請圈出存錢的日期：`
+                        : `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，從 <strong>${MONTH_NAMES[month - 1]}${startDay}號</strong>開始，每天存 <strong>${item.daily}</strong> 元，請填寫每天的累計存款：`;
 
                     const calHtml = `
-<div style="font-weight:bold;font-size:10pt;margin-bottom:3px;color:#4a90d9;text-align:center;">${MONTH_NAMES[month - 1]}</div>
-<table style="width:100%;border-collapse:collapse;margin:0 0 3px;table-layout:fixed;">
+<div style="font-weight:bold;font-size:9pt;margin-bottom:2px;color:#4a90d9;text-align:center;">${MONTH_NAMES[month - 1]}</div>
+<table style="width:100%;border-collapse:collapse;margin:0 0 2px;table-layout:fixed;">
     <thead><tr>${headerRow}</tr></thead>
     <tbody>${bodyRows}</tbody>
 </table>`;
@@ -248,30 +247,31 @@ WorksheetRegistry.register('b3', {
                 return null;
             };
 
-            while (calQs.length < calCount && calTries < calCount * 12) {
+            while (calQs.length < calCount && calTries < calCount * 30) {
                 calTries++;
                 const a = genOne();
                 if (!a) continue;
                 const b = genOne();
                 if (!b) continue;
+                const c = genOne();
+                if (!c) continue;
+                const d = genOne();
+                if (!d) continue;
 
-                // 兩題月曆左右並排，中間加分隔線
+                // 四題月曆以 2×2 格線排列（第一排兩題，第二排兩題）
+                const mkCell = (num, q) => `
+    <div style="min-width:0;">
+        <div style="font-size:7pt;margin-bottom:2px;">(${num}) ${q.subPrompt}</div>
+        ${q.calHtml}
+        <div style="font-size:7pt;margin-top:2px;">共需存：${q.answerFill} 天才能買到</div>
+    </div>`;
+
                 calQs.push({
-                    _key: `${a.key}+${b.key}`,
+                    _key: `${a.key}+${b.key}+${c.key}+${d.key}`,
                     prompt: '',
                     visual: `
-<div style="display:flex;gap:10px;align-items:flex-start;">
-    <div style="flex:1;min-width:0;">
-        <div style="font-size:8.5pt;margin-bottom:4px;">(1) ${a.subPrompt}</div>
-        ${a.calHtml}
-        <div style="font-size:8.5pt;margin-top:1px;">共需存：${a.answerFill} 天才能買到</div>
-    </div>
-    <div style="width:1px;background:#ccc;align-self:stretch;flex-shrink:0;"></div>
-    <div style="flex:1;min-width:0;">
-        <div style="font-size:8.5pt;margin-bottom:4px;">(2) ${b.subPrompt}</div>
-        ${b.calHtml}
-        <div style="font-size:8.5pt;margin-top:1px;">共需存：${b.answerFill} 天才能買到</div>
-    </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
+    ${mkCell(1, a)}${mkCell(2, b)}${mkCell(3, c)}${mkCell(4, d)}
 </div>`,
                     answerArea: '',
                     answerDisplay: ''

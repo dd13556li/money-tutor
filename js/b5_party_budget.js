@@ -1106,14 +1106,18 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderB5CatList(cats, activeCat) {
             const g = this.state.game;
             return cats.map(cat => {
-                const meta = B5_CATEGORY_META[cat];
-                const catItems = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
-                const selCount = catItems.filter(i => g.selectedIds.has(i.id)).length;
-                const isActive = cat === activeCat;
+                const meta           = B5_CATEGORY_META[cat];
+                const catItems       = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
+                const catTargetItems = catItems.filter(i => (g.targetIds || new Set()).has(i.id));
+                const selCount       = catTargetItems.filter(i => g.selectedIds.has(i.id)).length;
+                const isActive       = cat === activeCat;
+                const badgeHTML      = catTargetItems.length > 0
+                    ? `<span class="b5-cat-tab-badge">${selCount}/${catTargetItems.length}</span>`
+                    : '';
                 return `<div class="b5-cat-tab${isActive ? ' active' : ''}" data-cat="${cat}">
                     <span class="b5-cat-tab-icon">${meta.icon}</span>
                     <span class="b5-cat-tab-name">${meta.name}</span>
-                    <span class="b5-cat-tab-badge">${selCount}/${catItems.length}</span>
+                    ${badgeHTML}
                 </div>`;
             }).join('');
         },
@@ -1244,10 +1248,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const g    = this.state.game;
             const cats = this._getAvailableCategories();
             cats.forEach(cat => {
-                const catItems = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
-                const selCount = catItems.filter(i => g.selectedIds.has(i.id)).length;
-                const badge = document.querySelector(`.b5-cat-tab[data-cat="${cat}"] .b5-cat-tab-badge`);
-                if (badge) badge.textContent = `${selCount}/${catItems.length}`;
+                const catItems       = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
+                const catTargetItems = catItems.filter(i => (g.targetIds || new Set()).has(i.id));
+                const selCount       = catTargetItems.filter(i => g.selectedIds.has(i.id)).length;
+                const tab  = document.querySelector(`.b5-cat-tab[data-cat="${cat}"]`);
+                if (!tab) return;
+                let badge = tab.querySelector('.b5-cat-tab-badge');
+                if (catTargetItems.length > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'b5-cat-tab-badge';
+                        tab.appendChild(badge);
+                    }
+                    badge.textContent = `${selCount}/${catTargetItems.length}`;
+                } else if (badge) {
+                    badge.remove();
+                }
             });
         },
 
