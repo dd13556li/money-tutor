@@ -288,7 +288,7 @@ WorksheetRegistry.register('b2', {
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
                             <th style="${TH}">上次餘額</th>
-                            <th style="${TH}">金額</th>
+                            <th style="${TH}">本次金額</th>
                             <th style="${TH}">這次餘額</th>
                         </tr>
                         <tr>
@@ -421,8 +421,8 @@ WorksheetRegistry.register('b2', {
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
                     const amtField = showAnswers
-                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">${opt.total}</span> 元`
-                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:bottom;"></span> 元`;
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">${opt.total} 元</span>`
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>

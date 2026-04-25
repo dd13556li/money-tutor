@@ -140,27 +140,33 @@ WorksheetRegistry.register('b1', {
             const basePrompt = `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：${itemsText}`;
 
             if (questionType === 'steps') {
-                // 計算每次費用：每列顯示費用，填入累計金額
+                // 計算每次費用：四欄（同 B2），上次費用與本次費用填空，費用已揭露
                 let running = 0;
                 const rows = scenario.items.map(it => {
+                    const prev = running;
                     running += it.cost;
-                    const runAns = showAnswers
+                    const prevAns = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${prev}</span>`
+                        : blankLine(true);
+                    const newAns = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${running}</span>`
                         : blankLine(true);
                     return `<tr>
                         <td style="${TD}">${it.name}</td>
-                        <td style="text-align:right;${TD}font-weight:bold;">${it.cost} 元</td>
-                        <td style="text-align:right;${TD}">${runAns} 元</td>
+                        <td style="text-align:center;${TD}">${prevAns} 元</td>
+                        <td style="text-align:center;${TD}font-weight:bold;">${it.cost}</td>
+                        <td style="text-align:center;${TD}">${newAns} 元</td>
                     </tr>`;
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，填入每次費用後的累計金額：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，填入各項費用前後的累計金額：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}text-align:right;">費用</th>
-                            <th style="${TH}text-align:right;">累計（元）</th>
+                            <th style="${TH}">上次費用</th>
+                            <th style="${TH}">費用</th>
+                            <th style="${TH}">本次費用</th>
                         </tr>
                         ${rows}
                     </table>`,
@@ -255,8 +261,8 @@ WorksheetRegistry.register('b1', {
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
                     const amtField = showAnswers
-                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">${opt.total}</span> 元`
-                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:bottom;"></span> 元`;
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">${opt.total} 元</span>`
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
