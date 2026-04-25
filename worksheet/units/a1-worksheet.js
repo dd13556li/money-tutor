@@ -296,7 +296,7 @@ return `<div class="coin-choice-option" style="${style}">
                     visual: '',
                     answerArea: showAnswers
                         ? `答：找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
-                        : `答：找回 ${blankLine()} 元`,
+                        : `答：找回 ${this._renderPriceWithCoins(change, renderCoin)}${blankLine()} 元`,
                     answerDisplay: ''
                 });
             } else if (questionType === 'fill-select') {
