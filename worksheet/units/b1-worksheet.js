@@ -272,11 +272,15 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'coin-select') {
-                // 圖示選擇：表格條列費用+合計，下方選出正確錢幣組合
-                const itemRows = scenario.items.map(it => `<tr>
-                    <td style="${TD}">${it.name}</td>
-                    <td style="text-align:right;${TD}font-weight:bold;">${it.cost} 元</td>
-                </tr>`).join('');
+                // 圖示選擇：三欄表格（項目|金幣圖示|費用），費用已揭露，下方選出正確錢幣組合
+                const mkRevealRow = (labelHtml, amount) => {
+                    const coins = this._coinsDisplay(amount, renderCoin);
+                    return `<tr>
+                        <td style="${TD}">${labelHtml}</td>
+                        <td style="${TD}">${coins}</td>
+                        <td style="text-align:right;${TD}font-weight:bold;">${amount} 元</td>
+                    </tr>`;
+                };
                 const csOpts = this._coinOptions(total);
                 const csChoices = csOpts.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
@@ -294,17 +298,20 @@ WorksheetRegistry.register('b1', {
                         ${amtField}
                     </div>`;
                 }).join('');
+                const csTotalCoins = this._coinsDisplay(total, renderCoin);
                 return {
                     _key: `b1_${scenario.label}`,
                     prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，請選出正確的錢幣組合：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示</th>
                             <th style="${TH}text-align:right;">費用</th>
                         </tr>
-                        ${itemRows}
+                        ${scenario.items.map(it => mkRevealRow(it.name, it.cost)).join('')}
                         <tr style="border-top:2px solid #9ca3af;background:#f9fafb;">
                             <td style="${TD}font-weight:bold;">合計</td>
+                            <td style="${TD}">${csTotalCoins}</td>
                             <td style="text-align:right;${TD}font-weight:bold;">${total} 元</td>
                         </tr>
                     </table>
@@ -315,11 +322,15 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'hint-select') {
-                // 提示選擇：表格條列費用+合計，選項旁顯示灰色金額提示
-                const itemRows2 = scenario.items.map(it => `<tr>
-                    <td style="${TD}">${it.name}</td>
-                    <td style="text-align:right;${TD}font-weight:bold;">${it.cost} 元</td>
-                </tr>`).join('');
+                // 提示選擇：三欄表格（項目|金幣圖示|費用），費用已揭露，選項旁顯示灰色金額提示
+                const mkRevealRow2 = (labelHtml, amount) => {
+                    const coins = this._coinsDisplay(amount, renderCoin);
+                    return `<tr>
+                        <td style="${TD}">${labelHtml}</td>
+                        <td style="${TD}">${coins}</td>
+                        <td style="text-align:right;${TD}font-weight:bold;">${amount} 元</td>
+                    </tr>`;
+                };
                 const hsOpts = this._coinOptions(total);
                 const hsChoices = hsOpts.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
@@ -336,17 +347,20 @@ WorksheetRegistry.register('b1', {
                         <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total} 元</span>${answerTag}
                     </div>`;
                 }).join('');
+                const hsTotalCoins = this._coinsDisplay(total, renderCoin);
                 return {
                     _key: `b1_${scenario.label}`,
                     prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，請選出正確的錢幣組合：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示</th>
                             <th style="${TH}text-align:right;">費用</th>
                         </tr>
-                        ${itemRows2}
+                        ${scenario.items.map(it => mkRevealRow2(it.name, it.cost)).join('')}
                         <tr style="border-top:2px solid #9ca3af;background:#f9fafb;">
                             <td style="${TD}font-weight:bold;">合計</td>
+                            <td style="${TD}">${hsTotalCoins}</td>
                             <td style="text-align:right;${TD}font-weight:bold;">${total} 元</td>
                         </tr>
                     </table>
