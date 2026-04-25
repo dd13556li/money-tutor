@@ -7,7 +7,7 @@ WorksheetRegistry.register('b2', {
         const diff = { easy:'簡單', normal:'普通', hard:'困難' };
         const typeLabels = {
             'steps':         '數字填空：計算每次餘額',
-            'img-fill':      '看圖填空：計算每次餘額',
+            'img-fill':      '圖示填空：計算每次餘額',
             'fill':          '數字填空：計算最終餘額',
             'fill-select':   '圖示填空：計算最終餘額',
             'coin-select':   '圖示選擇：計算最終餘額',
@@ -24,7 +24,7 @@ WorksheetRegistry.register('b2', {
             options: [
                 { type: 'group',  label: '計算每次餘額' },
                 { label: '數字填空', value: 'steps'    },
-                { label: '看圖填空', value: 'img-fill' },
+                { label: '圖示填空', value: 'img-fill' },
                 { type: 'group',  label: '計算最終餘額' },
                 { label: '數字填空', value: 'fill'          },
                 { label: '圖示填空', value: 'fill-select' },
@@ -175,7 +175,7 @@ WorksheetRegistry.register('b2', {
 
     generate(options) {
         const diff = options.difficulty || 'easy';
-        const type = options.questionType || 'fill';
+        const type = options.questionType || 'steps';
         const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const usedKeys = options._usedValues || new Set();
@@ -422,7 +422,7 @@ WorksheetRegistry.register('b2', {
                         : checkbox;
                     const amtField = showAnswers
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">${opt.total}</span> 元`
-                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:middle;"></span> 元`;
+                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:bottom;"></span> 元`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>

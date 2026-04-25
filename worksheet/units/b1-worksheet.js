@@ -7,9 +7,9 @@ WorksheetRegistry.register('b1', {
         const diff = { easy:'簡單', normal:'普通', hard:'困難' };
         const typeLabels = {
             'steps':         '數字填空：計算每次費用',
-            'img-fill':      '看圖填空：計算每次費用',
+            'img-fill':      '圖示填空：計算每次費用',
             'fill':          '數字填空：計算最終費用',
-            'fill-select':   '填空與選擇：計算最終費用',
+            'fill-select':   '圖示填空：計算最終費用',
             'coin-select':   '圖示選擇：計算最終費用',
             'hint-select':   '提示選擇：計算最終費用',
             'hint-complete': '提示完成：計算最終費用',
@@ -24,10 +24,10 @@ WorksheetRegistry.register('b1', {
             options: [
                 { type: 'group',  label: '計算每次費用' },
                 { label: '數字填空', value: 'steps'    },
-                { label: '看圖填空', value: 'img-fill' },
+                { label: '圖示填空', value: 'img-fill' },
                 { type: 'group',  label: '計算最終費用' },
                 { label: '數字填空',   value: 'fill'          },
-                { label: '填空與選擇', value: 'fill-select'   },
+                { label: '圖示填空',   value: 'fill-select'   },
                 { label: '圖示選擇',   value: 'coin-select'   },
                 { label: '提示選擇',   value: 'hint-select'   },
                 { label: '提示完成',   value: 'hint-complete' },
@@ -111,7 +111,7 @@ WorksheetRegistry.register('b1', {
 
     generate(options) {
         const diff = options.difficulty || 'easy';
-        const questionType = options.questionType || 'fill';
+        const questionType = options.questionType || 'steps';
         const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const usedLabels = options._usedValues || new Set();
@@ -169,37 +169,33 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'img-fill') {
-                // 計算每次費用：金幣圖示 + 底線填費用；共需列也顯示金幣 + 底線
-                const rows = scenario.items.map(it => {
-                    const coins = this._coinsDisplay(it.cost, renderCoin);
+                // 圖示填空：同數字填空三欄結構，費用欄與累計欄前均加金幣圖示提示
+                let running = 0;
+                const mkCoinHintCell = (amount, wide) => {
+                    const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers
-                        ? `<span style="color:red;font-weight:bold;">${it.cost}</span>`
-                        : blankLine();
+                        ? `<span style="color:red;font-weight:bold;">${amount}</span>`
+                        : blankLine(wide);
+                    return `<td style="${TD}"><span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:3px;">${coins}<span style="margin-left:2px;">${ans} 元</span></span></td>`;
+                };
+                const rows = scenario.items.map(it => {
+                    running += it.cost;
                     return `<tr>
                         <td style="${TD}">${it.name}</td>
-                        <td style="${TD}">${coins}</td>
-                        <td style="text-align:right;${TD}">${ans} 元</td>
+                        ${mkCoinHintCell(it.cost, false)}
+                        ${mkCoinHintCell(running, true)}
                     </tr>`;
                 }).join('');
-                const totalCoins = this._coinsDisplay(total, renderCoin);
-                const totalAns   = showAnswers
-                    ? `<span style="color:red;font-weight:bold;">${total}</span>`
-                    : blankLine(true);
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看圖填入各項費用，並計算共需金額：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金幣圖示，填入各項費用和累計金額：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
-                            <th style="${TH}text-align:right;">費用（元）</th>
+                            <th style="${TH}">費用</th>
+                            <th style="${TH}">累計（元）</th>
                         </tr>
                         ${rows}
-                        <tr style="border-top:2px solid #9ca3af;background:#f9fafb;">
-                            <td style="${TD}font-weight:bold;">共需</td>
-                            <td style="${TD}">${totalCoins}</td>
-                            <td style="text-align:right;${TD}">${totalAns} 元</td>
-                        </tr>
                     </table>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -249,7 +245,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'coin-select') {
-                // 圖示選擇：告知合計，選出正確錢幣組合
+                // 圖示選擇：告知合計，選出正確錢幣組合，選項後加底線供填寫金額
                 const opts = this._coinOptions(total);
                 const choicesHtml = opts.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
@@ -258,9 +254,13 @@ WorksheetRegistry.register('b1', {
                     const check = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
+                    const amtField = showAnswers
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">${opt.total}</span> 元`
+                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:bottom;"></span> 元`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                        ${amtField}
                     </div>`;
                 }).join('');
                 return {
