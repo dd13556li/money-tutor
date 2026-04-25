@@ -201,7 +201,7 @@ WorksheetRegistry.register('a3', {
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
                     const amtField = (showAnswers && isCorrect)
-    ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">答案：${total} 元</span>`
+    ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span>`
     : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
 return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
@@ -253,13 +253,13 @@ return `<div class="coin-choice-option" style="${style}">
                     const check = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
-                    const amtField = (showAnswers && isCorrect)
-    ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">答案：${total} 元</span>`
-    : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
+                    const answerTag = (showAnswers && isCorrect)
+    ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${total} 元</span></span>`
+    : '';
 return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
-                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total}元</span>${amtField}
+                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total}元</span>${answerTag}
                     </div>`;
                 }).join('');
                 questions.push({
@@ -319,7 +319,7 @@ return `<div class="coin-choice-option" style="${style}">
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
                     const amtField = (showAnswers && isCorrect)
-    ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">答案：${change} 元</span>`
+    ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${change} 元</span>`
     : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
 return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
@@ -371,13 +371,13 @@ return `<div class="coin-choice-option" style="${style}">
                     const check = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
-                    const amtField = (showAnswers && isCorrect)
-    ? `<span style="color:red;font-weight:bold;margin-left:6px;align-self:flex-end;">答案：${change} 元</span>`
-    : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
+                    const answerTag = (showAnswers && isCorrect)
+    ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${change} 元</span></span>`
+    : '';
 return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
-                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total}元</span>${amtField}
+                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total}元</span>${answerTag}
                     </div>`;
                 }).join('');
                 questions.push({
