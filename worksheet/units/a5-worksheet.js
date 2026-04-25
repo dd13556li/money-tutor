@@ -238,7 +238,7 @@ WorksheetRegistry.register('a5', {
                     visual: '',
                     answerArea: showAnswers
                         ? `${resultLabel} <span style="color:red;font-weight:bold;">${result}</span> 元`
-                        : `${resultLabel} ${blankLine()} 元`,
+                        : `${resultLabel} ${this._renderPriceWithCoins(result, renderCoin)}${blankLine()} 元`,
                     answerDisplay: ''
                 };
             }
