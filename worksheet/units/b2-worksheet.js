@@ -304,39 +304,42 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'img-fill') {
-                // 看圖填空：三欄表格（項目 | 金額圖示+底線 | 餘額圖示+底線）
-                const mkCoinCell = (amount, color) => {
+                // 看圖填空：四欄表格（同數字填空），各餘額欄前加金幣圖示作為提示
+                const mkCoinHintCell = (amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${amount}</span>`
-                        : blankLine();
-                    const numColor = color ? `color:${color};` : '';
-                    return `<td style="${TD}"><span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:3px;">${coins}<span style="${numColor}margin-left:2px;">${ans} 元</span></span></td>`;
+                        : blankLine(true);
+                    return `<td style="text-align:center;${TD}"><span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:3px;">${coins}<span style="margin-left:2px;">${ans} 元</span></span></td>`;
                 };
                 let running = startAmount;
                 const rows = events.map(e => {
+                    const prevBalance = running;
                     running = e.type === 'income' ? running + e.amount : running - e.amount;
-                    const sign  = e.type === 'income' ? '（+）' : '（−）';
-                    const color = e.type === 'income' ? '#059669' : '#dc2626';
+                    const sign     = e.type === 'income' ? '+' : '−';
+                    const amtColor = e.type === 'income' ? '#059669' : '#dc2626';
                     return `<tr>
-                        <td style="${TD}"><span class="ws-emoji-icon">${e.icon}</span> ${e.name} <span style="color:${color};font-weight:bold;">${sign}</span></td>
-                        ${mkCoinCell(e.amount, color)}
-                        ${mkCoinCell(running, null)}
+                        <td style="${TD}"><span class="ws-emoji-icon">${e.icon}</span> ${e.name}</td>
+                        ${mkCoinHintCell(prevBalance)}
+                        <td style="text-align:center;${TD}color:${amtColor};font-weight:bold;">${sign} ${e.amount}</td>
+                        ${mkCoinHintCell(running)}
                     </tr>`;
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看圖填入金額，並計算每次的餘額：',
+                    prompt: '看金幣圖示，填入每次的餘額：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">上次餘額</th>
                             <th style="${TH}">金額</th>
-                            <th style="${TH}">餘額</th>
+                            <th style="${TH}">這次餘額</th>
                         </tr>
                         <tr>
                             <td style="${TD}">💰 一開始有</td>
                             <td style="text-align:center;${TD}color:#9ca3af;">—</td>
-                            ${mkCoinCell(startAmount, null)}
+                            <td style="text-align:center;${TD}color:#9ca3af;">—</td>
+                            <td style="text-align:center;${TD}font-weight:bold;">${startAmount} 元</td>
                         </tr>
                         ${rows}
                     </table>`,
@@ -389,11 +392,13 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'coin-select') {
-                // 圖示選擇：fill-select 樣式表格（含金幣圖示，金額已揭露），選出最後餘額的錢幣組合
+                // 圖示選擇：fill-select 樣式表格（含金幣圖示，金額含+/−前綴），選出最後餘額的錢幣組合
                 if (finalBalance <= 0) return null;
-                const mkRevealRow = (labelHtml, amount, color) => {
+                const mkRevealRow = (labelHtml, amount, color, signPrefix) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
-                    const amtHtml = `<span style="${color ? `color:${color};` : ''}font-weight:bold;">${amount}</span>`;
+                    const colorStyle = color ? `color:${color};` : '';
+                    const signHtml   = signPrefix ? `<span style="${colorStyle}font-weight:bold;">${signPrefix} </span>` : '';
+                    const amtHtml    = `${signHtml}<span style="${colorStyle}font-weight:bold;">${amount}</span>`;
                     return `<tr>
                         <td style="${TD}">${labelHtml}</td>
                         <td style="${TD}">${coins}</td>
@@ -401,10 +406,11 @@ WorksheetRegistry.register('b2', {
                     </tr>`;
                 };
                 const csEventRows = events.map(e => {
-                    const sign  = e.type === 'income' ? '（+）' : '（−）';
-                    const color = e.type === 'income' ? '#059669' : '#dc2626';
-                    const label = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${sign}</span>`;
-                    return mkRevealRow(label, e.amount, color);
+                    const signLabel = e.type === 'income' ? '（+）' : '（−）';
+                    const signAmt   = e.type === 'income' ? '+' : '−';
+                    const color     = e.type === 'income' ? '#059669' : '#dc2626';
+                    const label     = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${signLabel}</span>`;
+                    return mkRevealRow(label, e.amount, color, signAmt);
                 }).join('');
                 const opts = this._coinOptions(finalBalance);
                 const choicesHtml = opts.map((opt, i) => {
@@ -414,9 +420,13 @@ WorksheetRegistry.register('b2', {
                     const check = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
+                    const amtField = showAnswers
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">${opt.total}</span> 元`
+                        : `<span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;margin-left:6px;vertical-align:middle;"></span> 元`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
                         <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                        ${amtField}
                     </div>`;
                 }).join('');
                 return {
@@ -438,11 +448,13 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'hint-select') {
-                // 提示選擇：fill-select 樣式表格（含金幣圖示，金額已揭露），選項旁顯示灰色金額提示
+                // 提示選擇：fill-select 樣式表格（含金幣圖示，金額含+/−前綴），選項旁顯示灰色金額提示
                 if (finalBalance <= 0) return null;
-                const mkRevealRow2 = (labelHtml, amount, color) => {
+                const mkRevealRow2 = (labelHtml, amount, color, signPrefix) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
-                    const amtHtml = `<span style="${color ? `color:${color};` : ''}font-weight:bold;">${amount}</span>`;
+                    const colorStyle = color ? `color:${color};` : '';
+                    const signHtml   = signPrefix ? `<span style="${colorStyle}font-weight:bold;">${signPrefix} </span>` : '';
+                    const amtHtml    = `${signHtml}<span style="${colorStyle}font-weight:bold;">${amount}</span>`;
                     return `<tr>
                         <td style="${TD}">${labelHtml}</td>
                         <td style="${TD}">${coins}</td>
@@ -450,10 +462,11 @@ WorksheetRegistry.register('b2', {
                     </tr>`;
                 };
                 const hsEventRows = events.map(e => {
-                    const sign  = e.type === 'income' ? '（+）' : '（−）';
-                    const color = e.type === 'income' ? '#059669' : '#dc2626';
-                    const label = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${sign}</span>`;
-                    return mkRevealRow2(label, e.amount, color);
+                    const signLabel = e.type === 'income' ? '（+）' : '（−）';
+                    const signAmt   = e.type === 'income' ? '+' : '−';
+                    const color     = e.type === 'income' ? '#059669' : '#dc2626';
+                    const label     = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${signLabel}</span>`;
+                    return mkRevealRow2(label, e.amount, color, signAmt);
                 }).join('');
                 const opts2 = this._coinOptions(finalBalance);
                 const choicesHtml2 = opts2.map((opt, i) => {
