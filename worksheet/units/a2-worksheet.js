@@ -26,7 +26,7 @@ WorksheetRegistry.register('a2', {
             type: 'dropdown',
             options: [
                 { label: '數字填空(價格計算)', value: 'price-fill' },
-                { label: '看圖填空(價格計算)', value: 'price-img-fill' },
+                { label: '圖示填空(價格計算)', value: 'price-img-fill' },
                 { label: '填空與選擇(價格計算)', value: 'price-fill-select' },
                 { label: '圖示選擇(價格計算)', value: 'price-coin-select' },
                 { label: '提示選擇(價格計算)', value: 'price-hint-select' },
@@ -89,7 +89,7 @@ WorksheetRegistry.register('a2', {
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-img-fill') {
-                    // 看圖填空(價格計算)：在價格前顯示金錢圖示
+                    // 圖示填空(價格計算)：在價格前顯示金錢圖示
                     const svcListWithCoins = selectedSvcs.map(s =>
                         `${this._serviceImg(s)} ${s.name} ${this._renderPriceWithCoins(s.price, renderCoin)}(${s.price}元)`
                     ).join(' + ');
@@ -222,7 +222,7 @@ WorksheetRegistry.register('a2', {
                     answerDisplay: ''
                 });
             } else if (questionType === 'img-fill') {
-                // 看圖填空(找零計算)：在價格前顯示金錢圖示
+                // 圖示填空(找零計算)：在價格前顯示金錢圖示
                 const svcListWithCoins = selected.map(s =>
                     `${this._serviceImg(s)} ${s.name} ${this._renderPriceWithCoins(s.price, renderCoin)}(${s.price}元)`
                 ).join(' + ');

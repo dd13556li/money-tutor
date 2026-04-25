@@ -6,13 +6,13 @@ WorksheetRegistry.register('b4', {
     subtitle(opts) {
         const qt = {
             'cheaper-num':   '找便宜(2家-數字填空)',
-            'cheaper-coin':  '找便宜(2家-看圖填空)',
+            'cheaper-coin':  '找便宜(2家-圖示填空)',
             'cheaper-hint':  '找便宜(2家-圈選完成)',
             'cheaper3-num':  '找便宜(3家-數字填空)',
-            'cheaper3-coin': '找便宜(3家-看圖填空)',
+            'cheaper3-coin': '找便宜(3家-圖示填空)',
             'cheaper3-hint': '找便宜(3家-圈選完成)',
             'fill-num':      '計算差額(數字填空)',
-            'fill-coin':     '計算差額(看圖填空)',
+            'fill-coin':     '計算差額(圖示填空)',
             'fill-hint':     '計算差額(提示完成)',
             'fill-select':   '計算差額(選擇完成)',
         };
@@ -53,13 +53,13 @@ WorksheetRegistry.register('b4', {
                 type: 'dropdown',
                 options: [
                     { label: '找便宜(2家店比較-數字填空)',   value: 'cheaper-num'   },
-                    { label: '找便宜(2家店比較-看圖填空)',   value: 'cheaper-coin'  },
+                    { label: '找便宜(2家店比較-圖示填空)',   value: 'cheaper-coin'  },
                     { label: '找便宜(2家店比較-圈選完成)',   value: 'cheaper-hint'  },
                     { label: '找便宜(3家店比較-數字填空)',   value: 'cheaper3-num'  },
-                    { label: '找便宜(3家店比較-看圖填空)',   value: 'cheaper3-coin' },
+                    { label: '找便宜(3家店比較-圖示填空)',   value: 'cheaper3-coin' },
                     { label: '找便宜(3家店比較-圈選完成)',   value: 'cheaper3-hint' },
                     { label: '計算差額(數字填空)',           value: 'fill-num'      },
-                    { label: '計算差額(看圖填空)',           value: 'fill-coin'     },
+                    { label: '計算差額(圖示填空)',           value: 'fill-coin'     },
                     { label: '計算差額(提示完成)',           value: 'fill-hint'     },
                     { label: '計算差額(選擇完成)',           value: 'fill-select'   },
                 ],

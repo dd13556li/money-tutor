@@ -26,13 +26,13 @@ WorksheetRegistry.register('a1', {
             type: 'dropdown',
             options: [
                 { label: '數字填空(價格計算)', value: 'price-fill' },
-                { label: '看圖填空(價格計算)', value: 'price-img-fill' },
+                { label: '圖示填空(價格計算)', value: 'price-img-fill' },
                 { label: '填空與選擇(價格計算)', value: 'price-fill-select' },
                 { label: '圖示選擇(價格計算)', value: 'price-coin-select' },
                 { label: '提示選擇(價格計算)', value: 'price-hint-select' },
                 { label: '提示完成(價格計算)', value: 'price-hint-complete' },
                 { label: '數字填空(找零計算)', value: 'fill' },
-                { label: '看圖填空(找零計算)', value: 'img-fill' },
+                { label: '圖示填空(找零計算)', value: 'img-fill' },
                 { label: '填空與選擇(找零計算)', value: 'fill-select' },
                 { label: '圖示選擇(找零計算)', value: 'coin-select' },
                 { label: '提示選擇(找零計算)', value: 'hint-select' },
@@ -155,7 +155,7 @@ WorksheetRegistry.register('a1', {
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-img-fill') {
-                    // 看圖填空(價格計算)：在價格前顯示金錢圖示，金額用括號包圍
+                    // 圖示填空(價格計算)：在價格前顯示金錢圖示，金額用括號包圍
                     const itemListWithCoins = selectedDrinks.map(d =>
                         `${this._drinkImg(d)} ${d.name} ${this._renderPriceWithCoins(d.price, renderCoin)}(${d.price}元)`
                     ).join('、');
@@ -288,7 +288,7 @@ WorksheetRegistry.register('a1', {
                     answerDisplay: ''
                 });
             } else if (questionType === 'img-fill') {
-                // 看圖填空(找零計算)：在價格前顯示金錢圖示
+                // 圖示填空(找零計算)：在價格前顯示金錢圖示
                 const priceCoins = this._renderPriceWithCoins(drink.price, renderCoin);
                 const basePromptWithCoins = `${drinkImg} ${drink.name}，價格 ${priceCoins} ${drink.price} 元，投入 ${paid} 元`;
                 questions.push({

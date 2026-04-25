@@ -304,7 +304,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'img-fill') {
-                // 看圖填空：四欄表格（同數字填空），各餘額欄前加金幣圖示作為提示
+                // 圖示填空：四欄表格（同數字填空），各餘額欄前加金幣圖示作為提示
                 const mkCoinHintCell = (amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers
@@ -348,7 +348,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'fill-select') {
-                // 看圖填空：每列顯示金幣圖示，金額改底線；最後填最終餘額
+                // 圖示填空：每列顯示金幣圖示，金額改底線；最後填最終餘額
                 const mkCoinAmtRow = (labelHtml, amount, color) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers

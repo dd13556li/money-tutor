@@ -26,13 +26,13 @@ WorksheetRegistry.register('a6', {
             type: 'dropdown',
             options: [
                 { label: '數字填空(價格計算)', value: 'price-fill' },
-                { label: '看圖填空(價格計算)', value: 'price-img-fill' },
+                { label: '圖示填空(價格計算)', value: 'price-img-fill' },
                 { label: '填空與選擇(價格計算)', value: 'price-fill-select' },
                 { label: '圖示選擇(價格計算)', value: 'price-coin-select' },
                 { label: '提示選擇(價格計算)', value: 'price-hint-select' },
                 { label: '提示完成(價格計算)', value: 'price-hint-complete' },
                 { label: '數字填空(找零計算)', value: 'fill' },
-                { label: '看圖填空(找零計算)', value: 'img-fill' },
+                { label: '圖示填空(找零計算)', value: 'img-fill' },
                 { label: '填空與選擇(找零計算)', value: 'fill-select' },
                 { label: '圖示選擇(找零計算)', value: 'coin-select' },
                 { label: '提示選擇(找零計算)', value: 'hint-select' },
@@ -112,7 +112,7 @@ WorksheetRegistry.register('a6', {
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-img-fill') {
-                    // 看圖填空(價格計算)：在單價前顯示金錢圖示
+                    // 圖示填空(價格計算)：在單價前顯示金錢圖示
                     const priceVisualWithCoins = showAnswers
                         ? `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}(${unitPrice}元) × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
                         : `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}(${unitPrice}元) × ${tickets} 張 = ？？？ 元</div>`;
@@ -234,7 +234,7 @@ WorksheetRegistry.register('a6', {
                     answerDisplay: ''
                 });
             } else if (questionType === 'img-fill') {
-                // 看圖填空(找零計算)：在單價前顯示金錢圖示
+                // 圖示填空(找零計算)：在單價前顯示金錢圖示
                 const priceVisualWithCoins = showAnswers
                     ? `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}(${unitPrice}元) × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
                     : `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}(${unitPrice}元) × ${tickets} 張 = ？？？ 元</div>`;

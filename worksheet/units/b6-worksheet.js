@@ -6,7 +6,7 @@ WorksheetRegistry.register('b6', {
     subtitle(opts) {
         const qt = {
             'fill':          '數字填空',
-            'img-fill':      '看圖填空',
+            'img-fill':      '圖示填空',
             'fill-select':   '填空與選擇',
             'coin-select':   '圖示選擇',
             'hint-select':   '提示選擇',
@@ -22,7 +22,7 @@ WorksheetRegistry.register('b6', {
             type: 'dropdown',
             options: [
                 { label: '數字填空',   value: 'fill'          },
-                { label: '看圖填空',   value: 'img-fill'      },
+                { label: '圖示填空',   value: 'img-fill'      },
                 { label: '填空與選擇', value: 'fill-select'   },
                 { label: '圖示選擇',   value: 'coin-select'   },
                 { label: '提示選擇',   value: 'hint-select'   },
@@ -159,7 +159,7 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 看圖填空 ───────────────────────────────────────────────
+            // ── 圖示填空 ───────────────────────────────────────────────
             } else if (questionType === 'img-fill') {
                 const itemsWithCoins = scenario.items.map(it => {
                     const coinRow = this._coinsDisplay(it.cost, renderCoin);

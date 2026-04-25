@@ -7,13 +7,13 @@ WorksheetRegistry.register('a5', {
         const typeLabels = {
             'steps': '提款機步驟',
             'deposit-fill': '存款計算-數字填空',
-            'deposit-img-fill': '存款計算-看圖填空',
+            'deposit-img-fill': '存款計算-圖示填空',
             'deposit-fill-select': '存款計算-填空與選擇',
             'deposit-coin-select': '存款計算-圖示選擇',
             'deposit-hint-select': '存款計算-提示選擇',
             'deposit-hint-complete': '存款計算-提示完成',
             'withdraw-fill': '提款計算-數字填空',
-            'withdraw-img-fill': '提款計算-看圖填空',
+            'withdraw-img-fill': '提款計算-圖示填空',
             'withdraw-fill-select': '提款計算-填空與選擇',
             'withdraw-coin-select': '提款計算-圖示選擇',
             'withdraw-hint-select': '提款計算-提示選擇',
@@ -56,14 +56,14 @@ WorksheetRegistry.register('a5', {
                 { label: '提款機步驟', value: 'steps' },
                 // 存款計算（6種）
                 { label: '數字填空(存款)', value: 'deposit-fill' },
-                { label: '看圖填空(存款)', value: 'deposit-img-fill' },
+                { label: '圖示填空(存款)', value: 'deposit-img-fill' },
                 { label: '填空與選擇(存款)', value: 'deposit-fill-select' },
                 { label: '圖示選擇(存款)', value: 'deposit-coin-select' },
                 { label: '提示選擇(存款)', value: 'deposit-hint-select' },
                 { label: '提示完成(存款)', value: 'deposit-hint-complete' },
                 // 提款計算（6種）
                 { label: '數字填空(提款)', value: 'withdraw-fill' },
-                { label: '看圖填空(提款)', value: 'withdraw-img-fill' },
+                { label: '圖示填空(提款)', value: 'withdraw-img-fill' },
                 { label: '填空與選擇(提款)', value: 'withdraw-fill-select' },
                 { label: '圖示選擇(提款)', value: 'withdraw-coin-select' },
                 { label: '提示選擇(提款)', value: 'withdraw-hint-select' },
@@ -228,7 +228,7 @@ WorksheetRegistry.register('a5', {
                 };
 
             case 'img-fill': {
-                // 看圖填空：在帳戶金額和交易金額前顯示金錢圖示
+                // 圖示填空：在帳戶金額和交易金額前顯示金錢圖示
                 const accountCoins = this._renderPriceWithCoins(account, renderCoin);
                 const transactionCoins = this._renderPriceWithCoins(transaction, renderCoin);
                 const actionLabel = isDeposit ? '存款' : '提款';

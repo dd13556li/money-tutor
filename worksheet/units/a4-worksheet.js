@@ -97,13 +97,13 @@ WorksheetRegistry.register('a4', {
             type: 'dropdown',
             options: [
                 { label: '數字填空(價格計算)', value: 'price-fill' },
-                { label: '看圖填空(價格計算)', value: 'price-img-fill' },
+                { label: '圖示填空(價格計算)', value: 'price-img-fill' },
                 { label: '填空與選擇(價格計算)', value: 'price-fill-select' },
                 { label: '圖示選擇(價格計算)', value: 'price-coin-select' },
                 { label: '提示選擇(價格計算)', value: 'price-hint-select' },
                 { label: '提示完成(價格計算)', value: 'price-hint-complete' },
                 { label: '數字填空(找零計算)', value: 'fill' },
-                { label: '看圖填空(找零計算)', value: 'img-fill' },
+                { label: '圖示填空(找零計算)', value: 'img-fill' },
                 { label: '填空與選擇(找零計算)', value: 'fill-select' },
                 { label: '圖示選擇(找零計算)', value: 'coin-select' },
                 { label: '提示選擇(找零計算)', value: 'hint-select' },
@@ -357,7 +357,7 @@ WorksheetRegistry.register('a4', {
                     : (isFillType && showAnswers)
                         ? `<span style="color:red;font-weight:bold;">${subtotal}</span>`
                         : `${subtotal}`;
-                // 看圖填空：在價格前顯示金錢圖示
+                // 圖示填空：在價格前顯示金錢圖示
                 const priceDisplay = isImgFillType
                     ? `${renderPriceWithCoins(it.price)}(${it.price}元)`
                     : `${it.price}`;
@@ -383,7 +383,7 @@ WorksheetRegistry.register('a4', {
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-img-fill') {
-                    // 看圖填空(價格計算)：購物清單已包含金錢圖示
+                    // 圖示填空(價格計算)：購物清單已包含金錢圖示
                     questions.push({
                         prompt: '🛒 購物清單如下，請計算總金額：',
                         visual: listHtml,
@@ -502,7 +502,7 @@ WorksheetRegistry.register('a4', {
                     answerDisplay: ''
                 });
             } else if (questionType === 'img-fill') {
-                // 看圖填空(找零計算)：購物清單已包含金錢圖示
+                // 圖示填空(找零計算)：購物清單已包含金錢圖示
                 questions.push({
                     prompt: '🛒 購物清單如下，請計算總金額與找零：',
                     visual: listHtml,
