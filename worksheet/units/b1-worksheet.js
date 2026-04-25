@@ -5,7 +5,16 @@ WorksheetRegistry.register('b1', {
     defaultCount: 20,
     subtitle(opts) {
         const diff = { easy:'簡單', normal:'普通', hard:'困難' };
-        return `難度：${diff[opts.difficulty || 'easy']}`;
+        const typeLabels = {
+            'steps':         '數字填空：計算每次費用',
+            'img-fill':      '看圖填空：計算每次費用',
+            'fill':          '數字填空：計算最終費用',
+            'fill-select':   '填空與選擇：計算最終費用',
+            'coin-select':   '圖示選擇：計算最終費用',
+            'hint-select':   '提示選擇：計算最終費用',
+            'hint-complete': '提示完成：計算最終費用',
+        };
+        return `${diff[opts.difficulty || 'easy']}・${typeLabels[opts.questionType || 'steps'] || ''}`;
     },
 
     toolbarConfig: {
@@ -13,14 +22,17 @@ WorksheetRegistry.register('b1', {
             label: '📝 題型',
             type: 'dropdown',
             options: [
-                { label: '數字填空',   value: 'fill' },
-                { label: '看圖填空',   value: 'img-fill' },
-                { label: '填空與選擇', value: 'fill-select' },
-                { label: '圖示選擇',   value: 'coin-select' },
-                { label: '提示選擇',   value: 'hint-select' },
+                { type: 'group',  label: '計算每次費用' },
+                { label: '數字填空', value: 'steps'    },
+                { label: '看圖填空', value: 'img-fill' },
+                { type: 'group',  label: '計算最終費用' },
+                { label: '數字填空',   value: 'fill'          },
+                { label: '填空與選擇', value: 'fill-select'   },
+                { label: '圖示選擇',   value: 'coin-select'   },
+                { label: '提示選擇',   value: 'hint-select'   },
                 { label: '提示完成',   value: 'hint-complete' },
             ],
-            getCurrentValue: (p) => p.questionType || 'fill',
+            getCurrentValue: (p) => p.questionType || 'steps',
             onChange: (v, app) => { app.params.questionType = v; app.generate(); }
         },
         adjustCountButton: {
@@ -54,38 +66,38 @@ WorksheetRegistry.register('b1', {
 
     _scenarios: {
         easy: [
-            { icon:'🏫', label:'去學校',   items:[{ name:'午餐費', cost:50  }] },
-            { icon:'🏪', label:'去超商',   items:[{ name:'飲料',   cost:25  }] },
-            { icon:'📚', label:'圖書館',   items:[{ name:'影印費', cost:10  }] },
-            { icon:'🎭', label:'看表演',   items:[{ name:'門票',   cost:100 }] },
-            { icon:'🏊', label:'游泳課',   items:[{ name:'入場費', cost:80  }] },
-            { icon:'🎨', label:'美術課',   items:[{ name:'材料費', cost:30  }] },
-            { icon:'🚌', label:'搭公車',   items:[{ name:'公車費', cost:15  }] },
-            { icon:'🌿', label:'逛公園',   items:[{ name:'停車費', cost:20  }] },
-            { icon:'☕', label:'買早餐',   items:[{ name:'早餐',   cost:35  }] },
-            { icon:'🐟', label:'買魚飼料', items:[{ name:'飼料',   cost:45  }] },
+            { icon:'🏫', label:'去學校',   items:[{ name:'午餐費', cost:55  }, { name:'公車票', cost:20  }] },
+            { icon:'🏪', label:'去超商',   items:[{ name:'飲料費', cost:30  }, { name:'零食費', cost:20  }] },
+            { icon:'📚', label:'圖書館',   items:[{ name:'影印費', cost:10  }, { name:'文具費', cost:15  }] },
+            { icon:'🎭', label:'看表演',   items:[{ name:'表演票', cost:100 }, { name:'零食費', cost:20  }] },
+            { icon:'🏊', label:'游泳課',   items:[{ name:'入場費', cost:80  }, { name:'飲料費', cost:15  }] },
+            { icon:'🎨', label:'美術課',   items:[{ name:'材料費', cost:35  }, { name:'鉛筆費', cost:15  }] },
+            { icon:'🚌', label:'搭公車',   items:[{ name:'公車票', cost:20  }, { name:'飲料費', cost:15  }] },
+            { icon:'🌿', label:'逛公園',   items:[{ name:'停車費', cost:20  }, { name:'飲料費', cost:15  }] },
+            { icon:'☕', label:'買早餐',   items:[{ name:'早餐費', cost:35  }, { name:'飲料費', cost:15  }] },
+            { icon:'🐟', label:'買魚飼料', items:[{ name:'飼料費', cost:45  }, { name:'水草費', cost:20  }] },
         ],
         normal: [
             { icon:'🏫', label:'上學日',   items:[{ name:'午餐費', cost:60  }, { name:'公車費', cost:20  }] },
             { icon:'🎨', label:'才藝課',   items:[{ name:'課程費', cost:150 }, { name:'材料費', cost:50  }] },
             { icon:'🏥', label:'看醫生',   items:[{ name:'掛號費', cost:150 }, { name:'藥費',   cost:80  }] },
-            { icon:'🎬', label:'看電影',   items:[{ name:'票價',   cost:280 }, { name:'爆米花', cost:90  }] },
-            { icon:'🚂', label:'搭火車',   items:[{ name:'票價',   cost:250 }, { name:'便當',   cost:75  }] },
-            { icon:'🏊', label:'去游泳',   items:[{ name:'入場費', cost:80  }, { name:'飲料',   cost:25  }] },
-            { icon:'📖', label:'買書',     items:[{ name:'故事書', cost:180 }, { name:'文具',   cost:45  }] },
-            { icon:'🌄', label:'爬山',     items:[{ name:'門票',   cost:100 }, { name:'食物',   cost:120 }] },
-            { icon:'🎮', label:'遊樂場',   items:[{ name:'門票',   cost:200 }, { name:'遊戲',   cost:50  }] },
-            { icon:'🍜', label:'吃午飯',   items:[{ name:'午餐',   cost:85  }, { name:'飲料',   cost:30  }] },
+            { icon:'🎬', label:'看電影',   items:[{ name:'電影票', cost:280 }, { name:'爆米花', cost:90  }] },
+            { icon:'🚂', label:'搭火車',   items:[{ name:'火車票', cost:250 }, { name:'便當費', cost:75  }] },
+            { icon:'🏊', label:'去游泳',   items:[{ name:'入場費', cost:80  }, { name:'飲料費', cost:25  }] },
+            { icon:'📖', label:'買書',     items:[{ name:'故事書費', cost:180 }, { name:'文具費', cost:45 }] },
+            { icon:'🌄', label:'爬山',     items:[{ name:'門票費', cost:100 }, { name:'食物費', cost:120 }] },
+            { icon:'🎮', label:'遊樂場',   items:[{ name:'門票費', cost:200 }, { name:'遊戲費', cost:50  }] },
+            { icon:'🍜', label:'吃午飯',   items:[{ name:'午餐費', cost:85  }, { name:'飲料費', cost:30  }] },
         ],
         hard: [
-            { icon:'🛒', label:'大採購',   items:[{ name:'衣服',   cost:350 }, { name:'鞋子',   cost:490 }, { name:'書',     cost:180 }] },
-            { icon:'🎂', label:'買禮物',   items:[{ name:'禮物',   cost:280 }, { name:'蛋糕',   cost:420 }, { name:'卡片',   cost:35  }] },
-            { icon:'🌿', label:'出遊',     items:[{ name:'公車費', cost:20  }, { name:'冰淇淋', cost:45  }, { name:'門票',   cost:100 }, { name:'飲料', cost:30 }] },
-            { icon:'🏕️', label:'露營',   items:[{ name:'食材',   cost:350 }, { name:'裝備費', cost:200 }, { name:'入場費', cost:150 }] },
-            { icon:'🎡', label:'遊樂園',   items:[{ name:'門票',   cost:580 }, { name:'餐費',   cost:250 }, { name:'紀念品', cost:180 }] },
-            { icon:'🌍', label:'校外教學', items:[{ name:'車費',   cost:80  }, { name:'午餐',   cost:120 }, { name:'門票',   cost:200 }, { name:'零用', cost:100 }] },
-            { icon:'🎓', label:'畢業典禮', items:[{ name:'服裝',   cost:450 }, { name:'花束',   cost:280 }, { name:'聚餐',   cost:350 }] },
-            { icon:'🏖️', label:'去海邊', items:[{ name:'防曬乳', cost:180 }, { name:'餐費',   cost:300 }, { name:'停車費', cost:100 }, { name:'飲料', cost:60  }] },
+            { icon:'🛒', label:'大採購',   items:[{ name:'衣服費',  cost:350 }, { name:'鞋子費', cost:490 }, { name:'書費',    cost:180 }] },
+            { icon:'🎂', label:'買禮物',   items:[{ name:'禮物費',  cost:280 }, { name:'蛋糕費', cost:420 }, { name:'卡片費',  cost:35  }] },
+            { icon:'🌿', label:'出遊',     items:[{ name:'公車費',  cost:20  }, { name:'冰淇淋費', cost:45 }, { name:'門票費',  cost:100 }, { name:'飲料費', cost:30 }] },
+            { icon:'🏕️', label:'露營',   items:[{ name:'食材費',  cost:350 }, { name:'裝備費', cost:200 }, { name:'入場費',  cost:150 }] },
+            { icon:'🎡', label:'遊樂園',   items:[{ name:'門票費',  cost:580 }, { name:'餐費',   cost:250 }, { name:'紀念品費', cost:180 }] },
+            { icon:'🌍', label:'校外教學', items:[{ name:'交通費',  cost:80  }, { name:'午餐費', cost:120 }, { name:'門票費',  cost:200 }, { name:'零用錢', cost:100 }] },
+            { icon:'🎓', label:'畢業典禮', items:[{ name:'服裝費',  cost:450 }, { name:'花束費', cost:280 }, { name:'聚餐費',  cost:350 }] },
+            { icon:'🏖️', label:'去海邊', items:[{ name:'防曬乳',  cost:180 }, { name:'餐費',   cost:300 }, { name:'停車費',  cost:100 }, { name:'飲料費', cost:60  }] },
         ],
     },
 
@@ -118,12 +130,82 @@ WorksheetRegistry.register('b1', {
         chosen.forEach(s => usedLabels.add(`b1_${s.label}`));
         const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
 
+        const TH = 'padding:4px 8px;border-bottom:1.5px solid #9ca3af;';
+        const TD = 'padding:3px 8px;';
+        const TABLE = 'border-collapse:collapse;font-size:12pt;width:100%;margin-top:4px;';
+
         return chosen.map(scenario => {
             const total = scenario.items.reduce((s, it) => s + it.cost, 0);
             const itemsText = scenario.items.map(it => `${it.name} <strong>${it.cost}</strong> 元`).join('、');
             const basePrompt = `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：${itemsText}`;
 
-            if (questionType === 'fill') {
+            if (questionType === 'steps') {
+                // 計算每次費用：每列顯示費用，填入累計金額
+                let running = 0;
+                const rows = scenario.items.map(it => {
+                    running += it.cost;
+                    const runAns = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${running}</span>`
+                        : blankLine(true);
+                    return `<tr>
+                        <td style="${TD}">${it.name}</td>
+                        <td style="text-align:right;${TD}font-weight:bold;">${it.cost} 元</td>
+                        <td style="text-align:right;${TD}">${runAns} 元</td>
+                    </tr>`;
+                }).join('');
+                return {
+                    _key: `b1_${scenario.label}`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，填入每次費用後的累計金額：`,
+                    visual: `<table style="${TABLE}">
+                        <tr style="background:#f3f4f6;">
+                            <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}text-align:right;">費用</th>
+                            <th style="${TH}text-align:right;">累計（元）</th>
+                        </tr>
+                        ${rows}
+                    </table>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
+            } else if (questionType === 'img-fill') {
+                // 計算每次費用：金幣圖示 + 底線填費用；共需列也顯示金幣 + 底線
+                const rows = scenario.items.map(it => {
+                    const coins = this._coinsDisplay(it.cost, renderCoin);
+                    const ans   = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${it.cost}</span>`
+                        : blankLine();
+                    return `<tr>
+                        <td style="${TD}">${it.name}</td>
+                        <td style="${TD}">${coins}</td>
+                        <td style="text-align:right;${TD}">${ans} 元</td>
+                    </tr>`;
+                }).join('');
+                const totalCoins = this._coinsDisplay(total, renderCoin);
+                const totalAns   = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${total}</span>`
+                    : blankLine(true);
+                return {
+                    _key: `b1_${scenario.label}`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看圖填入各項費用，並計算共需金額：`,
+                    visual: `<table style="${TABLE}">
+                        <tr style="background:#f3f4f6;">
+                            <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}text-align:right;">費用（元）</th>
+                        </tr>
+                        ${rows}
+                        <tr style="border-top:2px solid #9ca3af;background:#f9fafb;">
+                            <td style="${TD}font-weight:bold;">共需</td>
+                            <td style="${TD}">${totalCoins}</td>
+                            <td style="text-align:right;${TD}">${totalAns} 元</td>
+                        </tr>
+                    </table>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
+            } else if (questionType === 'fill') {
                 // 數字填空：列出項目金額，填入合計
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${total}</span>`
@@ -132,23 +214,6 @@ WorksheetRegistry.register('b1', {
                     _key: `b1_${scenario.label}`,
                     prompt: basePrompt,
                     visual: '',
-                    answerArea: `至少要帶：${ans} 元`,
-                    answerDisplay: ''
-                };
-
-            } else if (questionType === 'img-fill') {
-                // 看圖填空：每個項目旁顯示金幣圖示，填入合計
-                const itemsWithCoins = scenario.items.map(it => {
-                    const coinRow = this._coinsDisplay(it.cost, renderCoin);
-                    return `${it.name}（<strong>${it.cost}</strong> 元）<span class="price-coins" style="vertical-align:middle;">${coinRow}</span>`;
-                }).join('&emsp;');
-                const ans = showAnswers
-                    ? `<span style="color:red;font-weight:bold;">${total}</span>`
-                    : blankLine();
-                return {
-                    _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，需要花：`,
-                    visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
                     answerArea: `至少要帶：${ans} 元`,
                     answerDisplay: ''
                 };

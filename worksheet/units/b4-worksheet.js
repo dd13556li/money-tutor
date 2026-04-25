@@ -21,7 +21,17 @@ WorksheetRegistry.register('b4', {
 
     toolbarConfig: {
         fontButton: null,
-        adjustCountButton: null,
+        adjustCountButton: {
+            label: '🎯 難度',
+            type: 'dropdown',
+            options: [
+                { label: '簡單', value: 'easy'   },
+                { label: '普通', value: 'normal' },
+                { label: '困難', value: 'hard'   },
+            ],
+            getCurrentValue: (p) => p.difficulty || 'easy',
+            onChange: (v, app) => { app.params.difficulty = v; app.generate(); }
+        },
         orientationButton: null,
         extraButtons: [
             {
@@ -59,28 +69,39 @@ WorksheetRegistry.register('b4', {
         ],
     },
 
-    _items: [
-        { name:'鉛筆盒',       icon:'✏️',  optA:{ store:'文具店',  price:85   }, optB:{ store:'超市',   price:65   }, optC:{ store:'書局',   price:72   } },
-        { name:'蘋果（1斤）',  icon:'🍎',  optA:{ store:'超市',    price:45   }, optB:{ store:'菜市場', price:35   }, optC:{ store:'量販店', price:40   } },
-        { name:'原子筆',       icon:'🖊️', optA:{ store:'書局',    price:15   }, optB:{ store:'大賣場', price:12   }, optC:{ store:'量販店', price:10   } },
-        { name:'礦泉水',       icon:'💧',  optA:{ store:'超商',    price:20   }, optB:{ store:'量販店', price:13   }, optC:{ store:'超市',   price:16   } },
-        { name:'洗髮精',       icon:'🧴',  optA:{ store:'藥妝店',  price:189  }, optB:{ store:'量販店', price:149  }, optC:{ store:'超市',   price:169  } },
-        { name:'巧克力',       icon:'🍫',  optA:{ store:'超商',    price:55   }, optB:{ store:'超市',   price:42   }, optC:{ store:'量販店', price:38   } },
-        { name:'毛巾',         icon:'🧣',  optA:{ store:'百貨',    price:250  }, optB:{ store:'市場',   price:180  }, optC:{ store:'量販店', price:195  } },
-        { name:'故事書',       icon:'📖',  optA:{ store:'書店',    price:280  }, optB:{ store:'二手店', price:150  }, optC:{ store:'網購',   price:130  } },
-        { name:'牛奶（1公升）',icon:'🥛',  optA:{ store:'超商',    price:65   }, optB:{ store:'超市',   price:55   }, optC:{ store:'量販店', price:48   } },
-        { name:'面紙（一包）', icon:'🧻',  optA:{ store:'超商',    price:39   }, optB:{ store:'量販店', price:25   }, optC:{ store:'大賣場', price:22   } },
-        { name:'雨傘',         icon:'☂️',  optA:{ store:'百貨',    price:480  }, optB:{ store:'夜市',   price:150  }, optC:{ store:'量販店', price:200  } },
-        { name:'餅乾（一盒）', icon:'🍪',  optA:{ store:'超商',    price:45   }, optB:{ store:'超市',   price:35   }, optC:{ store:'量販店', price:28   } },
-        { name:'牙刷',         icon:'🪥',  optA:{ store:'藥局',    price:39   }, optB:{ store:'量販店', price:29   }, optC:{ store:'超市',   price:32   } },
-        { name:'色鉛筆',       icon:'🖍️', optA:{ store:'文具店',  price:120  }, optB:{ store:'大賣場', price:89   }, optC:{ store:'量販店', price:75   } },
-        { name:'果汁（1瓶）',  icon:'🧃',  optA:{ store:'超商',    price:35   }, optB:{ store:'超市',   price:25   }, optC:{ store:'量販店', price:20   } },
-        { name:'電池（4顆）',  icon:'🔋',  optA:{ store:'超商',    price:85   }, optB:{ store:'量販店', price:59   }, optC:{ store:'大賣場', price:68   } },
-        { name:'洗碗精',       icon:'🧼',  optA:{ store:'超市',    price:59   }, optB:{ store:'量販店', price:45   }, optC:{ store:'大賣場', price:52   } },
-        { name:'運動鞋',       icon:'👟',  optA:{ store:'品牌店',  price:1580 }, optB:{ store:'網購',   price:1200 }, optC:{ store:'特賣場', price:950  } },
-        { name:'拖鞋',         icon:'🩴',  optA:{ store:'百貨',    price:390  }, optB:{ store:'夜市',   price:120  }, optC:{ store:'量販店', price:150  } },
-        { name:'手套',         icon:'🧤',  optA:{ store:'百貨',    price:320  }, optB:{ store:'市場',   price:180  }, optC:{ store:'量販店', price:145  } },
-    ],
+    // optA.price > optB.price（2家比較時 optB 永遠較便宜）
+    _items: {
+        easy: [
+            { name:'原子筆',       icon:'🖊️', optA:{ store:'書局',   price:15 }, optB:{ store:'大賣場', price:12 }, optC:{ store:'量販店', price:10 } },
+            { name:'礦泉水',       icon:'💧',  optA:{ store:'超商',   price:20 }, optB:{ store:'量販店', price:13 }, optC:{ store:'超市',   price:16 } },
+            { name:'果汁（1瓶）',  icon:'🧃',  optA:{ store:'超商',   price:35 }, optB:{ store:'超市',   price:25 }, optC:{ store:'量販店', price:20 } },
+            { name:'面紙（一包）', icon:'🧻',  optA:{ store:'超商',   price:39 }, optB:{ store:'量販店', price:25 }, optC:{ store:'大賣場', price:22 } },
+            { name:'牙刷',         icon:'🪥',  optA:{ store:'藥局',   price:39 }, optB:{ store:'量販店', price:29 }, optC:{ store:'超市',   price:32 } },
+            { name:'蘋果（1斤）',  icon:'🍎',  optA:{ store:'超市',   price:45 }, optB:{ store:'菜市場', price:35 }, optC:{ store:'量販店', price:40 } },
+            { name:'餅乾（一盒）', icon:'🍪',  optA:{ store:'超商',   price:45 }, optB:{ store:'超市',   price:35 }, optC:{ store:'量販店', price:28 } },
+            { name:'巧克力',       icon:'🍫',  optA:{ store:'超商',   price:55 }, optB:{ store:'超市',   price:42 }, optC:{ store:'量販店', price:38 } },
+            { name:'牛奶（1公升）',icon:'🥛',  optA:{ store:'超商',   price:65 }, optB:{ store:'超市',   price:55 }, optC:{ store:'量販店', price:48 } },
+            { name:'鉛筆盒',       icon:'✏️',  optA:{ store:'文具店', price:85 }, optB:{ store:'超市',   price:65 }, optC:{ store:'書局',   price:72 } },
+        ],
+        normal: [
+            { name:'洗碗精',       icon:'🧼',  optA:{ store:'超市',   price:59  }, optB:{ store:'量販店', price:45  }, optC:{ store:'大賣場', price:52  } },
+            { name:'電池（4顆）',  icon:'🔋',  optA:{ store:'超商',   price:85  }, optB:{ store:'量販店', price:59  }, optC:{ store:'大賣場', price:68  } },
+            { name:'色鉛筆',       icon:'🖍️', optA:{ store:'文具店', price:120 }, optB:{ store:'大賣場', price:89  }, optC:{ store:'量販店', price:75  } },
+            { name:'水壺',         icon:'🫙',  optA:{ store:'品牌店', price:185 }, optB:{ store:'量販店', price:135 }, optC:{ store:'超市',   price:160 } },
+            { name:'洗髮精',       icon:'🧴',  optA:{ store:'藥妝店', price:189 }, optB:{ store:'量販店', price:149 }, optC:{ store:'超市',   price:169 } },
+            { name:'桌遊',         icon:'🎲',  optA:{ store:'玩具店', price:260 }, optB:{ store:'量販店', price:195 }, optC:{ store:'網購',   price:180 } },
+            { name:'毛巾',         icon:'🧣',  optA:{ store:'百貨',   price:250 }, optB:{ store:'市場',   price:180 }, optC:{ store:'量販店', price:195 } },
+            { name:'故事書',       icon:'📖',  optA:{ store:'書店',   price:280 }, optB:{ store:'二手店', price:150 }, optC:{ store:'網購',   price:130 } },
+        ],
+        hard: [
+            { name:'手套',   icon:'🧤',  optA:{ store:'百貨',   price:320  }, optB:{ store:'市場',   price:180  }, optC:{ store:'量販店', price:145  } },
+            { name:'拖鞋',   icon:'🩴',  optA:{ store:'百貨',   price:390  }, optB:{ store:'夜市',   price:120  }, optC:{ store:'量販店', price:150  } },
+            { name:'玩具組', icon:'🧸',  optA:{ store:'玩具店', price:450  }, optB:{ store:'量販店', price:320  }, optC:{ store:'網購',   price:265  } },
+            { name:'雨傘',   icon:'☂️',  optA:{ store:'百貨',   price:480  }, optB:{ store:'夜市',   price:150  }, optC:{ store:'量販店', price:200  } },
+            { name:'書包',   icon:'🎒',  optA:{ store:'百貨',   price:580  }, optB:{ store:'量販店', price:360  }, optC:{ store:'網購',   price:290  } },
+            { name:'運動鞋', icon:'👟',  optA:{ store:'品牌店', price:1580 }, optB:{ store:'網購',   price:1200 }, optC:{ store:'特賣場', price:950  } },
+        ],
+    },
 
     generate(options) {
         const questionType = options.questionType || 'cheaper-num';
@@ -88,7 +109,9 @@ WorksheetRegistry.register('b4', {
         const showAnswers  = options._showAnswers  || false;
         const usedKeys     = options._usedValues   || new Set();
         const count        = options.count         || 10;
-        const items        = this._items;
+        const difficulty   = options.difficulty    || 'easy';
+        const items        = this._items[difficulty] || this._items.easy;
+        const keyPrefix    = `b4_${difficulty}_`;
 
         // 從題型後綴推導金額呈現方式
         let priceStyle;
@@ -118,15 +141,16 @@ WorksheetRegistry.register('b4', {
             return `${coinImgsHtml}${blankLine()} 元`;
         };
 
-        const available = items.map((_, i) => i).filter(i => !usedKeys.has(`b4_${i}`));
+        const available = items.map((_, i) => i).filter(i => !usedKeys.has(keyPrefix + i));
         const pool      = shuffle(available.length >= 2 ? available : items.map((_, i) => i));
         const chosen    = pool.slice(0, count);
-        chosen.forEach(i => usedKeys.add(`b4_${i}`));
+        chosen.forEach(i => usedKeys.add(keyPrefix + i));
 
         const iconSpan = (icon) => `<span class="ws-emoji-icon">${icon}</span>`;
 
         return chosen.map(idx => {
             const item = items[idx];
+            const itemKey = keyPrefix + idx;
 
             const swapped    = Math.random() < 0.5;
             const left       = swapped ? item.optB : item.optA;
@@ -150,7 +174,7 @@ WorksheetRegistry.register('b4', {
                     ? `<span style="color:red;font-weight:bold;">${cheaperOpt.store}</span>`
                     : blankLine();
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                     visual: priceRow,
                     answerArea: `哪家比較便宜？${ans}`,
@@ -173,7 +197,7 @@ WorksheetRegistry.register('b4', {
                       }`
                     : `<span style="margin:0 10px;">${storeA}</span>&ensp;&ensp;<span style="margin:0 10px;">${storeB}</span>`;
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                     visual: priceRow,
                     answerArea: `哪家比較便宜，請圈出來&ensp;${circleHtml}`,
@@ -202,7 +226,7 @@ WorksheetRegistry.register('b4', {
                         return `<span style="margin:0 5px;">${opt.store}</span>`;
                     }).join('&ensp;&ensp;');
                     return {
-                        _key: `b4_${idx}`,
+                        _key: itemKey,
                         prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在三家店的售價如下：`,
                         visual: priceRow3,
                         answerArea: `哪家最便宜，請圈出來&ensp;${circleHtml3}`,
@@ -214,7 +238,7 @@ WorksheetRegistry.register('b4', {
                     ? `<span style="color:red;font-weight:bold;">${cheapest3.store}</span>`
                     : blankLine();
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在三家店的售價如下：`,
                     visual: priceRow3,
                     answerArea: `哪家最便宜？${ans}`,
@@ -227,7 +251,7 @@ WorksheetRegistry.register('b4', {
                 const diffCoins = walletToCoins(diff);
                 const diffCoinImgs = `<span style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;margin:0 3px;vertical-align:middle;">${diffCoins.map(c => renderCoin(c)).join('')}</span>`;
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                     visual: priceRow,
                     answerArea: `${cheaperOpt.store}便宜了&ensp;${diffCoinImgs}${blankLine()} 元`,
@@ -236,7 +260,7 @@ WorksheetRegistry.register('b4', {
             }
 
             if (questionType === 'fill-hint') {
-                const mkHintComplete = (price, hideTotalNum) => {
+                const mkHintComplete = (price) => {
                     const combo = this._findCombo(price);
                     if (!combo) return `<strong>${price}</strong> 元`;
                     const partsHtml = combo.map(c => {
@@ -246,16 +270,16 @@ WorksheetRegistry.register('b4', {
                         const qty    = c.denom >= 100 ? '張' : '個';
                         return `${ansNum}${qty}&nbsp;${icons}`;
                     }).join('&ensp;');
-                    const totalColor = showAnswers ? 'color:red' : (hideTotalNum ? 'color:#ccc' : '');
-                    return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;margin:3px 0;">${partsHtml}&ensp;<span style="${totalColor};font-weight:bold;">共 ${price} 元</span></div>`;
+                    const numStyle = showAnswers ? 'color:red;font-weight:bold;' : 'color:#ccc;font-weight:bold;';
+                    return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;margin:3px 0;">${partsHtml}&ensp;共 <span style="${numStyle}">${price}</span> 元</div>`;
                 };
 
                 const priceRowHC = `<div style="display:flex;gap:18px;margin:6px 0;font-size:12pt;">
                     <span style="flex:1;text-align:center;background:#fef9c3;border-radius:8px;padding:4px 8px;">
-                        🏪 ${left.store}<br>${mkHintComplete(left.price, false)}
+                        🏪 ${left.store}<br>${mkHintComplete(left.price)}
                     </span>
                     <span style="flex:1;text-align:center;background:#dbeafe;border-radius:8px;padding:4px 8px;">
-                        🏬 ${right.store}<br>${mkHintComplete(right.price, false)}
+                        🏬 ${right.store}<br>${mkHintComplete(right.price)}
                     </span>
                 </div>`;
 
@@ -269,8 +293,8 @@ WorksheetRegistry.register('b4', {
                         const qty    = c.denom >= 100 ? '張' : '個';
                         return `${ansNum}${qty}&nbsp;${icons}`;
                     }).join('&ensp;');
-                    const totalColor = showAnswers ? 'color:red' : 'color:#ccc';
-                    diffArea = `${cheaperOpt.store}便宜了&ensp;${partsHtml}&ensp;<span style="${totalColor};font-weight:bold;">共 ${diff} 元</span>`;
+                    const numStyle = showAnswers ? 'color:red;font-weight:bold;' : 'color:#ccc;font-weight:bold;';
+                    diffArea = `${cheaperOpt.store}便宜了&ensp;${partsHtml}&ensp;共 <span style="${numStyle}">${diff}</span> 元`;
                 } else {
                     const ans = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${diff}</span>` : blankLine();
@@ -278,7 +302,7 @@ WorksheetRegistry.register('b4', {
                 }
 
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                     visual: priceRowHC,
                     answerArea: diffArea,
@@ -328,7 +352,7 @@ WorksheetRegistry.register('b4', {
                 }).join('');
 
                 return {
-                    _key: `b4_${idx}`,
+                    _key: itemKey,
                     prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                     visual: `${priceRowFS}
                         <div style="margin-bottom:4px;"><strong>${cheaperOpt.store}</strong> 便宜 <strong>${diff}</strong> 元？請選出正確的金額組合：</div>
@@ -343,7 +367,7 @@ WorksheetRegistry.register('b4', {
                 ? `<span style="color:red;font-weight:bold;">${diff}</span>`
                 : blankLine();
             return {
-                _key: `b4_${idx}`,
+                _key: itemKey,
                 prompt: `${iconSpan(item.icon)}<strong>${item.name}</strong> 在兩家店的售價如下：`,
                 visual: priceRow,
                 answerArea: `${cheaperOpt.store}便宜了${ans} 元`,

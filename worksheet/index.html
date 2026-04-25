@@ -62,8 +62,8 @@
 <script src="units/a4-worksheet.js"></script>
 <script src="units/a5-worksheet.js"></script>
 <script src="units/a6-worksheet.js"></script>
-<script src="units/b1-worksheet.js"></script>
-<script src="units/b2-worksheet.js"></script>
+<script src="units/b1-worksheet.js?v=2"></script>
+<script src="units/b2-worksheet.js?v=2"></script>
 <script src="units/b3-worksheet.js"></script>
 <script src="units/b4-worksheet.js"></script>
 <script src="units/b5-worksheet.js"></script>
@@ -488,9 +488,10 @@ const WorksheetApp = {
 
     _cycleOption(config) {
         const current = config.getCurrentValue(this.params);
-        const idx = config.options.findIndex(o => o.value === current);
-        const next = (idx + 1) % config.options.length;
-        config.onChange(config.options[next].value, this);
+        const selectable = config.options.filter(o => !o.type);
+        const idx = selectable.findIndex(o => o.value === current);
+        const next = (idx + 1) % selectable.length;
+        config.onChange(selectable[next].value, this);
     },
 
     _showDropdown(btnId, config) {
@@ -511,6 +512,19 @@ const WorksheetApp = {
 
         const currentVal = config.getCurrentValue(this.params);
         config.options.forEach(opt => {
+            if (opt.type === 'group') {
+                const grp = document.createElement('div');
+                grp.className = 'toolbar-dropdown-group';
+                grp.textContent = opt.label;
+                menu.appendChild(grp);
+                return;
+            }
+            if (opt.type === 'separator') {
+                const sep = document.createElement('div');
+                sep.className = 'toolbar-dropdown-separator';
+                menu.appendChild(sep);
+                return;
+            }
             const item = document.createElement('div');
             item.className = 'toolbar-dropdown-item' + (opt.value === currentVal ? ' active' : '');
             item.textContent = opt.label;
