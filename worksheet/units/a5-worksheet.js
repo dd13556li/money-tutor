@@ -293,7 +293,7 @@ return `<div class="coin-choice-option" style="${style}">
                     </div>`;
                 }).join('');
                 return {
-                    prompt: `${basePrompt}，${resultLabel} ${result} 元，請選出正確的金額組合：`,
+                    prompt: `${basePrompt}，${resultLabel} <span style="color:red;font-weight:bold;">${result}</span> 元，請選出正確的金額組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -320,7 +320,7 @@ return `<div class="coin-choice-option" style="${style}">
                     </div>`;
                 }).join('');
                 return {
-                    prompt: `${basePrompt}，${resultLabel} ${result} 元，請選出正確的金額組合：`,
+                    prompt: `${basePrompt}，${resultLabel} <span style="color:red;font-weight:bold;">${result}</span> 元，請選出正確的金額組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
