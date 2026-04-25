@@ -94,21 +94,24 @@ WorksheetRegistry.register('a6', {
             const paid = [100, 500, 1000, 2000, 5000].find(p => p > total) || 5000;
             const change = paid - total;
 
-            const routeDesc = `🚂 ${route.from} → ${route.to}（${this.trainNames[trainType]}），${tickets} 張票`;
-            const priceVisual = `<div>總票價：${unitPrice} 元 × ${tickets} 張 = ${total} 元</div>`;
+            const routeDesc = `🚂 ${route.from} 到 ${route.to}，搭乘${this.trainNames[trainType]}`;
+            const ticketDesc = tickets === 1 ? '一張票' : `${tickets} 張票`;
+            const pricePrompt = `${routeDesc}。一張票 ${unitPrice} 元，請問 ${ticketDesc}總共多少錢？`;
+            const changePrompt = `${routeDesc}。一張票 ${unitPrice} 元，買了 ${tickets} 張票，付 ${paid} 元，請問應找回多少錢？`;
+            const priceVisual = `<div>算式：${unitPrice} 元 × ${tickets} 張 = ${total} 元</div>`;
             const priceVisualFill = showAnswers
-                ? `<div>總票價：${unitPrice} 元 × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
-                : `<div>總票價：${unitPrice} 元 × ${tickets} 張 = ？？？ 元</div>`;
+                ? `<div>算式：${unitPrice} 元 × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
+                : `<div>算式：${unitPrice} 元 × ${tickets} 張 = ？？？ 元</div>`;
 
             if (isPrice) {
                 // 價格計算題型（只問總票價，不涉及找零）
                 if (questionType === 'price-fill') {
                     questions.push({
-                        prompt: routeDesc,
+                        prompt: pricePrompt,
                         visual: priceVisualFill,
                         answerArea: showAnswers
-                            ? `總共票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
-                            : `總共票價 ${blankLine()} 元`,
+                            ? `總票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
+                            : `總票價 ${blankLine()} 元`,
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-img-fill') {
@@ -117,11 +120,11 @@ WorksheetRegistry.register('a6', {
                         ? `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${unitPrice}</span>元)` : `(${blankLine()})`} × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
                         : `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${unitPrice}</span>元)` : `(${blankLine()})`} × ${tickets} 張 = ？？？ 元</div>`;
                     questions.push({
-                        prompt: routeDesc,
+                        prompt: pricePrompt,
                         visual: priceVisualWithCoins,
                         answerArea: showAnswers
-                            ? `總共票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
-                            : `總共票價 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元`,
+                            ? `總票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
+                            : `總票價 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元`,
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-fill-select') {
@@ -143,10 +146,10 @@ return `<div class="coin-choice-option" style="${style}">
                         </div>`;
                     }).join('');
                     const fillArea = showAnswers
-                        ? `總共票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
-                        : `總共票價 ${blankLine()} 元`;
+                        ? `總票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
+                        : `總票價 ${blankLine()} 元`;
                     questions.push({
-                        prompt: routeDesc,
+                        prompt: pricePrompt,
                         visual: priceVisualFill + `<div style="margin-top:6px;margin-bottom:6px;">${fillArea}</div>
                                  <div style="margin-bottom:4px;">請選出正確的金額組合：</div>
                                  <div class="coin-choice-options">${choicesHtml}</div>`,
@@ -172,7 +175,7 @@ return `<div class="coin-choice-option" style="${style}">
                         </div>`;
                     }).join('');
                     questions.push({
-                        prompt: `${routeDesc}，總票價 <span style="color:red;font-weight:bold;">${total}</span> 元，請選出正確的金額組合：`,
+                        prompt: `${routeDesc}。一張票 ${unitPrice} 元，${ticketDesc}共 <span style="color:red;font-weight:bold;">${total}</span> 元，請選出正確的金額組合：`,
                         visual: priceVisual + `<div class="coin-choice-options">${choicesHtml}</div>`,
                         answerArea: '',
                         answerDisplay: ''
@@ -197,7 +200,7 @@ return `<div class="coin-choice-option" style="${style}">
                         </div>`;
                     }).join('');
                     questions.push({
-                        prompt: `${routeDesc}，總票價 <span style="color:red;font-weight:bold;">${total}</span> 元，請選出正確的金額組合：`,
+                        prompt: `${routeDesc}。一張票 ${unitPrice} 元，${ticketDesc}共 <span style="color:red;font-weight:bold;">${total}</span> 元，請選出正確的金額組合：`,
                         visual: priceVisual + `<div class="coin-choice-options">${choicesHtml}</div>`,
                         answerArea: '',
                         answerDisplay: ''
@@ -215,7 +218,7 @@ return `<div class="coin-choice-option" style="${style}">
                     const totalColor = showAnswers ? 'color:red' : 'color:#ccc';
                     const totalHint = `<span style="font-size:14pt; font-weight:bold; margin-left:6px;">共 <span style="${totalColor};font-weight:bold;">${total}</span> 元</span>`;
                     questions.push({
-                        prompt: `${routeDesc}，總票價如下：`,
+                        prompt: `${pricePrompt}，請看金幣組合：`,
                         visual: priceVisual + `<div style="margin:4px 0;">總共要 ${partsHtml} ${totalHint}</div>`,
                         answerArea: '',
                         answerDisplay: ''
@@ -226,11 +229,11 @@ return `<div class="coin-choice-option" style="${style}">
 
             if (questionType === 'fill') {
                 questions.push({
-                    prompt: routeDesc,
+                    prompt: changePrompt,
                     visual: priceVisualFill,
                     answerArea: showAnswers
-                        ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
-                        : `總共費用 ${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
+                        ? `總票價 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
+                        : `總票價 ${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
                     answerDisplay: ''
                 });
             } else if (questionType === 'img-fill') {
@@ -239,10 +242,10 @@ return `<div class="coin-choice-option" style="${style}">
                     ? `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${unitPrice}</span>元)` : `(${blankLine()})`} × ${tickets} 張 = <span style="color:red;font-weight:bold;">${total}</span> 元</div>`
                     : `<div>總票價：${this._renderPriceWithCoins(unitPrice, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${unitPrice}</span>元)` : `(${blankLine()})`} × ${tickets} 張 = ？？？ 元</div>`;
                 questions.push({
-                    prompt: routeDesc,
+                    prompt: changePrompt,
                     visual: priceVisualWithCoins,
                     answerArea: showAnswers
-                        ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
+                        ? `總票價 <span style="color:red;font-weight:bold;">${total}</span> 元，你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
                         : `總共費用 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
                     answerDisplay: ''
                 });
@@ -268,7 +271,7 @@ return `<div class="coin-choice-option" style="${style}">
                     ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
                     : `總共費用 ${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`;
                 questions.push({
-                    prompt: routeDesc,
+                    prompt: changePrompt,
                     visual: priceVisualFill + `<div style="margin-top:6px;margin-bottom:6px;">${fillArea}</div>
                              <div style="margin-bottom:4px;">請選出正確的找零組合：</div>
                              <div class="coin-choice-options">${choicesHtml}</div>`,
@@ -294,7 +297,7 @@ return `<div class="coin-choice-option" style="${style}">
                     </div>`;
                 }).join('');
                 questions.push({
-                    prompt: `${routeDesc}，總票價 <span style="color:red;font-weight:bold;">${total}</span> 元，付 ${paid} 元，應找回 <span style="color:red;font-weight:bold;">${change}</span> 元，請選出正確的找零組合：`,
+                    prompt: `${routeDesc}。一張票 ${unitPrice} 元，${tickets} 張票共 <span style="color:red;font-weight:bold;">${total}</span> 元，付 ${paid} 元，應找回 <span style="color:red;font-weight:bold;">${change}</span> 元，請選出正確的找零組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -319,7 +322,7 @@ return `<div class="coin-choice-option" style="${style}">
                     </div>`;
                 }).join('');
                 questions.push({
-                    prompt: `${routeDesc}，總票價 <span style="color:red;font-weight:bold;">${total}</span> 元，付 ${paid} 元，應找回 <span style="color:red;font-weight:bold;">${change}</span> 元，請選出正確的找零組合：`,
+                    prompt: `${routeDesc}。一張票 ${unitPrice} 元，${tickets} 張票共 <span style="color:red;font-weight:bold;">${total}</span> 元，付 ${paid} 元，應找回 <span style="color:red;font-weight:bold;">${change}</span> 元，請選出正確的找零組合：`,
                     visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
@@ -337,7 +340,7 @@ return `<div class="coin-choice-option" style="${style}">
                 const totalColor = showAnswers ? 'color:red' : 'color:#ccc';
                 const totalHint = `<span style="font-size:14pt; font-weight:bold; margin-left:6px;">共 <span style="${totalColor};font-weight:bold;">${change}</span> 元</span>`;
                 questions.push({
-                    prompt: `${routeDesc}，總票價 ${total} 元，付 ${paid} 元，應找回多少元？`,
+                    prompt: `${routeDesc}。一張票 ${unitPrice} 元，${tickets} 張票共 ${total} 元，付 ${paid} 元，應找回多少元？`,
                     visual: `<div style="margin:4px 0;">找回 ${partsHtml} ${totalHint}</div>`,
                     answerArea: '',
                     answerDisplay: ''
