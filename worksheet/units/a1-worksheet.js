@@ -164,7 +164,7 @@ WorksheetRegistry.register('a1', {
                         visual: '',
                         answerArea: showAnswers
                             ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元`
-                            : `總共費用 ${blankLine()} 元`,
+                            : `總共費用 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元`,
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-fill-select') {

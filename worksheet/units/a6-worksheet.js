@@ -121,7 +121,7 @@ WorksheetRegistry.register('a6', {
                         visual: priceVisualWithCoins,
                         answerArea: showAnswers
                             ? `總共票價 <span style="color:red;font-weight:bold;">${total}</span> 元`
-                            : `總共票價 ${blankLine()} 元`,
+                            : `總共票價 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元`,
                         answerDisplay: ''
                     });
                 } else if (questionType === 'price-fill-select') {
@@ -243,7 +243,7 @@ WorksheetRegistry.register('a6', {
                     visual: priceVisualWithCoins,
                     answerArea: showAnswers
                         ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
-                        : `總共費用 ${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
+                        : `總共費用 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
                     answerDisplay: ''
                 });
             } else if (questionType === 'fill-select') {
