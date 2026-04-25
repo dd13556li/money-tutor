@@ -298,14 +298,14 @@ return `<div class="coin-choice-option" style="${style}">
             } else if (questionType === 'img-fill') {
                 // 圖示填空(找零計算)：在價格前顯示金錢圖示
                 const itemListWithCoins = selected.map(it =>
-                    `${it.img ? this._itemImg(it) : it.emoji} ${it.name} ${this._renderPriceWithCoins(it.price, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${it.price}</span>元)` : `(${blankLine()})`}`
+                    `${it.img ? this._itemImg(it) : it.emoji} ${it.name} ${this._renderPriceWithCoins(it.price, renderCoin)}${showAnswers ? `(<span style="color:red;font-weight:bold;">${it.price}</span>元)` : `(${blankLine()})元`}`
                 ).join('、');
                 questions.push({
                     prompt: `你點了：${itemListWithCoins}`,
                     visual: '',
                     answerArea: showAnswers
                         ? `總共費用 <span style="color:red;font-weight:bold;">${total}</span> 元　你付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
-                        : `總共費用 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元　你付 ${paid} 元，找回 ${blankLine()} 元`,
+                        : `總共費用 ${this._renderPriceWithCoins(total, renderCoin)}${blankLine()} 元　你付 ${paid} 元，找回 ${this._renderPriceWithCoins(change, renderCoin)}${blankLine()} 元`,
                     answerDisplay: ''
                 });
             } else if (questionType === 'fill-select') {
