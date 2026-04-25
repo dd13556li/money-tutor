@@ -9,7 +9,7 @@ WorksheetRegistry.register('b2', {
             'steps':         '數字填空：計算每次餘額',
             'img-fill':      '看圖填空：計算每次餘額',
             'fill':          '數字填空：計算最終餘額',
-            'fill-select':   '填空與選擇：計算最終餘額',
+            'fill-select':   '圖示填空：計算最終餘額',
             'coin-select':   '圖示選擇：計算最終餘額',
             'hint-select':   '提示選擇：計算最終餘額',
             'hint-complete': '提示完成：計算最終餘額',
@@ -27,7 +27,7 @@ WorksheetRegistry.register('b2', {
                 { label: '看圖填空', value: 'img-fill' },
                 { type: 'group',  label: '計算最終餘額' },
                 { label: '數字填空', value: 'fill'          },
-                { label: '填空與選擇', value: 'fill-select' },
+                { label: '圖示填空', value: 'fill-select' },
                 { label: '圖示選擇',   value: 'coin-select' },
                 { label: '提示選擇',   value: 'hint-select' },
                 { label: '提示完成',   value: 'hint-complete' },
@@ -283,7 +283,7 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '一、根據日記記錄，計算零用錢餘額：',
+                    prompt: '根據日記記錄，計算零用錢餘額：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
@@ -389,8 +389,23 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'coin-select') {
-                // 圖示選擇：事件表格，選出正確錢幣組合
+                // 圖示選擇：fill-select 樣式表格（含金幣圖示，金額已揭露），選出最後餘額的錢幣組合
                 if (finalBalance <= 0) return null;
+                const mkRevealRow = (labelHtml, amount, color) => {
+                    const coins = this._coinsDisplay(amount, renderCoin);
+                    const amtHtml = `<span style="${color ? `color:${color};` : ''}font-weight:bold;">${amount}</span>`;
+                    return `<tr>
+                        <td style="${TD}">${labelHtml}</td>
+                        <td style="${TD}">${coins}</td>
+                        <td style="text-align:right;${TD}">${amtHtml} 元</td>
+                    </tr>`;
+                };
+                const csEventRows = events.map(e => {
+                    const sign  = e.type === 'income' ? '（+）' : '（−）';
+                    const color = e.type === 'income' ? '#059669' : '#dc2626';
+                    const label = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${sign}</span>`;
+                    return mkRevealRow(label, e.amount, color);
+                }).join('');
                 const opts = this._coinOptions(finalBalance);
                 const choicesHtml = opts.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
@@ -406,19 +421,42 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '根據日記記錄，選出最後餘額的錢幣組合：',
-                    visual: `${buildEventsTable()}
-                             <div style="margin:6px 0;">最後剩下 <strong>${finalBalance}</strong> 元，請選出正確的錢幣組合：</div>
-                             <div class="coin-choice-options">${choicesHtml}</div>`,
+                    prompt: '看金幣圖示，選出最後餘額的錢幣組合：',
+                    visual: `<table style="${TABLE}">
+                        <tr style="background:#f3f4f6;">
+                            <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}text-align:right;">金額</th>
+                        </tr>
+                        ${mkRevealRow('💰 一開始有', startAmount, '#111')}
+                        ${csEventRows}
+                    </table>
+                    <div style="margin:6px 0;">最後剩下 <strong>${finalBalance}</strong> 元，請選出正確的錢幣組合：</div>
+                    <div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
                     answerDisplay: ''
                 };
 
             } else if (type === 'hint-select') {
-                // 提示選擇：事件表格，選項旁顯示灰色金額提示
+                // 提示選擇：fill-select 樣式表格（含金幣圖示，金額已揭露），選項旁顯示灰色金額提示
                 if (finalBalance <= 0) return null;
-                const opts = this._coinOptions(finalBalance);
-                const choicesHtml = opts.map((opt, i) => {
+                const mkRevealRow2 = (labelHtml, amount, color) => {
+                    const coins = this._coinsDisplay(amount, renderCoin);
+                    const amtHtml = `<span style="${color ? `color:${color};` : ''}font-weight:bold;">${amount}</span>`;
+                    return `<tr>
+                        <td style="${TD}">${labelHtml}</td>
+                        <td style="${TD}">${coins}</td>
+                        <td style="text-align:right;${TD}">${amtHtml} 元</td>
+                    </tr>`;
+                };
+                const hsEventRows = events.map(e => {
+                    const sign  = e.type === 'income' ? '（+）' : '（−）';
+                    const color = e.type === 'income' ? '#059669' : '#dc2626';
+                    const label = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${sign}</span>`;
+                    return mkRevealRow2(label, e.amount, color);
+                }).join('');
+                const opts2 = this._coinOptions(finalBalance);
+                const choicesHtml2 = opts2.map((opt, i) => {
                     const label = String.fromCharCode(9312 + i);
                     const isCorrect = opt.total === finalBalance;
                     const style = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
@@ -435,21 +473,28 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '根據日記記錄，選出最後餘額的錢幣組合：',
-                    visual: `${buildEventsTable()}
-                             <div style="margin:6px 0;">最後剩下 <strong>${finalBalance}</strong> 元，請選出正確的錢幣組合：</div>
-                             <div class="coin-choice-options">${choicesHtml}</div>`,
+                    prompt: '看金幣圖示，選出最後餘額的錢幣組合：',
+                    visual: `<table style="${TABLE}">
+                        <tr style="background:#f3f4f6;">
+                            <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}text-align:right;">金額</th>
+                        </tr>
+                        ${mkRevealRow2('💰 一開始有', startAmount, '#111')}
+                        ${hsEventRows}
+                    </table>
+                    <div style="margin:6px 0;">最後剩下 <strong>${finalBalance}</strong> 元，請選出正確的錢幣組合：</div>
+                    <div class="coin-choice-options">${choicesHtml2}</div>`,
                     answerArea: '',
                     answerDisplay: ''
                 };
 
             } else { // hint-complete
-                // 提示完成：每列（起始、各事件、最後餘額）顯示金幣圖示 + 底線填數量
+                // 提示完成：fill-select 樣式三欄大表格，金幣圖示欄顯示 ___個[coin]，金額欄填空
                 if (finalBalance <= 0) return null;
                 if (!this._findCombo(finalBalance)) return null;
 
-                // 渲染單列（表格列）：標籤欄 | 金幣+底線+共XX元
-                const mkHintRow = (labelHtml, amount) => {
+                const mkHintRow = (labelHtml, amount, color, isLast) => {
                     const combo = this._findCombo(amount);
                     if (!combo) return '';
                     const parts = combo.map(c => {
@@ -459,33 +504,37 @@ WorksheetRegistry.register('b2', {
                         const unit   = c.denom >= 100 ? '張' : '個';
                         return `<span style="white-space:nowrap;">${ansNum}${unit}&nbsp;${icon}</span>`;
                     }).join('&ensp;');
-                    const totalStyle = showAnswers ? 'color:red;font-weight:bold;' : 'color:#ccc;font-weight:bold;';
-                    const totalHtml  = `<span style="white-space:nowrap;">共 <span style="${totalStyle}">${amount}</span> 元</span>`;
-                    return `<tr>
-                        <td style="padding:4px 14px 4px 0;white-space:nowrap;vertical-align:middle;font-size:12pt;">${labelHtml}</td>
-                        <td style="padding:4px 0;vertical-align:middle;font-size:12pt;">
-                            <span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:5px;">
-                                ${parts}&ensp;${totalHtml}
-                            </span>
-                        </td>
+                    const ans = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${amount}</span>`
+                        : (isLast ? blankLine(true) : blankLine());
+                    const colorStyle = color ? `color:${color};` : '';
+                    const rowStyle = isLast ? `border-top:2px solid #9ca3af;background:#f9fafb;` : '';
+                    return `<tr style="${rowStyle}">
+                        <td style="${TD}${isLast ? 'font-weight:bold;' : ''}">${labelHtml}</td>
+                        <td style="${TD}"><span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:5px;">${parts}</span></td>
+                        <td style="text-align:right;${TD}"><span style="${colorStyle}">${ans}</span> 元</td>
                     </tr>`;
                 };
 
-                const eventRows = events.map(e => {
+                const hcEventRows = events.map(e => {
                     const sign  = e.type === 'income' ? '（+）' : '（−）';
                     const color = e.type === 'income' ? '#059669' : '#dc2626';
                     const label = `<span class="ws-emoji-icon">${e.icon}</span> ${e.name}<span style="color:${color};font-weight:bold;">${sign}</span>`;
-                    return mkHintRow(label, e.amount);
+                    return mkHintRow(label, e.amount, color, false);
                 }).join('');
 
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看圖填入每筆金額和最後的餘額：',
-                    visual: `<table style="border-collapse:collapse;width:100%;margin-top:4px;">
-                        ${mkHintRow('💰 一開始有', startAmount)}
-                        ${eventRows}
-                        <tr><td colspan="2" style="padding:2px 0;"><hr style="border:none;border-top:1.5px solid #e5e7eb;margin:4px 0;"></td></tr>
-                        ${mkHintRow('📊 最後剩下', finalBalance)}
+                    prompt: '看金幣圖示，填入數量和每筆金額：',
+                    visual: `<table style="${TABLE}">
+                        <tr style="background:#f3f4f6;">
+                            <th style="${TH}text-align:left;">項目</th>
+                            <th style="${TH}">金幣圖示（填數量）</th>
+                            <th style="${TH}text-align:right;">金額</th>
+                        </tr>
+                        ${mkHintRow('💰 一開始有', startAmount, '#111', false)}
+                        ${hcEventRows}
+                        ${mkHintRow('📊 最後剩下', finalBalance, null, true)}
                     </table>`,
                     answerArea: '',
                     answerDisplay: ''
