@@ -88,6 +88,14 @@ WorksheetRegistry.register('b5', {
             { icon:'🌸', event:'春日野餐',   label:'餅乾水果',   items:[{ name:'餅乾零食',   cost:55 }, { name:'水果盒',     cost:80 }] },
             { icon:'🌸', event:'春日野餐',   label:'涼帽紙巾',   items:[{ name:'涼帽',       cost:90 }, { name:'紙巾',       cost:25 }] },
             { icon:'🌸', event:'春日野餐',   label:'保冷袋飲料', items:[{ name:'保冷袋',     cost:70 }, { name:'氣泡水',     cost:40 }] },
+            { icon:'🎂', event:'生日派對',   label:'彩帶蠟燭',   items:[{ name:'彩帶裝飾',   cost:65 }, { name:'生日蠟燭',   cost:30 }] },
+            { icon:'🎂', event:'生日派對',   label:'氣球帽子',   items:[{ name:'彩色氣球',   cost:50 }, { name:'派對帽',     cost:80 }] },
+            { icon:'🎂', event:'生日派對',   label:'拉炮帽子',   items:[{ name:'噴彩拉炮',   cost:55 }, { name:'派對帽',     cost:80 }] },
+            { icon:'🎃', event:'萬聖節派對', label:'南瓜蜘蛛',   items:[{ name:'南瓜燈',     cost:85 }, { name:'蜘蛛網裝飾', cost:45 }] },
+            { icon:'🎃', event:'萬聖節派對', label:'鬼糖拉炮',   items:[{ name:'萬聖糖果',   cost:50 }, { name:'噴彩拉炮',   cost:55 }] },
+            { icon:'🌸', event:'春日野餐',   label:'水果帽子',   items:[{ name:'水果盒',     cost:80 }, { name:'涼帽',       cost:90 }] },
+            { icon:'🌸', event:'春日野餐',   label:'餅乾氣泡水', items:[{ name:'餅乾零食',   cost:55 }, { name:'氣泡水',     cost:40 }] },
+            { icon:'🌸', event:'春日野餐',   label:'三明治紙巾', items:[{ name:'三明治',     cost:60 }, { name:'紙巾',       cost:25 }] },
         ],
         normal: [
             { icon:'🎂', event:'生日派對',   label:'相機禮包',    items:[{ name:'拍立得相機', cost:150 }, { name:'糖果禮包',   cost:90  }] },
@@ -100,6 +108,14 @@ WorksheetRegistry.register('b5', {
             { icon:'🌸', event:'春日野餐',   label:'野餐籃三明治',items:[{ name:'野餐籃',     cost:150 }, { name:'三明治',     cost:60  }] },
             { icon:'🌸', event:'春日野餐',   label:'水果零食飲料',items:[{ name:'水果盒',     cost:80  }, { name:'氣泡水',     cost:40  }, { name:'餅乾零食',   cost:55  }] },
             { icon:'🌸', event:'春日野餐',   label:'防曬帽巾',    items:[{ name:'防曬乳',     cost:100 }, { name:'涼帽',       cost:90  }, { name:'紙巾',       cost:25  }] },
+            { icon:'🎂', event:'生日派對',   label:'禮物飲料',    items:[{ name:'小禮物',     cost:200 }, { name:'果汁飲料',   cost:120 }] },
+            { icon:'🎂', event:'生日派對',   label:'相機帽氣球',  items:[{ name:'拍立得相機', cost:150 }, { name:'派對帽',     cost:80  }, { name:'彩色氣球',   cost:50  }] },
+            { icon:'🎃', event:'萬聖節派對', label:'女巫萬聖糖',  items:[{ name:'女巫帽',     cost:120 }, { name:'萬聖糖果',   cost:50  }] },
+            { icon:'🎃', event:'萬聖節派對', label:'假髮面具拉炮',items:[{ name:'恐怖假髮',   cost:100 }, { name:'鬼臉面具',   cost:75  }, { name:'噴彩拉炮',   cost:55  }] },
+            { icon:'🌸', event:'春日野餐',   label:'野餐籃餅乾',  items:[{ name:'野餐籃',     cost:150 }, { name:'餅乾零食',   cost:55  }] },
+            { icon:'🌸', event:'春日野餐',   label:'防曬水果帽',  items:[{ name:'防曬乳',     cost:100 }, { name:'水果盒',     cost:80  }, { name:'涼帽',       cost:90  }] },
+            { icon:'🎂', event:'生日派對',   label:'蠟燭彩帶飲料',items:[{ name:'生日蠟燭',   cost:30  }, { name:'彩帶裝飾',   cost:65  }, { name:'果汁飲料',   cost:120 }] },
+            { icon:'🎃', event:'萬聖節派對', label:'裝扮骷髏網',  items:[{ name:'萬聖裝扮',   cost:180 }, { name:'骷髏貼紙',   cost:30  }, { name:'蜘蛛網裝飾', cost:45  }] },
         ],
         hard: [
             { icon:'🎂', event:'生日派對',   label:'蛋糕飲料氣球', items:[{ name:'生日蛋糕',   cost:380 }, { name:'果汁飲料',   cost:120 }, { name:'彩色氣球',   cost:50  }] },
@@ -110,6 +126,12 @@ WorksheetRegistry.register('b5', {
             { icon:'🎃', event:'萬聖節派對', label:'萬聖全套',     items:[{ name:'萬聖裝扮',   cost:180 }, { name:'恐怖假髮',   cost:100 }, { name:'鬼臉面具',   cost:75  }, { name:'糖果袋', cost:60  }] },
             { icon:'🌸', event:'春日野餐',   label:'野餐豪華組',   items:[{ name:'野餐籃',     cost:150 }, { name:'防曬乳',     cost:100 }, { name:'水果盒',     cost:80  }, { name:'三明治', cost:60  }] },
             { icon:'🌸', event:'春日野餐',   label:'野餐全裝備',   items:[{ name:'野餐籃',     cost:150 }, { name:'保冷袋',     cost:70  }, { name:'涼帽',       cost:90  }, { name:'餅乾零食', cost:55 }] },
+            { icon:'🎂', event:'生日派對',   label:'生日豪華全套', items:[{ name:'生日蛋糕',   cost:380 }, { name:'拍立得相機', cost:150 }, { name:'小禮物',     cost:200 }] },
+            { icon:'🎃', event:'萬聖節派對', label:'萬聖豪華套',   items:[{ name:'萬聖裝扮',   cost:180 }, { name:'女巫帽',     cost:120 }, { name:'恐怖假髮',   cost:100 }, { name:'骷髏貼紙', cost:30 }] },
+            { icon:'🌸', event:'春日野餐',   label:'春日完整配備', items:[{ name:'野餐籃',     cost:150 }, { name:'防曬乳',     cost:100 }, { name:'水果盒',     cost:80  }, { name:'氣泡水',   cost:40  }] },
+            { icon:'🎂', event:'生日派對',   label:'完整派對四件', items:[{ name:'生日蛋糕',   cost:380 }, { name:'果汁飲料',   cost:120 }, { name:'彩帶裝飾',   cost:65  }, { name:'派對帽',   cost:80  }] },
+            { icon:'🎃', event:'萬聖節派對', label:'萬聖裝扮四件', items:[{ name:'萬聖裝扮',   cost:180 }, { name:'女巫帽',     cost:120 }, { name:'巫師魔杖',   cost:65  }, { name:'恐怖假髮', cost:100 }] },
+            { icon:'🌸', event:'春日野餐',   label:'豪華野餐套組', items:[{ name:'野餐籃',     cost:150 }, { name:'防曬乳',     cost:100 }, { name:'涼帽',       cost:90  }, { name:'保冷袋',   cost:70  }] },
         ],
     },
 
@@ -122,6 +144,7 @@ WorksheetRegistry.register('b5', {
         '南瓜燈': '🎃', '糖果袋': '🍭', '女巫帽': '🧙', '鬼臉面具': '👻',
         '萬聖裝扮': '🦇', '蜘蛛網裝飾': '🕸️', '骷髏貼紙': '💀', '巫師魔杖': '🪄',
         '萬聖糖果': '🍫',
+        '恐怖假髮': '🧟',
         // 春日野餐
         '三明治': '🥪', '水果盒': '🍓', '野餐籃': '🧺', '餅乾零食': '🍪',
         '涼帽': '👒', '紙巾': '🧻', '一次性餐具': '🍴', '保冷袋': '🧊',
@@ -159,8 +182,10 @@ WorksheetRegistry.register('b5', {
 
         // ── 預算規劃（單題模式，不走 scenario 迴圈）────────────────────
         if (questionType === 'budget-plan') {
-            const budget     = this._budgets[diff];
-            const categories = this._budgetCategories;
+            const variant    = shuffle(this._budgetVariants[diff])[0];
+            const budget     = variant.budget;
+            const categories = variant.categories;
+            const theme      = variant.theme;
             const TH = 'border:1px solid #bbb;padding:5px 6px;font-weight:bold;';
             const TD = 'border:1px solid #ddd;padding:4px 6px;';
             const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
@@ -225,8 +250,8 @@ WorksheetRegistry.register('b5', {
             </div>`;
 
             return [{
-                _key: `b5_budget_${diff}`,
-                prompt: `你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
+                _key: `b5_budget_${diff}_${theme}`,
+                prompt: `${theme}，你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
                 visual: tableHtml,
                 answerArea: '',
                 answerDisplay: ''
@@ -503,39 +528,177 @@ WorksheetRegistry.register('b5', {
         }).filter(Boolean);
     },
 
-    _budgets: { easy: 200, normal: 350, hard: 500 },
-    _budgetCategories: [
-        {
-            label: '🎈 派對裝飾',
-            items: [
-                { name: '彩色氣球', cost: 30 },
-                { name: '生日蠟燭', cost: 20 },
-                { name: '彩帶裝飾', cost: 40 },
-                { name: '派對帽',   cost: 50 },
-                { name: '噴彩拉炮', cost: 35 },
-            ]
-        },
-        {
-            label: '🍰 食物飲料',
-            items: [
-                { name: '糖果禮包', cost: 55 },
-                { name: '餅乾零食', cost: 45 },
-                { name: '氣泡水',   cost: 30 },
-                { name: '三明治',   cost: 50 },
-                { name: '水果盒',   cost: 60 },
-            ]
-        },
-        {
-            label: '🎁 特別禮物',
-            items: [
-                { name: '小禮物',     cost: 80 },
-                { name: '南瓜燈',     cost: 60 },
-                { name: '巫師魔杖',   cost: 55 },
-                { name: '骷髏貼紙',   cost: 25 },
-                { name: '蜘蛛網裝飾', cost: 30 },
-            ]
-        },
-    ],
+    _budgetVariants: {
+        easy: [
+            {
+                theme: '🎂 生日派對',
+                budget: 200,
+                categories: [
+                    { label: '🎈 派對裝飾', items: [
+                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
+                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
+                        { name: '噴彩拉炮', cost: 35 },
+                    ]},
+                    { label: '🍬 食物飲料', items: [
+                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
+                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
+                    ]},
+                    { label: '🎁 小物道具', items: [
+                        { name: '小禮物', cost: 80 }, { name: '水果盒', cost: 60 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎃 萬聖節派對',
+                budget: 200,
+                categories: [
+                    { label: '🎭 裝扮道具', items: [
+                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具', cost: 50 },
+                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖', cost: 55 },
+                    ]},
+                    { label: '🍬 糖果點心', items: [
+                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果', cost: 35 },
+                        { name: '餅乾零食', cost: 45 },
+                    ]},
+                    { label: '🕸️ 場景布置', items: [
+                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🌸 春日野餐',
+                budget: 200,
+                categories: [
+                    { label: '🥪 野餐食物', items: [
+                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
+                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
+                    ]},
+                    { label: '🧺 野餐用品', items: [
+                        { name: '紙巾', cost: 20 }, { name: '保冷袋', cost: 55 },
+                    ]},
+                    { label: '🌞 防護用品', items: [
+                        { name: '涼帽', cost: 70 },
+                    ]},
+                ]
+            },
+        ],
+        normal: [
+            {
+                theme: '🎂 生日派對',
+                budget: 350,
+                categories: [
+                    { label: '🎈 派對裝飾', items: [
+                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
+                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
+                        { name: '噴彩拉炮', cost: 35 },
+                    ]},
+                    { label: '🍰 食物飲料', items: [
+                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
+                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
+                        { name: '水果盒',   cost: 60 },
+                    ]},
+                    { label: '🎁 特別禮物', items: [
+                        { name: '小禮物', cost: 80 }, { name: '果汁飲料', cost: 60 },
+                        { name: '南瓜燈', cost: 65 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎃 萬聖節派對',
+                budget: 350,
+                categories: [
+                    { label: '🎭 萬聖裝扮', items: [
+                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具', cost: 50 },
+                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖', cost: 55 },
+                    ]},
+                    { label: '🍬 糖果點心', items: [
+                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果', cost: 35 },
+                        { name: '餅乾零食', cost: 45 }, { name: '糖果禮包', cost: 55 },
+                    ]},
+                    { label: '🕸️ 場景布置', items: [
+                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
+                        { name: '恐怖假髮', cost: 80 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🌸 春日野餐',
+                budget: 350,
+                categories: [
+                    { label: '🥪 野餐食物', items: [
+                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
+                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
+                        { name: '保冷袋',   cost: 55 },
+                    ]},
+                    { label: '🧺 野餐用品', items: [
+                        { name: '野餐籃', cost: 120 }, { name: '一次性餐具', cost: 25 },
+                        { name: '紙巾',   cost: 20  },
+                    ]},
+                    { label: '🌞 防護用品', items: [
+                        { name: '涼帽', cost: 70 }, { name: '防曬乳', cost: 90 },
+                    ]},
+                ]
+            },
+        ],
+        hard: [
+            {
+                theme: '🎂 生日派對',
+                budget: 500,
+                categories: [
+                    { label: '🎈 派對裝飾', items: [
+                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
+                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
+                        { name: '噴彩拉炮', cost: 35 },
+                    ]},
+                    { label: '🍰 食物飲料', items: [
+                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
+                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
+                        { name: '水果盒',   cost: 60 },
+                    ]},
+                    { label: '🎁 特別禮物', items: [
+                        { name: '小禮物', cost: 80 }, { name: '拍立得相機', cost: 150 },
+                        { name: '果汁飲料', cost: 60 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎃 萬聖節派對',
+                budget: 450,
+                categories: [
+                    { label: '🎭 萬聖裝扮', items: [
+                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具',   cost: 50 },
+                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖',   cost: 55 },
+                        { name: '恐怖假髮', cost: 80 }, { name: '萬聖裝扮',   cost: 150 },
+                    ]},
+                    { label: '🍬 糖果點心', items: [
+                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果',   cost: 35 },
+                        { name: '糖果禮包', cost: 55 },
+                    ]},
+                    { label: '🕸️ 場景布置', items: [
+                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
+                    ]},
+                ]
+            },
+            {
+                theme: '🌸 春日野餐',
+                budget: 500,
+                categories: [
+                    { label: '🥪 野餐食物', items: [
+                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
+                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
+                        { name: '保冷袋',   cost: 55 },
+                    ]},
+                    { label: '🧺 野餐用品', items: [
+                        { name: '野餐籃', cost: 120 }, { name: '一次性餐具', cost: 25 },
+                        { name: '紙巾',   cost: 20  },
+                    ]},
+                    { label: '🌞 防護用品', items: [
+                        { name: '涼帽', cost: 70 }, { name: '防曬乳', cost: 90 },
+                    ]},
+                ]
+            },
+        ],
+    },
 
     _findCombo(amount) {
         const denoms = [1000, 500, 100, 50, 10, 5, 1];

@@ -79,38 +79,56 @@ WorksheetRegistry.register('b6', {
     // 困難：3–4 項，含較貴食材（哈密瓜、白米、葡萄）
     _scenarios: {
         easy: [
-            { icon:'🥬', label:'買蔬菜',   items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'青蔥',   unit:'把', cost:20 }] },
-            { icon:'🍅', label:'買番茄蔥', items:[{ name:'番茄',   unit:'斤', cost:45 }, { name:'青蔥',   unit:'把', cost:20 }] },
-            { icon:'🍎', label:'買蘋果蕉', items:[{ name:'蘋果',   unit:'斤', cost:50 }, { name:'香蕉',   unit:'把', cost:25 }] },
-            { icon:'🧂', label:'買雜貨',   items:[{ name:'食鹽',   unit:'包', cost:20 }, { name:'豆腐',   unit:'塊', cost:25 }] },
-            { icon:'🥬', label:'買根莖菜', items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'菠菜',   unit:'把', cost:25 }] },
-            { icon:'🍌', label:'買水果',   items:[{ name:'香蕉',   unit:'把', cost:25 }, { name:'柳橙',   unit:'斤', cost:40 }] },
-            { icon:'🍜', label:'買麵食',   items:[{ name:'麵條',   unit:'包', cost:35 }, { name:'食鹽',   unit:'包', cost:20 }] },
-            { icon:'🥕', label:'買根菜',   items:[{ name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'地瓜',   unit:'斤', cost:35 }] },
-            { icon:'🥦', label:'買新鮮菜', items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }] },
-            { icon:'🍊', label:'買柑橘',   items:[{ name:'柳橙',   unit:'斤', cost:40 }, { name:'蘋果',   unit:'斤', cost:50 }] },
+            { icon:'🥬', label:'買蔬菜',     location:'菜市場',    items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🍅', label:'買番茄蔥',   location:'早市',      items:[{ name:'番茄',   unit:'斤', cost:45 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🍎', label:'買蘋果蕉',   location:'水果攤',    items:[{ name:'蘋果',   unit:'斤', cost:50 }, { name:'香蕉',   unit:'把', cost:25 }] },
+            { icon:'🧂', label:'買雜貨',     location:'超市',      items:[{ name:'食鹽',   unit:'包', cost:20 }, { name:'豆腐',   unit:'塊', cost:25 }] },
+            { icon:'🥬', label:'買根莖菜',   location:'傳統市場',  items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'菠菜',   unit:'把', cost:25 }] },
+            { icon:'🍌', label:'買水果',     location:'水果攤',    items:[{ name:'香蕉',   unit:'把', cost:25 }, { name:'柳橙',   unit:'斤', cost:40 }] },
+            { icon:'🍜', label:'買麵食',     location:'超市',      items:[{ name:'麵條',   unit:'包', cost:35 }, { name:'食鹽',   unit:'包', cost:20 }] },
+            { icon:'🥕', label:'買根菜',     location:'傳統市場',  items:[{ name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'地瓜',   unit:'斤', cost:35 }] },
+            { icon:'🥦', label:'買新鮮菜',   location:'早市',      items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }] },
+            { icon:'🍊', label:'買柑橘',     location:'水果攤',    items:[{ name:'柳橙',   unit:'斤', cost:40 }, { name:'蘋果',   unit:'斤', cost:50 }] },
+            { icon:'🏪', label:'超市蔬菜',   location:'超市',      items:[{ name:'洋蔥',   unit:'斤', cost:35 }, { name:'紅蘿蔔', unit:'斤', cost:40 }] },
+            { icon:'🌿', label:'傳統市場菜', location:'傳統市場',  items:[{ name:'菠菜',   unit:'把', cost:25 }, { name:'番茄',   unit:'斤', cost:45 }] },
+            { icon:'🌽', label:'買玉米地瓜', location:'早市',      items:[{ name:'玉米',   unit:'條', cost:40 }, { name:'地瓜',   unit:'斤', cost:35 }] },
+            { icon:'🧅', label:'買洋蔥青蔥', location:'傳統市場',  items:[{ name:'洋蔥',   unit:'斤', cost:35 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🍊', label:'水果攤柑橘', location:'水果攤',    items:[{ name:'柳橙',   unit:'斤', cost:40 }, { name:'香蕉',   unit:'把', cost:25 }] },
+            { icon:'🥬', label:'早市嫩菜',   location:'早市',      items:[{ name:'菠菜',   unit:'把', cost:25 }, { name:'豆腐',   unit:'塊', cost:25 }] },
+            { icon:'🌾', label:'超市米麵',   location:'超市',      items:[{ name:'麵條',   unit:'包', cost:35 }, { name:'食鹽',   unit:'包', cost:20 }] },
+            { icon:'🌽', label:'市場玉米菠菜',location:'傳統市場', items:[{ name:'玉米',   unit:'條', cost:40 }, { name:'菠菜',   unit:'把', cost:25 }] },
         ],
         normal: [
-            { icon:'🛒', label:'今日買菜', items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }] },
-            { icon:'🛒', label:'蔬果採購', items:[{ name:'蘋果',   unit:'斤', cost:50 }, { name:'菠菜',   unit:'把', cost:25 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
-            { icon:'🛒', label:'週末採買', items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'香蕉',   unit:'把', cost:25 }, { name:'麵條',   unit:'包', cost:35 }] },
-            { icon:'🛒', label:'廚房補貨', items:[{ name:'醬油',   unit:'瓶', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }, { name:'青蔥',   unit:'把', cost:20 }] },
-            { icon:'🛒', label:'蔬菜水果', items:[{ name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'柳橙',   unit:'斤', cost:40 }, { name:'食鹽',   unit:'包', cost:20 }] },
-            { icon:'🛒', label:'晚餐食材', items:[{ name:'番茄',   unit:'斤', cost:45 }, { name:'麵條',   unit:'包', cost:35 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
-            { icon:'🛒', label:'鮮果雜貨', items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'高麗菜', unit:'顆', cost:30 }, { name:'豆腐',   unit:'塊', cost:25 }] },
-            { icon:'🛒', label:'平日買菜', items:[{ name:'菠菜',   unit:'把', cost:25 }, { name:'蘋果',   unit:'斤', cost:50 }, { name:'醬油',   unit:'瓶', cost:45 }] },
-            { icon:'🛒', label:'蔬菜雜糧', items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'麵條',   unit:'包', cost:35 }] },
-            { icon:'🛒', label:'水果零食', items:[{ name:'芒果',   unit:'斤', cost:60 }, { name:'香蕉',   unit:'把', cost:25 }, { name:'食鹽',   unit:'包', cost:20 }] },
+            { icon:'🛒', label:'今日買菜',   location:'菜市場',    items:[{ name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }] },
+            { icon:'🛒', label:'蔬果採購',   location:'傳統市場',  items:[{ name:'蘋果',   unit:'斤', cost:50 }, { name:'菠菜',   unit:'把', cost:25 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
+            { icon:'🛒', label:'週末採買',   location:'超市',      items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'香蕉',   unit:'把', cost:25 }, { name:'麵條',   unit:'包', cost:35 }] },
+            { icon:'🛒', label:'廚房補貨',   location:'超市',      items:[{ name:'醬油',   unit:'瓶', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🛒', label:'蔬菜水果',   location:'早市',      items:[{ name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'柳橙',   unit:'斤', cost:40 }, { name:'食鹽',   unit:'包', cost:20 }] },
+            { icon:'🛒', label:'晚餐食材',   location:'菜市場',    items:[{ name:'番茄',   unit:'斤', cost:45 }, { name:'麵條',   unit:'包', cost:35 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
+            { icon:'🛒', label:'鮮果雜貨',   location:'水果攤',    items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'高麗菜', unit:'顆', cost:30 }, { name:'豆腐',   unit:'塊', cost:25 }] },
+            { icon:'🛒', label:'平日買菜',   location:'早市',      items:[{ name:'菠菜',   unit:'把', cost:25 }, { name:'蘋果',   unit:'斤', cost:50 }, { name:'醬油',   unit:'瓶', cost:45 }] },
+            { icon:'🛒', label:'蔬菜雜糧',   location:'傳統市場',  items:[{ name:'地瓜',   unit:'斤', cost:35 }, { name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'麵條',   unit:'包', cost:35 }] },
+            { icon:'🛒', label:'水果零食',   location:'水果攤',    items:[{ name:'芒果',   unit:'斤', cost:60 }, { name:'香蕉',   unit:'把', cost:25 }, { name:'食鹽',   unit:'包', cost:20 }] },
+            { icon:'🏪', label:'超市採購',   location:'超市',      items:[{ name:'洋蔥',   unit:'斤', cost:35 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'麵條',   unit:'包', cost:35 }] },
+            { icon:'🌿', label:'早市三樣',   location:'早市',      items:[{ name:'番茄',   unit:'斤', cost:45 }, { name:'高麗菜', unit:'顆', cost:30 }, { name:'豆腐',   unit:'塊', cost:25 }] },
+            { icon:'🌽', label:'傳統市場蔬菜',location:'傳統市場', items:[{ name:'玉米',   unit:'條', cost:40 }, { name:'紅蘿蔔', unit:'斤', cost:40 }, { name:'菠菜',   unit:'把', cost:25 }] },
+            { icon:'🍊', label:'水果攤採買', location:'水果攤',    items:[{ name:'蘋果',   unit:'斤', cost:50 }, { name:'葡萄',   unit:'串', cost:80 }, { name:'香蕉',   unit:'把', cost:25 }] },
+            { icon:'🛒', label:'週間補充',   location:'超市',      items:[{ name:'洋蔥',   unit:'斤', cost:35 }, { name:'醬油',   unit:'瓶', cost:45 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
+            { icon:'🌿', label:'菜市場大買', location:'菜市場',    items:[{ name:'芒果',   unit:'斤', cost:60 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }] },
         ],
         hard: [
-            { icon:'🛒', label:'週間大買', items:[{ name:'白米',   unit:'包', cost:90 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }] },
-            { icon:'🛒', label:'豐盛採買', items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'青蔥',   unit:'把', cost:20 }] },
-            { icon:'🛒', label:'週一補貨', items:[{ name:'白米',   unit:'包', cost:90 }, { name:'醬油',   unit:'瓶', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }, { name:'菠菜',   unit:'把', cost:25 }] },
-            { icon:'🛒', label:'豐盛晚餐', items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'麵條',   unit:'包', cost:35 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
-            { icon:'🛒', label:'滿載而歸', items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'白米',   unit:'包', cost:90 }, { name:'紅蘿蔔', unit:'斤', cost:40 }] },
-            { icon:'🛒', label:'精心備料', items:[{ name:'芒果',   unit:'斤', cost:60 }, { name:'白米',   unit:'包', cost:90 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'地瓜',   unit:'斤', cost:35 }] },
-            { icon:'🛒', label:'假日大買', items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'蘋果',   unit:'斤', cost:50 }, { name:'白米',   unit:'包', cost:90 }, { name:'青蔥',   unit:'把', cost:20 }] },
-            { icon:'🛒', label:'一週食材', items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'白米',   unit:'包', cost:90 }, { name:'醬油',   unit:'瓶', cost:45 }, { name:'番茄',   unit:'斤', cost:45 }] },
+            { icon:'🛒', label:'週間大買',   location:'菜市場',    items:[{ name:'白米',   unit:'包', cost:90 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'高麗菜', unit:'顆', cost:30 }, { name:'番茄',   unit:'斤', cost:45 }] },
+            { icon:'🛒', label:'豐盛採買',   location:'傳統市場',  items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🛒', label:'週一補貨',   location:'超市',      items:[{ name:'白米',   unit:'包', cost:90 }, { name:'醬油',   unit:'瓶', cost:45 }, { name:'豆腐',   unit:'塊', cost:25 }, { name:'菠菜',   unit:'把', cost:25 }] },
+            { icon:'🛒', label:'豐盛晚餐',   location:'菜市場',    items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'麵條',   unit:'包', cost:35 }, { name:'雞蛋',   unit:'盒', cost:65 }] },
+            { icon:'🛒', label:'滿載而歸',   location:'早市',      items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'白米',   unit:'包', cost:90 }, { name:'紅蘿蔔', unit:'斤', cost:40 }] },
+            { icon:'🛒', label:'精心備料',   location:'傳統市場',  items:[{ name:'芒果',   unit:'斤', cost:60 }, { name:'白米',   unit:'包', cost:90 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'地瓜',   unit:'斤', cost:35 }] },
+            { icon:'🛒', label:'假日大買',   location:'超市',      items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'蘋果',   unit:'斤', cost:50 }, { name:'白米',   unit:'包', cost:90 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🛒', label:'一週食材',   location:'菜市場',    items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'白米',   unit:'包', cost:90 }, { name:'醬油',   unit:'瓶', cost:45 }, { name:'番茄',   unit:'斤', cost:45 }] },
+            { icon:'🏪', label:'超市大採',   location:'超市',      items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'洋蔥',   unit:'斤', cost:35 }, { name:'麵條',   unit:'包', cost:35 }] },
+            { icon:'🌿', label:'年節採買',   location:'傳統市場',  items:[{ name:'白米',   unit:'包', cost:90 }, { name:'葡萄',   unit:'串', cost:80 }, { name:'豆腐',   unit:'塊', cost:25 }, { name:'醬油',   unit:'瓶', cost:45 }] },
+            { icon:'🛒', label:'早市大採',   location:'早市',      items:[{ name:'哈密瓜', unit:'顆', cost:120}, { name:'芒果',   unit:'斤', cost:60 }, { name:'番茄',   unit:'斤', cost:45 }, { name:'青蔥',   unit:'把', cost:20 }] },
+            { icon:'🛒', label:'豐盛食材',   location:'菜市場',    items:[{ name:'葡萄',   unit:'串', cost:80 }, { name:'白米',   unit:'包', cost:90 }, { name:'雞蛋',   unit:'盒', cost:65 }, { name:'高麗菜', unit:'顆', cost:30 }] },
         ],
     },
 
@@ -120,6 +138,7 @@ WorksheetRegistry.register('b6', {
         '柳橙': '🍊', '麵條': '🍜', '紅蘿蔔': '🥕', '醬油': '🍶',
         '雞蛋': '🥚', '葡萄': '🍇', '芒果': '🥭', '白米': '🌾',
         '哈密瓜': '🍈',
+        '洋蔥':   '🧅', '玉米': '🌽',
     },
 
     _coinsDisplay(amount, renderCoin) {
@@ -153,8 +172,10 @@ WorksheetRegistry.register('b6', {
 
         // ── 預算規劃（單題模式，不走 scenario 迴圈）────────────────────
         if (questionType === 'budget-plan') {
-            const budget     = this._budgets[diff];
-            const categories = this._budgetCategories;
+            const variant    = shuffle(this._budgetVariants[diff])[0];
+            const budget     = variant.budget;
+            const categories = variant.categories;
+            const location   = variant.location;
             const TH = 'border:1px solid #bbb;padding:5px 6px;font-weight:bold;';
             const TD = 'border:1px solid #ddd;padding:4px 6px;';
             const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
@@ -218,8 +239,8 @@ WorksheetRegistry.register('b6', {
             </div>`;
 
             return [{
-                _key: `b6_budget_${diff}`,
-                prompt: `你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
+                _key: `b6_budget_${diff}_${location}`,
+                prompt: `去<strong>${location}</strong>買菜，你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
                 visual: tableHtml,
                 answerArea: '',
                 answerDisplay: ''
@@ -234,7 +255,8 @@ WorksheetRegistry.register('b6', {
             const itemsText = scenario.items
                 .map(it => `${getIcon(it.name)}${it.name}（1${it.unit}）<strong>${it.cost}</strong> 元`)
                 .join('、');
-            const basePromptFact = `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買 ${itemsText}`;
+            const loc = scenario.location || '菜市場';
+            const basePromptFact = `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${loc}</strong>，買 ${itemsText}`;
             const basePrompt = `${basePromptFact}，總共要多少錢？`;
 
             // ── 價格計算：數字填空 ─────────────────────────────────────
@@ -261,7 +283,7 @@ WorksheetRegistry.register('b6', {
                     : blankLine();
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買：`,
+                    prompt: `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${loc}</strong>，買：`,
                     visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
                     answerArea: `共需 ${ans} 元`,
                     answerDisplay: ''
@@ -386,7 +408,7 @@ WorksheetRegistry.register('b6', {
                 }).join('&emsp;');
                 return {
                     _key: `b6_${scenario.label}`,
-                    prompt: `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買：`,
+                    prompt: `去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${loc}</strong>，買：`,
                     visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
                     answerArea: showAnswers
                         ? `共需 <span style="color:red;font-weight:bold;">${total}</span> 元　付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
@@ -496,39 +518,165 @@ WorksheetRegistry.register('b6', {
         }).filter(Boolean);
     },
 
-    _budgets: { easy: 100, normal: 200, hard: 350 },
-    _budgetCategories: [
-        {
-            label: '🥬 蔬菜類',
-            items: [
-                { name: '高麗菜', cost: 30 },
-                { name: '青蔥',   cost: 20 },
-                { name: '番茄',   cost: 45 },
-                { name: '菠菜',   cost: 25 },
-                { name: '地瓜',   cost: 35 },
-            ]
-        },
-        {
-            label: '🍎 水果類',
-            items: [
-                { name: '蘋果', cost: 50 },
-                { name: '香蕉', cost: 25 },
-                { name: '柳橙', cost: 40 },
-                { name: '芒果', cost: 60 },
-                { name: '葡萄', cost: 80 },
-            ]
-        },
-        {
-            label: '🛒 食材雜糧',
-            items: [
-                { name: '雞蛋', cost: 65 },
-                { name: '麵條', cost: 35 },
-                { name: '豆腐', cost: 25 },
-                { name: '白米', cost: 90 },
-                { name: '醬油', cost: 45 },
-            ]
-        },
-    ],
+    _budgetVariants: {
+        easy: [
+            {
+                location: '早市',
+                budget: 100,
+                categories: [
+                    { label: '🥬 蔬菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '青蔥',   cost: 20 },
+                        { name: '番茄',   cost: 45 }, { name: '菠菜',   cost: 25 },
+                    ]},
+                    { label: '🍎 水果類', items: [
+                        { name: '蘋果', cost: 50 }, { name: '香蕉', cost: 25 }, { name: '柳橙', cost: 40 },
+                    ]},
+                    { label: '🛒 雜糧類', items: [
+                        { name: '豆腐', cost: 25 }, { name: '食鹽', cost: 20 }, { name: '麵條', cost: 35 },
+                    ]},
+                ]
+            },
+            {
+                location: '超市',
+                budget: 100,
+                categories: [
+                    { label: '🥬 蔬菜區', items: [
+                        { name: '洋蔥',   cost: 35 }, { name: '地瓜',   cost: 35 },
+                        { name: '紅蘿蔔', cost: 40 }, { name: '菠菜',   cost: 25 },
+                    ]},
+                    { label: '🍊 水果區', items: [
+                        { name: '蘋果', cost: 50 }, { name: '柳橙', cost: 40 }, { name: '香蕉', cost: 25 },
+                    ]},
+                    { label: '🛒 食品區', items: [
+                        { name: '豆腐', cost: 25 }, { name: '麵條', cost: 35 }, { name: '食鹽', cost: 20 },
+                    ]},
+                ]
+            },
+            {
+                location: '傳統市場',
+                budget: 100,
+                categories: [
+                    { label: '🥬 葉菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '菠菜',   cost: 25 }, { name: '番茄', cost: 45 },
+                    ]},
+                    { label: '🌽 根莖類', items: [
+                        { name: '地瓜', cost: 35 }, { name: '紅蘿蔔', cost: 40 }, { name: '玉米', cost: 40 },
+                    ]},
+                    { label: '🍌 水果類', items: [
+                        { name: '香蕉', cost: 25 }, { name: '柳橙', cost: 40 }, { name: '蘋果', cost: 50 },
+                    ]},
+                ]
+            },
+        ],
+        normal: [
+            {
+                location: '早市',
+                budget: 200,
+                categories: [
+                    { label: '🥬 蔬菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '青蔥',   cost: 20 },
+                        { name: '番茄',   cost: 45 }, { name: '菠菜',   cost: 25 }, { name: '地瓜', cost: 35 },
+                    ]},
+                    { label: '🍎 水果類', items: [
+                        { name: '蘋果', cost: 50 }, { name: '香蕉', cost: 25 },
+                        { name: '柳橙', cost: 40 }, { name: '芒果', cost: 60 }, { name: '葡萄', cost: 80 },
+                    ]},
+                    { label: '🛒 食材雜糧', items: [
+                        { name: '雞蛋', cost: 65 }, { name: '麵條', cost: 35 },
+                        { name: '豆腐', cost: 25 }, { name: '醬油', cost: 45 },
+                    ]},
+                ]
+            },
+            {
+                location: '超市',
+                budget: 200,
+                categories: [
+                    { label: '🥬 蔬菜區', items: [
+                        { name: '洋蔥',   cost: 35 }, { name: '紅蘿蔔', cost: 40 },
+                        { name: '番茄',   cost: 45 }, { name: '菠菜',   cost: 25 },
+                    ]},
+                    { label: '🍊 水果區', items: [
+                        { name: '蘋果', cost: 50 }, { name: '葡萄', cost: 80 }, { name: '芒果', cost: 60 },
+                    ]},
+                    { label: '🛒 食品區', items: [
+                        { name: '雞蛋', cost: 65 }, { name: '白米', cost: 90 },
+                        { name: '麵條', cost: 35 }, { name: '醬油', cost: 45 },
+                    ]},
+                ]
+            },
+            {
+                location: '傳統市場',
+                budget: 200,
+                categories: [
+                    { label: '🥬 葉菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '菠菜',   cost: 25 },
+                        { name: '青蔥',   cost: 20 }, { name: '番茄',   cost: 45 },
+                    ]},
+                    { label: '🌽 根莖類', items: [
+                        { name: '地瓜', cost: 35 }, { name: '紅蘿蔔', cost: 40 }, { name: '玉米', cost: 40 },
+                    ]},
+                    { label: '🛒 食材類', items: [
+                        { name: '雞蛋', cost: 65 }, { name: '豆腐', cost: 25 }, { name: '醬油', cost: 45 },
+                    ]},
+                ]
+            },
+        ],
+        hard: [
+            {
+                location: '早市',
+                budget: 350,
+                categories: [
+                    { label: '🥬 蔬菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '青蔥',   cost: 20 },
+                        { name: '番茄',   cost: 45 }, { name: '菠菜',   cost: 25 }, { name: '地瓜', cost: 35 },
+                    ]},
+                    { label: '🍎 水果類', items: [
+                        { name: '蘋果',   cost: 50 }, { name: '香蕉',   cost: 25 },
+                        { name: '葡萄',   cost: 80 }, { name: '哈密瓜', cost: 120 },
+                    ]},
+                    { label: '🛒 食材雜糧', items: [
+                        { name: '雞蛋', cost: 65 }, { name: '麵條', cost: 35 },
+                        { name: '豆腐', cost: 25 }, { name: '白米', cost: 90 }, { name: '醬油', cost: 45 },
+                    ]},
+                ]
+            },
+            {
+                location: '超市',
+                budget: 350,
+                categories: [
+                    { label: '🥬 蔬菜區', items: [
+                        { name: '洋蔥',   cost: 35 }, { name: '紅蘿蔔', cost: 40 },
+                        { name: '番茄',   cost: 45 }, { name: '菠菜',   cost: 25 }, { name: '地瓜', cost: 35 },
+                    ]},
+                    { label: '🍊 水果區', items: [
+                        { name: '蘋果',   cost: 50 }, { name: '芒果',   cost: 60 },
+                        { name: '葡萄',   cost: 80 }, { name: '哈密瓜', cost: 120 },
+                    ]},
+                    { label: '🛒 食品區', items: [
+                        { name: '雞蛋', cost: 65 }, { name: '白米', cost: 90 },
+                        { name: '麵條', cost: 35 }, { name: '醬油', cost: 45 },
+                    ]},
+                ]
+            },
+            {
+                location: '傳統市場',
+                budget: 350,
+                categories: [
+                    { label: '🥬 蔬菜類', items: [
+                        { name: '高麗菜', cost: 30 }, { name: '菠菜',   cost: 25 },
+                        { name: '番茄',   cost: 45 }, { name: '青蔥',   cost: 20 },
+                    ]},
+                    { label: '🍊 水果類', items: [
+                        { name: '蘋果',   cost: 50 }, { name: '哈密瓜', cost: 120 }, { name: '葡萄', cost: 80 },
+                    ]},
+                    { label: '🛒 年節食材', items: [
+                        { name: '白米', cost: 90 }, { name: '雞蛋', cost: 65 },
+                        { name: '醬油', cost: 45 }, { name: '豆腐', cost: 25 },
+                    ]},
+                ]
+            },
+        ],
+    },
 
     _findCombo(amount) {
         const denoms = [1000, 500, 100, 50, 10, 5, 1];
