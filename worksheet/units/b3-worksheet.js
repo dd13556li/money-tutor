@@ -51,7 +51,23 @@ WorksheetRegistry.register('b3', {
                 ],
                 getCurrentValue: (params) => params.questionType || 'fill',
                 onChange: (val, app) => { app.params.questionType = val; app.generate(); }
-            }
+            },
+            {
+                id: 'cal-layout-btn',
+                label: '📄 版面',
+                type: 'cycle',
+                options: [
+                    { label: '每頁 4 題', value: '4' },
+                    { label: '每頁 2 題', value: '2' },
+                    { label: '每頁 1 題', value: '1' },
+                ],
+                visible: (params) => {
+                    const qt = params.questionType || 'fill';
+                    return qt === 'calendar-hint' || qt === 'calendar-fill';
+                },
+                getCurrentValue: (params) => params.calLayout || '4',
+                onChange: (val, app) => { app.params.calLayout = val; app.generate(); }
+            },
         ],
     },
 
@@ -150,13 +166,21 @@ WorksheetRegistry.register('b3', {
         if (questionType === 'calendar-hint' || questionType === 'calendar-fill') {
             const calItems  = this._calItems[diff];
             const isHint    = questionType === 'calendar-hint';
-            const calCount  = Math.min(count, 4); // 每個 entry = 4 題（2×2），最多 4 頁
+            const calCount  = Math.min(count, 4);
             const calQs     = [];
             let calTries    = 0;
             const CAL_YEAR  = 2025;
             const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
-            // ── 產生單一月曆 block（供兩題並排使用）──
+            // ── 版面尺寸：根據每頁題數決定格子大小 ──
+            const perPage = parseInt(options.calLayout || '4');
+            const S = perPage === 1
+                ? { tdH:'54px', thFS:'11pt',  dayFS:'12.5pt', noteFS:'9.5pt',  monthFS:'12pt',  promptFS:'15pt', ansFS:'13pt', circleW:'32px', circleH:'32px', circleFS:'10.5pt', fillH:'15px', fillAnsFS:'10.5pt' }
+                : perPage === 2
+                ? { tdH:'38px', thFS:'9pt',   dayFS:'10pt',   noteFS:'7.5pt',  monthFS:'10pt',  promptFS:'14pt', ansFS:'12pt', circleW:'24px', circleH:'24px', circleFS:'8.5pt',  fillH:'11px', fillAnsFS:'8pt'    }
+                : { tdH:'26px', thFS:'7.5pt', dayFS:'8pt',    noteFS:'6pt',    monthFS:'9pt',   promptFS:'13pt', ansFS:'10pt', circleW:'18px', circleH:'18px', circleFS:'7.5pt',  fillH:'9px',  fillAnsFS:'6.5pt'  };
+
+            // ── 產生單一月曆 block ──
             const genOne = () => {
                 let gTries = 0;
                 while (gTries++ < 20) {
@@ -179,13 +203,11 @@ WorksheetRegistry.register('b3', {
 
                     const maxStart = daysInMonth - daysNeeded + 1;
                     const startDay = Math.floor(Math.random() * maxStart) + 1;
-                    const endDay   = startDay + daysNeeded - 1;
 
                     const numRows = Math.ceil((firstDayOfWeek + daysInMonth) / 7);
                     const DAY_LABELS = ['日','一','二','三','四','五','六'];
-                    // 2×2 格線模式：縮小字體與格高，確保四個月曆能在同一頁顯示
-                    const thStyle = 'background:#4a90d9;color:white;text-align:center;padding:2px 0;font-size:7.5pt;font-weight:bold;border:1px solid #bcd;';
-                    const tdBase  = 'text-align:center;border:1px solid #ccc;padding:1px 0;vertical-align:top;height:26px;width:14.28%;';
+                    const thStyle = `background:#4a90d9;color:white;text-align:center;padding:2px 0;font-size:${S.thFS};font-weight:bold;border:1px solid #bcd;`;
+                    const tdBase  = `text-align:center;border:1px solid #ccc;padding:1px 0;vertical-align:top;height:${S.tdH};width:14.28%;`;
                     const tdEmpty = 'background:#f0f0f0;border:1px solid #ddd;';
 
                     const headerRow = DAY_LABELS.map(d => `<th style="${thStyle}">${d}</th>`).join('');
@@ -199,26 +221,26 @@ WorksheetRegistry.register('b3', {
                             if (dayNum < 1 || dayNum > daysInMonth) {
                                 cells += `<td style="${tdBase}${tdEmpty}"></td>`;
                             } else {
-                                const isSaving  = dayNum >= startDay && dayNum <= endDay;
+                                const isSaving  = dayNum >= startDay && dayNum <= (startDay + daysNeeded - 1);
                                 const periodDay = dayNum - startDay + 1;
 
                                 if (isHint) {
                                     const daySpan = (showAnswers && isSaving)
-                                        ? `<span style="display:inline-block;width:18px;height:18px;line-height:18px;border-radius:50%;border:2px solid red;color:red;font-weight:bold;font-size:7.5pt;">${dayNum}</span>`
-                                        : `<span style="font-size:8pt;font-weight:bold;">${dayNum}</span>`;
+                                        ? `<span style="display:inline-block;width:${S.circleW};height:${S.circleH};line-height:${S.circleH};border-radius:50%;border:2px solid red;color:red;font-weight:bold;font-size:${S.circleFS};">${dayNum}</span>`
+                                        : `<span style="font-size:${S.dayFS};font-weight:bold;">${dayNum}</span>`;
                                     const hintDiv = isSaving
-                                        ? `<div style="color:#999;font-size:6pt;margin-top:0;">${periodDay * item.daily}元</div>`
+                                        ? `<div style="color:#999;font-size:${S.noteFS};margin-top:0;">${periodDay * item.daily}元</div>`
                                         : '';
                                     cells += `<td style="${tdBase}">${daySpan}${hintDiv}</td>`;
                                 } else {
-                                    const dayDiv = `<div style="font-size:8pt;font-weight:bold;">${dayNum}</div>`;
+                                    const dayDiv = `<div style="font-size:${S.dayFS};font-weight:bold;">${dayNum}</div>`;
                                     let writeArea;
                                     if (isSaving) {
                                         writeArea = showAnswers
-                                            ? `<div style="color:red;font-weight:bold;font-size:6.5pt;">${periodDay * item.daily}元</div>`
-                                            : `<div style="border-bottom:1px solid #999;margin:1px 2px 0;min-height:9px;"></div>`;
+                                            ? `<div style="color:red;font-weight:bold;font-size:${S.fillAnsFS};">${periodDay * item.daily}元</div>`
+                                            : `<div style="border-bottom:1px solid #999;margin:1px 2px 0;min-height:${S.fillH};"></div>`;
                                     } else {
-                                        writeArea = `<div style="min-height:9px;"></div>`;
+                                        writeArea = `<div style="min-height:${S.fillH};"></div>`;
                                     }
                                     cells += `<td style="${tdBase}">${dayDiv}${writeArea}</td>`;
                                 }
@@ -236,7 +258,7 @@ WorksheetRegistry.register('b3', {
                         : `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」需要 ${item.price} 元，從 <strong>${MONTH_NAMES[month - 1]}${startDay}號</strong>開始，每天存 <strong>${item.daily}</strong> 元，請填寫每天的累計存款：`;
 
                     const calHtml = `
-<div style="font-weight:bold;font-size:9pt;margin-bottom:2px;color:#4a90d9;text-align:center;">${MONTH_NAMES[month - 1]}</div>
+<div style="font-weight:bold;font-size:${S.monthFS};margin-bottom:2px;color:#4a90d9;text-align:center;">${MONTH_NAMES[month - 1]}</div>
 <table style="width:100%;border-collapse:collapse;margin:0 0 2px;table-layout:fixed;">
     <thead><tr>${headerRow}</tr></thead>
     <tbody>${bodyRows}</tbody>
@@ -247,32 +269,41 @@ WorksheetRegistry.register('b3', {
                 return null;
             };
 
-            while (calQs.length < calCount && calTries < calCount * 30) {
-                calTries++;
-                const a = genOne();
-                if (!a) continue;
-                const b = genOne();
-                if (!b) continue;
-                const c = genOne();
-                if (!c) continue;
-                const d = genOne();
-                if (!d) continue;
-
-                // 四題月曆以 2×2 格線排列（第一排兩題，第二排兩題）
-                const mkCell = (num, q) => `
+            const mkCell = (num, q) => `
     <div style="min-width:0;">
-        <div style="font-size:13pt;margin-bottom:4px;">(${num}) ${q.subPrompt}</div>
+        <div style="font-size:${S.promptFS};margin-bottom:4px;">(${num}) ${q.subPrompt}</div>
         ${q.calHtml}
-        <div style="font-size:10pt;margin-top:3px;">共需存：${q.answerFill} 天才能買到</div>
+        <div style="font-size:${S.ansFS};margin-top:3px;">共需存：${q.answerFill} 天才能買到</div>
     </div>`;
 
+            while (calQs.length < calCount && calTries < calCount * 30) {
+                calTries++;
+                const cals = [];
+                let failed = false;
+                for (let i = 0; i < perPage; i++) {
+                    const q = genOne();
+                    if (!q) { failed = true; break; }
+                    cals.push(q);
+                }
+                if (failed || cals.length < perPage) continue;
+
+                let visual;
+                if (perPage === 4) {
+                    visual = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
+    ${cals.map((q, i) => mkCell(i + 1, q)).join('')}
+</div>`;
+                } else if (perPage === 2) {
+                    visual = `<div style="display:flex;flex-direction:column;gap:14px;">
+    ${cals.map((q, i) => mkCell(i + 1, q)).join('')}
+</div>`;
+                } else {
+                    visual = mkCell(1, cals[0]);
+                }
+
                 calQs.push({
-                    _key: `${a.key}+${b.key}+${c.key}+${d.key}`,
+                    _key: cals.map(c => c.key).join('+'),
                     prompt: '',
-                    visual: `
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
-    ${mkCell(1, a)}${mkCell(2, b)}${mkCell(3, c)}${mkCell(4, d)}
-</div>`,
+                    visual,
                     answerArea: '',
                     answerDisplay: ''
                 });
