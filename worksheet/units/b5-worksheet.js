@@ -59,6 +59,18 @@ WorksheetRegistry.register('b5', {
         orientationButton: null,
         extraButtons: [
             {
+                id: 'b5-budget-layout-btn',
+                label: '📄 版面',
+                type: 'cycle',
+                options: [
+                    { label: '每頁 1 題', value: 'single' },
+                    { label: '每頁 2 題', value: 'double' },
+                ],
+                visible: (params) => (params.questionType || 'price-fill') === 'budget-plan',
+                getCurrentValue: (params) => params.budgetLayout || 'single',
+                onChange: (val, app) => { app.params.budgetLayout = val; app.generate(); }
+            },
+            {
                 id: 'coin-style-btn',
                 label: '📊 圖示類型',
                 type: 'dropdown',
@@ -182,80 +194,109 @@ WorksheetRegistry.register('b5', {
 
         // ── 預算規劃（單題模式，不走 scenario 迴圈）────────────────────
         if (questionType === 'budget-plan') {
-            const variant    = shuffle(this._budgetVariants[diff])[0];
-            const budget     = variant.budget;
-            const categories = variant.categories;
-            const theme      = variant.theme;
-            const TH = 'border:1px solid #bbb;padding:5px 6px;font-weight:bold;';
-            const TD = 'border:1px solid #ddd;padding:4px 6px;';
-            const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
-            const ckDone = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid red;color:red;font-size:11px;line-height:14px;text-align:center;vertical-align:middle;margin-right:4px;border-radius:2px;">✓</span>`;
-            const nameBlank  = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:80px;height:1.2em;"></span>`;
-            const priceBlank = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:50px;height:1.2em;"></span>`;
+            const budgetLayout = options.budgetLayout || 'single';
+            const compact = budgetLayout === 'double';
 
-            const exampleSel = [];
-            if (showAnswers) {
-                let rem = budget;
-                for (const cat of categories) {
-                    for (const item of cat.items) {
-                        if (item.cost <= rem) { exampleSel.push(item); rem -= item.cost; }
+            const rPrice = (name) => {
+                const range = this._costRanges[name];
+                if (!range) return 0;
+                const [lo, hi] = range;
+                return Math.round((lo + Math.random() * (hi - lo)) / 5) * 5;
+            };
+
+            const buildQuestion = (variant) => {
+                const theme   = variant.theme;
+                const budget  = variant.budget;
+                const matCats = variant.categories.map(cat => ({
+                    label: cat.label,
+                    items: cat.items.map(item => ({ name: item.name, cost: rPrice(item.name) }))
+                }));
+                const TH = `border:1px solid #bbb;padding:${compact?'2px 4px':'5px 6px'};font-weight:bold;`;
+                const TD = `border:1px solid #ddd;padding:${compact?'2px 4px':'4px 6px'};`;
+                const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
+                const ckDone = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid red;color:red;font-size:11px;line-height:14px;text-align:center;vertical-align:middle;margin-right:4px;border-radius:2px;">✓</span>`;
+                const nameBlank  = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:80px;height:1.2em;"></span>`;
+                const priceBlank = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:50px;height:1.2em;"></span>`;
+
+                const exampleSel = [];
+                if (showAnswers) {
+                    let rem = budget;
+                    for (const cat of matCats) {
+                        for (const item of cat.items) {
+                            if (item.cost <= rem) { exampleSel.push(item); rem -= item.cost; }
+                        }
                     }
                 }
-            }
-            const exampleTotal = exampleSel.reduce((s, i) => s + i.cost, 0);
+                const exampleTotal = exampleSel.reduce((s, i) => s + i.cost, 0);
 
-            const rows = categories.map(cat => {
-                const itemsHtml = `<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;">
-                    ${cat.items.map(item => {
-                        const sel = showAnswers && exampleSel.includes(item);
-                        const em  = this._itemEmoji[item.name] ? `<span class="ws-emoji-icon">${this._itemEmoji[item.name]}</span>` : '';
-                        return `<span style="white-space:nowrap;">${sel ? ckDone : ckBox}${em}${item.name}（${item.cost}元）</span>`;
-                    }).join('')}
+                const gap = compact ? '2px 8px' : '4px 12px';
+                const mt  = compact ? '2px' : '4px';
+                const rows = matCats.map(cat => {
+                    const itemsHtml = `<div style="display:flex;flex-wrap:wrap;gap:${gap};margin-top:${mt};">
+                        ${cat.items.map(item => {
+                            const sel = showAnswers && exampleSel.includes(item);
+                            const em  = this._itemEmoji[item.name] ? `<span class="ws-emoji-icon">${this._itemEmoji[item.name]}</span>` : '';
+                            return `<span style="white-space:nowrap;">${sel ? ckDone : ckBox}${em}${item.name}（${item.cost}元）</span>`;
+                        }).join('')}
+                    </div>`;
+                    const selItems = cat.items.filter(item => showAnswers && exampleSel.includes(item));
+                    const catSpend = selItems.reduce((s, i) => s + i.cost, 0);
+                    const col2 = (showAnswers && selItems.length > 0)
+                        ? selItems.map(i => `<span style="color:red;font-weight:bold;">${i.name}</span>`).join('、')
+                        : nameBlank;
+                    const col3 = (showAnswers && selItems.length > 0)
+                        ? `<span style="color:red;font-weight:bold;">${catSpend}</span>`
+                        : priceBlank;
+                    return `<tr>
+                        <td style="${TD}font-weight:bold;color:#1a5276;">${cat.label}${itemsHtml}</td>
+                        <td style="${TD}">${col2}</td>
+                        <td style="${TD}text-align:right;">${col3} 元</td>
+                    </tr>`;
+                }).join('');
+
+                const totalFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : priceBlank;
+                const spendFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+                const remFill   = showAnswers ? `<span style="color:red;font-weight:bold;">${budget - exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+                const tFS  = compact ? '9.5pt' : '11pt';
+                const fFS  = compact ? '10.5pt' : '12pt';
+                const mTop = compact ? '6px' : '10px';
+
+                const tableHtml = `<table style="width:100%;border-collapse:collapse;font-size:${tFS};margin:4px 0;">
+                    <thead><tr style="background:#4a90d9;color:white;">
+                        <th style="${TH}text-align:left;width:55%;">商品項目</th>
+                        <th style="${TH}text-align:left;width:27%;">購買商品</th>
+                        <th style="${TH}text-align:right;width:18%;">金額</th>
+                    </tr></thead>
+                    <tbody>
+                        ${rows}
+                        <tr style="background:#f9fafb;">
+                            <td colspan="2" style="${TD}border-top:2px solid #9ca3af;font-weight:bold;">總共花費</td>
+                            <td style="${TD}border-top:2px solid #9ca3af;text-align:right;font-weight:bold;">${totalFill} 元</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top:${mTop};font-size:${fFS};line-height:2.4;text-align:right;padding-right:7px;">
+                    預算 <strong>${budget}</strong> 元 &nbsp;－&nbsp; 花費 ${spendFill} 元 &nbsp;＝&nbsp; 剩餘 ${remFill} 元
                 </div>`;
-                const selItems  = cat.items.filter(item => showAnswers && exampleSel.includes(item));
-                const catSpend  = selItems.reduce((s, i) => s + i.cost, 0);
-                const col2 = (showAnswers && selItems.length > 0)
-                    ? selItems.map(i => `<span style="color:red;font-weight:bold;">${i.name}</span>`).join('、')
-                    : nameBlank;
-                const col3 = (showAnswers && selItems.length > 0)
-                    ? `<span style="color:red;font-weight:bold;">${catSpend}</span>`
-                    : priceBlank;
-                return `<tr>
-                    <td style="${TD}font-weight:bold;color:#1a5276;">${cat.label}${itemsHtml}</td>
-                    <td style="${TD}">${col2}</td>
-                    <td style="${TD}text-align:right;">${col3} 元</td>
-                </tr>`;
-            }).join('');
 
-            const totalFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : priceBlank;
-            const spendFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
-            const remFill   = showAnswers ? `<span style="color:red;font-weight:bold;">${budget - exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+                return {
+                    _key: `b5_budget_${diff}_${theme}`,
+                    prompt: `${theme}，你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
+                    visual: tableHtml,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+            };
 
-            const tableHtml = `<table style="width:100%;border-collapse:collapse;font-size:11pt;margin:4px 0;">
-                <thead><tr style="background:#4a90d9;color:white;">
-                    <th style="${TH}text-align:left;width:55%;">商品項目</th>
-                    <th style="${TH}text-align:left;width:27%;">購買商品</th>
-                    <th style="${TH}text-align:right;width:18%;">金額</th>
-                </tr></thead>
-                <tbody>
-                    ${rows}
-                    <tr style="background:#f9fafb;">
-                        <td colspan="2" style="${TD}border-top:2px solid #9ca3af;font-weight:bold;">總共花費</td>
-                        <td style="${TD}border-top:2px solid #9ca3af;text-align:right;font-weight:bold;">${totalFill} 元</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div style="margin-top:10px;font-size:12pt;line-height:2.4;text-align:right;padding-right:7px;">
-                預算 <strong>${budget}</strong> 元 &nbsp;－&nbsp; 花費 ${spendFill} 元 &nbsp;＝&nbsp; 剩餘 ${remFill} 元
-            </div>`;
+            const available = shuffle(
+                this._budgetVariants[diff].filter(v => !usedLabels.has(`b5_budget_${diff}_${v.theme}`))
+            );
+            const needed = budgetLayout === 'double' ? 2 : 1;
+            const chosen = available.length >= needed
+                ? available.slice(0, needed)
+                : shuffle(this._budgetVariants[diff]).slice(0, needed);
 
-            return [{
-                _key: `b5_budget_${diff}_${theme}`,
-                prompt: `${theme}，你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
-                visual: tableHtml,
-                answerArea: '',
-                answerDisplay: ''
-            }];
+            return chosen.map(buildQuestion);
         }
 
         return chosen.map(scenario => {
@@ -528,172 +569,196 @@ WorksheetRegistry.register('b5', {
         }).filter(Boolean);
     },
 
+    _costRanges: {
+        '彩色氣球': [25, 40], '生日蠟燭': [15, 25], '彩帶裝飾': [30, 50], '派對帽':   [40, 60],
+        '噴彩拉炮': [25, 45], '糖果禮包': [45, 65], '餅乾零食': [35, 55], '氣泡水':   [20, 40],
+        '三明治':   [40, 60], '水果盒':   [50, 70], '小禮物':   [65, 95], '果汁飲料': [50, 70],
+        '拍立得相機':[130,170],'南瓜燈':  [55, 80], '糖果袋':   [30, 50], '女巫帽':   [65, 90],
+        '鬼臉面具': [40, 60], '骷髏貼紙': [20, 30], '巫師魔杖': [45, 65], '萬聖裝扮': [125,170],
+        '蜘蛛網裝飾':[20, 40],'恐怖假髮': [65, 95], '萬聖糖果': [25, 45], '野餐籃':  [100,140],
+        '一次性餐具':[20, 30],'紙巾':     [15, 25], '保冷袋':   [45, 65], '涼帽':     [55, 80],
+        '防曬乳':   [75,110],
+    },
+
     _budgetVariants: {
         easy: [
             {
-                theme: '🎂 生日派對',
-                budget: 200,
+                theme: '🎂 生日派對', budget: 200,
                 categories: [
                     { label: '🎈 派對裝飾', items: [
-                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
-                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
-                        { name: '噴彩拉炮', cost: 35 },
+                        { name: '彩色氣球' }, { name: '生日蠟燭' }, { name: '彩帶裝飾' },
+                        { name: '派對帽' },   { name: '噴彩拉炮' },
                     ]},
                     { label: '🍬 食物飲料', items: [
-                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
-                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
+                        { name: '糖果禮包' }, { name: '餅乾零食' }, { name: '氣泡水' }, { name: '三明治' },
                     ]},
                     { label: '🎁 小物道具', items: [
-                        { name: '小禮物', cost: 80 }, { name: '水果盒', cost: 60 },
+                        { name: '小禮物' }, { name: '水果盒' },
                     ]},
                 ]
             },
             {
-                theme: '🎃 萬聖節派對',
-                budget: 200,
+                theme: '🎃 萬聖節派對', budget: 200,
                 categories: [
                     { label: '🎭 裝扮道具', items: [
-                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具', cost: 50 },
-                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖', cost: 55 },
+                        { name: '女巫帽' }, { name: '鬼臉面具' }, { name: '骷髏貼紙' }, { name: '巫師魔杖' },
                     ]},
                     { label: '🍬 糖果點心', items: [
-                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果', cost: 35 },
-                        { name: '餅乾零食', cost: 45 },
+                        { name: '糖果袋' }, { name: '萬聖糖果' }, { name: '餅乾零食' },
                     ]},
                     { label: '🕸️ 場景布置', items: [
-                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
+                        { name: '南瓜燈' }, { name: '蜘蛛網裝飾' },
                     ]},
                 ]
             },
             {
-                theme: '🌸 春日野餐',
-                budget: 200,
+                theme: '🌸 春日野餐', budget: 200,
                 categories: [
                     { label: '🥪 野餐食物', items: [
-                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
-                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
+                        { name: '三明治' }, { name: '餅乾零食' }, { name: '水果盒' }, { name: '氣泡水' },
                     ]},
                     { label: '🧺 野餐用品', items: [
-                        { name: '紙巾', cost: 20 }, { name: '保冷袋', cost: 55 },
+                        { name: '紙巾' }, { name: '保冷袋' },
                     ]},
                     { label: '🌞 防護用品', items: [
-                        { name: '涼帽', cost: 70 },
+                        { name: '涼帽' },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎉 特別節日', budget: 200,
+                categories: [
+                    { label: '🎭 裝扮道具', items: [
+                        { name: '女巫帽' }, { name: '鬼臉面具' }, { name: '噴彩拉炮' },
+                    ]},
+                    { label: '🍭 甜點飲料', items: [
+                        { name: '糖果禮包' }, { name: '氣泡水' }, { name: '水果盒' },
+                    ]},
+                    { label: '🌸 場景布置', items: [
+                        { name: '彩帶裝飾' }, { name: '生日蠟燭' }, { name: '南瓜燈' },
                     ]},
                 ]
             },
         ],
         normal: [
             {
-                theme: '🎂 生日派對',
-                budget: 350,
+                theme: '🎂 生日派對', budget: 350,
                 categories: [
                     { label: '🎈 派對裝飾', items: [
-                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
-                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
-                        { name: '噴彩拉炮', cost: 35 },
+                        { name: '彩色氣球' }, { name: '生日蠟燭' }, { name: '彩帶裝飾' },
+                        { name: '派對帽' },   { name: '噴彩拉炮' },
                     ]},
                     { label: '🍰 食物飲料', items: [
-                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
-                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
-                        { name: '水果盒',   cost: 60 },
+                        { name: '糖果禮包' }, { name: '餅乾零食' }, { name: '氣泡水' },
+                        { name: '三明治' },   { name: '水果盒' },
                     ]},
                     { label: '🎁 特別禮物', items: [
-                        { name: '小禮物', cost: 80 }, { name: '果汁飲料', cost: 60 },
-                        { name: '南瓜燈', cost: 65 },
+                        { name: '小禮物' }, { name: '果汁飲料' }, { name: '南瓜燈' },
                     ]},
                 ]
             },
             {
-                theme: '🎃 萬聖節派對',
-                budget: 350,
+                theme: '🎃 萬聖節派對', budget: 350,
                 categories: [
                     { label: '🎭 萬聖裝扮', items: [
-                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具', cost: 50 },
-                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖', cost: 55 },
+                        { name: '女巫帽' }, { name: '鬼臉面具' }, { name: '骷髏貼紙' }, { name: '巫師魔杖' },
                     ]},
                     { label: '🍬 糖果點心', items: [
-                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果', cost: 35 },
-                        { name: '餅乾零食', cost: 45 }, { name: '糖果禮包', cost: 55 },
+                        { name: '糖果袋' }, { name: '萬聖糖果' }, { name: '餅乾零食' }, { name: '糖果禮包' },
                     ]},
                     { label: '🕸️ 場景布置', items: [
-                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
-                        { name: '恐怖假髮', cost: 80 },
+                        { name: '南瓜燈' }, { name: '蜘蛛網裝飾' }, { name: '恐怖假髮' },
                     ]},
                 ]
             },
             {
-                theme: '🌸 春日野餐',
-                budget: 350,
+                theme: '🌸 春日野餐', budget: 350,
                 categories: [
                     { label: '🥪 野餐食物', items: [
-                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
-                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
-                        { name: '保冷袋',   cost: 55 },
+                        { name: '三明治' }, { name: '餅乾零食' }, { name: '水果盒' },
+                        { name: '氣泡水' }, { name: '保冷袋' },
                     ]},
                     { label: '🧺 野餐用品', items: [
-                        { name: '野餐籃', cost: 120 }, { name: '一次性餐具', cost: 25 },
-                        { name: '紙巾',   cost: 20  },
+                        { name: '野餐籃' }, { name: '一次性餐具' }, { name: '紙巾' },
                     ]},
                     { label: '🌞 防護用品', items: [
-                        { name: '涼帽', cost: 70 }, { name: '防曬乳', cost: 90 },
+                        { name: '涼帽' }, { name: '防曬乳' },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎉 特別節日', budget: 320,
+                categories: [
+                    { label: '🎭 裝扮道具', items: [
+                        { name: '女巫帽' }, { name: '鬼臉面具' }, { name: '巫師魔杖' },
+                    ]},
+                    { label: '🍭 甜點飲料', items: [
+                        { name: '糖果禮包' }, { name: '果汁飲料' }, { name: '水果盒' },
+                    ]},
+                    { label: '🕸️ 場景裝飾', items: [
+                        { name: '彩帶裝飾' }, { name: '南瓜燈' }, { name: '蜘蛛網裝飾' },
                     ]},
                 ]
             },
         ],
         hard: [
             {
-                theme: '🎂 生日派對',
-                budget: 500,
+                theme: '🎂 生日派對', budget: 500,
                 categories: [
                     { label: '🎈 派對裝飾', items: [
-                        { name: '彩色氣球', cost: 30 }, { name: '生日蠟燭', cost: 20 },
-                        { name: '彩帶裝飾', cost: 40 }, { name: '派對帽',   cost: 50 },
-                        { name: '噴彩拉炮', cost: 35 },
+                        { name: '彩色氣球' }, { name: '生日蠟燭' }, { name: '彩帶裝飾' },
+                        { name: '派對帽' },   { name: '噴彩拉炮' },
                     ]},
                     { label: '🍰 食物飲料', items: [
-                        { name: '糖果禮包', cost: 55 }, { name: '餅乾零食', cost: 45 },
-                        { name: '氣泡水',   cost: 30 }, { name: '三明治',   cost: 50 },
-                        { name: '水果盒',   cost: 60 },
+                        { name: '糖果禮包' }, { name: '餅乾零食' }, { name: '氣泡水' },
+                        { name: '三明治' },   { name: '水果盒' },
                     ]},
                     { label: '🎁 特別禮物', items: [
-                        { name: '小禮物', cost: 80 }, { name: '拍立得相機', cost: 150 },
-                        { name: '果汁飲料', cost: 60 },
+                        { name: '小禮物' }, { name: '拍立得相機' }, { name: '果汁飲料' },
                     ]},
                 ]
             },
             {
-                theme: '🎃 萬聖節派對',
-                budget: 450,
+                theme: '🎃 萬聖節派對', budget: 450,
                 categories: [
                     { label: '🎭 萬聖裝扮', items: [
-                        { name: '女巫帽',   cost: 80 }, { name: '鬼臉面具',   cost: 50 },
-                        { name: '骷髏貼紙', cost: 25 }, { name: '巫師魔杖',   cost: 55 },
-                        { name: '恐怖假髮', cost: 80 }, { name: '萬聖裝扮',   cost: 150 },
+                        { name: '女巫帽' }, { name: '鬼臉面具' }, { name: '骷髏貼紙' },
+                        { name: '巫師魔杖' },{ name: '恐怖假髮' }, { name: '萬聖裝扮' },
                     ]},
                     { label: '🍬 糖果點心', items: [
-                        { name: '糖果袋',   cost: 40 }, { name: '萬聖糖果',   cost: 35 },
-                        { name: '糖果禮包', cost: 55 },
+                        { name: '糖果袋' }, { name: '萬聖糖果' }, { name: '糖果禮包' },
                     ]},
                     { label: '🕸️ 場景布置', items: [
-                        { name: '南瓜燈', cost: 65 }, { name: '蜘蛛網裝飾', cost: 30 },
+                        { name: '南瓜燈' }, { name: '蜘蛛網裝飾' },
                     ]},
                 ]
             },
             {
-                theme: '🌸 春日野餐',
-                budget: 500,
+                theme: '🌸 春日野餐', budget: 500,
                 categories: [
                     { label: '🥪 野餐食物', items: [
-                        { name: '三明治',   cost: 50 }, { name: '餅乾零食', cost: 45 },
-                        { name: '水果盒',   cost: 60 }, { name: '氣泡水',   cost: 30 },
-                        { name: '保冷袋',   cost: 55 },
+                        { name: '三明治' }, { name: '餅乾零食' }, { name: '水果盒' },
+                        { name: '氣泡水' }, { name: '保冷袋' },
                     ]},
                     { label: '🧺 野餐用品', items: [
-                        { name: '野餐籃', cost: 120 }, { name: '一次性餐具', cost: 25 },
-                        { name: '紙巾',   cost: 20  },
+                        { name: '野餐籃' }, { name: '一次性餐具' }, { name: '紙巾' },
                     ]},
                     { label: '🌞 防護用品', items: [
-                        { name: '涼帽', cost: 70 }, { name: '防曬乳', cost: 90 },
+                        { name: '涼帽' }, { name: '防曬乳' },
+                    ]},
+                ]
+            },
+            {
+                theme: '🎉 特別節日', budget: 480,
+                categories: [
+                    { label: '🎭 表演服裝', items: [
+                        { name: '萬聖裝扮' }, { name: '女巫帽' }, { name: '恐怖假髮' }, { name: '巫師魔杖' },
+                    ]},
+                    { label: '🍭 派對食物', items: [
+                        { name: '糖果禮包' }, { name: '果汁飲料' }, { name: '水果盒' }, { name: '餅乾零食' },
+                    ]},
+                    { label: '🌸 場景裝飾', items: [
+                        { name: '彩帶裝飾' }, { name: '南瓜燈' },
                     ]},
                 ]
             },

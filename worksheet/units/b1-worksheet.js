@@ -66,8 +66,8 @@ WorksheetRegistry.register('b1', {
 
     _scenarios: {
         easy: [
-            { icon:'🏫', label:'去學校',   items:[{ name:'午餐費', cost:55  }, { name:'公車票', cost:20  }] },
-            { icon:'🏪', label:'去超商',   items:[{ name:'飲料費', cost:30  }, { name:'零食費', cost:20  }] },
+            { icon:'🏫', label:'學校',     items:[{ name:'午餐費', cost:55  }, { name:'公車票', cost:20  }] },
+            { icon:'🏪', label:'超商',     items:[{ name:'飲料費', cost:30  }, { name:'零食費', cost:20  }] },
             { icon:'📚', label:'圖書館',   items:[{ name:'影印費', cost:10  }, { name:'文具費', cost:15  }] },
             { icon:'🎭', label:'看表演',   items:[{ name:'表演票', cost:100 }, { name:'零食費', cost:20  }] },
             { icon:'🏊', label:'游泳課',   items:[{ name:'入場費', cost:80  }, { name:'飲料費', cost:15  }] },
@@ -83,7 +83,7 @@ WorksheetRegistry.register('b1', {
             { icon:'🏥', label:'看醫生',   items:[{ name:'掛號費', cost:150 }, { name:'藥費',   cost:80  }] },
             { icon:'🎬', label:'看電影',   items:[{ name:'電影票', cost:280 }, { name:'爆米花', cost:90  }] },
             { icon:'🚂', label:'搭火車',   items:[{ name:'火車票', cost:250 }, { name:'便當費', cost:75  }] },
-            { icon:'🏊', label:'去游泳',   items:[{ name:'入場費', cost:80  }, { name:'飲料費', cost:25  }] },
+            { icon:'🏊', label:'游泳池',   items:[{ name:'入場費', cost:80  }, { name:'飲料費', cost:25  }] },
             { icon:'📖', label:'買書',     items:[{ name:'故事書費', cost:180 }, { name:'文具費', cost:45 }] },
             { icon:'🌄', label:'爬山',     items:[{ name:'門票費', cost:100 }, { name:'食物費', cost:120 }] },
             { icon:'🎮', label:'遊樂場',   items:[{ name:'門票費', cost:200 }, { name:'遊戲費', cost:50  }] },
@@ -97,11 +97,11 @@ WorksheetRegistry.register('b1', {
             { icon:'🎡', label:'遊樂園',   items:[{ name:'門票費',  cost:580 }, { name:'餐費',   cost:250 }, { name:'紀念品費', cost:180 }] },
             { icon:'🌍', label:'校外教學', items:[{ name:'交通費',  cost:80  }, { name:'午餐費', cost:120 }, { name:'門票費',  cost:200 }, { name:'零用錢', cost:100 }] },
             { icon:'🎓', label:'畢業典禮', items:[{ name:'服裝費',  cost:450 }, { name:'花束費', cost:280 }, { name:'聚餐費',  cost:350 }] },
-            { icon:'🏖️', label:'去海邊', items:[{ name:'防曬乳',  cost:180 }, { name:'餐費',   cost:300 }, { name:'停車費',  cost:100 }, { name:'飲料費', cost:60  }] },
+            { icon:'🏖️', label:'海邊',   items:[{ name:'防曬乳',  cost:180 }, { name:'餐費',   cost:300 }, { name:'停車費',  cost:100 }, { name:'飲料費', cost:60  }] },
         ],
     },
 
-    // 將金額分解為金幣圖示（最多顯示 6 枚，避免版面過長）
+    // 將金額分解為金錢圖示（最多顯示 6 枚，避免版面過長）
     _coinsDisplay(amount, renderCoin) {
         const coins = walletToCoins(amount);
         const displayed = coins.slice(0, 6);
@@ -175,7 +175,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'img-fill') {
-                // 圖示填空：同數字填空三欄結構，費用欄與累計欄前均加金幣圖示提示
+                // 圖示填空：同數字填空三欄結構，費用欄與累計欄前均加金錢圖示提示
                 let running = 0;
                 const mkCoinHintCell = (amount, wide) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
@@ -194,7 +194,7 @@ WorksheetRegistry.register('b1', {
                 }).join('');
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金幣圖示，填入各項費用和累計金額：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金錢圖示，填入各項費用和累計金額：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
@@ -235,7 +235,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'fill-select') {
-                // 圖示填空：三欄表格（同 B2 fill-select），金幣圖示 + 費用填空，合計列同樣填空
+                // 圖示填空：三欄表格（同 B2 fill-select），金錢圖示 + 費用填空，合計列同樣填空
                 const mkCoinAmtRow = (labelHtml, amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans = showAnswers
@@ -253,11 +253,11 @@ WorksheetRegistry.register('b1', {
                     : blankLine(true);
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金幣圖示，填入各項費用和合計：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金錢圖示，填入各項費用和合計：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">費用（元）</th>
                         </tr>
                         ${scenario.items.map(it => mkCoinAmtRow(it.name, it.cost)).join('')}
@@ -272,7 +272,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'coin-select') {
-                // 圖示選擇：三欄表格（項目|金幣圖示|費用），費用已揭露，下方選出正確錢幣組合
+                // 圖示選擇：三欄表格（項目|金錢圖示|費用），費用已揭露，下方選出正確錢幣組合
                 const mkRevealRow = (labelHtml, amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     return `<tr>
@@ -305,7 +305,7 @@ WorksheetRegistry.register('b1', {
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">費用</th>
                         </tr>
                         ${scenario.items.map(it => mkRevealRow(it.name, it.cost)).join('')}
@@ -322,7 +322,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else if (questionType === 'hint-select') {
-                // 提示選擇：三欄表格（項目|金幣圖示|費用），費用已揭露，選項旁顯示灰色金額提示
+                // 提示選擇：三欄表格（項目|金錢圖示|費用），費用已揭露，選項旁顯示灰色金額提示
                 const mkRevealRow2 = (labelHtml, amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     return `<tr>
@@ -354,7 +354,7 @@ WorksheetRegistry.register('b1', {
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">費用</th>
                         </tr>
                         ${scenario.items.map(it => mkRevealRow2(it.name, it.cost)).join('')}
@@ -371,7 +371,7 @@ WorksheetRegistry.register('b1', {
                 };
 
             } else { // hint-complete
-                // 提示完成：三欄大表格（同 B2 hint-complete），金幣圖示填數量 + 費用填空
+                // 提示完成：三欄大表格（同 B2 hint-complete），金錢圖示填數量 + 費用填空
                 if (!this._findCombo(total)) return null;
                 const mkHintRow = (labelHtml, amount, isLast) => {
                     const combo = this._findCombo(amount);
@@ -395,11 +395,11 @@ WorksheetRegistry.register('b1', {
                 };
                 return {
                     _key: `b1_${scenario.label}`,
-                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金幣圖示，填入數量和費用：`,
+                    prompt: `要去<span class="ws-emoji-icon">${scenario.icon}</span><strong>${scenario.label}</strong>，看金錢圖示，填入數量和費用：`,
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示（填數量）</th>
+                            <th style="${TH}">金錢圖示（填數量）</th>
                             <th style="${TH}text-align:right;">費用（元）</th>
                         </tr>
                         ${scenario.items.map(it => mkHintRow(it.name, it.cost, false)).join('')}

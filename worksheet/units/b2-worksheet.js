@@ -165,7 +165,7 @@ WorksheetRegistry.register('b2', {
         ],
     },
 
-    // 將金額分解為金幣圖示（最多顯示 5 枚）
+    // 將金額分解為金錢圖示（最多顯示 5 枚）
     _coinsDisplay(amount, renderCoin) {
         const coins = walletToCoins(amount);
         const displayed = coins.slice(0, 5);
@@ -304,7 +304,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'img-fill') {
-                // 圖示填空：四欄表格（同數字填空），各餘額欄前加金幣圖示作為提示
+                // 圖示填空：四欄表格（同數字填空），各餘額欄前加金錢圖示作為提示
                 const mkCoinHintCell = (amount) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers
@@ -327,7 +327,7 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看金幣圖示，填入每次的餘額：',
+                    prompt: '看金錢圖示，填入每次的餘額：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
@@ -348,7 +348,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'fill-select') {
-                // 圖示填空：每列顯示金幣圖示，金額改底線；最後填最終餘額
+                // 圖示填空：每列顯示金錢圖示，金額改底線；最後填最終餘額
                 const mkCoinAmtRow = (labelHtml, amount, color) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
                     const ans   = showAnswers
@@ -376,7 +376,7 @@ WorksheetRegistry.register('b2', {
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">金額</th>
                         </tr>
                         ${mkCoinAmtRow('💰 一開始有', startAmount, '#111')}
@@ -392,7 +392,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'coin-select') {
-                // 圖示選擇：fill-select 樣式表格（含金幣圖示，金額含+/−前綴），選出最後餘額的錢幣組合
+                // 圖示選擇：fill-select 樣式表格（含金錢圖示，金額含+/−前綴），選出最後餘額的錢幣組合
                 if (finalBalance <= 0) return null;
                 const mkRevealRow = (labelHtml, amount, color, signPrefix) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
@@ -431,11 +431,11 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看金幣圖示，選出最後餘額的錢幣組合：',
+                    prompt: '看金錢圖示，選出最後餘額的錢幣組合：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">金額</th>
                         </tr>
                         ${mkRevealRow('💰 一開始有', startAmount, '#111')}
@@ -448,7 +448,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else if (type === 'hint-select') {
-                // 提示選擇：fill-select 樣式表格（含金幣圖示，金額含+/−前綴），選項旁顯示灰色金額提示
+                // 提示選擇：fill-select 樣式表格（含金錢圖示，金額含+/−前綴），選項旁顯示灰色金額提示
                 if (finalBalance <= 0) return null;
                 const mkRevealRow2 = (labelHtml, amount, color, signPrefix) => {
                     const coins = this._coinsDisplay(amount, renderCoin);
@@ -486,11 +486,11 @@ WorksheetRegistry.register('b2', {
                 }).join('');
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看金幣圖示，選出最後餘額的錢幣組合：',
+                    prompt: '看金錢圖示，選出最後餘額的錢幣組合：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示</th>
+                            <th style="${TH}">金錢圖示</th>
                             <th style="${TH}text-align:right;">金額</th>
                         </tr>
                         ${mkRevealRow2('💰 一開始有', startAmount, '#111')}
@@ -503,7 +503,7 @@ WorksheetRegistry.register('b2', {
                 };
 
             } else { // hint-complete
-                // 提示完成：fill-select 樣式三欄大表格，金幣圖示欄顯示 ___個[coin]，金額欄填空
+                // 提示完成：fill-select 樣式三欄大表格，金錢圖示欄顯示 ___個[coin]，金額欄填空
                 if (finalBalance <= 0) return null;
                 if (!this._findCombo(finalBalance)) return null;
 
@@ -538,11 +538,11 @@ WorksheetRegistry.register('b2', {
 
                 return {
                     _key: `b2_${diff}_${idx}`,
-                    prompt: '看金幣圖示，填入數量和每筆金額：',
+                    prompt: '看金錢圖示，填入數量和每筆金額：',
                     visual: `<table style="${TABLE}">
                         <tr style="background:#f3f4f6;">
                             <th style="${TH}text-align:left;">項目</th>
-                            <th style="${TH}">金幣圖示（填數量）</th>
+                            <th style="${TH}">金錢圖示（填數量）</th>
                             <th style="${TH}text-align:right;">金額</th>
                         </tr>
                         ${mkHintRow('💰 一開始有', startAmount, '#111', false)}

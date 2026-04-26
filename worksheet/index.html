@@ -686,6 +686,7 @@ const WorksheetApp = {
         // Extra buttons
         if (config && config.extraButtons) {
             config.extraButtons.forEach((eb, idx) => {
+                if (eb.visible && !eb.visible(this.params)) return;
                 buttons.push({ config: eb, type: 'extra', extraIndex: idx });
             });
         }
