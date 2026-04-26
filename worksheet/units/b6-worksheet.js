@@ -5,15 +5,22 @@ WorksheetRegistry.register('b6', {
     defaultCount: 10,
     subtitle(opts) {
         const qt = {
-            'fill':          '數字填空',
-            'img-fill':      '圖示填空',
-            'fill-select':   '填空與選擇',
-            'coin-select':   '圖示選擇',
-            'hint-select':   '提示選擇',
-            'hint-complete': '提示完成',
+            'price-fill':          '數字填空(價格計算)',
+            'price-img-fill':      '圖示填空(價格計算)',
+            'price-fill-select':   '填空與選擇(價格計算)',
+            'price-coin-select':   '圖示選擇(價格計算)',
+            'price-hint-select':   '提示選擇(價格計算)',
+            'price-hint-complete': '提示完成(價格計算)',
+            'fill':                '數字填空(找零計算)',
+            'img-fill':            '圖示填空(找零計算)',
+            'fill-select':         '填空與選擇(找零計算)',
+            'coin-select':         '圖示選擇(找零計算)',
+            'hint-select':         '提示選擇(找零計算)',
+            'hint-complete':       '提示完成(找零計算)',
+            'budget-plan':         '預算規劃',
         };
         const diff = { easy:'簡單', normal:'普通', hard:'困難' };
-        return `難度：${diff[opts.difficulty || 'easy']}　題型：${qt[opts.questionType || 'fill']}`;
+        return `難度：${diff[opts.difficulty || 'easy']}　題型：${qt[opts.questionType || 'price-fill']}`;
     },
 
     toolbarConfig: {
@@ -21,14 +28,21 @@ WorksheetRegistry.register('b6', {
             label: '📝 題型',
             type: 'dropdown',
             options: [
-                { label: '數字填空',   value: 'fill'          },
-                { label: '圖示填空',   value: 'img-fill'      },
-                { label: '填空與選擇', value: 'fill-select'   },
-                { label: '圖示選擇',   value: 'coin-select'   },
-                { label: '提示選擇',   value: 'hint-select'   },
-                { label: '提示完成',   value: 'hint-complete' },
+                { label: '數字填空(價格計算)',   value: 'price-fill'          },
+                { label: '圖示填空(價格計算)',   value: 'price-img-fill'      },
+                { label: '填空與選擇(價格計算)', value: 'price-fill-select'   },
+                { label: '圖示選擇(價格計算)',   value: 'price-coin-select'   },
+                { label: '提示選擇(價格計算)',   value: 'price-hint-select'   },
+                { label: '提示完成(價格計算)',   value: 'price-hint-complete' },
+                { label: '數字填空(找零計算)',   value: 'fill'                },
+                { label: '圖示填空(找零計算)',   value: 'img-fill'            },
+                { label: '填空與選擇(找零計算)', value: 'fill-select'         },
+                { label: '圖示選擇(找零計算)',   value: 'coin-select'         },
+                { label: '提示選擇(找零計算)',   value: 'hint-select'         },
+                { label: '提示完成(找零計算)',   value: 'hint-complete'       },
+                { label: '預算規劃',             value: 'budget-plan'         },
             ],
-            getCurrentValue: (p) => p.questionType || 'fill',
+            getCurrentValue: (p) => p.questionType || 'price-fill',
             onChange: (v, app) => { app.params.questionType = v; app.generate(); }
         },
         adjustCountButton: {
@@ -117,7 +131,7 @@ WorksheetRegistry.register('b6', {
 
     generate(options) {
         const diff         = options.difficulty    || 'easy';
-        const questionType = options.questionType  || 'fill';
+        const questionType = options.questionType  || 'price-fill';
         const coinStyle    = options.coinStyle     || 'real';
         const showAnswers  = options._showAnswers  || false;
         const usedLabels   = options._usedValues   || new Set();
@@ -137,17 +151,94 @@ WorksheetRegistry.register('b6', {
 
         const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
 
+        // ── 預算規劃（單題模式，不走 scenario 迴圈）────────────────────
+        if (questionType === 'budget-plan') {
+            const budget     = this._budgets[diff];
+            const categories = this._budgetCategories;
+            const TH = 'border:1px solid #bbb;padding:5px 6px;font-weight:bold;';
+            const TD = 'border:1px solid #ddd;padding:4px 6px;';
+            const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
+            const ckDone = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid red;color:red;font-size:11px;line-height:14px;text-align:center;vertical-align:middle;margin-right:4px;border-radius:2px;">✓</span>`;
+            const nameBlank  = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:80px;height:1.2em;"></span>`;
+            const priceBlank = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:50px;height:1.2em;"></span>`;
+
+            const exampleSel = [];
+            if (showAnswers) {
+                let rem = budget;
+                for (const cat of categories) {
+                    for (const item of cat.items) {
+                        if (item.cost <= rem) { exampleSel.push(item); rem -= item.cost; }
+                    }
+                }
+            }
+            const exampleTotal = exampleSel.reduce((s, i) => s + i.cost, 0);
+
+            const rows = categories.map(cat => {
+                const itemsHtml = `<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;">
+                    ${cat.items.map(item => {
+                        const sel = showAnswers && exampleSel.includes(item);
+                        return `<span style="white-space:nowrap;">${sel ? ckDone : ckBox}${item.name}（${item.cost}元）</span>`;
+                    }).join('')}
+                </div>`;
+                const selItems  = cat.items.filter(item => showAnswers && exampleSel.includes(item));
+                const catSpend  = selItems.reduce((s, i) => s + i.cost, 0);
+                const col2 = (showAnswers && selItems.length > 0)
+                    ? selItems.map(i => `<span style="color:red;font-weight:bold;">${i.name}</span>`).join('、')
+                    : nameBlank;
+                const col3 = (showAnswers && selItems.length > 0)
+                    ? `<span style="color:red;font-weight:bold;">${catSpend}</span>`
+                    : priceBlank;
+                return `<tr>
+                    <td style="${TD}font-weight:bold;color:#1a5276;">${cat.label}${itemsHtml}</td>
+                    <td style="${TD}">${col2}</td>
+                    <td style="${TD}text-align:right;">${col3} 元</td>
+                </tr>`;
+            }).join('');
+
+            const totalFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : priceBlank;
+            const spendFill = showAnswers ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+            const remFill   = showAnswers ? `<span style="color:red;font-weight:bold;">${budget - exampleTotal}</span>` : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+
+            const tableHtml = `<table style="width:100%;border-collapse:collapse;font-size:11pt;margin:4px 0;">
+                <thead><tr style="background:#4a90d9;color:white;">
+                    <th style="${TH}text-align:left;width:55%;">商品項目</th>
+                    <th style="${TH}text-align:left;width:27%;">購買商品</th>
+                    <th style="${TH}text-align:right;width:18%;">金額</th>
+                </tr></thead>
+                <tbody>
+                    ${rows}
+                    <tr style="background:#f9fafb;">
+                        <td colspan="2" style="${TD}border-top:2px solid #9ca3af;font-weight:bold;">總共花費</td>
+                        <td style="${TD}border-top:2px solid #9ca3af;text-align:right;font-weight:bold;">${totalFill} 元</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:10px;font-size:12pt;line-height:2.4;">
+                預算 <strong>${budget}</strong> 元 &nbsp;－&nbsp; 花費 ${spendFill} 元 &nbsp;＝&nbsp; 剩餘 ${remFill} 元
+            </div>`;
+
+            return [{
+                _key: `b6_budget_${diff}`,
+                prompt: `你的預算是 <strong>${budget}</strong> 元，請在下方勾選想買的商品，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
+                visual: tableHtml,
+                answerArea: '',
+                answerDisplay: ''
+            }];
+        }
+
         return chosen.map(scenario => {
             const total     = scenario.items.reduce((s, it) => s + it.cost, 0);
-            const getIcon = name => { const e = this._itemEmoji[name]; return e ? `<span class="ws-emoji-icon">${e}</span>` : ''; };
+            const paid      = [100, 200, 500, 1000, 2000].find(p => p > total) || 2000;
+            const change    = paid - total;
+            const getIcon   = name => { const e = this._itemEmoji[name]; return e ? `<span class="ws-emoji-icon">${e}</span>` : ''; };
             const itemsText = scenario.items
                 .map(it => `${getIcon(it.name)}${it.name}（1${it.unit}）<strong>${it.cost}</strong> 元`)
                 .join('、');
             const basePromptFact = `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買 ${itemsText}`;
             const basePrompt = `${basePromptFact}，總共要多少錢？`;
 
-            // ── 數字填空 ───────────────────────────────────────────────
-            if (questionType === 'fill') {
+            // ── 價格計算：數字填空 ─────────────────────────────────────
+            if (questionType === 'price-fill') {
                 const ans = showAnswers
                     ? `<span style="color:red;font-weight:bold;">${total}</span>`
                     : blankLine();
@@ -159,8 +250,8 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 圖示填空 ───────────────────────────────────────────────
-            } else if (questionType === 'img-fill') {
+            // ── 價格計算：圖示填空 ─────────────────────────────────────
+            } else if (questionType === 'price-img-fill') {
                 const itemsWithCoins = scenario.items.map(it => {
                     const coinRow = this._coinsDisplay(it.cost, renderCoin);
                     return `${getIcon(it.name)}${it.name}（1${it.unit}）（<strong>${it.cost}</strong> 元）<span style="vertical-align:middle;">${coinRow}</span>`;
@@ -176,8 +267,8 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 填空與選擇 ─────────────────────────────────────────────
-            } else if (questionType === 'fill-select') {
+            // ── 價格計算：填空與選擇 ───────────────────────────────────
+            } else if (questionType === 'price-fill-select') {
                 const opts      = this._coinOptions(total);
                 const fillArea  = showAnswers
                     ? `共需帶：<span style="color:red;font-weight:bold;">${total}</span> 元`
@@ -206,8 +297,8 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 圖示選擇 ───────────────────────────────────────────────
-            } else if (questionType === 'coin-select') {
+            // ── 價格計算：圖示選擇 ─────────────────────────────────────
+            } else if (questionType === 'price-coin-select') {
                 const opts        = this._coinOptions(total);
                 const choicesHtml = opts.map((opt, i) => {
                     const label     = String.fromCharCode(9312 + i);
@@ -229,8 +320,8 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 提示選擇 ───────────────────────────────────────────────
-            } else if (questionType === 'hint-select') {
+            // ── 價格計算：提示選擇 ─────────────────────────────────────
+            } else if (questionType === 'price-hint-select') {
                 const opts        = this._coinOptions(total);
                 const choicesHtml = opts.map((opt, i) => {
                     const label     = String.fromCharCode(9312 + i);
@@ -255,8 +346,8 @@ WorksheetRegistry.register('b6', {
                     answerDisplay: ''
                 };
 
-            // ── 提示完成 ───────────────────────────────────────────────
-            } else {
+            // ── 價格計算：提示完成 ─────────────────────────────────────
+            } else if (questionType === 'price-hint-complete') {
                 const combo = this._findCombo(total);
                 if (!combo) return null;
                 const partsHtml = combo.map(c => {
@@ -274,9 +365,170 @@ WorksheetRegistry.register('b6', {
                     answerArea: '',
                     answerDisplay: ''
                 };
+
+            // ── 找零計算：數字填空 ─────────────────────────────────────
+            } else if (questionType === 'fill') {
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `${basePromptFact}，付 ${paid} 元，應找回多少錢？`,
+                    visual: '',
+                    answerArea: showAnswers
+                        ? `共需 <span style="color:red;font-weight:bold;">${total}</span> 元　付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
+                        : `共需 ${blankLine()} 元　付 ${paid} 元，找回 ${blankLine()} 元`,
+                    answerDisplay: ''
+                };
+
+            // ── 找零計算：圖示填空 ─────────────────────────────────────
+            } else if (questionType === 'img-fill') {
+                const itemsWithCoins = scenario.items.map(it => {
+                    const coinRow = this._coinsDisplay(it.cost, renderCoin);
+                    return `${getIcon(it.name)}${it.name}（1${it.unit}）（<strong>${it.cost}</strong> 元）<span style="vertical-align:middle;">${coinRow}</span>`;
+                }).join('&emsp;');
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `去<span class="ws-emoji-icon">🛒</span><strong>菜市場</strong>，買：`,
+                    visual: `<div style="margin:4px 0 6px;line-height:2.2;">${itemsWithCoins}</div>`,
+                    answerArea: showAnswers
+                        ? `共需 <span style="color:red;font-weight:bold;">${total}</span> 元　付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
+                        : `共需 ${this._coinsDisplay(total, renderCoin)}${blankLine()} 元　付 ${paid} 元，找回 ${this._coinsDisplay(change, renderCoin)}${blankLine()} 元`,
+                    answerDisplay: ''
+                };
+
+            // ── 找零計算：填空與選擇 ───────────────────────────────────
+            } else if (questionType === 'fill-select') {
+                const fillArea  = showAnswers
+                    ? `共需 <span style="color:red;font-weight:bold;">${total}</span> 元　付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change}</span> 元`
+                    : `共需 ${blankLine()} 元　付 ${paid} 元，找回 ${blankLine()} 元`;
+                const opts = this._coinOptions(change);
+                const choicesHtml = opts.map((opt, i) => {
+                    const label     = String.fromCharCode(9312 + i);
+                    const isCorrect = opt.total === change;
+                    const style     = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const ansTag    = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${change} 元</span>` : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${ansTag}
+                    </div>`;
+                }).join('');
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `${basePromptFact}，付 ${paid} 元，應找回多少錢？`,
+                    visual: `<div style="margin-bottom:6px;">${fillArea}</div>
+                             <div style="margin-bottom:4px;">請選出正確的找零組合：</div>
+                             <div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
+            // ── 找零計算：圖示選擇 ─────────────────────────────────────
+            } else if (questionType === 'coin-select') {
+                const opts        = this._coinOptions(change);
+                const choicesHtml = opts.map((opt, i) => {
+                    const label     = String.fromCharCode(9312 + i);
+                    const isCorrect = opt.total === change;
+                    const style     = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                    </div>`;
+                }).join('');
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `${basePromptFact}，共需 <strong>${total}</strong> 元，付 ${paid} 元，應找回 <strong>${change}</strong> 元，請選出正確的找零組合：`,
+                    visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
+            // ── 找零計算：提示選擇 ─────────────────────────────────────
+            } else if (questionType === 'hint-select') {
+                const opts        = this._coinOptions(change);
+                const choicesHtml = opts.map((opt, i) => {
+                    const label     = String.fromCharCode(9312 + i);
+                    const isCorrect = opt.total === change;
+                    const style     = showAnswers && isCorrect ? 'border-color:red;border-width:3px;' : '';
+                    const check     = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const ansTag    = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${change} 元</span>` : '';
+                    return `<div class="coin-choice-option" style="${style}">
+                        <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                        <span style="color:#ccc;font-weight:bold;margin-left:6px;">${opt.total} 元</span>${ansTag}
+                    </div>`;
+                }).join('');
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `${basePromptFact}，共需 <strong>${total}</strong> 元，付 ${paid} 元，應找回 <strong>${change}</strong> 元，請選出正確的找零組合：`,
+                    visual: `<div class="coin-choice-options">${choicesHtml}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+
+            // ── 找零計算：提示完成 ─────────────────────────────────────
+            } else {
+                const combo = this._findCombo(change);
+                if (!combo) return null;
+                const partsHtml = combo.map(c => {
+                    const icons  = Array(Math.min(c.count, 5)).fill(renderCoin(c.denom)).join('');
+                    const ansNum = showAnswers
+                        ? `<span style="color:red;font-weight:bold;">${c.count}</span>` : '___';
+                    const unit   = c.denom >= 100 ? '張' : '個';
+                    return `${ansNum}${unit} ${icons}`;
+                }).join('&nbsp;&nbsp;');
+                const changeHint = `<span style="margin-left:8px;">找回 <span style="color:#ccc;font-weight:bold;">${change}</span> 元</span>`;
+                return {
+                    _key: `b6_${scenario.label}`,
+                    prompt: `${basePromptFact}，共需 ${total} 元，付 ${paid} 元，應找回多少元？`,
+                    visual: `<div style="margin:4px 0;">找回：${partsHtml}${changeHint}</div>`,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
             }
         }).filter(Boolean);
     },
+
+    _budgets: { easy: 100, normal: 200, hard: 350 },
+    _budgetCategories: [
+        {
+            label: '🥬 蔬菜類',
+            items: [
+                { name: '高麗菜', cost: 30 },
+                { name: '青蔥',   cost: 20 },
+                { name: '番茄',   cost: 45 },
+                { name: '菠菜',   cost: 25 },
+                { name: '地瓜',   cost: 35 },
+            ]
+        },
+        {
+            label: '🍎 水果類',
+            items: [
+                { name: '蘋果', cost: 50 },
+                { name: '香蕉', cost: 25 },
+                { name: '柳橙', cost: 40 },
+                { name: '芒果', cost: 60 },
+                { name: '葡萄', cost: 80 },
+            ]
+        },
+        {
+            label: '🛒 食材雜糧',
+            items: [
+                { name: '雞蛋', cost: 65 },
+                { name: '麵條', cost: 35 },
+                { name: '豆腐', cost: 25 },
+                { name: '白米', cost: 90 },
+                { name: '醬油', cost: 45 },
+            ]
+        },
+    ],
 
     _findCombo(amount) {
         const denoms = [1000, 500, 100, 50, 10, 5, 1];

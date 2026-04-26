@@ -508,7 +508,7 @@ return `<div class="coin-choice-option" style="${style}">
                     visual: listHtml,
                     answerArea: showAnswers
                         ? `(1) 總共 <span style="color:red;font-weight:bold;">${total}</span> 元　(2) 付 ${paid} 元，找回 <span style="color:red;font-weight:bold;">${change >= 0 ? change : '不夠'}</span> 元`
-                        : `(1) 總共 ${walletToCoins(total).map(c => renderCoin(c)).join('')}${blankLine()} 元　(2) 付 ${paid} 元，找回 ${blankLine()} 元`,
+                        : `(1) 總共 ${walletToCoins(total).map(c => renderCoin(c)).join('')}${blankLine()} 元　(2) 付 ${paid} 元，找回 ${walletToCoins(change).map(c => renderCoin(c)).join('')}${blankLine()} 元`,
                     answerDisplay: ''
                 });
             } else if (questionType === 'fill-select' && change <= 0) {

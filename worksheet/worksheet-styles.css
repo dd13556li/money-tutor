@@ -694,6 +694,26 @@ body {
     font-size: calc(var(--ws-font-scale) * 13pt);
 }
 
+/* A 系列：題目第一行（prompt）放大至與答案區同字級 */
+.worksheet-container .worksheet-page[data-unit="a1"] .question-number,
+.worksheet-container .worksheet-page[data-unit="a2"] .question-number,
+.worksheet-container .worksheet-page[data-unit="a3"] .question-number,
+.worksheet-container .worksheet-page[data-unit="a4"] .question-number,
+.worksheet-container .worksheet-page[data-unit="a5"] .question-number,
+.worksheet-container .worksheet-page[data-unit="a6"] .question-number {
+    font-size: calc(var(--ws-font-scale) * 13pt);
+}
+
+/* F 系列：題目第一行（prompt）放大至與答案區同字級 */
+.worksheet-container .worksheet-page[data-unit="f1"] .question-number,
+.worksheet-container .worksheet-page[data-unit="f2"] .question-number,
+.worksheet-container .worksheet-page[data-unit="f3"] .question-number,
+.worksheet-container .worksheet-page[data-unit="f4"] .question-number,
+.worksheet-container .worksheet-page[data-unit="f5"] .question-number,
+.worksheet-container .worksheet-page[data-unit="f6"] .question-number {
+    font-size: calc(var(--ws-font-scale) * 13pt);
+}
+
 /* B 系列：題目第一行（prompt）與答案區同字級；emoji 由 ws-emoji-icon 獨立縮放 */
 .worksheet-container .worksheet-page[data-unit="b1"] .question-number,
 .worksheet-container .worksheet-page[data-unit="b2"] .question-number,

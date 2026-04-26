@@ -161,10 +161,12 @@ WorksheetRegistry.register('c4', {
                     const checkboxContent = showAnswers && isCorrect ? '✓' : '';
                     const checkboxStyle = showAnswers && isCorrect ? 'color: red; font-weight: bold;' : '';
                     const coinsHtml = combo.coins.map(c => Array(c.count).fill(renderCoin(c.denom)).join('')).join(' ');
-                    const answerMark = showAnswers && isCorrect ? ' <span class="answer-text">✔ 正確</span>' : '';
+                    const amtField = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">${combo.total} 元</span>`
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="combo-option">
                         <div class="combo-checkbox" style="${checkboxStyle}">${checkboxContent}</div>
-                        <div class="combo-coins">${coinsHtml}</div>${answerMark}
+                        <div class="combo-coins">${coinsHtml}</div>${amtField}
                     </div>`;
                 }).join('');
 

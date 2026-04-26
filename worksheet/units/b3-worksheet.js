@@ -41,8 +41,8 @@ WorksheetRegistry.register('b3', {
                 label: '📝 測驗題型',
                 type: 'dropdown',
                 options: [
-                    { label: '數字填空（存幾週）',      value: 'fill' },
-                    { label: '填空與選擇（存幾週＋金額組合）', value: 'fill-select' },
+                    { label: '數字填空（存幾天）',      value: 'fill' },
+                    { label: '填空與選擇（存幾天＋金額組合）', value: 'fill-select' },
                     { label: '圖示選擇（選出正確金額）', value: 'coin-select' },
                     { label: '提示選擇（有金額提示）',  value: 'hint-select' },
                     { label: '提示完成（填入幣值數量）', value: 'hint-complete' },
@@ -261,9 +261,9 @@ WorksheetRegistry.register('b3', {
                 // 四題月曆以 2×2 格線排列（第一排兩題，第二排兩題）
                 const mkCell = (num, q) => `
     <div style="min-width:0;">
-        <div style="font-size:7pt;margin-bottom:2px;">(${num}) ${q.subPrompt}</div>
+        <div style="font-size:13pt;margin-bottom:4px;">(${num}) ${q.subPrompt}</div>
         ${q.calHtml}
-        <div style="font-size:7pt;margin-top:2px;">共需存：${q.answerFill} 天才能買到</div>
+        <div style="font-size:10pt;margin-top:3px;">共需存：${q.answerFill} 天才能買到</div>
     </div>`;
 
                 calQs.push({
@@ -290,26 +290,26 @@ WorksheetRegistry.register('b3', {
             if (usedKeys.has(key) && usedKeys.size < items.length * weeklyOpts.length) continue;
             usedKeys.add(key);
 
-            const weeks = Math.ceil(item.price / weekly);
+            const days = Math.ceil(item.price / weekly);
             const price = item.price;
 
-            // ── 1. 數字填空：填入需要存幾週 ──────────────────────────
+            // ── 1. 數字填空：填入需要存幾天 ──────────────────────────
             if (questionType === 'fill') {
                 const ans = showAnswers
-                    ? `<span style="color:red;font-weight:bold;">${weeks}</span>`
+                    ? `<span style="color:red;font-weight:bold;">${days}</span>`
                     : blankLine();
                 questions.push({
                     _key: key,
-                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
+                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每天存 <strong>${weekly}</strong> 元，要存幾天才夠？`,
                     visual: '',
-                    answerArea: `需要存：${ans} 週`,
+                    answerArea: `需存 ${ans} 天`,
                     answerDisplay: ''
                 });
 
-            // ── 2. 填空與選擇：填入週數 ＋ 選出總價的金額組合 ──────────
+            // ── 2. 填空與選擇：填入天數 ＋ 選出總價的金額組合 ──────────
             } else if (questionType === 'fill-select') {
-                const weeksAns = showAnswers
-                    ? `<span style="color:red;font-weight:bold;">${weeks}</span>`
+                const daysAns = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${days}</span>`
                     : blankLine();
                 const correctCoins = walletToCoins(price);
                 const opts = this._generateCoinOptions(price, correctCoins);
@@ -330,8 +330,8 @@ WorksheetRegistry.register('b3', {
                 }).join('');
                 questions.push({
                     _key: key,
-                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每週存 <strong>${weekly}</strong> 元，要存幾週才夠？`,
-                    visual: `<div style="margin-bottom:6px;">需要存：${weeksAns} 週</div>
+                    prompt: `想買「<span class="ws-emoji-icon">${item.icon}</span><strong>${item.name}</strong>」要 ${price} 元，每天存 <strong>${weekly}</strong> 元，要存幾天才夠？`,
+                    visual: `<div style="margin-bottom:6px;">需存 ${daysAns} 天</div>
                              <div style="margin-bottom:4px;">請選出 <strong>${price} 元</strong> 的正確金額組合：</div>
                              <div class="coin-choice-options">${choicesHtml}</div>`,
                     answerArea: '',
@@ -349,12 +349,12 @@ WorksheetRegistry.register('b3', {
                     const check     = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
-                    const answerTag = (showAnswers && isCorrect)
+                    const amtField = (showAnswers && isCorrect)
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${price} 元</span>`
-                        : '';
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${amtField}
                     </div>`;
                 }).join('');
                 questions.push({

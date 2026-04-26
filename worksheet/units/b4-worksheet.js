@@ -5,16 +5,16 @@ WorksheetRegistry.register('b4', {
     defaultCount: 10,
     subtitle(opts) {
         const qt = {
-            'cheaper-num':   '找便宜(2家-數字填空)',
-            'cheaper-coin':  '找便宜(2家-圖示填空)',
-            'cheaper-hint':  '找便宜(2家-圈選完成)',
-            'cheaper3-num':  '找便宜(3家-數字填空)',
-            'cheaper3-coin': '找便宜(3家-圖示填空)',
-            'cheaper3-hint': '找便宜(3家-圈選完成)',
-            'fill-num':      '計算差額(數字填空)',
-            'fill-coin':     '計算差額(圖示填空)',
-            'fill-hint':     '計算差額(提示完成)',
-            'fill-select':   '計算差額(選擇完成)',
+            'cheaper-num':   '數字填空(2家-找便宜)',
+            'cheaper-coin':  '圖示填空(2家-找便宜)',
+            'cheaper-hint':  '圈選完成(2家-找便宜)',
+            'cheaper3-num':  '數字填空(3家-找便宜)',
+            'cheaper3-coin': '圖示填空(3家-找便宜)',
+            'cheaper3-hint': '圈選完成(3家-找便宜)',
+            'fill-num':      '數字填空(計算差額)',
+            'fill-coin':     '圖示填空(計算差額)',
+            'fill-hint':     '提示完成(計算差額)',
+            'fill-select':   '圖示完成(計算差額)',
         };
         return `題型：${qt[opts.questionType || 'cheaper-num']}`;
     },
@@ -52,16 +52,16 @@ WorksheetRegistry.register('b4', {
                 label: '📝 測驗題型',
                 type: 'dropdown',
                 options: [
-                    { label: '找便宜(2家店比較-數字填空)',   value: 'cheaper-num'   },
-                    { label: '找便宜(2家店比較-圖示填空)',   value: 'cheaper-coin'  },
-                    { label: '找便宜(2家店比較-圈選完成)',   value: 'cheaper-hint'  },
-                    { label: '找便宜(3家店比較-數字填空)',   value: 'cheaper3-num'  },
-                    { label: '找便宜(3家店比較-圖示填空)',   value: 'cheaper3-coin' },
-                    { label: '找便宜(3家店比較-圈選完成)',   value: 'cheaper3-hint' },
-                    { label: '計算差額(數字填空)',           value: 'fill-num'      },
-                    { label: '計算差額(圖示填空)',           value: 'fill-coin'     },
-                    { label: '計算差額(提示完成)',           value: 'fill-hint'     },
-                    { label: '計算差額(選擇完成)',           value: 'fill-select'   },
+                    { label: '數字填空(2家店比較-找便宜)',   value: 'cheaper-num'   },
+                    { label: '圖示填空(2家店比較-找便宜)',   value: 'cheaper-coin'  },
+                    { label: '圈選完成(2家店比較-找便宜)',   value: 'cheaper-hint'  },
+                    { label: '數字填空(3家店比較-找便宜)',   value: 'cheaper3-num'  },
+                    { label: '圖示填空(3家店比較-找便宜)',   value: 'cheaper3-coin' },
+                    { label: '圈選完成(3家店比較-找便宜)',   value: 'cheaper3-hint' },
+                    { label: '數字填空(計算差額)',           value: 'fill-num'      },
+                    { label: '圖示填空(計算差額)',           value: 'fill-coin'     },
+                    { label: '圖示完成(計算差額)',           value: 'fill-select'   },
+                    { label: '提示完成(計算差額)',           value: 'fill-hint'     },
                 ],
                 getCurrentValue: (params) => params.questionType || 'cheaper-num',
                 onChange: (val, app) => { app.params.questionType = val; app.generate(); }
@@ -342,12 +342,12 @@ WorksheetRegistry.register('b4', {
                     const check     = (showAnswers && isCorrect)
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
-                    const answerTag = (showAnswers && isCorrect)
+                    const amtField = (showAnswers && isCorrect)
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${diff} 元</span>`
-                        : '';
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold;min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${answerTag}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${amtField}
                     </div>`;
                 }).join('');
 

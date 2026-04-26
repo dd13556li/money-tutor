@@ -142,12 +142,12 @@ WorksheetRegistry.register('c3', {
                         ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
                         : checkbox;
                     const correctAmount = opt.count * targetDenom;
-                    const answerTag = (showAnswers && isCorrect)
+                    const amtField = (showAnswers && isCorrect)
                         ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${correctAmount} 元</span>`
-                        : '';
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
                         <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
-                        <div class="combo-coins">${coinsVisual}</div>${answerTag}
+                        <div class="combo-coins">${coinsVisual}</div>${amtField}
                     </div>`;
                 }).join('');
 

@@ -385,7 +385,7 @@ WorksheetRegistry.register('b1', {
                     }).join('&ensp;');
                     const ans = showAnswers
                         ? `<span style="color:red;font-weight:bold;">${amount}</span>`
-                        : (isLast ? blankLine(true) : blankLine());
+                        : `<span style="display:inline-block;border-bottom:1.5px solid #000;min-width:${isLast ? '100px' : '60px'};height:1.2em;margin:0 4px;text-align:center;vertical-align:bottom;"><span style="color:#ccc;font-weight:bold;">${amount}</span></span>`;
                     const rowStyle = isLast ? 'border-top:2px solid #9ca3af;background:#f9fafb;' : '';
                     return `<tr style="${rowStyle}">
                         <td style="${TD}${isLast ? 'font-weight:bold;' : ''}">${labelHtml}</td>

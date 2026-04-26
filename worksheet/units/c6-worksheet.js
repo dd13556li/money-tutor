@@ -135,9 +135,15 @@ WorksheetRegistry.register('c6', {
                     const label = String.fromCharCode(9312 + idx);
                     const isCorrect = opt.total === change;
                     const style = showAnswers && isCorrect ? 'border-color: red; border-width: 3px;' : '';
+                    const check = (showAnswers && isCorrect)
+                        ? '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid red;color:red;font-size:14px;line-height:16px;text-align:center;margin:0 4px;vertical-align:middle;">✓</span>'
+                        : checkbox;
+                    const amtField = (showAnswers && isCorrect)
+                        ? `<span style="color:red;font-weight:bold;margin-left:6px;">答案：${opt.total} 元</span>`
+                        : `<span style="display:inline-flex;align-items:flex-end;align-self:flex-end;margin-left:6px;gap:2px;"><span style="display:inline-block;min-width:60px;border-bottom:1.5px solid #333;line-height:1;"></span><span>元</span></span>`;
                     return `<div class="coin-choice-option" style="${style}">
-                        <span style="font-weight:bold; min-width:20px;">${label}</span>${checkbox}
-                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>
+                        <span style="font-weight:bold; min-width:20px;">${label}</span>${check}
+                        <div class="combo-coins">${opt.coins.map(c => renderCoin(c)).join('')}</div>${amtField}
                     </div>`;
                 }).join('');
 
