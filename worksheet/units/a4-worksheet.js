@@ -38,6 +38,14 @@ WorksheetRegistry.register('a4', {
         return info ? `A4 ${info.name}購物` : 'A4 超市購物';
     },
 
+    subtitle(opts) {
+        if ((opts?.questionType || 'price-fill') === 'budget-plan') {
+            const diff = { easy: '簡單', normal: '普通', hard: '困難' };
+            return `預算規劃　難度：${diff[opts?.difficulty || 'easy']}`;
+        }
+        return '購物計算與找零';
+    },
+
     toolbarConfig: {
         fontButton: {
             label: '🏪 商店類型',
@@ -108,9 +116,35 @@ WorksheetRegistry.register('a4', {
                 { label: '圖示選擇(找零計算)', value: 'coin-select' },
                 { label: '提示選擇(找零計算)', value: 'hint-select' },
                 { label: '提示完成(找零計算)', value: 'hint-complete' },
+                { label: '預算規劃', value: 'budget-plan' },
             ],
             getCurrentValue: (params) => params.questionType || 'price-fill',
             onChange: (val, app) => { app.params.questionType = val; app.generate(); }
+        },
+        {
+            id: 'a4-budget-difficulty-btn',
+            label: '🎯 預算難度',
+            type: 'dropdown',
+            options: [
+                { label: '簡單', value: 'easy' },
+                { label: '普通', value: 'normal' },
+                { label: '困難', value: 'hard' },
+            ],
+            visible: (params) => (params.questionType || 'price-fill') === 'budget-plan',
+            getCurrentValue: (params) => params.difficulty || 'easy',
+            onChange: (val, app) => { app.params.difficulty = val; app.generate(); }
+        },
+        {
+            id: 'a4-budget-layout-btn',
+            label: '📄 版面',
+            type: 'cycle',
+            options: [
+                { label: '每頁 1 題', value: 'single' },
+                { label: '每頁 2 題', value: 'double' },
+            ],
+            visible: (params) => (params.questionType || 'price-fill') === 'budget-plan',
+            getCurrentValue: (params) => params.budgetLayout || 'single',
+            onChange: (val, app) => { app.params.budgetLayout = val; app.generate(); }
         }]
     },
 
@@ -277,6 +311,7 @@ WorksheetRegistry.register('a4', {
         const isMixed = store === 'mixed';
         const storeKeys = Object.keys(this.stores);
         const questionType = options.questionType || 'price-fill';
+        const diff = options.difficulty || 'easy';
         const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const renderCoin = (value) => {
@@ -286,6 +321,89 @@ WorksheetRegistry.register('a4', {
             return coinImgFront(value);
         };
         const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
+
+        // ── 預算規劃（不走一般迴圈）────────────────────────────────
+        if (questionType === 'budget-plan') {
+            const budgetLayout = options.budgetLayout || 'single';
+            const compact = budgetLayout === 'double';
+            const needed = compact ? 2 : 1;
+            const numItems = { easy: 6, normal: 8, hard: 10 }[diff] || 6;
+
+            const buildQuestion = () => {
+                const currentStore = isMixed
+                    ? storeKeys[Math.floor(Math.random() * storeKeys.length)]
+                    : store;
+                const products = this.stores[currentStore] || this.stores.convenience;
+                const storeInfoData = this.storeInfo[currentStore] || { name: '商店', emoji: '🏪' };
+
+                const matItems = pickRandom(products, Math.min(numItems, products.length));
+                const allTotal = matItems.reduce((s, it) => s + it.price, 0);
+                const ratio = 0.5 + Math.random() * 0.15;
+                const roundTo = allTotal > 500 ? 50 : 10;
+                const rawBudget = Math.round(allTotal * ratio / roundTo) * roundTo;
+                const minPrice = Math.min(...matItems.map(it => it.price));
+                const budget = Math.max(rawBudget, minPrice + roundTo);
+
+                const exampleSel = [];
+                if (showAnswers) {
+                    let rem = budget;
+                    for (const item of matItems) {
+                        if (item.price <= rem) { exampleSel.push(item); rem -= item.price; }
+                    }
+                }
+                const exampleTotal = exampleSel.reduce((s, it) => s + it.price, 0);
+
+                const TH = 'padding:4px 6px;border:1px solid #ccc;font-size:10.5pt;';
+                const TD = 'padding:3px 6px;border:1px solid #ddd;font-size:10pt;vertical-align:middle;';
+                const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
+                const ckDone = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid red;color:red;font-size:11px;line-height:14px;text-align:center;vertical-align:middle;margin-right:4px;border-radius:2px;">✓</span>`;
+                const priceBlank = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:50px;height:1.2em;"></span>`;
+                const tFS  = compact ? '9.5pt' : '11pt';
+                const fFS  = compact ? '10.5pt' : '12pt';
+                const mTop = compact ? '6px' : '10px';
+
+                const itemRows = matItems.map(item => {
+                    const checked = showAnswers && exampleSel.some(s => s.name === item.name);
+                    const cb = checked ? ckDone : ckBox;
+                    const priceCell = (showAnswers && checked)
+                        ? `<span style="color:red;font-weight:bold;">${item.price}</span>`
+                        : priceBlank;
+                    return `<tr>
+                        <td style="${TD}">${cb}${this._productImg(item)}${item.name}（${item.price}元）</td>
+                        <td style="${TD}text-align:right;">${priceCell}</td>
+                    </tr>`;
+                }).join('');
+
+                const spendFill = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>`
+                    : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+                const remFill = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${budget - exampleTotal}</span>`
+                    : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+
+                const tableHtml = `<table style="width:100%;border-collapse:collapse;font-size:${tFS};">
+                    <thead><tr style="background:#4a90d9;color:white;">
+                        <th style="${TH}text-align:left;width:75%;">${storeInfoData.emoji} ${storeInfoData.name}商品</th>
+                        <th style="${TH}text-align:right;width:25%;">金額</th>
+                    </tr></thead>
+                    <tbody>${itemRows}</tbody>
+                </table>
+                <div style="margin-top:${mTop};font-size:${fFS};line-height:2.4;text-align:right;padding-right:7px;">
+                    預算 <strong>${budget}</strong> 元 &nbsp;－&nbsp; 花費 ${spendFill} 元 &nbsp;＝&nbsp; 剩餘 ${remFill} 元
+                </div>`;
+
+                return {
+                    _key: `a4_budget_${diff}_${currentStore}_${Math.random().toString(36).slice(2, 7)}`,
+                    prompt: `你有 <strong>${budget}</strong> 元要去${storeInfoData.name}購物，請在下方勾選想買的商品，並將價格填入右側欄位（注意不能超過預算！）：`,
+                    visual: tableHtml,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+            };
+
+            return Array.from({ length: needed }, buildQuestion);
+        }
+
         const questions = [];
         const isPrice = questionType.startsWith('price-');
 

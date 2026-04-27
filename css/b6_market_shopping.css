@@ -200,7 +200,7 @@
 .b6-sr-sel-item  .b6-icon-img { width: 20px; height: 20px; filter: none; }
 .b6-ci-icon      .b6-icon-img { width: 24px; height: 24px; filter: none; }
 .b6-cc-row       .b6-icon-img { width: 22px; height: 22px; filter: none; }
-.b6-cf-icon      .b6-icon-img { width: 128px; height: 128px; }
+.b6-cf-icon      .b6-icon-img { width: 256px; height: 256px; }
 /* Phase 2 第一張卡片商品圖示 */
 .b6c-rf-item-icon .b6-icon-img { width: 128px; height: 128px; }
 /* 買菜成功頁採購清單商品圖示 */
@@ -853,7 +853,7 @@
     pointer-events: none;
     animation: b6CollectFlashIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
     box-shadow: 0 8px 28px rgba(29,78,216,0.4);
-    min-width: 200px;
+    min-width: 280px;
 }
 .b6-collect-flash.all-done {
     background: linear-gradient(135deg, #d97706, #f59e0b);

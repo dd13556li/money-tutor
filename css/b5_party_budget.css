@@ -379,7 +379,7 @@
     .b5-budget-amount { font-size: 2rem; }
     .b5-items-grid    { gap: 8px; }
     .b5-item-card     { padding: 10px 8px; }
-    .b5-item-icon     { font-size: 26px; }
+    .b5-item-icon .b5-icon-emoji { font-size: 26px; }
     .b5-item-name     { font-size: 12px; }
     .b5-item-price    { font-size: 1rem; }
 }
@@ -931,23 +931,34 @@
     padding: 8px; font-size: 14px; cursor: pointer;
 }
 
-/* ── 商品選取浮動標籤（B6 flyout pattern）──────────────────── */
+/* ── 商品選取彈窗（B6 collect-flash 模式）─────────────────── */
 .b5-item-flyout {
-    display: flex; align-items: center; gap: 5px;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
     background: linear-gradient(135deg, #6e28b4, #a855f7);
-    color: #fff; border-radius: 20px;
-    padding: 4px 10px; font-size: 13px; font-weight: 600;
-    box-shadow: 0 2px 8px rgba(110,40,180,0.4);
-    white-space: nowrap; opacity: 1;
-    animation: b5FlyoutUp 1s ease-out forwards;
+    color: #fff;
+    border-radius: 22px;
+    padding: 20px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 9500;
     pointer-events: none;
+    animation: b5CollectFlashIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    box-shadow: 0 8px 28px rgba(110,40,180,0.45);
+    min-width: 240px;
 }
-.b5-if-icon { font-size: 16px; }
-.b5-if-price { font-size: 12px; opacity: 0.9; }
-@keyframes b5FlyoutUp {
-    0%   { opacity: 1; transform: translateY(0); }
-    70%  { opacity: 1; transform: translateY(-20px); }
-    100% { opacity: 0; transform: translateY(-30px); }
+.b5-if-item  { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.b5-if-icon  { font-size: 0; line-height: 0; }
+.b5-if-icon .b5-icon-emoji { font-size: 120px; line-height: 1; }
+.b5-if-name  { font-size: 20px; font-weight: 800; text-align: center; }
+.b5-if-price { font-size: 18px; font-weight: 700; color: #e9d5ff; }
+.b5-if-fade  { transition: opacity 0.4s; opacity: 0; }
+@keyframes b5CollectFlashIn {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* ── 新版行程卡式標題區 ──────────────────────────────────────── */
@@ -1588,7 +1599,11 @@
     gap: 4px;
     position: relative;
 }
-.b5-item-icon { font-size: 28px; line-height: 1; }
+.b5-item-icon {
+    font-size: 0; line-height: 0; /* 封住 alt 文字與任何雜散文字 */
+    display: flex; align-items: center; justify-content: center;
+}
+.b5-item-icon .b5-icon-emoji { font-size: 28px; line-height: 1; } /* emoji fallback */
 .b5-shopping-layout .b5-item-name {
     font-size: 12px;
     font-weight: bold;
@@ -2455,3 +2470,22 @@
     50%       { transform: translateX(-50%) translateY(-5px); }
 }
 #b5c-confirm-btn.b6-product-here-hint::after { top: -46px; }
+
+/* ── B5 商品圖示（PNG + emoji fallback）─────────────────────── */
+.b5-icon-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    vertical-align: middle;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+}
+.b5-icon-emoji { font-size: inherit; }
+
+/* 各情境圖示尺寸覆寫（參照 B6 .b6-icon-img 模式） */
+.b5-item-icon    .b5-icon-img { width: 128px; height: 128px; }
+.b5-tc-icon      .b5-icon-img { width: 32px; height: 32px; }
+.b5-ri-item-icon .b5-icon-img { width: 24px; height: 24px; filter: none; }
+.b5-hm-icon      .b5-icon-img { width: 22px; height: 22px; filter: none; }
+.b5-if-icon      .b5-icon-img { width: 256px; height: 256px; }
+.b5p2-fi-icon    .b5-icon-img { width: 28px; height: 28px; }
+.b5-it-icon      .b5-icon-img { width: 28px; height: 28px; filter: none; }

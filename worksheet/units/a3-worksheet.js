@@ -1,9 +1,14 @@
-// A3 麥當勞 作業單
+// A3 美式速食店 作業單
 WorksheetRegistry.register('a3', {
-    name: 'A3 麥當勞',
+    name: 'A3 美式速食店',
     icon: '🍔',
     defaultCount: 20,
-    subtitle() { return '點餐計算與找零'; },
+    subtitle(opts) {
+        if ((opts?.questionType || 'price-fill') === 'budget-plan') {
+            return '美式速食店預算規劃';
+        }
+        return '點餐計算與找零';
+    },
 
     toolbarConfig: {
         fontButton: null,
@@ -37,10 +42,12 @@ WorksheetRegistry.register('a3', {
                 { label: '圖示選擇(找零計算)', value: 'coin-select' },
                 { label: '提示選擇(找零計算)', value: 'hint-select' },
                 { label: '提示完成(找零計算)', value: 'hint-complete' },
+                { label: '預算規劃', value: 'budget-plan' },
             ],
             getCurrentValue: (params) => params.questionType || 'price-fill',
             onChange: (val, app) => { app.params.questionType = val; app.generate(); }
-        }]
+        },
+        ]
     },
 
     menu: {
@@ -147,6 +154,7 @@ WorksheetRegistry.register('a3', {
     generate(options) {
         const { count = 8 } = options;
         const questionType = options.questionType || 'price-fill';
+        const diff = options.difficulty || 'easy';
         const coinStyle = options.coinStyle || 'real';
         const showAnswers = options._showAnswers || false;
         const renderCoin = (value) => {
@@ -156,6 +164,92 @@ WorksheetRegistry.register('a3', {
             return coinImgFront(value);
         };
         const checkbox = '<span style="display:inline-block;width:16px;height:16px;border:1.5px solid #333;margin:0 4px;vertical-align:middle;"></span>';
+
+        // ── 預算規劃（每頁 1 題）─────────────────────────────────
+        if (questionType === 'budget-plan') {
+            const ic = { burgers: 5, sides: 5, drinks: 5, desserts: 5 };
+
+            const buildQuestion = () => {
+                const cats = [
+                    { label: '🍔 漢堡主餐', items: pickRandom(this.menu.burgers, ic.burgers) },
+                    { label: '🍟 附餐小食', items: pickRandom(this.menu.sides, ic.sides) },
+                    { label: '🥤 飲料', items: pickRandom(this.menu.drinks, ic.drinks) },
+                    { label: '🍰 甜點', items: pickRandom(this.menu.desserts, ic.desserts) },
+                ];
+                const allItems = cats.flatMap(c => c.items);
+                const allTotal = allItems.reduce((s, it) => s + it.price, 0);
+                const ratio = 0.5 + Math.random() * 0.15;
+                const rawBudget = Math.round(allTotal * ratio / 10) * 10;
+                const minPrice = Math.min(...allItems.map(it => it.price));
+                const budget = Math.max(rawBudget, minPrice + 10);
+
+                const exampleSel = [];
+                if (showAnswers) {
+                    let rem = budget;
+                    for (const cat of cats) {
+                        for (const item of cat.items) {
+                            if (item.price <= rem) { exampleSel.push(item); rem -= item.price; }
+                        }
+                    }
+                }
+                const exampleTotal = exampleSel.reduce((s, it) => s + it.price, 0);
+
+                const TH  = 'padding:4px 6px;border:1px solid #ccc;font-size:10.5pt;';
+                const TD  = 'padding:3px 6px;border:1px solid #ddd;font-size:10pt;vertical-align:top;';
+                const TDB = 'padding:3px 6px;border:1px solid #ddd;font-size:10pt;vertical-align:bottom;';
+                const ckBox  = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>`;
+                const ckDone = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid red;color:red;font-size:11px;line-height:14px;text-align:center;vertical-align:middle;margin-right:4px;border-radius:2px;">✓</span>`;
+                const nameBlank  = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:80px;height:1.2em;"></span>`;
+                const priceBlank = `<span style="display:inline-block;border-bottom:1px solid #333;min-width:50px;height:1.2em;"></span>`;
+
+                const rows = cats.map(cat => {
+                    const selItems = showAnswers ? exampleSel.filter(i => cat.items.some(ci => ci.name === i.name)) : [];
+                    const catSpend = selItems.reduce((s, i) => s + i.price, 0);
+                    const itemsHtml = cat.items.map(item => {
+                        const checked = showAnswers && exampleSel.some(s => s.name === item.name);
+                        const cb = checked ? ckDone : ckBox;
+                        return `<div style="margin-left:12px;">${cb}${item.name}（${item.price}元）</div>`;
+                    }).join('');
+                    const col2 = (showAnswers && selItems.length > 0) ? selItems.map(i => i.name).join('、') : nameBlank;
+                    const col3 = (showAnswers && selItems.length > 0) ? `<span style="color:red;font-weight:bold;">${catSpend}</span>` : priceBlank;
+                    return `<tr>
+                        <td style="${TD}font-weight:bold;color:#c0392b;">${cat.label}${itemsHtml}</td>
+                        <td style="${TDB}">${col2}</td>
+                        <td style="${TDB}text-align:right;">${col3}</td>
+                    </tr>`;
+                }).join('');
+
+                const spendFill = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${exampleTotal}</span>`
+                    : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+                const remFill = showAnswers
+                    ? `<span style="color:red;font-weight:bold;">${budget - exampleTotal}</span>`
+                    : `<span style="display:inline-block;border-bottom:1.5px solid #333;min-width:60px;height:1.2em;"></span>`;
+
+                const tableHtml = `<table style="width:100%;border-collapse:collapse;font-size:11pt;">
+                    <thead><tr style="background:#e8443a;color:white;">
+                        <th style="${TH}text-align:left;width:55%;">點餐項目</th>
+                        <th style="${TH}text-align:left;width:27%;">選購商品</th>
+                        <th style="${TH}text-align:right;width:18%;">金額</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div style="margin-top:10px;font-size:12pt;line-height:2.4;text-align:right;padding-right:7px;">
+                    預算 <strong>${budget}</strong> 元 &nbsp;－&nbsp; 花費 ${spendFill} 元 &nbsp;＝&nbsp; 剩餘 ${remFill} 元
+                </div>`;
+
+                return {
+                    _key: `a3_budget_${Math.random().toString(36).slice(2, 7)}`,
+                    prompt: `你有 <strong>${budget}</strong> 元要去美式速食店點餐，請在下方勾選想點的食物，並將商品名稱和價格填入右側欄位（注意不能超過預算！）：`,
+                    visual: tableHtml,
+                    answerArea: '',
+                    answerDisplay: ''
+                };
+            };
+
+            return [buildQuestion()];
+        }
+
         const questions = [];
         const allItems = [...this.menu.burgers, ...this.menu.sides, ...this.menu.drinks, ...this.menu.desserts];
 

@@ -5,7 +5,7 @@
 
 ---
 
-## 一、B5_ALL_ITEMS（生日派對主題商品，共 20 種）
+## 一、B5_ALL_ITEMS（生日派對主題商品，共 17 種）
 
 | id | 名稱 | 圖示 | 單價 | 類別 |
 |----|------|------|------|------|
@@ -25,10 +25,7 @@
 | tablecloth | 派對桌巾 | 🎪 | 75 | decor |
 | wand | 魔法棒 | 🪄 | 45 | decor |
 | gift | 小禮物 | 🎁 | 200 | activity |
-| photo | 拍立得相機 | 📸 | 150 | activity |  刪除
-| popper | 噴彩拉炮 | 🎆 | 55 | activity |  改為 彩帶拉炮
-| speaker | 藍牙喇叭 | 🔊 | 280 | activity | 刪除
-| game | 桌遊卡片 | 🃏 | 120 | activity | 刪除
+| popper | 彩帶拉炮 | 🎆 | 55 | activity |
 
 ---
 
@@ -38,7 +35,7 @@
 |---------|------|------|----------------------|
 | food | 食物飲料 | 🍱 | cake, drink, candy, plate, cup, napkin |
 | decor | 裝飾道具 | 🎊 | balloon, candle, ribbon, hat, banner, lights, sticker, tablecloth, wand |
-| activity | 遊戲活動 | 🎯 | gift, photo, popper, speaker, game |
+| activity | 遊戲活動 | 🎯 | gift, popper |
 
 ---
 
@@ -122,7 +119,7 @@
 | skull | 骷髏擺件 | 💀 | 70 | decor |
 | glow | 螢光棒 | 🌟 | 25 | activity |
 | ghost | 鬼臉面具 | 😱 | 90 | activity |
-| treat | 糖果包裝袋 | 🛍️ | 40 | food |
+| treat | 萬聖節糖果 | 🛍️ | 40 | food |
 | fangs | 吸血鬼牙齒 | 🦷 | 30 | activity |
 | hw_bat | 蝙蝠裝飾 | 🦇 | 40 | decor |
 | hw_mask | 恐怖面具 | 😈 | 65 | activity |
@@ -209,71 +206,69 @@
 
 ---
 
-## 十、商品圖示英文檔名（`images/b5/`，待製作）
+## 十、商品圖示英文檔名（`images/b5/`）
 
 > 路徑：`images/b5/`；格式建議 PNG 透明背景，尺寸 128×128；Emoji 作為備用
+> ⚠️ 缺少圖檔（需補製）：`icon-b5-juice-drink.png`、`icon-b5-candy-bag.png`、`icon-b5-party-napkin.png`、`icon-b5-hw-spider-web.png`、`icon-b5-hw-glow-stick.png`
 
 ### 生日派對（birthday）
 
-| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
-|----|---------|-------------|-----------|
-| cake | 生日蛋糕 | icon-b5-birthday-cake.png | 🎂 |
-| drink | 果汁飲料 | icon-b5-juice-drink.png | 🧃 |
-| balloon | 彩色氣球 | icon-b5-balloon.png | 🎈 |
-| gift | 小禮物 | icon-b5-gift.png | 🎁 |
-| plate | 派對紙盤 | icon-b5-party-plate.png | 🍽️ |
-| candle | 生日蠟燭 | icon-b5-birthday-candle.png | 🕯️ |
-| ribbon | 彩帶裝飾 | icon-b5-ribbon.png | 🎊 |
-| hat | 派對帽 | icon-b5-party-hat.png | 🎉 |
-| candy | 糖果禮包 | icon-b5-candy-bag.png | 🍬 |
-| photo | 拍立得底片 | icon-b5-instant-film.png | 📸 |
-| popper | 噴彩拉炮 | icon-b5-party-popper.png | 🎆 |
-| banner | 生日橫幅 | icon-b5-birthday-banner.png | 🏷️ |
-| cup | 派對杯組 | icon-b5-party-cup.png | 🥤 |
-| napkin | 主題餐巾紙 | icon-b5-party-napkin.png | 🧻 |
-| speaker | 藍牙喇叭 | icon-b5-bluetooth-speaker.png | 🔊 |
-| game | 桌遊卡片 | icon-b5-board-game-card.png | 🃏 |
-| lights | 彩色串燈 | icon-b5-string-lights.png | 💡 |
-| sticker | 主題貼紙 | icon-b5-theme-sticker.png | 🌟 |
-| tablecloth | 派對桌巾 | icon-b5-party-tablecloth.png | 🎪 |
-| wand | 魔法棒 | icon-b5-magic-wand.png | 🪄 |
+| id | 中文名稱 | 英文檔名 | Emoji 備用 | 狀態 |
+|----|---------|---------|-----------|------|
+| cake | 生日蛋糕 | icon-b5-birthday-cake.png | 🎂 | ✅ |
+| drink | 果汁飲料 | icon-b5-juice-drink.png | 🧃 | ⚠️ 缺少 |
+| balloon | 彩色氣球 | icon-b5-balloon.png | 🎈 | ✅ |
+| gift | 小禮物 | icon-b5-gift.png | 🎁 | ✅ |
+| plate | 派對紙盤 | icon-b5-party-plate.png | 🍽️ | ✅ |
+| candle | 生日蠟燭 | icon-b5-birthday-candle.png | 🕯️ | ✅ |
+| ribbon | 彩帶裝飾 | icon-b5-ribbon.png | 🎊 | ✅ |
+| hat | 派對帽 | icon-b5-party-hat.png | 🎉 | ✅ |
+| candy | 糖果禮包 | icon-b5-candy-bag.png | 🍬 | ⚠️ 缺少 |
+| popper | 彩帶拉炮 | icon-b5-party-popper.png | 🎆 | ✅ |
+| banner | 生日橫幅 | icon-b5-birthday-banner.png | 🏷️ | ✅ |
+| cup | 派對杯組 | icon-b5-party-cup.png | 🥤 | ✅ |
+| napkin | 主題餐巾紙 | icon-b5-party-napkin.png | 🧻 | ⚠️ 缺少 |
+| lights | 彩色串燈 | icon-b5-string-lights.png | 💡 | ✅ |
+| sticker | 主題貼紙 | icon-b5-theme-sticker.png | 🌟 | ✅ |
+| tablecloth | 派對桌巾 | icon-b5-party-tablecloth.png | 🎪 | ✅ |
+| wand | 魔法棒 | icon-b5-magic-wand.png | 🪄 | ✅ |
 
 ### 萬聖節派對（halloween）
 
-| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
-|----|---------|-------------|-----------|
-| pumpkin | 南瓜燈 | icon-b5-hw-pumpkin.png | 🎃 |
-| costume | 萬聖節服裝 | icon-b5-hw-costume.png | 👻 |
-| candy_bag | 糖果袋 | icon-b5-hw-candy-bag.png | 🍬 |
-| witch_hat | 巫師帽 | icon-b5-hw-witch-hat.png | 🧙 |
-| spider | 蜘蛛網裝飾 | icon-b5-hw-spider-web.png | 🕸️ |
-| skull | 骷髏擺件 | icon-b5-hw-skull.png | 💀 |
-| glow | 螢光棒 | icon-b5-hw-glow-stick.png | 🌟 |
-| ghost | 鬼臉面具 | icon-b5-hw-ghost-mask.png | 😱 |
-| treat | 糖果包裝袋 | icon-b5-hw-treat-bag.png | 🛍️ |
-| fangs | 吸血鬼牙齒 | icon-b5-hw-vampire-fangs.png | 🦷 |
-| hw_bat | 蝙蝠裝飾 | icon-b5-hw-bat.png | 🦇 |
-| hw_mask | 恐怖面具 | icon-b5-hw-horror-mask.png | 😈 |
-| hw_chocolate | 萬聖節巧克力 | icon-b5-hw-chocolate.png | 🍫 |
-| hw_cookie | 鬼臉餅乾 | icon-b5-hw-ghost-cookie.png | 🍪 |
-| hw_popcorn | 鬼怪爆米花 | icon-b5-hw-ghost-popcorn.png | 🍿 |
+| id | 中文名稱 | 英文檔名 | Emoji 備用 | 狀態 |
+|----|---------|---------|-----------|------|
+| pumpkin | 南瓜燈 | icon-b5-hw-pumpkin.png | 🎃 | ✅ |
+| costume | 萬聖節服裝 | icon-b5-hw-costume.png | 👻 | ✅ |
+| candy_bag | 糖果袋 | icon-b5-hw-candy-bag.png | 🍬 | ✅ |
+| witch_hat | 巫師帽 | icon-b5-hw-witch-hat.png | 🧙 | ✅ |
+| spider | 蜘蛛網裝飾 | icon-b5-hw-spider-web.png | 🕸️ | ⚠️ 缺少 |
+| skull | 骷髏擺件 | icon-b5-hw-skull.png | 💀 | ✅ |
+| glow | 螢光棒 | icon-b5-hw-glow-stick.png | 🌟 | ⚠️ 缺少 |
+| ghost | 鬼臉面具 | icon-b5-hw-ghost-mask.png | 😱 | ✅ |
+| treat | 萬聖節糖果 | icon-b5-hw-treat-bag.png | 🛍️ | ✅ |
+| fangs | 吸血鬼牙齒 | icon-b5-hw-vampire-fangs.png | 🦷 | ✅ |
+| hw_bat | 蝙蝠裝飾 | icon-b5-hw-bat.png | 🦇 | ✅ |
+| hw_mask | 恐怖面具 | icon-b5-hw-horror-mask.png | 😈 | ✅ |
+| hw_chocolate | 萬聖節巧克力 | icon-b5-hw-chocolate.png | 🍫 | ✅ |
+| hw_cookie | 鬼臉餅乾 | icon-b5-hw-ghost-cookie.png | 🍪 | ✅ |
+| hw_popcorn | 鬼怪爆米花 | icon-b5-hw-ghost-popcorn.png | 🍿 | ✅ |
 
 ### 春日野餐（picnic）
 
-| id | 中文名稱 | 建議英文檔名 | Emoji 備用 |
-|----|---------|-------------|-----------|
-| sandwich | 三明治 | icon-b5-pc-sandwich.png | 🥪 |
-| blanket | 野餐墊 | icon-b5-pc-picnic-blanket.png | 🧺 |
-| fruit | 水果盒 | icon-b5-pc-fruit-box.png | 🍓 |
-| juice | 果汁飲料 | icon-b5-pc-juice.png | 🧃 |
-| cookies | 餅乾點心 | icon-b5-pc-cookies.png | 🍪 |
-| sunhat | 遮陽帽 | icon-b5-pc-sun-hat.png | 👒 |
-| frisbee | 飛盤 | icon-b5-pc-frisbee.png | 🥏 |
-| bubble | 泡泡水 | icon-b5-pc-bubble-wand.png | 🫧 |
-| balloon | 彩色汽球 | icon-b5-pc-balloon.png | 🎈 |
-| kite | 風箏 | icon-b5-pc-kite.png | 🪁 |
-| pc_onigiri | 飯糰 | icon-b5-pc-onigiri.png | 🍙 |
-| pc_flowers | 野花束 | icon-b5-pc-wildflowers.png | 🌺 |
-| pc_umbrella | 遮陽傘 | icon-b5-pc-beach-umbrella.png | ⛱️ |
-| pc_badminton | 羽毛球組 | icon-b5-pc-badminton.png | 🏸 |
-| pc_rope | 跳繩 | icon-b5-pc-jump-rope.png | 🪢 |
+| id | 中文名稱 | 英文檔名 | Emoji 備用 | 狀態 |
+|----|---------|---------|-----------|------|
+| sandwich | 三明治 | icon-b5-pc-sandwich.png | 🥪 | ✅ |
+| blanket | 野餐墊 | icon-b5-pc-picnic-blanket.png | 🧺 | ✅ |
+| fruit | 水果盒 | icon-b5-pc-fruit-box.png | 🍓 | ✅ |
+| juice | 果汁飲料 | icon-b5-pc-juice.png | 🧃 | ✅ |
+| cookies | 餅乾點心 | icon-b5-pc-cookies.png | 🍪 | ✅ |
+| sunhat | 遮陽帽 | icon-b5-pc-sun-hat.png | 👒 | ✅ |
+| frisbee | 飛盤 | icon-b5-pc-frisbee.png | 🥏 | ✅ |
+| bubble | 泡泡水 | icon-b5-pc-bubble-wand.png | 🫧 | ✅ |
+| balloon | 彩色汽球 | icon-b5-pc-balloon.png | 🎈 | ✅ |
+| kite | 風箏 | icon-b5-pc-kite.png | 🪁 | ✅ |
+| pc_onigiri | 飯糰 | icon-b5-pc-onigiri.png | 🍙 | ✅ |
+| pc_flowers | 野花束 | icon-b5-pc-wildflowers.png | 🌺 | ✅ |
+| pc_umbrella | 遮陽傘 | icon-b5-pc-beach-umbrella.png | ⛱️ | ✅ |
+| pc_badminton | 羽毛球組 | icon-b5-pc-badminton.png | 🏸 | ✅ |
+| pc_rope | 跳繩 | icon-b5-pc-jump-rope.png | 🪢 | ✅ |
