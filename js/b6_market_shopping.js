@@ -1269,15 +1269,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 h.stall === g.activeStall &&
                 !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
             );
-            // 簡單模式：每次只高亮一個；普通模式：全部高亮
-            const toHighlight = diff === 'easy' ? unselected.slice(0, 1) : unselected;
+            // 簡單/普通模式：每次只高亮一個；困難模式：不高亮
+            const toHighlight = diff !== 'hard' ? unselected.slice(0, 1) : unselected;
             toHighlight.forEach(h => {
                 const btn = document.querySelector(`.b6-product-btn[data-item-id="${h.id}"]`);
                 if (btn) btn.classList.add('b6-product-here-hint');
             });
 
-            // 簡單模式：當前攤位的提示商品都選完，但其他攤位還有未選的提示商品 → 高亮導航按鈕
-            if (diff === 'easy' && toHighlight.length === 0) {
+            // 簡單/普通模式：當前攤位的提示商品都選完，但其他攤位還有未選的提示商品 → 高亮導航按鈕
+            if (diff !== 'hard' && toHighlight.length === 0) {
                 const remainingInOtherStalls = hintItems.filter(h =>
                     !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
                 );
@@ -1733,9 +1733,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const stallInfo = _currentStalls[newKey];
                 const remaining = destReq ? (destReq.count - destSelCount) : 0;
                 const remStr = remaining === 2 ? '兩' : String(remaining);
-                Game.Speech.speak(remaining > 0
-                    ? `${stallInfo.name}，還要買${remStr}樣`
-                    : `今天${stallInfo.name}不用買`);
+                let stallSpeech;
+                if (remaining > 0) {
+                    stallSpeech = `${stallInfo.name}，還要買${remStr}樣`;
+                } else if (destReq) {
+                    stallSpeech = `${stallInfo.name}的物品已經採購完成`;
+                } else {
+                    stallSpeech = `今天${stallInfo.name}不用買`;
+                }
+                Game.Speech.speak(stallSpeech);
                 // 只替換商品面板，不重建整頁
                 _refreshStallPanel();
             };
@@ -1934,6 +1940,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             this._showAllCollectedFlash();
                             if (this.state.settings.difficulty === 'easy') {
                                 document.getElementById('b6-checkout-btn')?.classList.add('b6-product-here-hint');
+                            }
+                        });
+                    } else if (g.p1HintMode && diff === 'normal') {
+                        // 普通提示模式：語音後自動切換到下一個提示商品的攤位
+                        const nextHint = (g.p1HintItems || []).find(h =>
+                            !(g.selectedItems || []).some(si => si.stall === h.stall && si.id === h.id)
+                        );
+                        const nextStall = nextHint?.stall;
+                        doUIUpdate();
+                        Game.Speech.speak(`${itemName}，${price}元`, () => {
+                            if (nextStall && nextStall !== g.activeStall && this._b6RefreshPanel) {
+                                g.activeStall = nextStall;
+                                this._b6RefreshPanel();
                             }
                         });
                     } else {
@@ -2903,11 +2922,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this._showCenterFeedback('✅', '付款成功！');
             g.paidAmount = wTotal;
             if (change === 0) {
-                // 剛好付清：直接進入結果
+                // 剛好付清：語音播完後直接進入結果（suppressSpeech=true 避免結果頁重複播音）
                 Game.Speech.speak(`剛好${toTWD(wTotal)}，買菜成功！`, () => {
                     Game.TimerManager.setTimeout(() => {
                         this.state.isProcessing = false;
-                        this._showChangeResult(wTotal, 0);
+                        this._showChangeResult(wTotal, 0, true);
                     }, 400, 'turnTransition');
                 });
             } else {
@@ -3050,11 +3069,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b6c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b6c-wallet-info"><span id="b6c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b6c-placed-total">0</span>/${change} 元）</span>
                         </div>
                         <div style="flex:1;display:flex;justify-content:flex-end;">
-                            <button class="b6c-wallet-toggle-btn" id="b6c-wallet-toggle">▶ 展開</button>
+                            <button class="b6c-wallet-toggle-btn" id="b6c-wallet-toggle">▼ 收合</button>
                         </div>
                     </div>
                     <div class="b6c-wallet-split">
-                        <div class="b6c-wallet-split-left" id="b6c-wallet-left" style="display:none;">
+                        <div class="b6c-wallet-split-left" id="b6c-wallet-left" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                             ${walletStaticHtml || '<span class="b6p2-wallet-empty" style="font-size:12px;">（餘額為0）</span>'}
                         </div>
                         <div class="b6c-wallet-split-right b6p2-drop-zone b6c-drop-zone" id="b6c-wallet-zone">
@@ -3088,8 +3107,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletToggleBtn && walletLeftPanel) {
                 Game.EventManager.on(walletToggleBtn, 'click', () => {
                     const isOpen = walletLeftPanel.style.display !== 'none';
-                    walletLeftPanel.style.display = isOpen ? 'none' : 'block';
-                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▲ 收起';
+                    walletLeftPanel.style.display = isOpen ? 'none' : 'flex';
+                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▼ 收合';
                 }, {}, 'gameUI');
             }
 
@@ -3849,7 +3868,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2800, 'ui');
         },
 
-        _showChangeResult(paid, change) {
+        _showChangeResult(paid, change, skipSpeech = false) {
             const g = this.state.game;
 
             // 儲存本關收據（A3/A4 交易摘要模式）
@@ -3861,8 +3880,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean);
             g.receipts.push({ items, total, paid, change });
 
-            // 易/普通模式結果語音（困難模式語音已在 _showChangeQuiz 播出）
-            if (this.state.settings.difficulty !== 'hard') {
+            // 易/普通模式結果語音（困難模式語音已在 _showChangeQuiz 播出；skipSpeech=true 時跳過以免重複）
+            if (this.state.settings.difficulty !== 'hard' && !skipSpeech) {
                 Game.Speech.speak(change === 0
                     ? `剛好${toTWD(paid)}，買菜成功！`
                     : `付了${toTWD(paid)}，找回${toTWD(change)}，買菜成功！`);

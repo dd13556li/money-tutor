@@ -33,7 +33,7 @@ const B5_ALL_ITEMS = [
     { id: 'wand',         name: '魔法棒',     price: 45,  priceRange:[30,65],   icon: '🪄', imageUrl: '../images/b5/icon-b5-magic-wand.png' },
     { id: 'dice',         name: '遊戲骰子',   price: 85,  priceRange:[60,120],  icon: '🎲', imageUrl: '../images/b5/icon-b5-game-dice.png' },
     { id: 'funglasses',   name: '造型眼鏡',   price: 40,  priceRange:[25,55],   icon: '🕶️', imageUrl: '../images/b5/icon-b5-fun-glasses.png' },
-    { id: 'bdcake',       name: '生日蛋糕',   price: 350, priceRange:[280,420], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
+    { id: 'bdcake',       name: '派對吹捲',   price: 40,  priceRange:[25,55],   icon: '🎉', imageUrl: '../images/b5/icon-b5-bd-party-blower.png' },
     { id: 'squishy',      name: '造型捏捏樂', price: 60,  priceRange:[40,80],   icon: '🎊', imageUrl: '../images/b5/icon-b5-squishy-toy.png' },
     { id: 'bubbleguns',   name: '泡泡槍',     price: 75,  priceRange:[50,100],  icon: '🫧', imageUrl: '../images/b5/icon-b5-bd-bubble-gun.png' },
     { id: 'playingcards', name: '撲克牌',     price: 90,  priceRange:[65,120],  icon: '🃏', imageUrl: '../images/b5/icon-b5-playing-cards.png' },
@@ -231,8 +231,8 @@ const B5_THEMES = {
             { id:'pc_basket',      name:'野餐籃',           price:180, priceRange:[140,240], icon:'🧺', imageUrl:'../images/b5/icon-b5-pc-basket.png' },
             { id:'pc_tablecloth',  name:'野餐桌巾',         price:90,  priceRange:[65,120],  icon:'🎪', imageUrl:'../images/b5/icon-b5-pc-tablecloth.png' },
             { id:'pc_bell',        name:'風鈴',             price:75,  priceRange:[50,100],  icon:'🔔', imageUrl:'../images/b5/icon-b5-pc-bell.png' },
-            { id:'pc_straw_hat',   name:'草帽',             price:120, priceRange:[85,160],  icon:'👒', imageUrl:'../images/b5/icon-b5-pc-straw-hat.png' },
-            { id:'pc_sticker',     name:'貼紙套組',         price:40,  priceRange:[25,55],   icon:'🌺', imageUrl:'../images/b5/icon-b5-pc-sticker.png' },
+            { id:'pc_straw_hat',   name:'保冷袋',           price:120, priceRange:[85,160],  icon:'🧊', imageUrl:'../images/b5/icon-b5-pc-cooler-bag.png' },
+            { id:'pc_sticker',     name:'風格掛布',         price:80,  priceRange:[60,110],  icon:'🪆', imageUrl:'../images/b5/icon-b5-pc-style-banner.png' },
             { id:'pc_wreath',      name:'花環',             price:85,  priceRange:[60,115],  icon:'💐', imageUrl:'../images/b5/icon-b5-pc-wreath.png' },
             // ── 遊戲活動（10種）──
             { id:'pc_dice',        name:'遊戲骰子',         price:85,  priceRange:[60,120],  icon:'🎲', imageUrl:'../images/b5/icon-b5-pc-game-dice.png' },
@@ -759,8 +759,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const g   = this.state.game;
             const s   = this.state.settings;
 
-            // 取得第一關資料（新模型）
-            const round0    = g.rounds[0];
+            // 取得當前關卡資料（currentRound 已在關卡結束時遞增）
+            const round0    = g.rounds[g.currentRound];
             const themeData = B5_THEMES[round0.themeKey] || B5_THEMES.birthday;
             const items     = round0.targetItems; // 本關指定採購商品
 
@@ -970,17 +970,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="b5-ri-inner">
                     <div class="b5-ri-list-title">🛒 今天要買的商品</div>
                     <div class="b5-ri-list">${listHTML}</div>
-                    <div class="b5-ri-hint">${diff === 'hard' ? '記住採購清單再關閉' : '點「關閉」開始採購'}</div>
+                    ${diff === 'hard' ? '<div class="b5-ri-hint">記住採購清單再關閉</div>' : ''}
                     <button class="b5-ri-cancel-btn" id="b5-ri-cancel">✕ 關閉</button>
                 </div>`;
             document.body.appendChild(card);
 
-            const nameList = targets.map(i => i.name).join('、');
-            const speechMap = {
-                easy:   `今天要買的商品`,
-                normal: `今天要買的商品`,
-                hard:   `今天要買的商品`,
-            };
             let closed = false;
             const dismiss = () => {
                 if (closed) return;
@@ -994,8 +988,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 300, 'turnTransition');
                 }
             };
-            // 播放採購清單語音（播完後不自動關閉）
-            Game.Speech.speak(speechMap[diff]);
+            // 播放採購清單語音：整句一次朗讀，避免逐項分段造成停頓
+            const itemsSpeech = targets.map(i => `${i.name}${toTWD(i.price)}`).join('，');
+            Game.Speech.speak(`今天要買的商品，${itemsSpeech}`);
             // 取消按鈕
             document.getElementById('b5-ri-cancel')?.addEventListener('click', dismiss, { once: true });
             // 困難模式：10秒後自動關閉讓玩家記住；其他模式不自動關閉（由玩家手動關）
@@ -1521,6 +1516,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                     AssistClick.buildQueue();
                                 });
                             });
+                        } else if (diff === 'normal' && g.p1HintMode) {
+                            // 普通提示模式：語音後自動切換到下一個提示商品的類別
+                            const nextHintId = (g.p1HintItems || []).find(hid => !g.selectedIds.has(hid));
+                            const nextCat = nextHintId ? B5_ITEM_CATEGORIES[nextHintId] : null;
+                            if (nextCat && nextCat !== g.activeCategory) {
+                                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                                    this._switchB5Category(nextCat);
+                                });
+                            } else {
+                                Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
+                            }
                         } else {
                             Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
                         }
@@ -1560,6 +1566,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmBtn) {
                 Game.EventManager.on(confirmBtn, 'click', () => {
                     if (g.submitted) return;
+                    // 所有目標商品已選完：切斷語音、解除 isProcessing，直接進行結帳
+                    if (g.selectedIds.size === g.targetIds.size && g.selectedIds.size > 0) {
+                        window.speechSynthesis.cancel();
+                        this.state.isProcessing = false;
+                    }
                     this._handleConfirm();
                 }, {}, 'gameUI');
             }
@@ -1699,8 +1710,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'normal') {
                 Game.Speech.speak('請依提示，採購指定的物品');
             }
-            // 簡單/普通模式：重置並啟動引導提示
-            g.selectedIds = new Set();
+            // 保留已正確採購的商品，只對尚未採購的商品給予引導
             this._switchB5Category(g.activeCategory);
             this._b5P1ActivateHintMode();
         },
@@ -1718,7 +1728,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diff === 'hard') return;
             const hintIds = g.p1HintItems || [];
             const unselected = hintIds.filter(id => !g.selectedIds.has(id));
-            const toHighlight = diff === 'easy' ? unselected.slice(0, 1) : unselected;
+            const toHighlight = diff !== 'hard' ? unselected.slice(0, 1) : unselected;
             toHighlight.forEach(id => {
                 const card = document.querySelector(`.b5-item-card[data-id="${id}"]`);
                 if (card) card.classList.add('b5-hint-here');
@@ -1856,7 +1866,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 (g.customItems || []).filter(c => !c._deleted).forEach(c => roundItemObjects.push({ icon: '📦', name: c.name, price: c.price || 0 }));
                 const roundTotal = roundItemObjects.reduce((s, i) => s + i.price, 0);
                 if (!g.roundItemsList) g.roundItemsList = [];
-                g.roundItemsList.push({ roundNum: g.currentRound + 1, items: roundItemObjects, total: roundTotal });
+                g.roundItemsList.push({ roundNum: g.currentRound + 1, items: roundItemObjects, total: roundTotal, themeKey: (g.rounds[g.currentRound] || {}).themeKey || 'birthday' });
                 g.items.filter(i => g.selectedIds.has(i.id)).forEach(i => {
                     if (!g.successfulRoundItems.includes(`${i.icon} ${i.name}`))
                         g.successfulRoundItems.push(`${i.icon} ${i.name}`);
@@ -2616,11 +2626,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b5c-wallet-info${diff === 'hard' ? ' b6c-hidden' : ''}" id="b5c-wallet-info"><span id="b5c-wallet-balance">${walletRemaining}</span>元（已找回<span id="b5c-placed-total">0</span>/${change} 元）</span>
                         </div>
                         <div style="flex:1;display:flex;justify-content:flex-end;">
-                            <button class="b5c-wallet-toggle-btn" id="b5c-wallet-toggle">▶ 展開</button>
+                            <button class="b5c-wallet-toggle-btn" id="b5c-wallet-toggle">▼ 收合</button>
                         </div>
                     </div>
                     <div class="b5c-wallet-split">
-                        <div class="b5c-wallet-split-left" id="b5c-wallet-left" style="display:none;">
+                        <div class="b5c-wallet-split-left" id="b5c-wallet-left" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                             ${walletStaticHtml || '<span class="b5p2-wallet-empty" style="font-size:12px;">（餘額為0）</span>'}
                         </div>
                         <div class="b5c-wallet-split-right b5p2-drop-zone b5c-drop-zone" id="b5c-wallet-zone">
@@ -2658,8 +2668,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletToggleBtn && walletLeftPanel) {
                 Game.EventManager.on(walletToggleBtn, 'click', () => {
                     const isOpen = walletLeftPanel.style.display !== 'none';
-                    walletLeftPanel.style.display = isOpen ? 'none' : 'block';
-                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▲ 收起';
+                    walletLeftPanel.style.display = isOpen ? 'none' : 'flex';
+                    walletToggleBtn.textContent = isOpen ? '▶ 展開' : '▼ 收合';
                 }, {}, 'gameUI');
             }
 
@@ -3294,11 +3304,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalRoundsCount = roundItemsList.length;
             let b5RicIdx = 0;
 
+            const _b5RicImgMap = { birthday: '001', halloween: '002', picnic: '003' };
             const _perRoundHTML = (idx) => {
                 if (!totalRoundsCount) return '';
                 const entry = roundItemsList[Math.min(idx, totalRoundsCount - 1)];
                 const stats = (g.roundStats || [])[idx];
                 const hasMultiple = totalRoundsCount > 1;
+
+                const roundThemeKey = entry.themeKey || 'birthday';
+                const themeImgSrc = `../images/b5/${_b5RicImgMap[roundThemeKey] || '001'}.png`;
+                const themeImgHTML = `<img src="${themeImgSrc}" alt="${roundThemeKey}"
+                    style="width:100%;height:120px;object-fit:cover;border-radius:12px 12px 0 0;display:block;"
+                    onerror="this.style.display='none'">`;
 
                 const navHTML = `<div class="b5-ric-nav">
                     ${hasMultiple ? `<button class="b5-ric-nav-btn" id="b5-ric-prev" ${idx === 0 ? 'disabled' : ''}>◀</button>` : '<span></span>'}
@@ -3331,7 +3348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5-prs-item"><span class="b5-prs-label">剩餘金額</span><span class="b5-prs-val ${stats.budget - stats.spent >= 0 ? 'b5-prs-saved' : 'b5-prs-over'}">${stats.budget - stats.spent}元</span></div>
                 </div>` : '';
 
-                return navHTML + tableHTML + statsHTML;
+                return themeImgHTML + navHTML + tableHTML + statsHTML;
             };
 
             const _updateSummaryBtn = () => {
