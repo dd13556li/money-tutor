@@ -5,47 +5,73 @@
 
 // ── 所有可選商品 ─────────────────────────────────────────────
 const B5_ALL_ITEMS = [
-    { id: 'cake',       name: '生日蛋糕',   price: 380, priceRange:[350,500], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
-    { id: 'drink',      name: '果汁飲料',   price: 120, priceRange:[80,150],  icon: '🧃', imageUrl: '../images/b5/icon-b5-juice-drink.png' },
-    { id: 'balloon',    name: '彩色氣球',   price: 50,  priceRange:[30,65],   icon: '🎈', imageUrl: '../images/b5/icon-b5-balloon.png' },
-    { id: 'gift',       name: '小禮物',     price: 200, priceRange:[150,300], icon: '🎁', imageUrl: '../images/b5/icon-b5-gift.png' },
-    { id: 'plate',      name: '派對紙盤',   price: 45,  priceRange:[30,60],   icon: '🍽️', imageUrl: '../images/b5/icon-b5-party-plate.png' },
-    { id: 'candle',     name: '生日蠟燭',   price: 30,  priceRange:[20,45],   icon: '🕯️', imageUrl: '../images/b5/icon-b5-birthday-candle.png' },
-    { id: 'ribbon',     name: '彩帶裝飾',   price: 65,  priceRange:[45,85],   icon: '🎊', imageUrl: '../images/b5/icon-b5-ribbon.png' },
-    { id: 'hat',        name: '派對帽',     price: 80,  priceRange:[50,100],  icon: '🎉', imageUrl: '../images/b5/icon-b5-party-hat.png' },
-    { id: 'candy',      name: '糖果禮包',   price: 90,  priceRange:[65,120],  icon: '🍬', imageUrl: '../images/b5/icon-b5-candy-bag.png' },
-    { id: 'photo',      name: '拍立得底片', price: 280, priceRange:[250,380], icon: '📸' },
-    { id: 'popper',     name: '彩帶拉炮',   price: 55,  priceRange:[35,75],   icon: '🎆', imageUrl: '../images/b5/icon-b5-party-popper.png' },
-    { id: 'banner',     name: '生日橫幅',   price: 70,  priceRange:[50,95],   icon: '🏷️', imageUrl: '../images/b5/icon-b5-birthday-banner.png' },
-    { id: 'cup',        name: '派對杯組',   price: 55,  priceRange:[40,80],   icon: '🥤', imageUrl: '../images/b5/icon-b5-party-cup.png' },
-    { id: 'napkin',     name: '主題餐巾紙', price: 35,  priceRange:[25,50],   icon: '🧻', imageUrl: '../images/b5/icon-b5-party-napkin.png' },
-    { id: 'speaker',    name: '藍牙喇叭',   price: 380, priceRange:[350,550], icon: '🔊' },
-    { id: 'game',       name: '桌遊卡片',   price: 120, priceRange:[100,160], icon: '🃏' },
-    { id: 'lights',     name: '彩色串燈',   price: 90,  priceRange:[75,130],  icon: '💡', imageUrl: '../images/b5/icon-b5-string-lights.png' },
-    { id: 'sticker',    name: '主題貼紙',   price: 40,  priceRange:[25,55],   icon: '🌟', imageUrl: '../images/b5/icon-b5-theme-sticker.png' },
-    { id: 'tablecloth', name: '派對桌巾',   price: 75,  priceRange:[50,95],   icon: '🎪', imageUrl: '../images/b5/icon-b5-party-tablecloth.png' },
-    { id: 'wand',       name: '魔法棒',     price: 45,  priceRange:[30,65],   icon: '🪄', imageUrl: '../images/b5/icon-b5-magic-wand.png' },
+    // ── 食物飲料（10種）──
+    { id: 'cake',        name: '生日蛋糕',   price: 380, priceRange:[350,500], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
+    { id: 'drink',       name: '果汁飲料',   price: 120, priceRange:[80,150],  icon: '🧃', imageUrl: '../images/b5/icon-b5-juice-drink.png' },
+    { id: 'candy',       name: '糖果禮包',   price: 90,  priceRange:[65,120],  icon: '🍬', imageUrl: '../images/b5/icon-b5-candy-bag.png' },
+    { id: 'plate',       name: '派對紙盤',   price: 45,  priceRange:[30,60],   icon: '🍽️', imageUrl: '../images/b5/icon-b5-party-plate.png' },
+    { id: 'cup',         name: '派對杯組',   price: 55,  priceRange:[40,80],   icon: '🥤', imageUrl: '../images/b5/icon-b5-party-cup.png' },
+    { id: 'napkin',      name: '主題餐巾紙', price: 35,  priceRange:[25,50],   icon: '🧻', imageUrl: '../images/b5/icon-b5-party-napkin.png' },
+    { id: 'bd_cookie',   name: '造型餅乾',   price: 55,  priceRange:[35,75],   icon: '🍪', imageUrl: '../images/b5/icon-b5-bd-cookie.png' },
+    { id: 'bd_choco',    name: '巧克力',     price: 65,  priceRange:[45,90],   icon: '🍫', imageUrl: '../images/b5/icon-b5-bd-chocolate.png' },
+    { id: 'bd_lollipop', name: '棒棒糖',     price: 35,  priceRange:[20,50],   icon: '🍭', imageUrl: '../images/b5/icon-b5-bd-lollipop.png' },
+    { id: 'bd_fruit',    name: '水果拼盤',   price: 130, priceRange:[90,170],  icon: '🍓', imageUrl: '../images/b5/icon-b5-bd-fruit-plate.png' },
+    // ── 裝飾道具（10種）──
+    { id: 'balloon',     name: '彩色氣球',   price: 50,  priceRange:[30,65],   icon: '🎈', imageUrl: '../images/b5/icon-b5-balloon.png' },
+    { id: 'candle',      name: '生日蠟燭',   price: 30,  priceRange:[20,45],   icon: '🕯️', imageUrl: '../images/b5/icon-b5-birthday-candle.png' },
+    { id: 'ribbon',      name: '彩帶裝飾',   price: 65,  priceRange:[45,85],   icon: '🎊', imageUrl: '../images/b5/icon-b5-ribbon.png' },
+    { id: 'hat',         name: '派對帽',     price: 80,  priceRange:[50,100],  icon: '🎉', imageUrl: '../images/b5/icon-b5-party-hat.png' },
+    { id: 'banner',      name: '生日橫幅',   price: 70,  priceRange:[50,95],   icon: '🏷️', imageUrl: '../images/b5/icon-b5-birthday-banner.png' },
+    { id: 'lights',      name: '彩色串燈',   price: 90,  priceRange:[75,130],  icon: '💡', imageUrl: '../images/b5/icon-b5-string-lights.png' },
+    { id: 'sticker',     name: '主題貼紙',   price: 40,  priceRange:[25,55],   icon: '🌟', imageUrl: '../images/b5/icon-b5-theme-sticker.png' },
+    { id: 'tablecloth',  name: '派對桌巾',   price: 75,  priceRange:[50,95],   icon: '🎪', imageUrl: '../images/b5/icon-b5-party-tablecloth.png' },
+    { id: 'bd_flag',     name: '派對旗子',   price: 55,  priceRange:[35,75],   icon: '🎏', imageUrl: '../images/b5/icon-b5-bd-party-flag.png' },
+    { id: 'bd_confetti', name: '彩色紙花',   price: 30,  priceRange:[20,45],   icon: '🎉', imageUrl: '../images/b5/icon-b5-bd-confetti.png' },
+    // ── 遊戲活動（10種）──
+    { id: 'popper',       name: '彩帶拉炮',   price: 55,  priceRange:[35,75],   icon: '🎆', imageUrl: '../images/b5/icon-b5-party-popper.png' },
+    { id: 'gift',         name: '小禮物',     price: 200, priceRange:[150,300], icon: '🎁', imageUrl: '../images/b5/icon-b5-gift.png' },
+    { id: 'wand',         name: '魔法棒',     price: 45,  priceRange:[30,65],   icon: '🪄', imageUrl: '../images/b5/icon-b5-magic-wand.png' },
+    { id: 'dice',         name: '遊戲骰子',   price: 85,  priceRange:[60,120],  icon: '🎲', imageUrl: '../images/b5/icon-b5-game-dice.png' },
+    { id: 'funglasses',   name: '造型眼鏡',   price: 40,  priceRange:[25,55],   icon: '🕶️', imageUrl: '../images/b5/icon-b5-fun-glasses.png' },
+    { id: 'bdcake',       name: '生日蛋糕',   price: 350, priceRange:[280,420], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
+    { id: 'squishy',      name: '造型捏捏樂', price: 60,  priceRange:[40,80],   icon: '🎊', imageUrl: '../images/b5/icon-b5-squishy-toy.png' },
+    { id: 'bubbleguns',   name: '泡泡槍',     price: 75,  priceRange:[50,100],  icon: '🫧', imageUrl: '../images/b5/icon-b5-bubble-gun.png' },
+    { id: 'playingcards', name: '撲克牌',     price: 90,  priceRange:[65,120],  icon: '🃏', imageUrl: '../images/b5/icon-b5-playing-cards.png' },
+    { id: 'bd_ball',      name: '玩具球',     price: 60,  priceRange:[40,85],   icon: '⚽', imageUrl: '../images/b5/icon-b5-bd-ball.png' },
 ];
 
 const ITEMS_PER_PAGE = 5; // 舊版分頁（已棄用）
 
 // ── 商品類別對照 ────────────────────────────────────────────────
 const B5_ITEM_CATEGORIES = {
-    // 生日派對
+    // 生日派對 食物（10）
     cake:'food', drink:'food', candy:'food', plate:'food', cup:'food', napkin:'food',
-    balloon:'decor', candle:'decor', ribbon:'decor', hat:'decor', banner:'decor', lights:'decor', sticker:'decor', tablecloth:'decor',
-    photo:'activity', popper:'activity', gift:'activity', speaker:'activity', game:'activity', wand:'activity',
-    // 萬聖節
-    pumpkin:'decor', costume:'activity', candy_bag:'food',
-    witch_hat:'decor', spider:'decor', skull:'decor', glow:'activity',
-    ghost:'activity', treat:'food', fangs:'activity',
-    hw_bat:'decor', hw_mask:'activity',
-    hw_chocolate:'food', hw_cookie:'food', hw_popcorn:'food',
-    // 春日野餐
-    sandwich:'food', blanket:'decor', fruit:'food', juice:'food',
-    cookies:'food', sunhat:'decor', frisbee:'activity', bubble:'activity', kite:'activity',
-    pc_onigiri:'food', pc_flowers:'decor', pc_umbrella:'decor',
-    pc_badminton:'activity', pc_rope:'activity',
+    bd_cookie:'food', bd_choco:'food', bd_lollipop:'food', bd_fruit:'food',
+    // 生日派對 裝飾（10）
+    balloon:'decor', candle:'decor', ribbon:'decor', hat:'decor', banner:'decor',
+    lights:'decor', sticker:'decor', tablecloth:'decor', bd_flag:'decor', bd_confetti:'decor',
+    // 生日派對 遊戲活動（10）
+    popper:'activity', gift:'activity', wand:'activity',
+    dice:'activity', funglasses:'activity', bdcake:'activity', squishy:'activity',
+    bubbleguns:'activity', playingcards:'activity', bd_ball:'activity',
+    // 萬聖節 食物（10）
+    candy_bag:'food', treat:'food', hw_chocolate:'food', hw_cookie:'food', hw_popcorn:'food',
+    hw_cake:'food', hw_drink:'food', hw_jelly:'food', hw_bread:'food', hw_marshmallow:'food',
+    // 萬聖節 裝飾（10）
+    pumpkin:'decor', witch_hat:'decor', spider:'decor', skull:'decor', hw_bat:'decor',
+    hw_gravestone:'decor', hw_ghost_deco:'decor', hw_cauldron:'decor', hw_banner:'decor', hw_lights:'decor',
+    // 萬聖節 遊戲活動（10）
+    costume:'activity', glow:'activity', ghost:'activity', fangs:'activity', hw_mask:'activity',
+    hw_dice:'activity', hw_funglasses:'activity', hw_squishy:'activity', hw_bubbleguns:'activity', hw_playingcards:'activity',
+    // 春日野餐 食物（10）
+    sandwich:'food', fruit:'food', juice:'food', cookies:'food', pc_onigiri:'food',
+    pc_cake:'food', pc_tea:'food', pc_bread:'food', pc_cheese:'food', pc_grapes:'food',
+    // 春日野餐 裝飾（10）
+    blanket:'decor', sunhat:'decor', pc_flowers:'decor', pc_umbrella:'decor',
+    pc_basket:'decor', pc_tablecloth:'decor', pc_bell:'decor', pc_straw_hat:'decor', pc_sticker:'decor', pc_wreath:'decor',
+    // 春日野餐 遊戲活動（10）
+    frisbee:'activity', bubble:'activity', kite:'activity', pc_badminton:'activity', pc_rope:'activity',
+    pc_dice:'activity', pc_funglasses:'activity', pc_ball:'activity', pc_dart:'activity', pc_playingcards:'activity',
 };
 const B5_CATEGORY_META = {
     food:     { name: '食物飲料', icon: '🍱' },
@@ -153,11 +179,29 @@ const B5_THEMES = {
             { id:'ghost',       name:'鬼臉面具',     price:90,  priceRange:[65,120],  icon:'😱', imageUrl:'../images/b5/icon-b5-hw-ghost-mask.png' },
             { id:'treat',       name:'萬聖節糖果',   price:40,  priceRange:[25,55],   icon:'🛍️', imageUrl:'../images/b5/icon-b5-hw-treat-bag.png' },
             { id:'fangs',       name:'吸血鬼牙齒',   price:30,  priceRange:[20,45],   icon:'🦷', imageUrl:'../images/b5/icon-b5-hw-vampire-fangs.png' },
-            { id:'hw_bat',      name:'蝙蝠裝飾',     price:40,  priceRange:[25,55],   icon:'🦇', imageUrl:'../images/b5/icon-b5-hw-bat.png' },
-            { id:'hw_mask',     name:'恐怖面具',     price:65,  priceRange:[45,90],   icon:'😈', imageUrl:'../images/b5/icon-b5-hw-horror-mask.png' },
-            { id:'hw_chocolate',name:'萬聖節巧克力', price:35,  priceRange:[25,50],   icon:'🍫', imageUrl:'../images/b5/icon-b5-hw-chocolate.png' },
-            { id:'hw_cookie',   name:'鬼臉餅乾',     price:30,  priceRange:[20,45],   icon:'🍪', imageUrl:'../images/b5/icon-b5-hw-ghost-cookie.png' },
-            { id:'hw_popcorn',  name:'鬼怪爆米花',   price:40,  priceRange:[25,55],   icon:'🍿', imageUrl:'../images/b5/icon-b5-hw-ghost-popcorn.png' },
+            { id:'hw_bat',         name:'蝙蝠裝飾',     price:40,  priceRange:[25,55],   icon:'🦇', imageUrl:'../images/b5/icon-b5-hw-bat.png' },
+            { id:'hw_mask',        name:'恐怖面具',     price:65,  priceRange:[45,90],   icon:'😈', imageUrl:'../images/b5/icon-b5-hw-horror-mask.png' },
+            { id:'hw_chocolate',   name:'萬聖節巧克力', price:35,  priceRange:[25,50],   icon:'🍫', imageUrl:'../images/b5/icon-b5-hw-chocolate.png' },
+            { id:'hw_cookie',      name:'鬼臉餅乾',     price:30,  priceRange:[20,45],   icon:'🍪', imageUrl:'../images/b5/icon-b5-hw-ghost-cookie.png' },
+            { id:'hw_popcorn',     name:'鬼怪爆米花',   price:40,  priceRange:[25,55],   icon:'🍿', imageUrl:'../images/b5/icon-b5-hw-ghost-popcorn.png' },
+            // ── 食物飲料（新增5種補到10）──
+            { id:'hw_cake',        name:'南瓜蛋糕',     price:280, priceRange:[220,360], icon:'🎃', imageUrl:'../images/b5/icon-b5-hw-cake.png' },
+            { id:'hw_drink',       name:'魔女飲料',     price:50,  priceRange:[35,70],   icon:'🧃', imageUrl:'../images/b5/icon-b5-hw-drink.png' },
+            { id:'hw_jelly',       name:'眼球果凍',     price:40,  priceRange:[25,55],   icon:'🍮', imageUrl:'../images/b5/icon-b5-hw-jelly.png' },
+            { id:'hw_bread',       name:'骷髏麵包',     price:65,  priceRange:[45,90],   icon:'🍞', imageUrl:'../images/b5/icon-b5-hw-bread.png' },
+            { id:'hw_marshmallow', name:'鬼臉棉花糖',   price:35,  priceRange:[20,50],   icon:'☁️', imageUrl:'../images/b5/icon-b5-hw-marshmallow.png' },
+            // ── 裝飾道具（新增5種補到10）──
+            { id:'hw_gravestone',  name:'墓碑擺件',     price:80,  priceRange:[55,110],  icon:'🪦', imageUrl:'../images/b5/icon-b5-hw-gravestone.png' },
+            { id:'hw_ghost_deco',  name:'幽靈吊飾',     price:45,  priceRange:[30,65],   icon:'👻', imageUrl:'../images/b5/icon-b5-hw-ghost-deco.png' },
+            { id:'hw_cauldron',    name:'巫師鍋裝飾',   price:120, priceRange:[90,160],  icon:'🪄', imageUrl:'../images/b5/icon-b5-hw-cauldron.png' },
+            { id:'hw_banner',      name:'萬聖節橫幅',   price:60,  priceRange:[40,85],   icon:'🏷️', imageUrl:'../images/b5/icon-b5-hw-banner.png' },
+            { id:'hw_lights',      name:'橘色串燈',     price:70,  priceRange:[50,95],   icon:'🔦', imageUrl:'../images/b5/icon-b5-hw-lights.png' },
+            // ── 遊戲活動（10種，圖片為萬聖節主題專屬，後續補圖）──
+            { id:'hw_dice',        name:'遊戲骰子',     price:85,  priceRange:[60,120],  icon:'🎲', imageUrl:'../images/b5/icon-b5-hw-game-dice.png' },
+            { id:'hw_funglasses',  name:'造型眼鏡',     price:40,  priceRange:[25,55],   icon:'🕶️', imageUrl:'../images/b5/icon-b5-hw-fun-glasses.png' },
+            { id:'hw_squishy',     name:'造型捏捏樂',   price:60,  priceRange:[40,80],   icon:'🎊', imageUrl:'../images/b5/icon-b5-hw-squishy-toy.png' },
+            { id:'hw_bubbleguns',  name:'泡泡槍',       price:75,  priceRange:[50,100],  icon:'🫧', imageUrl:'../images/b5/icon-b5-hw-bubble-gun.png' },
+            { id:'hw_playingcards',name:'撲克牌',       price:90,  priceRange:[65,120],  icon:'🃏', imageUrl:'../images/b5/icon-b5-hw-playing-cards.png' },
         ],
     },
     picnic: {
@@ -176,8 +220,27 @@ const B5_THEMES = {
             { id:'pc_onigiri',  name:'飯糰',      price:45,  priceRange:[30,60],   icon:'🍙', imageUrl:'../images/b5/icon-b5-pc-onigiri.png' },
             { id:'pc_flowers',  name:'野花束',    price:55,  priceRange:[40,75],   icon:'🌺', imageUrl:'../images/b5/icon-b5-pc-wildflowers.png' },
             { id:'pc_umbrella', name:'遮陽傘',    price:90,  priceRange:[70,130],  icon:'⛱️', imageUrl:'../images/b5/icon-b5-pc-beach-umbrella.png' },
-            { id:'pc_badminton',name:'羽毛球組',  price:75,  priceRange:[55,100],  icon:'🏸', imageUrl:'../images/b5/icon-b5-pc-badminton.png' },
-            { id:'pc_rope',     name:'跳繩',      price:50,  priceRange:[35,70],   icon:'🪢', imageUrl:'../images/b5/icon-b5-pc-jump-rope.png' },
+            { id:'pc_badminton',   name:'羽毛球組',   price:75,  priceRange:[55,100],  icon:'🏸', imageUrl:'../images/b5/icon-b5-pc-badminton.png' },
+            { id:'pc_rope',        name:'跳繩',       price:50,  priceRange:[35,70],   icon:'🪢', imageUrl:'../images/b5/icon-b5-pc-jump-rope.png' },
+            // ── 食物飲料（新增5種補到10）──
+            { id:'pc_cake',        name:'野餐蛋糕',   price:200, priceRange:[150,270], icon:'🎂', imageUrl:'../images/b5/icon-b5-pc-cake.png' },
+            { id:'pc_tea',         name:'野餐茶飲',   price:45,  priceRange:[30,65],   icon:'🍵', imageUrl:'../images/b5/icon-b5-pc-tea.png' },
+            { id:'pc_bread',       name:'法式麵包',   price:80,  priceRange:[55,110],  icon:'🥖', imageUrl:'../images/b5/icon-b5-pc-bread.png' },
+            { id:'pc_cheese',      name:'起司片',     price:75,  priceRange:[50,100],  icon:'🧀', imageUrl:'../images/b5/icon-b5-pc-cheese.png' },
+            { id:'pc_grapes',      name:'葡萄串',     price:65,  priceRange:[45,90],   icon:'🍇', imageUrl:'../images/b5/icon-b5-pc-grapes.png' },
+            // ── 裝飾道具（新增6種補到10）──
+            { id:'pc_basket',      name:'野餐籃',           price:180, priceRange:[140,240], icon:'🧺', imageUrl:'../images/b5/icon-b5-pc-basket.png' },
+            { id:'pc_tablecloth',  name:'野餐桌巾',         price:90,  priceRange:[65,120],  icon:'🎪', imageUrl:'../images/b5/icon-b5-pc-tablecloth.png' },
+            { id:'pc_bell',        name:'風鈴',             price:75,  priceRange:[50,100],  icon:'🔔', imageUrl:'../images/b5/icon-b5-pc-bell.png' },
+            { id:'pc_straw_hat',   name:'草帽',             price:120, priceRange:[85,160],  icon:'👒', imageUrl:'../images/b5/icon-b5-pc-straw-hat.png' },
+            { id:'pc_sticker',     name:'貼紙套組',         price:40,  priceRange:[25,55],   icon:'🌺', imageUrl:'../images/b5/icon-b5-pc-sticker.png' },
+            { id:'pc_wreath',      name:'花環',             price:85,  priceRange:[60,115],  icon:'💐', imageUrl:'../images/b5/icon-b5-pc-wreath.png' },
+            // ── 遊戲活動（10種）──
+            { id:'pc_dice',        name:'遊戲骰子',         price:85,  priceRange:[60,120],  icon:'🎲', imageUrl:'../images/b5/icon-b5-pc-game-dice.png' },
+            { id:'pc_funglasses',  name:'造型眼鏡',         price:40,  priceRange:[25,55],   icon:'🕶️', imageUrl:'../images/b5/icon-b5-pc-fun-glasses.png' },
+            { id:'pc_ball',        name:'球',               price:55,  priceRange:[35,80],   icon:'⚽', imageUrl:'../images/b5/icon-b5-pc-ball.png' },
+            { id:'pc_dart',        name:'魔鬼氈飛鏢靶',     price:95,  priceRange:[65,130],  icon:'🎯', imageUrl:'../images/b5/icon-b5-pc-dart-board.png' },
+            { id:'pc_playingcards',name:'撲克牌',           price:90,  priceRange:[65,120],  icon:'🃏', imageUrl:'../images/b5/icon-b5-pc-playing-cards.png' },
         ],
     },
 };
@@ -1020,23 +1083,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        // ── 目標商品清單（任務卡內）──────────────────────────────────────
+        // ── 目標商品清單（任務卡內，128×128 圖片卡片橫排）─────────────────
         _renderTargetChecklist(g) {
             const diff    = this.state.settings.difficulty;
             const targets = g.targetItems || [];
             if (!targets.length) return '';
             if (diff === 'hard') {
-                // 困難模式：只顯示數量摘要，不顯示清單（用提示鈕重看清單）
                 const selCount = targets.filter(t => g.selectedIds.has(t.id)).length;
                 return `<div class="b5-tc-hard-summary">共 ${targets.length} 樣商品｜已選 <span id="b5-tc-sel-count">${selCount}</span> / ${targets.length}</div>`;
             }
-            // 簡單/普通模式：顯示清單
             return `<div class="b5-target-checklist" id="b5-target-checklist">
                 ${targets.map(item => {
                     const done = g.selectedIds.has(item.id);
-                    return `<div class="b5-tc-item${done ? ' done' : ''}" data-tc-id="${item.id}">
-                        <span class="b5-tc-check">${done ? '☑️' : '☐'}</span>
-                        <span class="b5-tc-icon">${b5IconHTML(item)}</span>
+                    return `<div class="b5-tc-card${done ? ' done' : ''}" data-tc-id="${item.id}">
+                        ${done ? '<span class="b5-tc-check-mark">✅</span>' : ''}
+                        <span class="b5-tc-img">${b5IconHTML(item)}</span>
                         <span class="b5-tc-name">${item.name}</span>
                         <span class="b5-tc-price">${item.price}元</span>
                     </div>`;
@@ -1055,11 +1116,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             targets.forEach(item => {
                 const done = g.selectedIds.has(item.id);
-                const row  = document.querySelector(`.b5-tc-item[data-tc-id="${item.id}"]`);
-                if (!row) return;
-                row.classList.toggle('done', done);
-                const check = row.querySelector('.b5-tc-check');
-                if (check) check.textContent = done ? '☑️' : '☐';
+                const card = document.querySelector(`.b5-tc-card[data-tc-id="${item.id}"]`);
+                if (!card) return;
+                card.classList.toggle('done', done);
+                let mark = card.querySelector('.b5-tc-check-mark');
+                if (done && !mark) {
+                    mark = document.createElement('span');
+                    mark.className = 'b5-tc-check-mark';
+                    mark.textContent = '✅';
+                    card.insertBefore(mark, card.firstChild);
+                } else if (!done && mark) {
+                    mark.remove();
+                }
             });
         },
 
@@ -1651,22 +1719,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return baseTotal + customTotal;
         },
 
-        // ── 商品選取浮動標籤（B6 flyout pattern）──────────────────
+        // ── 商品選取彈窗（白底設計：圖片256×256 + 名稱 + 金額，彈窗期間封鎖點擊）──
         _showItemFlyout(item) {
             document.querySelector('.b5-item-flyout')?.remove();
+            document.querySelector('.b5-flyout-blocker')?.remove();
+            // 透明阻擋層：彈窗期間防止點到下方商品
+            const blocker = document.createElement('div');
+            blocker.className = 'b5-flyout-blocker';
+            document.body.appendChild(blocker);
             const flyout = document.createElement('div');
             flyout.className = 'b5-item-flyout';
             flyout.innerHTML = `
-                <div class="b5-if-item">
-                    <span class="b5-if-icon">${b5IconHTML(item)}</span>
-                    <span class="b5-if-name">${item.name}</span>
-                </div>
-                <div class="b5-if-price">+${item.price}元</div>`;
+                <div class="b5-if-img">${b5IconHTML(item)}</div>
+                <div class="b5-if-name">${item.name}</div>
+                <div class="b5-if-price">✅ +${item.price} 元</div>`;
             document.body.appendChild(flyout);
             Game.TimerManager.setTimeout(() => {
                 flyout.classList.add('b5-if-fade');
+                if (document.body.contains(blocker)) blocker.remove();
                 Game.TimerManager.setTimeout(() => { if (flyout.parentNode) flyout.remove(); }, 400, 'ui');
-            }, 1400, 'ui');
+            }, 1800, 'ui');
         },
 
         _updateTotalBar() {
@@ -1856,11 +1928,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ...selectedItems,
                 ...(this.state.game.customItems || []).filter(i => !i._deleted).map(i => ({ icon: '📦', name: i.name, price: i.price }))
             ];
-            const formulaParts = allItems.map((it, idx) =>
-                (idx > 0 ? '<span class="b5p2-fp">+</span>' : '') +
-                `<span class="b5p2-fi"><span class="b5p2-fi-icon">${b5IconHTML(it)}</span><span class="b5p2-fi-name">${it.name}</span><span class="b5p2-fi-price">${it.price}元</span></span>`
+            const itemsHTML = allItems.map(it =>
+                `<div class="b5p2-ref-item">
+                    <span class="b5p2-ri-img">${b5IconHTML(it)}</span>
+                    <span class="b5p2-ri-name">${it.name}</span>
+                    <span class="b5p2-ri-price">${it.price}元</span>
+                </div>`
             ).join('');
-            const formulaHTML = formulaParts + `<span class="b5p2-fp">=</span><span class="b5p2-fi-total">${total}元</span>`;
             return `
             <div class="b5p2-ref-card">
                 <div class="b5p2-ref-header">
@@ -1874,7 +1948,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="b5-p1-hint-btn" id="b5-p2-hint-btn">💡 提示</button>
                     </span>
                 </div>
-                <div class="b5p2-formula-row">${formulaHTML}</div>
+                <div class="b5p2-ref-items-grid">${itemsHTML}</div>
+                <div class="b5p2-ref-total-bar">合計 <strong class="b5p2-ref-total-num">${total}</strong> 元</div>
             </div>`;
         },
 
@@ -3190,19 +3265,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${hasMultiple ? `<button class="b5-ric-nav-btn" id="b5-ric-next" ${idx >= totalRoundsCount - 1 ? 'disabled' : ''}>▶</button>` : '<span></span>'}
                 </div>`;
 
-                const rows = (entry.items || []).map(item => {
+                const cards = (entry.items || []).map(item => {
                     if (typeof item === 'object') {
-                        return `<tr><td class="b5-it-icon">${b5IconHTML(item)}</td><td class="b5-it-name">${item.name}</td><td class="b5-it-price">${item.price}元</td></tr>`;
+                        return `<div class="b5-review-item-card">
+                            <span class="b5-ric-img">${b5IconHTML(item)}</span>
+                            <span class="b5-ric-name">${item.name}</span>
+                            <span class="b5-ric-price">${item.price}元</span>
+                        </div>`;
                     }
                     const sp = item.indexOf(' ');
-                    return `<tr><td class="b5-it-icon">${item.slice(0, sp)}</td><td class="b5-it-name" colspan="2">${item.slice(sp + 1)}</td></tr>`;
+                    return `<div class="b5-review-item-card">
+                        <span class="b5-ric-img b5-ric-emoji">${item.slice(0, sp)}</span>
+                        <span class="b5-ric-name">${item.slice(sp + 1)}</span>
+                    </div>`;
                 }).join('');
                 const tableTotal = entry.total ?? (entry.items || []).reduce((s, i) => s + (typeof i === 'object' ? i.price : 0), 0);
-                const tableHTML = `<table class="b5-items-table">
-                    <thead><tr><th>商品</th><th>名稱</th><th>價格</th></tr></thead>
-                    <tbody>${rows}
-                    <tr class="b5-it-total-row"><td>💰</td><td>總計</td><td>${tableTotal}元</td></tr>
-                    </tbody></table>`;
+                const tableHTML = `
+                <div class="b5-review-items-grid">${cards}</div>
+                <div class="b5-review-total-bar">💰 合計 <strong>${tableTotal}</strong> 元</div>`;
 
                 const statsHTML = stats ? `<div class="b5-per-round-stats">
                     <div class="b5-prs-item"><span class="b5-prs-label">本題預算</span><span class="b5-prs-val">${stats.budget}元</span></div>

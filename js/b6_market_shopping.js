@@ -2159,6 +2159,11 @@ document.addEventListener('DOMContentLoaded', () => {
         _showItemCollectFlash(item, collected, needed) {
             document.getElementById('b6-col-progress')?.remove();
             document.querySelector('.b6-collect-flash')?.remove();
+            document.querySelector('.b6-flyout-blocker')?.remove();
+            // 透明阻擋層：彈窗期間防止點到下方商品
+            const blocker = document.createElement('div');
+            blocker.className = 'b6-flyout-blocker';
+            document.body.appendChild(blocker);
             const isAll = collected >= needed;
             const el = document.createElement('div');
             el.id = 'b6-col-progress';
@@ -2176,6 +2181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(el);
             Game.TimerManager.setTimeout(() => {
                 el.classList.add('b6-cf-fade');
+                if (document.body.contains(blocker)) blocker.remove();
                 Game.TimerManager.setTimeout(() => { if (el.parentNode) el.remove(); }, 400, 'ui');
             }, 1400, 'ui');
         },

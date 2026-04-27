@@ -4,7 +4,7 @@
 
 /* ── 頁面容器：卡片不滿版，置中，統一最大寬度 ──────────────────── */
 .b5-unit .game-container {
-    max-width: 620px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 12px 16px 24px;
     display: flex;
@@ -931,30 +931,35 @@
     padding: 8px; font-size: 14px; cursor: pointer;
 }
 
-/* ── 商品選取彈窗（B6 collect-flash 模式）─────────────────── */
+/* ── 商品選取彈窗（白底設計：圖片 + 名稱 + 金額）──────────── */
 .b5-item-flyout {
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #6e28b4, #a855f7);
-    color: #fff;
-    border-radius: 22px;
-    padding: 20px 32px;
+    background: #fff;
+    border: 2px solid #10b981;
+    border-radius: 20px;
+    padding: 18px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     z-index: 9500;
     pointer-events: none;
-    animation: b5CollectFlashIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
-    box-shadow: 0 8px 28px rgba(110,40,180,0.45);
-    min-width: 240px;
+    animation: b5CollectFlashIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    box-shadow: 0 8px 32px rgba(16,185,129,0.25), 0 2px 8px rgba(0,0,0,0.10);
+    min-width: 200px;
 }
-.b5-if-item  { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.b5-if-icon  { font-size: 0; line-height: 0; }
-.b5-if-icon .b5-icon-emoji { font-size: 120px; line-height: 1; }
-.b5-if-name  { font-size: 20px; font-weight: 800; text-align: center; }
-.b5-if-price { font-size: 18px; font-weight: 700; color: #e9d5ff; }
+.b5-if-img  { font-size: 0; line-height: 0; }
+.b5-if-img .b5-icon-emoji { font-size: 160px; line-height: 1; }
+.b5-if-name  { font-size: 22px; font-weight: 800; text-align: center; color: #065f46; }
+.b5-if-price {
+    font-size: 18px; font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #059669, #10b981);
+    border-radius: 20px;
+    padding: 5px 22px;
+}
 .b5-if-fade  { transition: opacity 0.4s; opacity: 0; }
 @keyframes b5CollectFlashIn {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
@@ -1488,7 +1493,7 @@
 }
 @media (min-width: 640px) {
     .b5-items-grid {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         overflow-y: visible;
         max-height: none;
     }
@@ -2368,25 +2373,37 @@
 .b5-ri-item-price { font-size: 14px; font-weight: 700; color: #7c3aed; white-space: nowrap; }
 .b5-ri-total { margin-top: 10px; font-size: 16px; font-weight: 800; color: #d97706; }
 
-/* ── Target checklist in task card ── */
+/* ── Target checklist in task card（128×128 圖片卡片橫排）── */
 .b5-target-checklist {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    margin-top: 6px; justify-content: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    justify-content: flex-start;
 }
-.b5-tc-item {
+.b5-tc-card {
     display: flex; flex-direction: column; align-items: center;
-    text-align: center; gap: 3px;
-    padding: 8px 6px; border-radius: 10px;
-    background: #f9fafb; border: 1.5px solid #e5e7eb;
-    min-width: 72px; flex: 1; max-width: 100px;
+    text-align: center; gap: 4px;
+    padding: 8px 6px 6px;
+    border-radius: 12px;
+    background: #f9fafb; border: 2px solid #e5e7eb;
+    flex: 0 0 auto;
+    width: 148px;
     position: relative;
     transition: background 0.15s, border-color 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
-.b5-tc-item.done { background: #d1fae5; border-color: #6ee7b7; }
-.b5-tc-check { font-size: 13px; position: absolute; top: 3px; left: 5px; }
-.b5-tc-icon  { font-size: 28px; margin: 4px 0 2px; }
-.b5-tc-name  { font-size: 11px; font-weight: 600; color: #374151; width: 100%; }
-.b5-tc-price { font-size: 12px; font-weight: 700; color: #7c3aed; }
+.b5-tc-card.done {
+    background: #d1fae5; border-color: #6ee7b7;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.18);
+}
+.b5-tc-check-mark { position: absolute; top: 3px; right: 5px; font-size: 16px; }
+.b5-tc-img       { font-size: 0; line-height: 0; }
+.b5-tc-img .b5-icon-emoji { font-size: 64px; line-height: 1; }
+.b5-tc-name  { font-size: 12px; font-weight: 700; color: #374151; width: 100%; }
+.b5-tc-price { font-size: 13px; font-weight: 800; color: #7c3aed; }
 .b5-tc-hard-summary {
     padding: 6px 10px; border-radius: 8px;
     background: #f3f4f6; font-size: 14px; font-weight: 600; color: #374151;
@@ -2483,9 +2500,72 @@
 
 /* 各情境圖示尺寸覆寫（參照 B6 .b6-icon-img 模式） */
 .b5-item-icon    .b5-icon-img { width: 128px; height: 128px; }
-.b5-tc-icon      .b5-icon-img { width: 32px; height: 32px; }
+.b5-tc-img       .b5-icon-img { width: 128px; height: 128px; }
 .b5-ri-item-icon .b5-icon-img { width: 24px; height: 24px; filter: none; }
 .b5-hm-icon      .b5-icon-img { width: 22px; height: 22px; filter: none; }
-.b5-if-icon      .b5-icon-img { width: 256px; height: 256px; }
-.b5p2-fi-icon    .b5-icon-img { width: 28px; height: 28px; }
-.b5-it-icon      .b5-icon-img { width: 28px; height: 28px; filter: none; }
+.b5-if-img       .b5-icon-img { width: 256px; height: 256px; }
+.b5p2-ri-img     .b5-icon-img { width: 128px; height: 128px; }
+.b5-ric-img      .b5-icon-img { width: 128px; height: 128px; }
+
+/* ── Phase 2 ref card：商品圖片格 ─────────────────────────────── */
+.b5p2-ref-items-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 10px 12px 6px;
+}
+.b5p2-ref-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; background: rgba(255,255,255,0.7);
+    border-radius: 12px; padding: 8px 8px 6px;
+    min-width: 120px; max-width: 148px; flex: 0 1 140px;
+    border: 1.5px solid rgba(255,255,255,0.9);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.b5p2-ri-img     { font-size: 0; line-height: 0; }
+.b5p2-ri-img .b5-icon-emoji { font-size: 48px; line-height: 1; }
+.b5p2-ri-name    { font-size: 12px; font-weight: 700; color: #78350f; text-align: center; }
+.b5p2-ri-price   { font-size: 13px; font-weight: 800; color: #b45309; }
+.b5p2-ref-total-bar {
+    text-align: center; padding: 6px 0 4px;
+    font-size: 15px; font-weight: 700; color: #92400e;
+}
+.b5p2-ref-total-num { font-size: 20px; color: #d97706; }
+
+/* ── 派對回顧頁：商品圖片 3欄格 ─────────────────────────────── */
+.b5-review-items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+}
+.b5-review-item-card {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 5px; background: #f5f3ff;
+    border: 1.5px solid #ddd6fe; border-radius: 12px;
+    padding: 10px 6px 8px;
+    text-align: center;
+}
+.b5-ric-img      { font-size: 0; line-height: 0; }
+.b5-ric-emoji    { font-size: 48px !important; line-height: 1 !important; }
+.b5-ric-img .b5-icon-emoji { font-size: 48px; line-height: 1; }
+.b5-ric-name     { font-size: 12px; font-weight: 700; color: #374151; }
+.b5-ric-price    { font-size: 13px; font-weight: 800; color: #7c3aed; }
+.b5-review-total-bar {
+    text-align: center; padding: 8px 12px;
+    background: #faf5ff; border-radius: 10px;
+    font-size: 15px; font-weight: 700; color: #5b21b6;
+    margin-top: 4px;
+}
+.b5-review-total-bar strong { font-size: 18px; color: #d97706; }
+
+/* ── 彈窗期間透明阻擋層（防誤點商品）─────────────────────────── */
+.b5-flyout-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9400;
+    pointer-events: all;
+    background: transparent;
+    cursor: default;
+}

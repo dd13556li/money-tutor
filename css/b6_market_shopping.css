@@ -3093,3 +3093,13 @@
 .b6-snav-btn.b6-product-here-hint::after { top: -46px; }
 #b6c-confirm-btn.b6-product-here-hint::after { top: -46px; }
 #b6-p2-confirm-btn.b6-product-here-hint::after { top: -46px; }
+
+/* ── 彈窗期間透明阻擋層（防誤點商品）─────────────────────────── */
+.b6-flyout-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 9400;
+    pointer-events: all;
+    background: transparent;
+    cursor: default;
+}
