@@ -3094,6 +3094,99 @@
 #b6c-confirm-btn.b6-product-here-hint::after { top: -46px; }
 #b6-p2-confirm-btn.b6-product-here-hint::after { top: -46px; }
 
+/* ── 困難模式購物清單彈窗（A3 pattern：攤位分區 + 🔊 喇叭）─────── */
+.b6-p1hh-cat-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 680px;
+    width: 92%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: bPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.b6-p1hh-cat-modal-hdr {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.b6-p1hh-cat-modal-icon { font-size: 2.2em; display: block; margin-bottom: 6px; }
+.b6-p1hh-cat-modal-title {
+    font-size: 1.5em; font-weight: 900; color: #065f46;
+    margin: 0 0 6px;
+}
+.b6-p1hh-cat-modal-desc {
+    font-size: 1em; color: #6b7280; margin: 0 0 8px;
+}
+.b6-p1hh-cat-modal-budget {
+    display: inline-block;
+    background: #d1fae5; color: #065f46;
+    font-size: 14px; font-weight: 700;
+    padding: 3px 14px; border-radius: 20px;
+}
+.b6-p1hh-cat-modal-budget strong { color: #059669; font-size: 1.1em; }
+.b6-p1hh-cat-modal-body {
+    display: flex; flex-direction: column; gap: 16px;
+}
+/* 攤位分區 */
+.b6-p1hh-cat-section {
+    background: linear-gradient(135deg, #fef9c3, #fde68a);
+    border: 2px solid #fbbf24;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+.b6-p1hh-cat-hdr {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1.1em; font-weight: 800; color: #92400e;
+    margin-bottom: 12px;
+}
+.b6-p1hh-cat-hdr-icon { font-size: 1.3em; }
+.b6-p1hh-cat-items {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start;
+}
+/* 單個商品卡片 */
+.b6-p1hh-cat-item {
+    background: #fff; border: 2px solid #fbbf24; border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    position: relative;
+    min-width: 0;
+}
+.b6-p1hh-cat-item-done {
+    opacity: 0.55;
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+.b6-p1hh-cat-check {
+    position: absolute; top: 5px; right: 5px;
+    font-size: 1.1em; color: #059669; font-weight: 900;
+}
+.b6-p1hh-cat-img { font-size: 0; line-height: 0; }
+.b6-p1hh-cat-img .b6-icon-img { width: 44px; height: 44px; object-fit: contain; }
+.b6-p1hh-cat-img .b6-icon-emoji { font-size: 2em; line-height: 1; }
+.b6-p1hh-cat-info { display: flex; flex-direction: column; gap: 2px; }
+.b6-p1hh-cat-name { font-size: 15px; font-weight: 700; color: #1f2937; }
+.b6-p1hh-cat-price { font-size: 14px; font-weight: 800; color: #b45309; }
+.b6-p1hh-cat-speak-btn {
+    background: #22c55e; border: none; border-radius: 50%;
+    width: 34px; height: 34px; flex-shrink: 0;
+    cursor: pointer; font-size: 1em;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+    margin-left: auto;
+}
+.b6-p1hh-cat-speak-btn:hover { background: #16a34a; transform: scale(1.1); }
+.b6-p1hh-cat-speak-btn:active { transform: scale(0.95); }
+/* 關閉按鈕 */
+.b6-p1hh-cat-close-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff; border: none; border-radius: 25px;
+    padding: 14px; font-size: 1.1em; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+}
+.b6-p1hh-cat-close-btn:hover { opacity: 0.88; }
+
 /* ── 彈窗期間透明阻擋層（防誤點商品）─────────────────────────── */
 .b6-flyout-blocker {
     position: fixed;

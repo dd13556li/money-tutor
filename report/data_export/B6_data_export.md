@@ -1,7 +1,7 @@
 # B6 菜市場買菜 — 商品資料匯出
 
 > 資料來源：`js/b6_market_shopping.js`（B6_STALLS / B6_MISSIONS / B6_MARKETS）
-> 匯出日期：2026-04-23（2026-04-23 更新：商品圖片已引用；b6IconHTML 輔助函數已加入）
+> 匯出日期：2026-04-27（2026-04-27 更新：`_showItemCollectFlash` 新增 `b6-flyout-blocker` 阻擋層）
 
 ---
 
@@ -250,7 +250,15 @@
 
 ---
 
-## 六、攤位導航（2026-04-14 重設計）
+## 六、攤位商品收集彈窗（2026-04-27 更新）
+
+- `_showItemCollectFlash(item, collected, needed)` 新增 `.b6-flyout-blocker` 透明阻擋層
+- 彈窗顯示期間（1400ms）阻擋下方商品點擊，動畫結束時自動移除
+- 搜尋 `b6-flyout-blocker`、`_showItemCollectFlash`
+
+---
+
+## 七、攤位導航（2026-04-14 重設計）
 
 - 移除 `b6-stall-tabs`，改用 `b6-stall-nav`（◀/▶ 按鈕 + 攤位名稱 + 圓點指示器）
 - 各攤位完成時更新 `.b6-snav-dot`（標記完成狀態）
@@ -259,7 +267,7 @@
 
 ---
 
-## 七、自訂購物項目功能（2026-04-04 新增）
+## 八、自訂購物項目功能（2026-04-04 新增）
 
 - 設定頁「難度」下方有「自訂購物項目」切換列（普通/困難可見，`#b6-custom-items-toggle-row`）
 - 啟用後購物頁顯示 `b6-custom-items-panel`（`_renderCustomItemsPanel`）
@@ -268,7 +276,7 @@
 
 ---
 
-## 八、隨機市場（random）
+## 九、隨機市場（random）
 
 - 設定頁選「隨機」時，每關從 traditional/supermarket/nightmarket 隨機挑一個市場
 - `mission._mktKey` 記錄本關市場，`_currentStalls` 動態切換
@@ -277,7 +285,7 @@
 
 ---
 
-## 九、金錢圖示規格
+## 十、金錢圖示規格
 
 - 付款托盤：紙鈔（≥100元）`height:auto`（固定高度由 CSS 控制）、硬幣 `52px`
 - Ghost slot：opacity 0.3
@@ -289,7 +297,7 @@
 
 ---
 
-## 十、進入畫面市場圖示（引用 B4 商店圖示）
+## 十一、進入畫面市場圖示（引用 B4 商店圖示）
 
 > 歡迎畫面第1頁依市場類型顯示，路徑：`images/b4/`；Emoji 作為圖片載入失敗備用
 
@@ -301,7 +309,7 @@
 
 ---
 
-## 十一、商品圖示狀態（2026-04-23 更新）
+## 十二、商品圖示狀態（2026-04-23 更新）
 
 > 路徑：`images/b6/`；格式 PNG 透明背景；✅ = 圖片已存在並引用；❌ = 仍用 Emoji fallback（檔案待製作）
 > `b6IconHTML(item)` 輔助函數已加入 JS；產品按鈕自動顯示圖片，無圖片時退回 Emoji。
@@ -463,7 +471,7 @@
 
 ---
 
-## 十二、缺少的圖片檔案（待製作）
+## 十三、缺少的圖片檔案（待製作）
 
 > 以下 46 個圖片尚無對應 PNG 檔，目前使用 Emoji 顯示。
 

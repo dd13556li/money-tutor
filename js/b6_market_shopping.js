@@ -1328,20 +1328,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const existing = document.getElementById('b6-p1-hard-hint-overlay');
             if (existing) existing.remove();
 
-            // 每列格式：「攤位名 icon 商品名 價格」+ 已選標記 + 🔊 按鈕
-            const itemsHTML = newHintItems.map(({ stall, id }) => {
-                const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
-                if (!item) return '';
+            // 按攤位分組（依任務攤位順序）
+            const stallOrder = [...new Set(newHintItems.map(h => h.stall))];
+            const stallsHTML = stallOrder.map(stall => {
                 const stallInfo = _currentStalls[stall];
-                const alreadySel = (g.selectedItems || []).some(si => si.stall === stall && si.id === id);
-                const speechText = `${stallInfo?.name || ''}，${item.name}，${item.price}元`;
-                return `<div class="b6-p1hh-item${alreadySel ? ' b6-p1hh-item-done' : ''}">
-                    <span class="b6-p1hh-stall-name">${stallInfo?.name || ''}</span>
-                    <span class="b6-p1hh-icon">${b6IconHTML(item)}</span>
-                    <span class="b6-p1hh-name">${item.name}</span>
-                    <span class="b6-p1hh-price">${item.price} 元</span>
-                    ${alreadySel ? '<span class="b6-p1hh-done-badge">✅ 已選</span>' : ''}
-                    <button class="b6-p1hh-speak-btn" data-speech="${speechText}" title="播放語音">🔊</button>
+                if (!stallInfo) return '';
+                const items = newHintItems
+                    .filter(h => h.stall === stall)
+                    .map(h => (stallInfo.items || []).find(i => i.id === h.id))
+                    .filter(Boolean);
+                if (!items.length) return '';
+                const itemsHTML = items.map(item => {
+                    const alreadySel = (g.selectedItems || []).some(si => si.stall === stall && si.id === item.id);
+                    const speechText = `${stallInfo.name}，${item.name}，${item.price}元`;
+                    return `<div class="b6-p1hh-cat-item${alreadySel ? ' b6-p1hh-cat-item-done' : ''}">
+                        ${alreadySel ? '<span class="b6-p1hh-cat-check">✓</span>' : ''}
+                        <span class="b6-p1hh-cat-img">${b6IconHTML(item)}</span>
+                        <div class="b6-p1hh-cat-info">
+                            <div class="b6-p1hh-cat-name">${item.name}</div>
+                            <div class="b6-p1hh-cat-price">${item.price} 元</div>
+                        </div>
+                        <button class="b6-p1hh-cat-speak-btn" data-speech="${speechText}" title="播放語音">🔊</button>
+                    </div>`;
+                }).join('');
+                return `<div class="b6-p1hh-cat-section">
+                    <div class="b6-p1hh-cat-hdr">
+                        <span class="b6-p1hh-cat-hdr-icon">${stallInfo.icon || '🛒'}</span>
+                        <span class="b6-p1hh-cat-hdr-name">${stallInfo.name}</span>
+                    </div>
+                    <div class="b6-p1hh-cat-items">${itemsHTML}</div>
                 </div>`;
             }).join('');
 
@@ -1352,31 +1367,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const overlay = document.createElement('div');
             overlay.id = 'b6-p1-hard-hint-overlay';
-            overlay.className = 'b6-p1hh-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10200;';
             overlay.innerHTML = `
-                <div class="b6-p1hh-modal">
-                    <div class="b6-p1hh-header">💡 購物建議清單</div>
-                    <div class="b6-p1hh-subtext">以下是一組符合預算的購買參考方案。</div>
-                    <div class="b6-p1hh-list">${itemsHTML}</div>
-                    <div class="b6-p1hh-total">合計：<strong>${totalSuggested}</strong> 元（預算 ${g.mission.budget} 元）</div>
-                    <button class="b6-p1hh-close-btn" id="b6-p1hh-close">我知道了，開始購物</button>
+                <div class="b6-p1hh-cat-modal">
+                    <div class="b6-p1hh-cat-modal-hdr">
+                        <span class="b6-p1hh-cat-modal-icon">🛒</span>
+                        <h3 class="b6-p1hh-cat-modal-title">困難模式 — 購物清單</h3>
+                        <p class="b6-p1hh-cat-modal-desc">以下是一組符合預算的購買參考方案</p>
+                        <div class="b6-p1hh-cat-modal-budget">預算 ${g.mission.budget} 元｜建議合計 <strong>${totalSuggested}</strong> 元</div>
+                    </div>
+                    <div class="b6-p1hh-cat-modal-body">${stallsHTML}</div>
+                    <button class="b6-p1hh-cat-close-btn" id="b6-p1hh-cat-close">我知道了，開始購物！</button>
                 </div>`;
             document.body.appendChild(overlay);
 
-            // 🔊 按鈕：點按播放語音（不自動播）
-            overlay.querySelectorAll('.b6-p1hh-speak-btn').forEach(btn => {
+            overlay.querySelectorAll('.b6-p1hh-cat-speak-btn').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.stopPropagation();
                     Game.Speech.speak(btn.dataset.speech || '');
                 });
             });
 
-            // 關閉：不設 p1HintMode，困難模式保持自由選購
-            const closeBtn = document.getElementById('b6-p1hh-close');
-            const dismiss = () => {
-                window.speechSynthesis.cancel();
-                overlay.remove();
-            };
+            const dismiss = () => { window.speechSynthesis.cancel(); overlay.remove(); };
+            const closeBtn = document.getElementById('b6-p1hh-cat-close');
             if (closeBtn) closeBtn.addEventListener('click', dismiss, { once: true });
             overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
         },

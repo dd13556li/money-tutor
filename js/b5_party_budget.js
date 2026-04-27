@@ -1620,36 +1620,70 @@ document.addEventListener('DOMContentLoaded', () => {
             const targets = g.targetItems || [];
             const existing = document.getElementById('b5-hard-hint-modal');
             if (existing) existing.remove();
-            const itemsHTML = targets.map(item => {
-                const done = g.selectedIds.has(item.id);
-                return `<div class="b5-hm-row${done ? ' b5-hm-done' : ''}">
-                    <span class="b5-hm-icon">${b5IconHTML(item)}</span>
-                    <span class="b5-hm-name">${item.name}</span>
-                    <span class="b5-hm-price">${item.price}元</span>
-                    ${done ? '<span class="b5-hm-tick">✓</span>' : ''}
+
+            // 按類別分組（food → decor → activity）
+            const catOrder = ['food', 'decor', 'activity'];
+            const byCategory = {};
+            catOrder.forEach(c => { byCategory[c] = []; });
+            targets.forEach(item => {
+                const cat = B5_ITEM_CATEGORIES[item.id] || 'activity';
+                (byCategory[cat] = byCategory[cat] || []).push(item);
+            });
+
+            const categoriesHTML = catOrder.map(cat => {
+                const items = byCategory[cat];
+                if (!items.length) return '';
+                const meta = B5_CATEGORY_META[cat];
+                const itemsHTML = items.map(item => {
+                    const done = g.selectedIds.has(item.id);
+                    const speechText = `${item.name}，${toTWD(item.price)}`;
+                    return `<div class="b5-hmcat-item${done ? ' b5-hmcat-item-done' : ''}">
+                        ${done ? '<span class="b5-hmcat-check">✓</span>' : ''}
+                        <span class="b5-hmcat-img">${b5IconHTML(item)}</span>
+                        <div class="b5-hmcat-info">
+                            <div class="b5-hmcat-name">${item.name}</div>
+                            <div class="b5-hmcat-price">${item.price}元</div>
+                        </div>
+                        <button class="b5-hmcat-speak-btn" data-speech="${speechText}" title="播放語音">🔊</button>
+                    </div>`;
+                }).join('');
+                return `<div class="b5-hmcat-section">
+                    <div class="b5-hmcat-hdr">
+                        <span class="b5-hmcat-hdr-icon">${meta.icon}</span>
+                        <span class="b5-hmcat-hdr-name">${meta.name}</span>
+                    </div>
+                    <div class="b5-hmcat-items">${itemsHTML}</div>
                 </div>`;
             }).join('');
+
             const selCount = [...g.selectedIds].filter(id => g.targetIds.has(id)).length;
+            const themeIcon = (B5_THEMES[g.rounds?.[g.currentRound]?.themeKey] || B5_THEMES.birthday).icon;
+
             const overlay = document.createElement('div');
             overlay.id = 'b5-hard-hint-modal';
-            overlay.className = 'b5-hint-modal-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10200;';
             overlay.innerHTML = `
-                <div class="b5-hint-modal">
-                    <div class="b5-hm-header">💡 購物清單提示</div>
-                    <div class="b5-hm-progress">已選 ${selCount} / ${targets.length} 樣</div>
-                    <div class="b5-hm-section">${itemsHTML}</div>
-                    <button class="b5-hm-close-btn" id="b5-hm-close">✕ 關閉</button>
+                <div class="b5-hmcat-modal">
+                    <div class="b5-hmcat-modal-hdr">
+                        <span class="b5-hmcat-modal-icon">${themeIcon}</span>
+                        <h3 class="b5-hmcat-modal-title">困難模式 — 採購清單</h3>
+                        <p class="b5-hmcat-modal-desc">請記住並購買以下所有商品</p>
+                        <div class="b5-hmcat-modal-progress">已選 ${selCount} / ${targets.length} 樣</div>
+                    </div>
+                    <div class="b5-hmcat-modal-body">${categoriesHTML}</div>
+                    <button class="b5-hmcat-close-btn" id="b5-hmcat-close">我記住了，開始購物！</button>
                 </div>`;
             document.body.appendChild(overlay);
-            const close = () => overlay.remove();
-            Game.EventManager.on(document.getElementById('b5-hm-close'), 'click', close, {}, 'gameUI');
+
+            overlay.querySelectorAll('.b5-hmcat-speak-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', e => {
+                    e.stopPropagation();
+                    Game.Speech.speak(btn.dataset.speech || '');
+                }, {}, 'gameUI');
+            });
+            const close = () => { window.speechSynthesis.cancel(); overlay.remove(); };
+            Game.EventManager.on(document.getElementById('b5-hmcat-close'), 'click', close, {}, 'gameUI');
             Game.EventManager.on(overlay, 'click', e => { if (e.target === overlay) close(); }, {}, 'gameUI');
-            const remaining = targets.filter(i => !g.selectedIds.has(i.id));
-            const parts = remaining.map(i => `${i.name}${toTWD(i.price)}`);
-            const speech = remaining.length > 0
-                ? `還需要選${parts.join('、')}`
-                : '所有商品都選好了，請確認結帳';
-            Game.Speech.speak(speech);
         },
 
         // ── B5 Phase 1 提示系統（B6 _b6P1ShowHint pattern）───────────
@@ -1660,6 +1694,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 困難模式：不重置已選，直接顯示採購清單彈窗（已購項目淡化）
                 this._showHardModeHintModal();
                 return;
+            }
+            // 普通模式：播放提示語音
+            if (diff === 'normal') {
+                Game.Speech.speak('請依提示，採購指定的物品');
             }
             // 簡單/普通模式：重置並啟動引導提示
             g.selectedIds = new Set();
