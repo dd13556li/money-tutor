@@ -35,7 +35,7 @@ const B5_ALL_ITEMS = [
     { id: 'funglasses',   name: '造型眼鏡',   price: 40,  priceRange:[25,55],   icon: '🕶️', imageUrl: '../images/b5/icon-b5-fun-glasses.png' },
     { id: 'bdcake',       name: '生日蛋糕',   price: 350, priceRange:[280,420], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
     { id: 'squishy',      name: '造型捏捏樂', price: 60,  priceRange:[40,80],   icon: '🎊', imageUrl: '../images/b5/icon-b5-squishy-toy.png' },
-    { id: 'bubbleguns',   name: '泡泡槍',     price: 75,  priceRange:[50,100],  icon: '🫧', imageUrl: '../images/b5/icon-b5-bubble-gun.png' },
+    { id: 'bubbleguns',   name: '泡泡槍',     price: 75,  priceRange:[50,100],  icon: '🫧', imageUrl: '../images/b5/icon-b5-bd-bubble-gun.png' },
     { id: 'playingcards', name: '撲克牌',     price: 90,  priceRange:[65,120],  icon: '🃏', imageUrl: '../images/b5/icon-b5-playing-cards.png' },
     { id: 'bd_ball',      name: '玩具球',     price: 60,  priceRange:[40,85],   icon: '⚽', imageUrl: '../images/b5/icon-b5-bd-ball.png' },
 ];
@@ -66,8 +66,8 @@ const B5_ITEM_CATEGORIES = {
     // 春日野餐 食物（10）
     sandwich:'food', fruit:'food', juice:'food', cookies:'food', pc_onigiri:'food',
     pc_cake:'food', pc_tea:'food', pc_bread:'food', pc_cheese:'food', pc_grapes:'food',
-    // 春日野餐 裝飾（10）
-    blanket:'decor', sunhat:'decor', pc_flowers:'decor', pc_umbrella:'decor',
+    // 春日野餐 裝飾（9）
+    blanket:'decor', sunhat:'decor', pc_flowers:'decor',
     pc_basket:'decor', pc_tablecloth:'decor', pc_bell:'decor', pc_straw_hat:'decor', pc_sticker:'decor', pc_wreath:'decor',
     // 春日野餐 遊戲活動（10）
     frisbee:'activity', bubble:'activity', kite:'activity', pc_badminton:'activity', pc_rope:'activity',
@@ -219,7 +219,6 @@ const B5_THEMES = {
             { id:'kite',        name:'風箏',      price:160, priceRange:[130,220], icon:'🪁', imageUrl:'../images/b5/icon-b5-pc-kite.png' },
             { id:'pc_onigiri',  name:'飯糰',      price:45,  priceRange:[30,60],   icon:'🍙', imageUrl:'../images/b5/icon-b5-pc-onigiri.png' },
             { id:'pc_flowers',  name:'野花束',    price:55,  priceRange:[40,75],   icon:'🌺', imageUrl:'../images/b5/icon-b5-pc-wildflowers.png' },
-            { id:'pc_umbrella', name:'遮陽傘',    price:90,  priceRange:[70,130],  icon:'⛱️', imageUrl:'../images/b5/icon-b5-pc-beach-umbrella.png' },
             { id:'pc_badminton',   name:'羽毛球組',   price:75,  priceRange:[55,100],  icon:'🏸', imageUrl:'../images/b5/icon-b5-pc-badminton.png' },
             { id:'pc_rope',        name:'跳繩',       price:50,  priceRange:[35,70],   icon:'🪢', imageUrl:'../images/b5/icon-b5-pc-jump-rope.png' },
             // ── 食物飲料（新增5種補到10）──
@@ -969,7 +968,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'b5-round-intro';
             card.innerHTML = `
                 <div class="b5-ri-inner">
-                    <div class="b5-ri-round">${themeData.icon} 第 ${roundNum} 關</div>
                     <div class="b5-ri-list-title">🛒 今天要買的商品</div>
                     <div class="b5-ri-list">${listHTML}</div>
                     <div class="b5-ri-hint">${diff === 'hard' ? '記住採購清單再關閉' : '點「關閉」開始採購'}</div>
@@ -979,9 +977,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const nameList = targets.map(i => i.name).join('、');
             const speechMap = {
-                easy:   `第${roundNum}關，今天要買${nameList}，跟著提示找商品！`,
-                normal: `第${roundNum}關，採購清單：${nameList}，共${toTWD(budget)}，自己找到這些商品吧！`,
-                hard:   `第${roundNum}關，採購清單：${nameList}，共${toTWD(budget)}，記住後自行採購！`,
+                easy:   `今天要買的商品`,
+                normal: `今天要買的商品`,
+                hard:   `今天要買的商品`,
             };
             let closed = false;
             const dismiss = () => {
@@ -1514,9 +1512,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         // 普通/困難模式
                         if (g.selectedIds.size === g.targetIds.size) {
-                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
-                            Game.Speech.speak('所有商品選購完成，可以確認購買了！');
-                            document.getElementById('b5-confirm-btn')?.classList.add('b5-hint-here');
+                            // 最後一個：唸完商品名稱後，再唸完成語音才解鎖
+                            this.state.isProcessing = true;
+                            Game.Speech.speak(`${item.name}，${toTWD(item.price)}`, () => {
+                                document.getElementById('b5-confirm-btn')?.classList.add('b5-hint-here');
+                                Game.Speech.speak('所有商品選購完成，可以確認購買了！', () => {
+                                    this.state.isProcessing = false;
+                                    AssistClick.buildQueue();
+                                });
+                            });
                         } else {
                             Game.Speech.speak(`${item.name}，${toTWD(item.price)}`);
                         }
@@ -3205,11 +3209,10 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="b5-rt-inner">
                     <div class="b5-rt-label">準備好了嗎？</div>
-                    <div class="b5-rt-round">第 ${roundNum} 關</div>
                     <div class="b5-rt-icon">🎂</div>
                 </div>`;
             document.body.appendChild(card);
-            Game.Speech.speak(`第${roundNum}關`);
+            Game.Speech.speak(`準備好了嗎`);
             Game.TimerManager.setTimeout(() => {
                 card.classList.add('b5-rt-fade');
                 Game.TimerManager.setTimeout(() => {
