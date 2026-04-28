@@ -9,9 +9,9 @@ const B5_ALL_ITEMS = [
     { id: 'cake',        name: '生日蛋糕',   price: 380, priceRange:[350,500], icon: '🎂', imageUrl: '../images/b5/icon-b5-birthday-cake.png' },
     { id: 'drink',       name: '果汁飲料',   price: 120, priceRange:[80,150],  icon: '🧃', imageUrl: '../images/b5/icon-b5-juice-drink.png' },
     { id: 'candy',       name: '糖果禮包',   price: 90,  priceRange:[65,120],  icon: '🍬', imageUrl: '../images/b5/icon-b5-candy-bag.png' },
-    { id: 'plate',       name: '派對紙盤',   price: 45,  priceRange:[30,60],   icon: '🍽️', imageUrl: '../images/b5/icon-b5-party-plate.png' },
-    { id: 'cup',         name: '派對杯組',   price: 55,  priceRange:[40,80],   icon: '🥤', imageUrl: '../images/b5/icon-b5-party-cup.png' },
-    { id: 'napkin',      name: '主題餐巾紙', price: 35,  priceRange:[25,50],   icon: '🧻', imageUrl: '../images/b5/icon-b5-party-napkin.png' },
+    { id: 'bd_cupcake',  name: '杯子蛋糕',   price: 150, priceRange:[110,200], icon: '🧁', imageUrl: '../images/b5/icon-b5-bd-cupcake.png' },
+    { id: 'bd_soda',     name: '汽水',       price: 60,  priceRange:[40,85],   icon: '🥤', imageUrl: '../images/b5/icon-b5-bd-soda.png' },
+    { id: 'bd_popcorn',  name: '爆米花',     price: 50,  priceRange:[30,70],   icon: '🍿', imageUrl: '../images/b5/icon-b5-bd-popcorn.png' },
     { id: 'bd_cookie',   name: '造型餅乾',   price: 55,  priceRange:[35,75],   icon: '🍪', imageUrl: '../images/b5/icon-b5-bd-cookie.png' },
     { id: 'bd_choco',    name: '巧克力',     price: 65,  priceRange:[45,90],   icon: '🍫', imageUrl: '../images/b5/icon-b5-bd-chocolate.png' },
     { id: 'bd_lollipop', name: '棒棒糖',     price: 35,  priceRange:[20,50],   icon: '🍭', imageUrl: '../images/b5/icon-b5-bd-lollipop.png' },
@@ -45,7 +45,7 @@ const ITEMS_PER_PAGE = 5; // 舊版分頁（已棄用）
 // ── 商品類別對照 ────────────────────────────────────────────────
 const B5_ITEM_CATEGORIES = {
     // 生日派對 食物（10）
-    cake:'food', drink:'food', candy:'food', plate:'food', cup:'food', napkin:'food',
+    cake:'food', drink:'food', candy:'food', bd_cupcake:'food', bd_soda:'food', bd_popcorn:'food',
     bd_cookie:'food', bd_choco:'food', bd_lollipop:'food', bd_fruit:'food',
     // 生日派對 裝飾（10）
     balloon:'decor', candle:'decor', ribbon:'decor', hat:'decor', banner:'decor',
@@ -55,13 +55,13 @@ const B5_ITEM_CATEGORIES = {
     dice:'activity', funglasses:'activity', bdcake:'activity', squishy:'activity',
     bubbleguns:'activity', playingcards:'activity', bd_ball:'activity',
     // 萬聖節 食物（10）
-    candy_bag:'food', treat:'food', hw_chocolate:'food', hw_cookie:'food', hw_popcorn:'food',
+    hw_mummy_hotdog:'food', treat:'food', hw_chocolate:'food', hw_cookie:'food', hw_popcorn:'food',
     hw_cake:'food', hw_drink:'food', hw_jelly:'food', hw_bread:'food', hw_marshmallow:'food',
     // 萬聖節 裝飾（10）
     pumpkin:'decor', witch_hat:'decor', spider:'decor', skull:'decor', hw_bat:'decor',
     hw_gravestone:'decor', hw_ghost_deco:'decor', hw_cauldron:'decor', hw_banner:'decor', hw_lights:'decor',
     // 萬聖節 遊戲活動（10）
-    costume:'activity', glow:'activity', ghost:'activity', fangs:'activity', hw_mask:'activity',
+    candy_bag:'activity', glow:'activity', ghost:'activity', fangs:'activity', hw_mask:'activity',
     hw_dice:'activity', hw_funglasses:'activity', hw_squishy:'activity', hw_bubbleguns:'activity', hw_playingcards:'activity',
     // 春日野餐 食物（10）
     sandwich:'food', fruit:'food', juice:'food', cookies:'food', pc_onigiri:'food',
@@ -170,7 +170,7 @@ const B5_THEMES = {
         name: '萬聖節派對', icon: '🎃',
         allItems: [
             { id:'pumpkin',     name:'南瓜燈',      price:150, priceRange:[120,200], icon:'🎃', imageUrl:'../images/b5/icon-b5-hw-pumpkin.png' },
-            { id:'costume',     name:'萬聖節服裝',   price:250, priceRange:[180,350], icon:'👻', imageUrl:'../images/b5/icon-b5-hw-costume.png' },
+            { id:'hw_mummy_hotdog', name:'木乃伊熱狗捲', price:65, priceRange:[45,90], icon:'🌭', imageUrl:'../images/b5/icon-b5-hw-mummy-hotdog.png' },
             { id:'candy_bag',   name:'糖果袋',       price:80,  priceRange:[60,110],  icon:'🍬', imageUrl:'../images/b5/icon-b5-hw-candy-bag.png' },
             { id:'witch_hat',   name:'巫師帽',       price:60,  priceRange:[45,85],   icon:'🧙', imageUrl:'../images/b5/icon-b5-hw-witch-hat.png' },
             { id:'spider',      name:'蜘蛛網裝飾',   price:45,  priceRange:[30,65],   icon:'🕸️', imageUrl:'../images/b5/icon-b5-hw-spider-web.png' },
@@ -443,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 8. 設定頁 ─────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();

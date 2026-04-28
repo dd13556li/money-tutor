@@ -497,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 7. 設定頁 ─────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();
@@ -1198,6 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 第一頁提示入口（依難度路由）────────────────────────
         _b6P1ShowHint() {
+            window.speechSynthesis.cancel();
             const g    = this.state.game;
             const diff = this.state.settings.difficulty;
             if (diff === 'hard') {

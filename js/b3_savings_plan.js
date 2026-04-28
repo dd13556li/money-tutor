@@ -307,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 8. 設定頁 ─────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();
@@ -2501,6 +2502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
+                window.speechSynthesis.cancel();
                 Game.EventManager.removeByCategory('gameUI');
                 AssistClick.deactivate(); // 測驗總結畫面讓使用者自行操作
                 // ── 第二畫面：測驗總結 ──
@@ -3296,6 +3298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 600, 'speech');
 
             Game.EventManager.on(document.getElementById('b3-view-summary-btn'), 'click', () => {
+                window.speechSynthesis.cancel();
                 Game.EventManager.removeByCategory('gameUI');
                 // ── 第二頁：測驗總結 ──
                 app.innerHTML = `

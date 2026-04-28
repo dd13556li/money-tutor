@@ -311,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Settings ───────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();
@@ -2649,6 +2650,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Phase 1 提示：在未答對的 ？框上方顯示正確金額數字 ──────
         _showPhase1AmountHints(curr) {
+            window.speechSynthesis.cancel();
             // 清除舊提示
             document.querySelectorAll('.b1-cost-hint-tip').forEach(el => el.remove());
             let shown = 0;

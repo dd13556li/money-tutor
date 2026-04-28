@@ -536,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 8. 設定頁 ─────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();
@@ -2280,6 +2281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 普通/困難 Phase 1 提示：在未答對的 ？框上方顯示正確金額數字 ──
         _showDiaryAmountHints(question) {
+            window.speechSynthesis.cancel();
             document.querySelectorAll('.b2-cost-hint-tip').forEach(el => el.remove());
             let shown = 0;
             document.querySelectorAll('.b2-cost-input:not(.b2-input-correct)').forEach(el => {

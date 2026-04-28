@@ -420,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Settings ───────────────────────────────────────────
         showSettings() {
+            window.speechSynthesis.cancel();
             Game.TimerManager.clearAll();
             Game.EventManager.removeByCategory('gameUI');
             this.resetGameState();
@@ -4554,6 +4555,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Speech.speak('恭喜你完成所有測驗');
 
             document.getElementById('b4-cm-continue-btn').addEventListener('click', () => {
+                window.speechSynthesis.cancel();
                 overlay.remove();
                 onContinue?.();
             });
