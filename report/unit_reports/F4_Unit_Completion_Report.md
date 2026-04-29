@@ -1033,3 +1033,12 @@ this.voice =
 - 非 `'custom'`，不顯示自訂輸入框（既有邏輯自動處理）
 
 **關鍵搜尋詞**：`sortingCounts.preset`、`getSortingCountConfig`、`order: 0`
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| F4 正確放置播數字語音（2026-03-20）| `handleInstantFeedback` 正確分支：`playSound('correct')` → `Speech.speak(numberBox.dataset.value)`；簡單模式＋輔助點擊均適用 |
+| F4 簡單模式放置不重播語音（2026-03-24）| `handleInstantFeedback` 正確分支移除 `Speech.speak(numberBox.dataset.value)`；拖曳開始時播1次即可 |

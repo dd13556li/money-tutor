@@ -1233,3 +1233,13 @@ const quickCheck = target.closest('.draggable-item, .money-item, ..., .source-it
 **關鍵搜尋詞**：`image-preview-container` in `updateCustomThemeSettings`；`z-index: 10001` in `.modal-content` of `css/f3-number-recognition.css`
 
 ---
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| F3 觸控放置拖回 | `.placed-item` |
+| F3 自訂主題上傳3項 | `TimerManager.setTimeout.*nameInput.*focus`, `image-preview-container` |
+| F1/F3 上傳語音修復 | `confirmAddCustomItem`, `Speech.speak.*addCustomItem` |

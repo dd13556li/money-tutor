@@ -1715,3 +1715,33 @@ if (targetProductId) {
 `showNormalModeHint`, `target-item-modal`, `showTargetItemModal`, `指定任務模式：顯示指定飲料彈窗`
 
 ---
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+> 以下記錄原存於 CLAUDE.md 修復記錄速查表，詳細說明見各搜尋關鍵字對應程式碼。
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| A1 自訂金額彈窗升級 | `showCustomWalletModal`, `a1CustomWalletQty`, `a1AdjustWalletQty`, `a1ConfirmWallet`, `generateWalletCoins customWalletDetails` |
+| A1 coinFirst 新增 | `_initCoinFirstScreen`, `updateDrinkAvailabilityByCoinAmount`, `coin-first-locked` |
+| A1 coinFirst easy誤判 | `handleEasyModeAction`, `return false` |
+| A1 coinFirst cancel修復 | `cancelCoinInsertion`, `INSERT_COIN` |
+| A1 coinFirst buildQueue crash | `buildActionQueue('coinFirstInsert')`, `coinFirstSelect` |
+| A1 交易摘要圖片 | `showTransactionSummary`, `product.imageUrl` |
+| A1 coinFirst 螢幕圖片 | `screenProductImg` |
+| A1 coinFirst step1提示 | `showNormalModeHint`, `coin-first-available` |
+| A1 coinFirst 遮罩透明 | `coin-first-transparent-overlay`, `coin-first-content` |
+| A1 交易摘要圖片動畫 | `productReveal`, `180×180px` |
+| A1 productVended重複出貨 | `processPayment`, `productVended` |
+| A1 coinFirst easy螢幕初始 | `screenProductImage`, `screenProductImg` |
+| A1 coinFirst modal背景 | `.cf-header-card`, `coin-first-content` |
+| A1 coinFirst 完成 | `drinkLightUp`, `coinFirstInsert`, `coinFirstSelect` |
+| A1 coinFirst拆分 | `isCoinFirstMode()`, `coinFirstAssigned`, `coinFirstFree` |
+| A1 coinFirst設定頁兩列 | `coinFirstFree` button |
+| A1 coinFirstAssigned即時亮燈 | `updateDrinkAvailabilityByCoinAmount`, `.coin-modal z-index:10300` |
+| A1 coinFirst流程稽核3項 | `cfTarget`, `coinFirstFree：允許重新選擇`, `指定購買：只高亮目標` |
+| A1 輔助點擊說明更新 | `showSettings`, warning text |
+| A1 coinFirst稽核3項 | `coinFirstAssigned 關閉彈窗後應進入投幣階段` |
+| A1 交易完成頁卡片加寬＋金錢圖示（2026-04-10）| `mkMoneyIcons`, `a1-money-icons-row` |

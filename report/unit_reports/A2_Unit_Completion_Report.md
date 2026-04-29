@@ -1493,3 +1493,34 @@ if (_cfTaskType !== 'assigned' && _cfTaskType !== 'coinFirstAssigned') {
 `coinFirstFree`、`freeChoice`、`assigned` 等模式不受影響。
 
 **關鍵搜尋詞**：`_cfTaskType`、`confirmMoneySelection`、`_handleCoinFirstPaymentError`
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| A2 coinFirst 灰暗 CSS cascade | `transition: none !important`, `requestAnimationFrame setProperty.*important`, `serviceItemFadeIn :not(.coin-first-unlocking)` |
+| A2 coinFirst 指示燈放大+紅色 | `.indicator-light 18px`, `light.classList.add('active')`, `redLightPulse` |
+| A2 coinFirst 需要金額顯示修復 | `_cfSvc`, `_displayReq`, `easyMode.assignedService || normalMode.assignedService` |
+| A2 設定頁按鈕寬度修復 | `button-group`（移除 `flex:1`）|
+| A2 自訂金額（自選服務）| `showCustomWalletModal`, `custom walletType`, `setupFreeChoiceMode custom`, `generateCustomWalletFromDetails` |
+| A2 confirmCustomWallet 不閃爍 | `closeCustomWalletModal`, `customBtn.textContent`, `updateStartButton`, `custom-wallet-warning` |
+| A2 coinFirst 新增 | `showCoinFirstScreen`, `_lockServicesForCoinFirst`, `_initCoinFirstScreen`, `updateServiceAvailabilityByAmount`, `coin-first-locked`, `coin-first-available`, `coinFirstAssigned`, `coinFirstFree` |
+| A2 coinFirst 輔助點擊 | `coinFirstInsert`, `coinFirstSelect`, `autoSelectCoinFirstService`, `buildActionQueue`, `transitionToNextPhase` |
+| A2 coinFirst 服務未鎖定修復 | `_lockServicesForCoinFirst`, `showTaskPopupIfNeeded` coinFirst guard, `closeTaskPopup` 播放引導語音 |
+| A2 設定頁任務類型分組 | 先投幣再選服務/先選服務再投幣兩組標題；`coinFirstFree` 使用 fixed500/fixed1000 |
+| A2 coinFirst 錢包修正+方框暗化 | `setupCoinFirstAssignedMode` 改用 `generateWalletCoins`；`_lockServicesForCoinFirst` 加 `coin-first-locked-wrapper`；CSS filter 移至 wrapper 層 |
+| A2 coinFirst 紙鈔投完仍要求紙鈔 | `showNormalModeHint` coinFirst step1 加 `billsInserted` 判斷；`confirmMoneySelection` coinFirst 分支中 `hintShown` 時自動呼叫 `showNormalModeHint` |
+| A2 錢包式付款彈窗（2026-03-22）| `walletPaymentModal(activeType)`, `.wp-section.inactive` |
+| A2 兩階段付款重構（2026-03-22）| `confirmMoneySelection` `shouldVerify`；`updateSlotStatus` 移除 `amountMatched` |
+| A2 coinFirst 付款驗證（2026-03-22）| `validateCoinFirstPayment`, `_handleCoinFirstPaymentError` |
+| A2 難度分離提示（2026-03-22）| 普通模式 3 次自動顯示勾勾；困難模式僅提示鈕觸發；`willShowHint`, `hintSuffix` |
+| A2 coinFirst 應付金額修復（2026-03-22）| `showPaymentError` + `showPaymentHintAfterErrors` 加 `isCoinFirstMode()` 判斷 |
+| A2 coinFirstAssigned 錢包增量（2026-03-22）| `setupCoinFirstAssignedMode` 改用 `generateWalletForAssignedMode`（服務價格 + 100~500 元）|
+| A2 付款完成語音整合（2026-03-22）| `completePayment` 改 `speakCustom('付款完成，票卷列印中')`；`printTicket` 移除 `speech.speak('ticketPrinting')` |
+| A2 燈號已亮任務彈窗修正（2026-03-22）| `showTaskPopup` + `closeTaskPopup` 偵測 `.coin-first-available` |
+| A2 元元語音重複（2026-03-28）| `selectService`：`convertAmountToSpeech` 已含「元」，移除末尾多餘「元」；搜尋 `這個服務需要` |
+| A2 coinFirst 亮燈改 price<=inserted（2026-03-28）| `updateServiceAvailabilityByAmount`：`inserted===price` → `price<=inserted`；搜尋 `price <= inserted`, `已有${availCount}個服務可以選了` |
+| A2 coinFirstAssigned 付款超額移除 cash 音效（2026-03-28）| `confirmMoneySelection` cash 音效條件加 `coinFirstAssigned` 排除；搜尋 `_cfTaskType` |
+| A2 普通模式 step1 指定任務改彈窗（2026-03-20）| `showNormalModeHint` step1：移除 `difficulty==='hard'` 限制，指定任務統一呼叫 `showTaskPopup()` |

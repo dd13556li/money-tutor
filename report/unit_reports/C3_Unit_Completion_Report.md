@@ -1537,3 +1537,16 @@ const baseCoinId = coinId.replace(/^(source-item-)+/, '');
 - `js/c3_money_exchange.js`：`getCommonCSS()` 三處 `.unit3-banknote-container` 規則
 
 **關鍵搜尋詞**：`min-height: 0 !important`、`padding: 2px 2px 4px 2px`、`unit3-banknote-container`
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| C1/C2/C3 speak() catch雙重callback | `catch`, `safeCallback()` |
+| C3 普通模式固定1輪 | `totalExchanges = 1` |
+| C3 提示鈕 | `showNormalModeHint`, `c3-hint-btn` |
+| C3 困難模式移除提示 | `exchangeAreaTitleHTML` |
+| C3 completeExchange Bug | `MoneyExchange3.ModeStrategies.handleCompletion()` |
+| C3 答對語音 | `handleMultiRound`, `playFinalCompletionSpeech` |

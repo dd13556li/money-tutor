@@ -1222,3 +1222,11 @@ applyHintMarkings(mode) {
   - `showHardModeHint()`：完整改寫
 
 **關鍵搜尋詞**：`applyHintMarkings`、`hintedCoinIds`、`showNormalModeHint`、`showHardModeHint`
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| C4 輔助點擊兩階段+hint CSS | `_closeInstructionModal`, `instruction-modal-overlay`, `unit4-easy-source-item:not(.assist-click-hint)` |

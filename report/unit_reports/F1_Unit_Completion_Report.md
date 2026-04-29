@@ -1329,3 +1329,14 @@ Fallback 從 `'物件'` 改為 `icon`（直接播 emoji，不說物件）。
 搜尋：`getItemName`（`js/f1_object_correspondence.js`）
 
 ---
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| F1 validateDrop重複定義 | `validateDrop`（現只有一處）|
+| F1 assist-click-hint CSS | `f1AssistBoxPulse`, `assist-click-hint`, `injectGlobalAnimationStyles` |
+| F1 getItemName 擴展40圖示 | `getItemName`, `f1AssistBounce`, fallback `|| icon` |
+| F1/F3 上傳語音修復 | `confirmAddCustomItem`, `Speech.speak.*addCustomItem` |

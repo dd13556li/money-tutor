@@ -1889,3 +1889,22 @@ progressInfoElement.textContent = `步驟 ${step} / ${totalSteps}`;
 
 *報告更新時間：2026-03-25*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| A5 6x setInterval→遞迴 | `autoTakeCash`, `activeInterval` |
+| A5 煙火 zIndex | `zIndex: 10200` |
+| A5 click監聽洩漏 | `_clickModeHandler`, `unbindClickModeHandler` |
+| A5 隨機任務 | `getActualSessionType()`, `randomBag` |
+| A5 selectMenuOption undefined | `selectMenuOption`, `getActualSessionType()` |
+| A5 showTaskReminderModal 錯誤類型 | `getActualSessionType()` |
+| A5 存款彈窗路由 | `showBillSelectionModal`, `getActualSessionType()` |
+| A5 提款金額路由 | `startWithdrawProcess`, `getActualSessionType()` |
+| A5 提款金額不一致 | `easyModeHints.assignedAmount` |
+| A5 存款提示消失 | `clearATMEasyHint`, `showATMEasyHint` |
+| A5 轉帳提示彈窗 | `showBankCodeInputScreen`, `getActualSessionType()` |
+| A5 普通模式自動提示關閉（2026-03-20）| `DIFFICULTY_CONFIG.normal.autoShowHint: false`；`showATMEasyHint` 計時器條件加 `config.autoShowHint` 守衛 |

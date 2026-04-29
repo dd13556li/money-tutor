@@ -1336,3 +1336,14 @@ rawAccuracy: this.totalAnswers > 0 ? this.correctAnswers / this.totalAnswers : 0
 
 *報告更新時間：2026-03-10*
 *報告產生者：Claude Code (claude-sonnet-4-6)*
+
+---
+
+## 修復記錄速查（從 CLAUDE.md 遷移，2026-04-29）
+
+| 項目 | 搜尋關鍵字 |
+|------|------------|
+| F5 this.timer setInterval→遞迴 | `startTimer`, `tick`, `'timer'` |
+| F5 易模式隱藏測驗模式 | `updateTestModeVisibility` |
+| F5 普通計分0/0 | `checkAnswer`, `handleCorrectAnswer` |
+| F5 除以零防護 | `accuracy: this.totalAnswers > 0 ? Math.round` |
