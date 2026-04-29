@@ -881,6 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 11. 題目渲染 ──────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeByCategory('gameUI');
             AssistClick.deactivate();
             this.state.isProcessing  = false;
@@ -1852,6 +1853,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const display = document.getElementById('b2-ht-modal-display');
                 const errorEl = document.getElementById('b2-ht-modal-error');
                 const closeModal = () => {
+                    window.speechSynthesis.cancel();
                     overlay.remove();
                     inputEl.classList.remove('b2-input-active');
                     q.activeInputEl = null;
@@ -2247,6 +2249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeModal = () => {
                 if (closed) return;
                 closed = true;
+                window.speechSynthesis.cancel();
                 if (document.body.contains(modal)) modal.remove();
                 afterClose?.();
             };
@@ -3149,7 +3152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             Game.Speech.speak(`從${question.startAmount}元開始，${parts.join('，')}，最後剩下${effAnswer}元`);
 
-            const closeHM = () => { document.getElementById('b2-hard-hint-modal')?.remove(); };
+            const closeHM = () => { window.speechSynthesis.cancel(); document.getElementById('b2-hard-hint-modal')?.remove(); };
             Game.EventManager.on(document.getElementById('b2-hm-close-btn'), 'click', closeHM, {}, 'gameUI');
             overlay.addEventListener('click', e => { if (e.target === overlay) closeHM(); });
         },

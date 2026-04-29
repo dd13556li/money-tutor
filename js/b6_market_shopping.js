@@ -1040,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 9. 關卡初始化 ─────────────────────────────────────
         renderRound() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeByCategory('gameUI');
             this.state.isProcessing = false;
             AssistClick.deactivate();

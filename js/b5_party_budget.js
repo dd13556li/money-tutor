@@ -903,6 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 10. 關卡渲染 ──────────────────────────────────────
         renderRound() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeByCategory('gameUI');
             this.state.isProcessing = false;
             AssistClick.deactivate();

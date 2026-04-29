@@ -2238,7 +2238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="b3-hint-modal-close">✕ 關閉</button>
             </div>`;
             document.body.appendChild(modal);
-            const close = () => modal.remove();
+            const close = () => { window.speechSynthesis.cancel(); modal.remove(); };
             modal.querySelector('.b3-hint-modal-close').addEventListener('click', close);
             modal.addEventListener('click', e => { if (e.target === modal) close(); });
         },
@@ -2650,6 +2650,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const close = () => {
                 if (closed) return;
                 closed = true;
+                window.speechSynthesis.cancel();
                 modal.remove();
                 afterClose?.();
             };
@@ -2661,6 +2662,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── 11. 題目渲染 ──────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeByCategory('gameUI');
             AssistClick.deactivate();
             this.state.isProcessing  = false;

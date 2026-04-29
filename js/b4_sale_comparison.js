@@ -820,6 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Render Question ────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeByCategory('gameUI');
             AssistClick.deactivate();
             this.state.isProcessing    = false;
@@ -1018,6 +1019,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeModal = () => {
                 if (closed) return;
                 closed = true;
+                window.speechSynthesis.cancel();
                 if (modal.parentNode) modal.remove();
                 afterClose?.();
             };
@@ -4111,7 +4113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 600, 'ui');
             });
-            document.getElementById('b4-hnp-x').addEventListener('click', () => overlay.remove());
+            document.getElementById('b4-hnp-x').addEventListener('click', () => { window.speechSynthesis.cancel(); overlay.remove(); });
         },
 
         // 困難模式第二頁：答對後顯示三個金錢圖示選項
@@ -4218,7 +4220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const speech = `${expStore}${expPrice}元，減去${cheapStore}${cheapPrice}元，等於${correctDiff}${diffUnit}`;
             Game.Speech.speak(speech);
 
-            overlay.addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', () => { window.speechSynthesis.cancel(); overlay.remove(); });
         },
 
         _getDiffOptions(correct, isUnit = false) {

@@ -657,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Render Question ────────────────────────────────────
         renderQuestion() {
             Game.TimerManager.clearAll();
+            window.speechSynthesis.cancel();
             Game.EventManager.removeAll();
             AssistClick.deactivate();
             this.state.isProcessing = false;
@@ -1360,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 點外部關閉
             overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) overlay.remove();
+                if (e.target === overlay) { window.speechSynthesis.cancel(); overlay.remove(); }
             });
         },
 
@@ -2626,6 +2627,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeModal = () => {
                 if (closed) return;
                 closed = true;
+                window.speechSynthesis.cancel();
                 if (document.body.contains(modal)) modal.remove();
                 afterClose?.();
             };
