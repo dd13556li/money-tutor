@@ -3196,3 +3196,77 @@
     background: transparent;
     cursor: default;
 }
+
+/* ── 任務卡攤位清單（同 B5 目標清單 pattern）──────────────────── */
+.b6-stall-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: center;
+}
+.b6-scc-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 10px 12px 8px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    flex: 0 0 auto;
+    min-width: 100px;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.b6-scc-card.done {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.18);
+}
+.b6-scc-check {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 15px;
+}
+.b6-scc-icon {
+    font-size: 40px;
+    line-height: 1;
+}
+.b6-scc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+.b6-scc-req {
+    font-size: 12px;
+    font-weight: 600;
+    color: #059669;
+}
+.b6-scc-prog {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+.b6-scc-card.done .b6-scc-prog {
+    color: #16a34a;
+    background: #bbf7d0;
+}
+.b6-sc-hard-summary {
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-top: 6px;
+    text-align: center;
+    width: 100%;
+}

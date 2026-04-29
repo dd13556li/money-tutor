@@ -1536,6 +1536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="b6-p1-hint-btn" id="b6-p1-hint-btn">💡 提示</button>
                         </div>
                     </div>
+                    ${this._renderB6StallChecklist(g)}
                     ${diff !== 'hard' ? (() => {
                         const { pct, label, emoji, color } = this._b6BudgetBarInfo(total, budget);
                         return `<div class="b6-budget-bar-wrap" id="b6-budget-bar-wrap">
@@ -1605,6 +1606,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     app.style.opacity    = '';
                 }, 200, 'ui');
             });
+        },
+
+        _renderB6StallChecklist(g) {
+            const diff   = this.state.settings.difficulty;
+            const stalls = g.mission?.stalls || [];
+            if (!stalls.length) return '';
+            if (diff === 'hard') {
+                const total    = stalls.reduce((s, r) => s + r.count, 0);
+                const selCount = (g.selectedItems || []).length;
+                return `<div class="b6-sc-hard-summary">共需 ${total} 樣商品｜已選 <span id="b6-sc-sel-count">${selCount}</span> / ${total}</div>`;
+            }
+            return `<div class="b6-stall-checklist" id="b6-stall-checklist">
+                ${stalls.map(({ stall, count }) => {
+                    const stallInfo = _currentStalls[stall];
+                    if (!stallInfo) return '';
+                    const selCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
+                    const done = selCount >= count;
+                    return `<div class="b6-scc-card${done ? ' done' : ''}" data-scc-stall="${stall}">
+                        ${done ? '<span class="b6-scc-check">✅</span>' : ''}
+                        <span class="b6-scc-icon">${stallInfo.icon}</span>
+                        <span class="b6-scc-name">${stallInfo.name}</span>
+                        <span class="b6-scc-req">買 ${count} 樣</span>
+                        <span class="b6-scc-prog">${selCount}/${count}</span>
+                    </div>`;
+                }).join('')}
+            </div>`;
         },
 
         _renderCustomItemsPanel() {
@@ -2030,7 +2057,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 barLabel.textContent = emoji + ' ' + label;
             }
 
-            // 更新攤位需求列（任務卡）
+            // 更新任務卡頂部攤位清單（b6-stall-checklist）
+            const diff = this.state.settings.difficulty;
+            if (diff === 'hard') {
+                const el = document.getElementById('b6-sc-sel-count');
+                if (el) el.textContent = (g.selectedItems || []).length;
+            } else {
+                (mission.stalls || []).forEach(({ stall, count }) => {
+                    const sccEl = document.querySelector(`.b6-scc-card[data-scc-stall="${stall}"]`);
+                    if (!sccEl) return;
+                    const selCount = (g.selectedItems || []).filter(i => i.stall === stall).length;
+                    const done = selCount >= count;
+                    sccEl.classList.toggle('done', done);
+                    let mark = sccEl.querySelector('.b6-scc-check');
+                    if (done && !mark) {
+                        mark = document.createElement('span');
+                        mark.className = 'b6-scc-check';
+                        mark.textContent = '✅';
+                        sccEl.insertBefore(mark, sccEl.firstChild);
+                    } else if (!done && mark) {
+                        mark.remove();
+                    }
+                    const prog = sccEl.querySelector('.b6-scc-prog');
+                    if (prog) prog.textContent = `${selCount}/${count}`;
+                });
+            }
+
+            // 更新攤位需求列（左側進度卡）
             (mission.stalls || []).forEach(({ stall, count }) => {
                 const reqEl = document.querySelector(`.b6-stall-req[data-req-stall="${stall}"]`);
                 if (!reqEl) return;
