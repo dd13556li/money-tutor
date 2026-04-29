@@ -1,7 +1,7 @@
 # B5 生日派對預算 — 商品資料匯出
 
 > 資料來源：`js/b5_party_budget.js`（B5_ALL_ITEMS / B5_ROUND_CONFIG / B5_THEMES）
-> 匯出日期：2026-04-27（重大更新：商品擴充至各主題30種，B5_SCENARIOS 已廢棄改用動態生成）
+> 匯出日期：2026-04-29（更新：預算範圍說明 / 食物飲料商品 id 修正 / 第六節改為魔法商品系統）
 
 ---
 
@@ -11,14 +11,16 @@
 
 ### 食物飲料（10 種）
 
+> ⚠️ 2026-04-29 更新：舊版 `plate`/`cup`/`napkin` 已替換為 `bd_cupcake`/`bd_soda`/`bd_popcorn`
+
 | id | 名稱 | 圖示 | 基準單價 | 價格範圍 | imageUrl |
 |----|------|------|----------|----------|---------|
 | cake | 生日蛋糕 | 🎂 | 380 | [350,500] | icon-b5-birthday-cake.png |
 | drink | 果汁飲料 | 🧃 | 120 | [80,150] | icon-b5-juice-drink.png |
 | candy | 糖果禮包 | 🍬 | 90 | [65,120] | icon-b5-candy-bag.png |
-| plate | 派對紙盤 | 🍽️ | 45 | [30,60] | icon-b5-party-plate.png |
-| cup | 派對杯組 | 🥤 | 55 | [40,80] | icon-b5-party-cup.png |
-| napkin | 主題餐巾紙 | 🧻 | 35 | [25,50] | icon-b5-party-napkin.png |
+| bd_cupcake | 杯子蛋糕 | 🧁 | 150 | [110,200] | icon-b5-bd-cupcake.png |
+| bd_soda | 汽水 | 🥤 | 60 | [40,85] | icon-b5-bd-soda.png |
+| bd_popcorn | 爆米花 | 🍿 | 50 | [30,70] | icon-b5-bd-popcorn.png |
 | bd_cookie | 造型餅乾 | 🍪 | 55 | [35,75] | icon-b5-bd-cookie.png |
 | bd_choco | 巧克力 | 🍫 | 65 | [45,90] | icon-b5-bd-chocolate.png |
 | bd_lollipop | 棒棒糖 | 🍭 | 35 | [20,50] | icon-b5-bd-lollipop.png |
@@ -48,7 +50,7 @@
 | wand | 魔法棒 | 🪄 | 45 | [30,65] | icon-b5-magic-wand.png |
 | dice | 遊戲骰子 | 🎲 | 85 | [60,120] | icon-b5-game-dice.png |
 | funglasses | 造型眼鏡 | 🕶️ | 40 | [25,55] | icon-b5-fun-glasses.png |
-| bdcake | 生日蛋糕 | 🎂 | 350 | [280,420] | icon-b5-birthday-cake.png |
+| bdcake | 派對吹捲 | 🎉 | 40 | [25,55] | icon-b5-bd-party-blower.png |
 | squishy | 造型捏捏樂 | 🎊 | 60 | [40,80] | icon-b5-squishy-toy.png |
 | bubbleguns | 泡泡槍 | 🫧 | 75 | [50,100] | icon-b5-bd-bubble-gun.png |
 | playingcards | 撲克牌 | 🃏 | 90 | [65,120] | icon-b5-playing-cards.png |
@@ -76,11 +78,15 @@
 > `_B5_SCENARIOS_DEPRECATED` 仍保留在 JS 中供回溯，但已不使用。
 > 每關由 `_generateRound(diff, themeKey)` 動態生成：隨機抽 count 件商品 + 隨機化各商品價格。
 
-| 難度 | countRange | 預算計算 |
-|------|-----------|---------|
-| easy | [2, 3] | 大於目標總和的最小標準鈔票面額（100/500/1000/2000），確保找零 > 0 |
-| normal | [3, 4] | 同上 |
-| hard | [4, 6] | 同上 |
+| 難度 | 指定商品數 | 單件價格範圍 | 目標總價估算 | 可能的預算值 |
+|------|-----------|------------|------------|------------|
+| easy（簡單） | 2–3 件 | 20–500 元 | 約 40–1,500 元 | **100 / 500 / 1,000 / 2,000 元** |
+| normal（普通） | 3–4 件 | 20–500 元 | 約 60–2,000 元 | **100 / 500 / 1,000 / 2,000 元** |
+| hard（困難） | 4–6 件 | 20–500 元 | 約 80–3,000 元 | **100 / 500 / 1,000 / 2,000 / 5,000 元** |
+
+**預算計算邏輯**：`stdDenoms = [100, 500, 1000, 2000, 5000]`，取第一個大於目標總價的面額；超過 5000 則為 `Math.ceil((totalSum + 100) / 100) * 100`。確保找零 > 0。
+
+> **魔法商品注意**：魔法商品價格固定（老師設定，不隨機化），直接累加進目標總價後再計算預算。理論上任何 1–9999 元的魔法商品均可支援，預算會自動對應調整。
 
 ---
 
@@ -202,12 +208,15 @@
 
 ---
 
-## 六、自訂商品功能（2026-04-04 新增）
+## 六、魔法商品功能（2026-04-29 全面重構，取代舊 customItems 系統）
 
-- 設定頁「難度」下方有「自訂商品」切換列（普通/困難可見，`#b5-custom-items-toggle-row`）
-- 啟用後關卡頁顯示 `b5-custom-items-panel`（`_renderCustomItemsPanel`）
-- `_getTotal()` 中包含 `customTotal`（`g.customItems` 中未刪除的商品價格總和）
-- 搜尋 `customItemsEnabled`、`b5-custom-items-panel`、`b5-cip-add-btn`
+- 設定頁「難度」下方有「✨ 魔法商品」切換列（普通/困難可見，`#b5-custom-items-toggle-row`）
+- 啟用後**在設定頁**顯示魔法商品面板（`_renderMagicItemsPanel`），含類別選擇 / 圖片上傳 / 名稱 / 金額（數字鍵盤，1–9999 元）
+- 魔法商品儲存至 `state.settings.magicItems[]`（跨關保留；上限 5 個）
+- **普通模式**：魔法商品永遠列為指定必買目標（`_generateRound` 優先加入，一般商品補足剩餘名額）
+- **困難模式**：魔法商品出現在對應類別的商品格，自由選購（非強制必買）
+- `_getTotal()` 已移除 `customTotal`；魔法商品以 `selectedIds` 計入（與一般商品相同）
+- 搜尋 `customItemsEnabled`、`magicItems`、`_renderMagicItemsPanel`、`_bindMagicItemsPanel`、`_compressMagicImage`
 
 ---
 
