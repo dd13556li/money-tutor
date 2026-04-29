@@ -130,6 +130,18 @@ const B4_STORE_IMAGES = {
     '網購':     '../images/b4/icon-b4-store-online.png',
     '高級餐廳': '../images/b4/icon-b4-store-restaurant.png',
 };
+const B4_STORES = [
+    { store: '便利商店', storeIcon: '🏪' }, { store: '超市',     storeIcon: '🛒' },
+    { store: '量販店',   storeIcon: '🏬' }, { store: '生活百貨', storeIcon: '🧺' },
+    { store: '文具店',   storeIcon: '🏪' }, { store: '書店',     storeIcon: '📚' },
+    { store: '二手店',   storeIcon: '♻️' }, { store: '百貨公司', storeIcon: '🏢' },
+    { store: '傳統市場', storeIcon: '🥬' }, { store: '夜市',     storeIcon: '🌙' },
+    { store: '藥妝店',   storeIcon: '💊' }, { store: '藥局',     storeIcon: '💊' },
+    { store: '體育用品店', storeIcon: '⚽' }, { store: '手搖店', storeIcon: '🥤' },
+    { store: '咖啡廳',   storeIcon: '☕' }, { store: '麵包店',   storeIcon: '🥐' },
+    { store: '網購',     storeIcon: '💻' }, { store: '高級餐廳', storeIcon: '🍽️' },
+];
+
 function b4StoreIconHTML(storeName, storeEmoji) {
     const url = B4_STORE_IMAGES[storeName];
     if (url) {
@@ -318,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── State ──────────────────────────────────────────────
         state: {
-            settings: { difficulty: null, questionCount: null, compareStores: null, clickMode: 'off', itemCat: 'all', customItemsEnabled: false },
+            settings: { difficulty: null, questionCount: null, compareStores: null, clickMode: 'off', itemCat: 'all', customItemsEnabled: false, magicItems: [] },
             quiz: {
                 currentQuestion: 0,
                 totalQuestions: 10,
@@ -474,6 +486,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 兩家店：比較兩間商店價格 ｜ 三家店：三間商店由便宜到貴排序 ｜ 單位比價：計算每單位的價格再比較
                             </div>
                         </div>
+                        <div class="b-setting-group" id="b4-custom-items-group-wrap">
+                            <div id="b4-custom-items-toggle-row" style="display:none;">
+                                <label style="font-size:13px;color:#374151;font-weight:600;">✨ 魔法商品</label>
+                                <div class="b-btn-group" id="b4-custom-items-group" style="margin-top:4px;">
+                                    <button class="b-sel-btn active" data-custom="off">✗ 關閉</button>
+                                    <button class="b-sel-btn" data-custom="on">✓ 開啟</button>
+                                </div>
+                                ${this._renderMagicItemsPanel()}
+                            </div>
+                        </div>
                         <div class="b-setting-group">
                             <label class="b-setting-label">🏷️ 商品類別</label>
                             <div class="b-btn-group" id="cat-group">
@@ -482,22 +504,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="b-sel-btn" data-cat="stationery">文具書籍</button>
                                 <button class="b-sel-btn" data-cat="daily">生活用品</button>
                                 <button class="b-sel-btn" data-cat="clothing">服飾配件</button>
-                            </div>
-                            <div id="b4-custom-price-toggle-row" style="display:none;margin-top:8px;">
-                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂價格</label>
-                                <div class="b-btn-group" id="b4-custom-price-group" style="margin-top:4px;">
-                                    <button class="b-sel-btn active" data-custom="off">關閉</button>
-                                    <button class="b-sel-btn" data-custom="on">開啟</button>
-                                </div>
-                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在題目頁面修改兩間商店的價格，系統重新計算比較結果（兩家店模式）</div>
-                            </div>
-                            <div id="b4-triple-custom-price-toggle-row" style="display:none;margin-top:8px;">
-                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂價格</label>
-                                <div class="b-btn-group" id="b4-triple-custom-price-group" style="margin-top:4px;">
-                                    <button class="b-sel-btn active" data-triple-custom="off">關閉</button>
-                                    <button class="b-sel-btn" data-triple-custom="on">開啟</button>
-                                </div>
-                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在題目頁面修改三間商店的價格，系統重新計算排序結果（三家店模式）</div>
                             </div>
                         </div>
                         <div class="b-setting-group">
@@ -551,23 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _bindSettingsEvents() {
             Game.EventManager.removeByCategory('settings');
-            const _updateCustomPriceToggle = () => {
-                const s = this.state.settings;
-                // 兩家店
-                const toggle = document.getElementById('b4-custom-price-toggle-row');
-                const showTwo = s.difficulty !== 'easy' && s.compareStores === 'two';
-                if (toggle) toggle.style.display = showTwo ? '' : 'none';
-                // 三家店
-                const tripleToggle = document.getElementById('b4-triple-custom-price-toggle-row');
-                const showTriple = s.difficulty !== 'easy' && s.compareStores === 'triple';
-                if (tripleToggle) tripleToggle.style.display = showTriple ? '' : 'none';
-                // 若兩者皆不顯示 → 重置 customItemsEnabled
-                if (!showTwo && !showTriple) {
-                    this.state.settings.customItemsEnabled = false;
-                    document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
-                    document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(b => b.classList.toggle('active', b.dataset.tripleCustom === 'off'));
-                }
-            };
             const _updateUnitBtnVisibility = () => {
                 const unitBtn = document.querySelector('[data-stores="unit"]');
                 if (!unitBtn) return;
@@ -597,7 +586,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.state.settings.clickMode = 'off';
                         if (modeGroup) modeGroup.style.display = '';
                     }
-                    _updateCustomPriceToggle();
                     _updateUnitBtnVisibility();
                     this._checkCanStart();
                 }, {}, 'settings');
@@ -627,13 +615,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.querySelectorAll('[data-stores]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
+                    const prevMode = this.state.settings.compareStores;
                     document.querySelectorAll('[data-stores]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.compareStores = btn.dataset.stores;
-                    _updateCustomPriceToggle();
+                    // 顯示/隱藏魔法商品 toggle（單位比價不支援）
+                    const toggleRow = document.getElementById('b4-custom-items-toggle-row');
+                    if (toggleRow) toggleRow.style.display = btn.dataset.stores === 'unit' ? 'none' : '';
+                    // 切換兩家/三家時清空魔法商品（格式不相容）
+                    const modeChanged = prevMode && prevMode !== btn.dataset.stores
+                                     && prevMode !== 'unit' && btn.dataset.stores !== 'unit';
+                    if (modeChanged && this.state.settings.magicItems?.length > 0) {
+                        this.state.settings.magicItems = [];
+                        document.querySelectorAll('#b4-custom-items-group [data-custom]').forEach(b =>
+                            b.classList.toggle('active', b.dataset.custom === 'off'));
+                        this.state.settings.customItemsEnabled = false;
+                    }
+                    // 若已開啟且格式改變，重繪面板
+                    if (this.state.settings.customItemsEnabled) {
+                        const panel = document.getElementById('b4-magic-panel');
+                        if (panel) { panel.outerHTML = this._renderMagicItemsPanel(); this._bindMagicItemsPanel(); }
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
+
+            // 魔法商品 toggle
+            document.querySelectorAll('#b4-custom-items-group [data-custom]').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('#b4-custom-items-group [data-custom]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
+                    const panel = document.getElementById('b4-magic-panel');
+                    if (panel) {
+                        panel.style.display = this.state.settings.customItemsEnabled ? '' : 'none';
+                        if (this.state.settings.customItemsEnabled) this._bindMagicItemsPanel();
+                    }
+                }, {}, 'settings');
+            });
+            if (this.state.settings.customItemsEnabled) {
+                const panel = document.getElementById('b4-magic-panel');
+                if (panel) { panel.style.display = ''; this._bindMagicItemsPanel(); }
+            }
 
             document.querySelectorAll('#cat-group [data-cat]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -644,21 +667,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
 
-            document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#b4-custom-price-group [data-custom]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
-                }, {}, 'settings');
-            });
-
-            document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(btn => {
-                Game.EventManager.on(btn, 'click', () => {
-                    document.querySelectorAll('#b4-triple-custom-price-group [data-triple-custom]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    this.state.settings.customItemsEnabled = btn.dataset.tripleCustom === 'on';
-                }, {}, 'settings');
-            });
 
             document.querySelectorAll('[data-assist]').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -689,6 +697,248 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.EventManager.on(document.getElementById('start-btn'), 'click', () => {
                 this.startGame();
             }, {}, 'settings');
+        },
+
+        // ── 魔法商品 ────────────────────────────────────────────
+        _renderMagicItemsPanel() {
+            const s = this.state.settings;
+            const storeCount = s.compareStores === 'triple' ? 3 : 2;
+            const items = s.magicItems || [];
+            const listHTML = items.map((mi, idx) => `
+                <div class="b4-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b4-mp-item-icon">${b4IconHTML(mi)}</span>
+                    <span class="b4-mp-item-name">${mi.name}</span>
+                    ${mi.stores.map(st => `<span class="b4-mp-item-store">${st.storeIcon} ${st.price}元</span>`).join('')}
+                    <button class="b4-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`).join('');
+            const storeFields = Array.from({ length: storeCount }, (_, i) => `
+                <div class="b4-mp-store-row">
+                    <span class="b4-mp-store-label">店${i + 1}：</span>
+                    <div class="b4-mp-store-wrap"><button class="b4-cip-input b4-mp-store-btn" id="b4-mp-store-${i}-btn" type="button">選擇商店</button></div>
+                    <button class="b4-cip-input b4-cip-price-inp b4-mp-price-btn" id="b4-mp-price-${i}-btn" type="button">金額</button>
+                </div>`).join('');
+            return `
+            <div id="b4-magic-panel" style="display:${s.customItemsEnabled ? '' : 'none'};margin-top:10px;">
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px;">最多 5 個魔法商品（每次遊戲保證出現一題）</div>
+                <div id="b4-mp-list">${listHTML}</div>
+                <div class="b4-mp-add-box">
+                    <div class="b4-mp-row">
+                        <input type="file" id="b4-mp-file" accept="image/*" style="display:none">
+                        <button class="b4-mp-upload-btn" id="b4-mp-upload-btn" title="上傳圖片（選填）">📷</button>
+                        <img id="b4-mp-preview" class="b4-mp-img-preview" style="display:none" alt="">
+                        <input type="text" id="b4-mp-name" class="b4-cip-input" placeholder="商品名稱（最多6字）" maxlength="6" style="flex:1;">
+                    </div>
+                    ${storeFields}
+                    <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                        <button class="b4-cip-add-btn" id="b4-mp-add-btn">＋ 新增</button>
+                    </div>
+                </div>
+            </div>`;
+        },
+
+        _bindMagicItemsPanel() {
+            const s = this.state.settings;
+            if (!s.magicItems) s.magicItems = [];
+            const uploadBtn0 = document.getElementById('b4-mp-upload-btn');
+            if (!uploadBtn0 || uploadBtn0._b4MpBound) return;
+            uploadBtn0._b4MpBound = true;
+            const storeCount = s.compareStores === 'triple' ? 3 : 2;
+            let pendingImageUrl = null;
+            const selectedStores = Array(storeCount).fill(null);
+            const selectedPrices = Array(storeCount).fill(0);
+
+            // 圖片上傳
+            const fileInput = document.getElementById('b4-mp-file');
+            const preview   = document.getElementById('b4-mp-preview');
+            if (uploadBtn0 && fileInput) {
+                Game.EventManager.on(uploadBtn0, 'click', () => fileInput.click(), {}, 'settings');
+                Game.EventManager.on(fileInput, 'change', () => {
+                    const file = fileInput.files?.[0];
+                    if (!file) return;
+                    this._compressMagicImage(file, (url) => {
+                        pendingImageUrl = url;
+                        if (preview) { preview.src = url; preview.style.display = ''; }
+                    });
+                }, {}, 'settings');
+            }
+
+            // 各店：商店下拉 + 金額 numpad
+            for (let i = 0; i < storeCount; i++) {
+                const storeBtn = document.getElementById(`b4-mp-store-${i}-btn`);
+                const priceBtn = document.getElementById(`b4-mp-price-${i}-btn`);
+                if (storeBtn) {
+                    Game.EventManager.on(storeBtn, 'click', (e) => {
+                        e.stopPropagation();
+                        this._showStoreDropdown(storeBtn, selectedStores, i, (store) => {
+                            selectedStores[i] = store;
+                            storeBtn.textContent = `${store.storeIcon} ${store.store}`;
+                            storeBtn.classList.add('b4-mp-store-btn--set');
+                        });
+                    }, {}, 'settings');
+                }
+                if (priceBtn) {
+                    Game.EventManager.on(priceBtn, 'click', () => {
+                        this._showMpPriceNumpad(selectedPrices[i], (n) => {
+                            selectedPrices[i] = n;
+                            priceBtn.textContent = `${n} 元`;
+                            priceBtn.classList.add('b4-mp-price-btn--set');
+                        });
+                    }, {}, 'settings');
+                }
+            }
+
+            // 新增按鈕
+            const addBtn = document.getElementById('b4-mp-add-btn');
+            if (addBtn) {
+                Game.EventManager.on(addBtn, 'click', () => {
+                    if (s.magicItems.length >= 5) { alert('最多新增 5 個魔法商品'); return; }
+                    const name = document.getElementById('b4-mp-name')?.value.trim();
+                    if (!name) { alert('請輸入商品名稱'); return; }
+                    for (let i = 0; i < storeCount; i++) {
+                        if (!selectedStores[i]) { alert(`請選擇店 ${i + 1} 的商店`); return; }
+                        if (!selectedPrices[i] || selectedPrices[i] < 1) { alert(`請輸入店 ${i + 1} 的金額`); return; }
+                    }
+                    const storeNames = selectedStores.slice(0, storeCount).map(st => st.store);
+                    if (new Set(storeNames).size < storeCount) { alert('請選擇不同的商店'); return; }
+                    const prices = selectedPrices.slice(0, storeCount);
+                    if (new Set(prices).size < storeCount) { alert('各店金額不可相同'); return; }
+                    s.magicItems.push({
+                        id: `magic-b4-${Date.now()}`,
+                        name,
+                        icon: '✨',
+                        imageUrl: pendingImageUrl || null,
+                        stores: selectedStores.slice(0, storeCount).map((st, i) => ({
+                            store: st.store, storeIcon: st.storeIcon, price: selectedPrices[i]
+                        })),
+                        storeCount,
+                        isCustom: true,
+                    });
+                    pendingImageUrl = null;
+                    selectedStores.fill(null);
+                    selectedPrices.fill(0);
+                    document.getElementById('b4-mp-name').value = '';
+                    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+                    if (fileInput) fileInput.value = '';
+                    for (let i = 0; i < storeCount; i++) {
+                        const sb = document.getElementById(`b4-mp-store-${i}-btn`);
+                        if (sb) { sb.textContent = '選擇商店'; sb.classList.remove('b4-mp-store-btn--set'); }
+                        const pb = document.getElementById(`b4-mp-price-${i}-btn`);
+                        if (pb) { pb.textContent = '金額'; pb.classList.remove('b4-mp-price-btn--set'); }
+                    }
+                    this._refreshB4MagicItemsList();
+                }, {}, 'settings');
+            }
+
+            // 刪除（委派）
+            const list = document.getElementById('b4-mp-list');
+            if (list) {
+                Game.EventManager.on(list, 'click', (e) => {
+                    const btn = e.target.closest('[data-mp-del]');
+                    if (!btn) return;
+                    s.magicItems.splice(parseInt(btn.dataset.mpDel), 1);
+                    this._refreshB4MagicItemsList();
+                }, {}, 'settings');
+            }
+        },
+
+        _refreshB4MagicItemsList() {
+            const list = document.getElementById('b4-mp-list');
+            if (!list) return;
+            const items = this.state.settings.magicItems || [];
+            list.innerHTML = items.map((mi, idx) => `
+                <div class="b4-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b4-mp-item-icon">${b4IconHTML(mi)}</span>
+                    <span class="b4-mp-item-name">${mi.name}</span>
+                    ${mi.stores.map(st => `<span class="b4-mp-item-store">${st.storeIcon} ${st.price}元</span>`).join('')}
+                    <button class="b4-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`).join('');
+        },
+
+        _showMpPriceNumpad(currentPrice, onConfirm) {
+            document.getElementById('b-mp-price-numpad')?.remove();
+            let val = currentPrice > 0 ? String(currentPrice) : '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-mp-price-numpad';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">💰 輸入金額</div>
+                    <div id="b-mppnp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">${currentPrice > 0 ? currentPrice : '---'}</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-mppnpk="${k}">${k}</button>`).join('')}
+                    </div>
+                    <button id="b-mppnp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-mppnp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-mppnpk]').forEach(npBtn => {
+                npBtn.addEventListener('click', () => {
+                    const k = npBtn.dataset.mppnpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 9999) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 9999) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-mppnp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
+        _showStoreDropdown(anchor, selectedStores, currentIdx, onSelect) {
+            document.getElementById('b4-mp-store-dropdown')?.remove();
+            const usedStores = new Set(
+                selectedStores.filter((st, i) => st !== null && i !== currentIdx).map(st => st.store)
+            );
+            const available = B4_STORES.filter(st => !usedStores.has(st.store));
+            const drop = document.createElement('div');
+            drop.id = 'b4-mp-store-dropdown';
+            drop.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1.5px solid #d1d5db;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:10100;padding:8px;display:flex;flex-wrap:wrap;gap:4px;max-width:280px;min-width:200px;';
+            drop.innerHTML = available.map(st =>
+                `<button style="padding:5px 8px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;cursor:pointer;font-size:13px;white-space:nowrap;" data-sname="${st.store}" data-sicon="${st.storeIcon}">${st.storeIcon} ${st.store}</button>`
+            ).join('');
+            const wrap = anchor.closest('.b4-mp-store-wrap') || anchor.parentElement;
+            wrap.style.position = 'relative';
+            wrap.appendChild(drop);
+            drop.querySelectorAll('[data-sname]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onSelect({ store: btn.dataset.sname, storeIcon: btn.dataset.sicon });
+                    drop.remove();
+                });
+            });
+            const close = (e) => {
+                if (!drop.contains(e.target) && e.target !== anchor) {
+                    drop.remove(); document.removeEventListener('click', close);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', close), 0);
+        },
+
+        _compressMagicImage(file, cb) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const size = 200;
+                    const scale = Math.min(size / img.width, size / img.height, 1);
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = Math.round(img.width  * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    cb(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         },
 
         _showSettingsCountNumpad(label, onConfirm) {
@@ -814,6 +1064,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     result.push({ ...finalItem, swapped, diff, isTriple: false, isUnit: false });
                 }
             }
+
+            // 注入魔法商品（每次遊戲保證出現一題）
+            if (!isUnit) {
+                const magic = (this.state.settings.magicItems || [])
+                    .filter(mi => isTriple ? mi.storeCount === 3 : mi.storeCount === 2);
+                if (magic.length > 0) {
+                    const chosen = magic[Math.floor(Math.random() * magic.length)];
+                    let magicQ;
+                    if (isTriple) {
+                        const sortedAsc = [...chosen.stores].sort((a, b) => a.price - b.price);
+                        const shuffled  = [...chosen.stores].sort(() => Math.random() - 0.5);
+                        const cheapestIdx = shuffled.findIndex(s => s.price === sortedAsc[0].price);
+                        const middleIdx   = shuffled.findIndex(s => s.price === sortedAsc[1].price);
+                        const mostExpIdx  = shuffled.findIndex(s => s.price === sortedAsc[2].price);
+                        const diff = sortedAsc[2].price - sortedAsc[0].price;
+                        magicQ = { ...chosen, stores: shuffled, sortedAsc, cheapestIdx, middleIdx, mostExpIdx, diff, isTriple: true, isUnit: false };
+                    } else {
+                        const sortedDesc = [...chosen.stores].sort((a, b) => b.price - a.price);
+                        const optA = sortedDesc[0];
+                        const optB = sortedDesc[1];
+                        const swapped = Math.random() < 0.5;
+                        const diff = optA.price - optB.price;
+                        magicQ = { ...chosen, optA, optB, swapped, diff, isTriple: false, isUnit: false };
+                    }
+                    const replaceIdx = Math.floor(Math.random() * result.length);
+                    result[replaceIdx] = magicQ;
+                }
+            }
+
             return result;
         },
 
@@ -864,9 +1143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>` : ''}
-                    ${this.state.settings.customItemsEnabled && !curr.isUnit && diff !== 'easy'
-                        ? this._cppInlineHTML([{ id:'left', store: left.store, price: left.price }, { id:'right', store: right.store, price: right.price }])
-                        : ''}
                 </div>
                 <div class="b4-compare-grid" id="compare-grid">
                     ${this._renderOptionCard('left', left, curr.isUnit ? curr.optB.price / curr.optB.qty : curr.optB.price, correctSide, curr.isUnit ? curr : null)}
@@ -1668,48 +1944,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (text) Game.Speech.speak(text);
                 }, {}, 'gameUI');
             }
-            // 自訂價格（折疊面板 + 數字鍵盤）
-            if (this.state.settings.customItemsEnabled && !curr.isUnit && diff !== 'easy') {
-                this._bindCppEvents(() => {
-                    const boxes = document.querySelectorAll('.b4-cpp-box');
-                    const vals = {};
-                    boxes.forEach(b => { vals[b.dataset.cppId] = parseInt(b.dataset.cppVal) || 0; });
-                    if (!vals.left || !vals.right || vals.left < 1 || vals.right < 1 || vals.left === vals.right) {
-                        Game.Speech.speak('請輸入兩個不同的有效價格'); return;
-                    }
-                    this._applyCustomPrices(curr, vals.left, vals.right);
-                    this.renderQuestion();
-                });
-            }
-        },
-
-        _applyCustomPrices(curr, leftPrice, rightPrice) {
-            // left = curr.swapped ? curr.optB : curr.optA
-            // right = curr.swapped ? curr.optA : curr.optB
-            if (curr.swapped) {
-                // left=optB, right=optA
-                if (leftPrice <= rightPrice) {
-                    curr.optB.price = leftPrice;
-                    curr.optA.price = rightPrice;
-                } else {
-                    // optB (left) becomes more expensive → flip
-                    curr.optB.price = rightPrice;
-                    curr.optA.price = leftPrice;
-                    curr.swapped = false;
-                }
-            } else {
-                // left=optA, right=optB
-                if (leftPrice >= rightPrice) {
-                    curr.optA.price = leftPrice;
-                    curr.optB.price = rightPrice;
-                } else {
-                    // optA (left) becomes cheaper → flip
-                    curr.optA.price = rightPrice;
-                    curr.optB.price = leftPrice;
-                    curr.swapped = true;
-                }
-            }
-            curr.diff = curr.optA.price - curr.optB.price;
         },
 
         // ── Select Phase Handler ────────────────────────────────
@@ -1813,7 +2047,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? '哪家商店最便宜？'
                 : '從最便宜到最貴，依序輸入各家商品金額';
 
-            const showTripleCpp = this.state.settings.customItemsEnabled && diff !== 'easy';
             const cardsHTML = curr.stores.map((store, idx) => {
                 let priceDisplay;
                 if (diff === 'hard') {
@@ -1846,7 +2079,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="../images/index/educated_money_bag_character.png" alt="" class="b4-hint-mascot" onerror="this.style.display='none'">
                         <button class="b4-hero-hint-btn" id="b4-hero-hint-btn">💡 提示</button>
                     </div>`}
-                    ${showTripleCpp ? this._cppInlineHTML(curr.stores.map((s, i) => ({ id: i, store: s.store, price: s.price }))) : ''}
                 </div>
                 <div class="b4-triple-grid" id="triple-grid">
                     ${cardsHTML}
@@ -1937,130 +2169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (text) Game.Speech.speak(text);
             }, {}, 'gameUI');
 
-            // 自訂價格（折疊面板 + 數字鍵盤）
-            if (this.state.settings.customItemsEnabled && diff !== 'easy') {
-                this._bindCppEvents(() => {
-                    const boxes = document.querySelectorAll('.b4-cpp-box');
-                    const prices = Array.from(boxes).map(b => parseInt(b.dataset.cppVal) || 0);
-                    if (prices.some(p => p <= 0) || new Set(prices).size < prices.length) {
-                        Game.Speech.speak('請輸入三個不同的有效價格'); return;
-                    }
-                    this._applyTripleCustomPrices(curr, prices);
-                    this._renderTripleQuestion(curr, diff, document.getElementById('app'));
-                });
-            }
-        },
-
-        // ── 三商店自訂價格套用 ─────────────────────────────────────────
-        _applyTripleCustomPrices(curr, prices) {
-            curr.stores.forEach((store, i) => { store.price = prices[i]; });
-            const sorted = [...curr.stores].sort((a, b) => a.price - b.price);
-            curr.sortedAsc = sorted;
-            curr.cheapestIdx = curr.stores.findIndex(s => s === sorted[0]);
-            curr.middleIdx   = curr.stores.findIndex(s => s === sorted[1]);
-            curr.mostExpIdx  = curr.stores.findIndex(s => s === sorted[2]);
-            curr.diff = sorted[2].price - sorted[0].price;
-        },
-
-        // ── 自訂價格：內嵌可折疊卡片 HTML ─────────────────────────────
-        // entries: [{ id, store, price }, ...] — id 用於 data-cpp-id attr
-        _cppInlineHTML(entries) {
-            const rows = entries.map(e => `
-            <div class="b4-cpp-row">
-                <span class="b4-cpp-label">${e.store}：</span>
-                <div class="b4-cpp-box" data-cpp-id="${e.id}" data-cpp-val="${e.price}" style="cursor:pointer;">
-                    <span class="b4-cpp-box-val">${e.price}</span><span class="b4-cpp-box-unit"> 元</span>
-                </div>
-            </div>`).join('');
-            return `
-            <div class="b4-cpp-inline">
-                <button class="b4-cpp-toggle-btn" id="b4-cpp-toggle-btn">⚙️ 自訂價格</button>
-                <div class="b4-cpp-body" id="b4-cpp-body" style="display:none;">
-                    ${rows}
-                    <button class="b4-cpp-apply-btn" id="b4-cpp-apply-btn">✓ 套用</button>
-                </div>
-            </div>`;
-        },
-
-        // ── 自訂價格：數字鍵盤彈窗 ─────────────────────────────────────
-        _openCppNumpad(label, currentVal, onConfirm) {
-            const prev = document.getElementById('b4-cpp-np-modal');
-            if (prev) prev.remove();
-            const overlay = document.createElement('div');
-            overlay.id = 'b4-cpp-np-modal';
-            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);';
-            overlay.innerHTML = `
-            <div class="b4-pi-modal-card">
-                <button class="b4-modal-close-x" id="b4-cpp-np-x">✕</button>
-                <div class="b4-pi-modal-title">${label}</div>
-                <div class="b4-input-display" id="b4-cpp-np-display">
-                    <span id="b4-cpp-np-val">${currentVal || '0'}</span><span class="b4-unit-text"> 元</span>
-                </div>
-                <div class="b4-numpad">
-                    ${[7,8,9,4,5,6,1,2,3].map(n => `<button class="b4-numpad-btn" data-cpp-n="${n}">${n}</button>`).join('')}
-                    <button class="b4-numpad-btn btn-del" id="b4-cpp-np-del">⌫</button>
-                    <button class="b4-numpad-btn" data-cpp-n="0">0</button>
-                    <button class="b4-numpad-btn btn-ok" id="b4-cpp-np-ok">✓</button>
-                </div>
-            </div>`;
-            document.body.appendChild(overlay);
-
-            let val = String(currentVal || '');
-            const updateDisp = () => {
-                const el = document.getElementById('b4-cpp-np-val');
-                if (el) el.textContent = val || '0';
-            };
-            overlay.querySelectorAll('[data-cpp-n]').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    e.stopPropagation();
-                    if (val.length >= 6) return;
-                    val += btn.dataset.cppN;
-                    updateDisp();
-                });
-            });
-            document.getElementById('b4-cpp-np-del').addEventListener('click', e => {
-                e.stopPropagation(); val = val.slice(0, -1); updateDisp();
-            });
-            document.getElementById('b4-cpp-np-ok').addEventListener('click', e => {
-                e.stopPropagation();
-                const n = parseInt(val);
-                if (!n || n < 1) return;
-                overlay.remove();
-                onConfirm(n);
-            });
-            document.getElementById('b4-cpp-np-x').addEventListener('click', () => overlay.remove());
-        },
-
-        // ── 自訂價格：绑定折疊按鈕 + 數字鍵盤（兩家店 or 三家店）────────
-        _bindCppEvents(applyFn) {
-            const toggleBtn = document.getElementById('b4-cpp-toggle-btn');
-            const body      = document.getElementById('b4-cpp-body');
-            if (toggleBtn && body) {
-                Game.EventManager.on(toggleBtn, 'click', () => {
-                    const open = body.style.display === 'none';
-                    body.style.display = open ? '' : 'none';
-                    toggleBtn.classList.toggle('b4-cpp-toggle-open', open);
-                }, {}, 'gameUI');
-            }
-            // 每個輸入框點擊 → 數字鍵盤
-            document.querySelectorAll('.b4-cpp-box').forEach(box => {
-                Game.EventManager.on(box, 'click', () => {
-                    const id  = box.dataset.cppId;
-                    const cur = parseInt(box.dataset.cppVal) || 0;
-                    this._openCppNumpad(`輸入${box.querySelector('.b4-cpp-label') ? '' : ''}價格`, cur, (n) => {
-                        box.dataset.cppVal = n;
-                        const valEl = box.querySelector('.b4-cpp-box-val');
-                        if (valEl) valEl.textContent = n;
-                    });
-                }, {}, 'gameUI');
-            });
-            // 套用按鈕
-            const applyBtn = document.getElementById('b4-cpp-apply-btn');
-            if (applyBtn) {
-                Game.EventManager.on(applyBtn, 'click', () => {
-                    applyFn();
-                }, {}, 'gameUI');
-            }
         },
 
         // ── 三商店普通模式：點幣後輸入三個金額 ────────────────────────
