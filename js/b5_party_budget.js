@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: 'off', partyTheme: null, customItemsEnabled: false },
+            settings: { difficulty: null, rounds: null, clickMode: 'off', partyTheme: null, customItemsEnabled: false, magicItems: [] },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -478,13 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="b-setting-group" id="b5-custom-items-group-wrap">
                             <div id="b5-custom-items-toggle-row" style="display:none;">
-                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂商品</label>
+                                <label style="font-size:13px;color:#374151;font-weight:600;">✨ 魔法商品</label>
                                 <div class="b-btn-group" id="b5-custom-items-group" style="margin-top:4px;">
                                     <button class="b-sel-btn active" data-custom="off">關閉</button>
                                     <button class="b-sel-btn" data-custom="on">開啟</button>
                                 </div>
-                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在關卡頁面新增自訂商品，計入選購總金額</div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後可在設定頁新增自訂商品；普通模式為指定必買，困難模式可自由選購</div>
                             </div>
+                            ${this._renderMagicItemsPanel()}
                         </div>
                         <div class="b-setting-group" id="assist-click-group" style="display:none;">
                             <label class="b-setting-label">🤖 輔助點擊：</label>
@@ -578,6 +579,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (customToggle) customToggle.style.display = 'none';
                             this.state.settings.customItemsEnabled = false;
                             document.querySelectorAll('#b5-custom-items-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
+                            const panel = document.getElementById('b5-magic-panel');
+                            if (panel) panel.style.display = 'none';
                         } else {
                             assistGroup.style.display = 'none';
                             this.state.settings.clickMode = 'off';
@@ -630,8 +633,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#b5-custom-items-group [data-custom]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
+                    const panel = document.getElementById('b5-magic-panel');
+                    if (panel) {
+                        panel.style.display = this.state.settings.customItemsEnabled ? '' : 'none';
+                        if (this.state.settings.customItemsEnabled) this._bindMagicItemsPanel();
+                    }
                 }, {}, 'settings');
             });
+            if (this.state.settings.customItemsEnabled) {
+                const panel = document.getElementById('b5-magic-panel');
+                if (panel) { panel.style.display = ''; this._bindMagicItemsPanel(); }
+            }
 
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -704,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _generateRound(diff, themeKey) {
             const theme = B5_THEMES[themeKey] || B5_THEMES.birthday;
             const [minC, maxC] = B5_ROUND_CONFIG[diff].countRange;
-            const count = minC + Math.floor(Math.random() * (maxC - minC + 1));
+            const totalCount = minC + Math.floor(Math.random() * (maxC - minC + 1));
 
             // 為本關所有商品隨機化價格
             const roundPrices = {};
@@ -712,17 +724,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 roundPrices[item.id] = this._randomPrice(item);
             });
 
-            // 隨機抽取 count 件作為目標
+            // 魔法商品（普通/困難模式）永遠列為必買目標，使用固定價格
+            const magicItems = (diff !== 'easy') ? (this.state.settings.magicItems || []) : [];
+            const magicTargets = magicItems.map(mi => ({ ...mi }));
+
+            // 剩餘名額由一般商品隨機補齊
+            const regularCount = Math.max(0, totalCount - magicTargets.length);
             const shuffled = [...theme.allItems].sort(() => Math.random() - 0.5);
-            const targetItems = shuffled.slice(0, count).map(item => ({
+            const regularTargets = shuffled.slice(0, regularCount).map(item => ({
                 ...item,
                 price: roundPrices[item.id],
             }));
 
-            const targetSum = targetItems.reduce((s, i) => s + i.price, 0);
+            const targetItems = [...magicTargets, ...regularTargets];
+            const targetSum   = targetItems.reduce((s, i) => s + i.price, 0);
             // 預算 = 大於目標總和的最小標準鈔票面額，確保找零 > 0
-            const stdDenoms = [100, 500, 1000, 2000];
-            const budget = stdDenoms.find(d => d > targetSum) || targetSum + 200;
+            const stdDenoms = [100, 500, 1000, 2000, 5000];
+            const budget = stdDenoms.find(d => d > targetSum) || Math.ceil((targetSum + 100) / 100) * 100;
             return { targetItems, budget, themeKey, roundPrices };
         },
 
@@ -921,11 +939,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ...item,
                 price: roundData.roundPrices[item.id] || item.price,
             }));
+            // 注入魔法商品（普通/困難模式）
+            const diff = this.state.settings.difficulty;
+            if (diff !== 'easy') {
+                const magic = this.state.settings.magicItems || [];
+                g.items = [...g.items, ...magic.map(mi => ({ ...mi }))];
+            }
 
             g.selectedIds    = new Set();
             g.submitted      = false;
             g.roundErrors    = 0;
-            g.customItems    = [];
             g.activeCategory = null;
             g.p1HintMode     = false;
             g.p1HintItems    = [];
@@ -936,7 +959,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this._bindRoundEvents();
             this._updateTotalBar();
 
-            const diff = this.state.settings.difficulty;
             this._showRoundIntroCard(g.currentRound + 1, g.budget, () => {
                 if (diff === 'easy') {
                     this._b5P1ActivateHintMode();
@@ -1073,8 +1095,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="b5-right-panel" id="b5-right-panel">${this._renderB5RightPanel(g)}</div>
                 </div>
                 <div id="b5-result-area"></div>
-                <div id="b5-custom-items-list"></div>
-                ${this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy' ? this._renderCustomItemsPanel() : ''}
             </div>`;
         },
 
@@ -1169,7 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _getAvailableCategories() {
             const g = this.state.game;
-            const catSet = new Set(g.items.map(i => B5_ITEM_CATEGORIES[i.id]).filter(Boolean));
+            const catSet = new Set(g.items.map(i => B5_ITEM_CATEGORIES[i.id] || i.categoryKey).filter(Boolean));
             return Object.keys(B5_CATEGORY_META).filter(c => catSet.has(c));
         },
 
@@ -1177,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const g = this.state.game;
             return cats.map(cat => {
                 const meta           = B5_CATEGORY_META[cat];
-                const catItems       = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
+                const catItems       = g.items.filter(i => (B5_ITEM_CATEGORIES[i.id] || i.categoryKey) === cat);
                 const catTargetItems = catItems.filter(i => (g.targetIds || new Set()).has(i.id));
                 const selCount       = catTargetItems.filter(i => g.selectedIds.has(i.id)).length;
                 const isActive       = cat === activeCat;
@@ -1207,7 +1227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _renderB5CategoryItems(cat) {
             const g = this.state.game;
             const diff = this.state.settings.difficulty;
-            const items = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
+            const items = g.items.filter(i => (B5_ITEM_CATEGORIES[i.id] || i.categoryKey) === cat);
             if (!items.length) return '<div class="b5-cp-hint">此類別無商品</div>';
             return items.map(item => {
                 const isSelected = g.selectedIds.has(item.id);
@@ -1318,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const g    = this.state.game;
             const cats = this._getAvailableCategories();
             cats.forEach(cat => {
-                const catItems       = g.items.filter(i => B5_ITEM_CATEGORIES[i.id] === cat);
+                const catItems       = g.items.filter(i => (B5_ITEM_CATEGORIES[i.id] || i.categoryKey) === cat);
                 const catTargetItems = catItems.filter(i => (g.targetIds || new Set()).has(i.id));
                 const selCount       = catTargetItems.filter(i => g.selectedIds.has(i.id)).length;
                 const tab  = document.querySelector(`.b5-cat-tab[data-cat="${cat}"]`);
@@ -1337,59 +1357,208 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        _renderCustomItemsPanel() {
+        _renderMagicItemsPanel() {
+            const items  = this.state.settings.magicItems || [];
+            const catMeta = B5_CATEGORY_META;
+            const listHTML = items.map((mi, idx) => `
+                <div class="b5-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b5-mp-item-icon">${b5IconHTML(mi)}</span>
+                    <span class="b5-mp-item-cat">${catMeta[mi.categoryKey]?.icon || '✨'}</span>
+                    <span class="b5-mp-item-name">${mi.name}</span>
+                    <button class="b5-mp-item-price" data-mp-price-idx="${idx}">${mi.price}元</button>
+                    <button class="b5-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`).join('');
             return `
-            <div class="b5-custom-items-panel" id="b5-cip-panel">
-                <div class="b5-cip-header">🛍️ 自訂商品</div>
-                <div class="b5-cip-add-row">
-                    <input type="text" id="b5-cip-name-input" placeholder="商品名稱" maxlength="8" class="b5-cip-input">
-                    <input type="number" id="b5-cip-price-input" placeholder="金額" min="1" max="9999" class="b5-cip-input b5-cip-price-inp">
-                    <button class="b5-cip-add-btn" id="b5-cip-add-btn">＋ 新增</button>
+            <div id="b5-magic-panel" style="display:${this.state.settings.customItemsEnabled ? '' : 'none'};margin-top:10px;">
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px;">最多 5 個魔法商品（普通模式=必買指定；困難模式=自由選購）</div>
+                <div id="b5-mp-list">${listHTML}</div>
+                <div class="b5-mp-add-box">
+                    <div class="b5-mp-row">
+                        <span class="b5-mp-label">類別：</span>
+                        <button class="b5-mp-cat-btn active" data-mp-cat="food">🍱 食物</button>
+                        <button class="b5-mp-cat-btn" data-mp-cat="decor">🎊 裝飾</button>
+                        <button class="b5-mp-cat-btn" data-mp-cat="activity">🎯 遊戲</button>
+                    </div>
+                    <div class="b5-mp-row">
+                        <input type="file" id="b5-mp-file" accept="image/*" style="display:none">
+                        <button class="b5-mp-upload-btn" id="b5-mp-upload-btn" title="上傳圖片（選填）">📷</button>
+                        <img id="b5-mp-preview" class="b5-mp-img-preview" style="display:none" alt="">
+                        <input type="text" id="b5-mp-name" class="b5-cip-input" placeholder="名稱（最多6字）" maxlength="6" style="flex:1;">
+                        <button class="b5-cip-input b5-cip-price-inp b5-mp-price-btn" id="b5-mp-price-btn" type="button">金額</button>
+                        <button class="b5-cip-add-btn" id="b5-mp-add-btn">＋</button>
+                    </div>
                 </div>
             </div>`;
         },
 
-        _bindCustomItemsPanel() {
-            const g = this.state.game;
-            const addBtn = document.getElementById('b5-cip-add-btn');
-            if (!addBtn) return;
-            Game.EventManager.on(addBtn, 'click', () => {
-                const nameEl  = document.getElementById('b5-cip-name-input');
-                const priceEl = document.getElementById('b5-cip-price-input');
-                const name  = nameEl?.value.trim();
-                const price = parseInt(priceEl?.value);
-                if (!name || !price || price < 1) return;
-                const newItem = { name, price, icon: '🛍️', _deleted: false };
-                g.customItems.push(newItem);
-                const ci  = g.customItems.length - 1;
-                const list = document.getElementById('b5-custom-items-list');
-                const card = document.createElement('div');
-                card.className = 'b5-item-card b5-cip-custom-card selected';
-                card.id = `b5-custom-item-${ci}`;
-                const cipMoneyHTML = this._renderB5MoneyIcons(price);
-                card.innerHTML = `
-                    <div class="b5-item-top">
-                        <span class="b5-item-name">${newItem.icon} ${name}</span>
-                        <span class="b5-check-mark">✅</span>
-                        <button class="b5-cip-del-btn" data-custom-idx="${ci}">✕</button>
+        _bindMagicItemsPanel() {
+            const s = this.state.settings;
+            if (!s.magicItems) s.magicItems = [];
+            const uploadBtn0 = document.getElementById('b5-mp-upload-btn');
+            if (!uploadBtn0 || uploadBtn0._b5MpBound) return;
+            uploadBtn0._b5MpBound = true;
+            let pendingImageUrl = null;
+            let selectedPrice   = 0;
+            let selectedCat = document.querySelector('.b5-mp-cat-btn.active')?.dataset.mpCat || 'food';
+
+            // 金額數字鍵盤
+            const priceBtn = document.getElementById('b5-mp-price-btn');
+            if (priceBtn) {
+                Game.EventManager.on(priceBtn, 'click', () => {
+                    this._showMpPriceNumpad(selectedPrice, (n) => {
+                        selectedPrice = n;
+                        priceBtn.textContent = `${n} 元`;
+                        priceBtn.classList.add('b5-mp-price-btn--set');
+                    });
+                }, {}, 'settings');
+            }
+
+            // 類別選擇
+            document.querySelectorAll('.b5-mp-cat-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('.b5-mp-cat-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedCat = btn.dataset.mpCat;
+                }, {}, 'settings');
+            });
+
+            // 圖片上傳
+            const fileInput = document.getElementById('b5-mp-file');
+            const uploadBtn = document.getElementById('b5-mp-upload-btn');
+            const preview   = document.getElementById('b5-mp-preview');
+            if (uploadBtn && fileInput) {
+                Game.EventManager.on(uploadBtn, 'click', () => fileInput.click(), {}, 'settings');
+                Game.EventManager.on(fileInput, 'change', () => {
+                    const file = fileInput.files?.[0];
+                    if (!file) return;
+                    this._compressMagicImage(file, (url) => {
+                        pendingImageUrl = url;
+                        if (preview) { preview.src = url; preview.style.display = ''; }
+                    });
+                }, {}, 'settings');
+            }
+
+            // 新增按鈕
+            const addBtn = document.getElementById('b5-mp-add-btn');
+            if (addBtn) {
+                Game.EventManager.on(addBtn, 'click', () => {
+                    if (s.magicItems.length >= 5) { alert('最多新增 5 個魔法商品'); return; }
+                    const name = document.getElementById('b5-mp-name')?.value.trim();
+                    if (!name) { alert('請輸入商品名稱'); return; }
+                    if (!selectedPrice || selectedPrice < 1) { alert('請輸入金額'); return; }
+                    const item = {
+                        id: `magic-b5-${Date.now()}`,
+                        name,
+                        price: selectedPrice,
+                        icon: '✨',
+                        imageUrl: pendingImageUrl || null,
+                        categoryKey: selectedCat,
+                        isCustom: true,
+                    };
+                    s.magicItems.push(item);
+                    pendingImageUrl = null;
+                    selectedPrice = 0;
+                    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+                    document.getElementById('b5-mp-name').value = '';
+                    const pb = document.getElementById('b5-mp-price-btn');
+                    if (pb) { pb.textContent = '金額'; pb.classList.remove('b5-mp-price-btn--set'); }
+                    if (fileInput) fileInput.value = '';
+                    this._refreshMagicItemsList();
+                }, {}, 'settings');
+            }
+
+            // 刪除（委派於清單容器）
+            const list = document.getElementById('b5-mp-list');
+            if (list) {
+                Game.EventManager.on(list, 'click', (e) => {
+                    const priceBtn = e.target.closest('[data-mp-price-idx]');
+                    if (priceBtn) {
+                        const idx = parseInt(priceBtn.dataset.mpPriceIdx);
+                        this._showMpPriceNumpad(s.magicItems[idx].price, (n) => {
+                            s.magicItems[idx].price = n;
+                            this._refreshMagicItemsList();
+                        });
+                        return;
+                    }
+                    const delBtn = e.target.closest('[data-mp-del]');
+                    if (!delBtn) return;
+                    const idx = parseInt(delBtn.dataset.mpDel);
+                    s.magicItems.splice(idx, 1);
+                    this._refreshMagicItemsList();
+                }, {}, 'settings');
+            }
+        },
+
+        _refreshMagicItemsList() {
+            const list = document.getElementById('b5-mp-list');
+            if (!list) return;
+            const items   = this.state.settings.magicItems || [];
+            const catMeta = B5_CATEGORY_META;
+            list.innerHTML = items.map((mi, idx) => `
+                <div class="b5-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b5-mp-item-icon">${b5IconHTML(mi)}</span>
+                    <span class="b5-mp-item-cat">${catMeta[mi.categoryKey]?.icon || '✨'}</span>
+                    <span class="b5-mp-item-name">${mi.name}</span>
+                    <button class="b5-mp-item-price" data-mp-price-idx="${idx}">${mi.price}元</button>
+                    <button class="b5-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`).join('');
+        },
+
+        _showMpPriceNumpad(currentPrice, onConfirm) {
+            document.getElementById('b-mp-price-numpad')?.remove();
+            let val = currentPrice > 0 ? String(currentPrice) : '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-mp-price-numpad';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">💰 輸入金額</div>
+                    <div id="b-mppnp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">${currentPrice > 0 ? currentPrice : '---'}</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-mppnpk="${k}">${k}</button>`).join('')}
                     </div>
-                    <div class="b5-item-bottom">
-                        <div class="b5-item-money-icons">${cipMoneyHTML}</div>
-                        <span class="b5-item-price">${price} 元</span>
-                    </div>`;
-                list.appendChild(card);
-                const delBtn = card.querySelector('[data-custom-idx]');
-                Game.EventManager.on(delBtn, 'click', (e) => {
-                    e.stopPropagation();
-                    g.customItems[ci]._deleted = true;
-                    card.remove();
-                    this._updateTotalBar();
-                }, {}, 'gameUI');
-                if (nameEl) nameEl.value = '';
-                if (priceEl) priceEl.value = '';
-                this._updateTotalBar();
-                this.audio.play('click');
-            }, {}, 'gameUI');
+                    <button id="b-mppnp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-mppnp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-mppnpk]').forEach(npBtn => {
+                npBtn.addEventListener('click', () => {
+                    const k = npBtn.dataset.mppnpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 9999) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 9999) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-mppnp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
+        _compressMagicImage(file, cb) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const size   = 200;
+                    const scale  = Math.min(size / img.width, size / img.height, 1);
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = Math.round(img.width  * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    cb(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         },
 
         _bindRoundEvents() {
@@ -1595,10 +1764,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, {}, 'gameUI');
             }
 
-            // ⑦ 自訂商品面板
-            if (this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy') {
-                this._bindCustomItemsPanel();
-            }
         },
 
         // ── 預算提示鈕（B1 _showCoinHint pattern）────────────────
@@ -1746,7 +1911,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 自動切換到第一個提示商品的類別
             const firstId = g.p1HintItems.find(hid => !g.selectedIds.has(hid));
             if (firstId) {
-                const cat = B5_ITEM_CATEGORIES[firstId];
+                const mi  = (this.state.settings.magicItems || []).find(m => m.id === firstId);
+                const cat = B5_ITEM_CATEGORIES[firstId] || mi?.categoryKey;
                 if (cat && cat !== g.activeCategory) this._switchB5Category(cat);
             }
             this._b5P1UpdateHintHighlights();
@@ -1764,13 +1930,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _getTotal() {
             const g = this.state.game;
-            const baseTotal = g.items
+            return g.items
                 .filter(item => g.selectedIds.has(item.id))
                 .reduce((sum, item) => sum + item.price, 0);
-            const customTotal = (g.customItems || [])
-                .filter(i => !i._deleted)
-                .reduce((sum, i) => sum + i.price, 0);
-            return baseTotal + customTotal;
         },
 
         // ── 商品選取彈窗（白底設計：圖片256×256 + 名稱 + 金額，彈窗期間封鎖點擊）──
@@ -1865,7 +2027,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 g.roundStats.push({ roundNum: g.currentRound + 1, budget: g.budget, spent: total });
                 // 記錄本關選購物品（per-round list for review page navigation）
                 const roundItemObjects = g.items.filter(i => g.selectedIds.has(i.id)).map(i => ({ icon: i.icon, name: i.name, price: i.price }));
-                (g.customItems || []).filter(c => !c._deleted).forEach(c => roundItemObjects.push({ icon: '📦', name: c.name, price: c.price || 0 }));
                 const roundTotal = roundItemObjects.reduce((s, i) => s + i.price, 0);
                 if (!g.roundItemsList) g.roundItemsList = [];
                 g.roundItemsList.push({ roundNum: g.currentRound + 1, items: roundItemObjects, total: roundTotal, themeKey: (g.rounds[g.currentRound] || {}).themeKey || 'birthday' });
@@ -1978,10 +2139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         _renderB5P2RefCard(selectedItems, total, themeData) {
-            const allItems = [
-                ...selectedItems,
-                ...(this.state.game.customItems || []).filter(i => !i._deleted).map(i => ({ icon: '📦', name: i.name, price: i.price }))
-            ];
+            const allItems = [...selectedItems];
             const itemsHTML = allItems.map(it =>
                 `<div class="b5p2-ref-item">
                     <span class="b5p2-ri-img">${b5IconHTML(it)}</span>

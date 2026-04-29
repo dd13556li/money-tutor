@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── 6. State ──────────────────────────────────────────
         state: {
-            settings: { difficulty: null, rounds: null, clickMode: 'off', marketType: null, customItemsEnabled: false },
+            settings: { difficulty: null, rounds: null, clickMode: 'off', marketType: null, customItemsEnabled: false, magicItems: [] },
             game: {
                 currentRound: 0,
                 totalRounds: 5,
@@ -531,13 +531,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="b-setting-group" id="b6-custom-items-wrap" style="display:none;">
                             <div id="b6-custom-items-toggle-row">
-                                <label style="font-size:13px;color:#374151;font-weight:600;">🛠️ 自訂購物項目</label>
+                                <label style="font-size:13px;color:#374151;font-weight:600;">✨ 魔法商品</label>
                                 <div class="b-btn-group" id="b6-custom-items-group" style="margin-top:4px;">
                                     <button class="b-sel-btn active" data-custom="off">關閉</button>
                                     <button class="b-sel-btn" data-custom="on">開啟</button>
                                 </div>
-                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後，可在購物頁面新增自訂商品，計入付款總金額</div>
+                                <div style="margin-top:4px;font-size:12px;color:#6b7280;">開啟後可在設定頁新增自訂商品到指定攤位，普通/困難模式有效</div>
                             </div>
+                            ${this._renderMagicItemsPanel()}
                         </div>
                         <div class="b-setting-group" id="assist-click-group" style="display:none;">
                             <label class="b-setting-label">🤖 輔助點擊：</label>
@@ -618,6 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (customWrap) customWrap.style.display = 'none';
                             this.state.settings.customItemsEnabled = false;
                             document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(b => b.classList.toggle('active', b.dataset.custom === 'off'));
+                            const panel = document.getElementById('b6-magic-panel');
+                            if (panel) panel.style.display = 'none';
                         } else {
                             assistGroup.style.display = 'none';
                             this.state.settings.clickMode = 'off';
@@ -669,6 +672,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#market-group .b-sel-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.marketType = btn.dataset.market;
+                    // 市場類型改變時清空魔法商品（攤位鍵不同），重建攤位按鈕
+                    this.state.settings.magicItems = [];
+                    const panel = document.getElementById('b6-magic-panel');
+                    if (panel && this.state.settings.customItemsEnabled) {
+                        panel.outerHTML = this._renderMagicItemsPanel();
+                        this._bindMagicItemsPanel();
+                    }
                     this._checkCanStart();
                 }, {}, 'settings');
             });
@@ -678,8 +688,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('#b6-custom-items-group [data-custom]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.state.settings.customItemsEnabled = btn.dataset.custom === 'on';
+                    const panel = document.getElementById('b6-magic-panel');
+                    if (panel) {
+                        panel.style.display = this.state.settings.customItemsEnabled ? '' : 'none';
+                        if (this.state.settings.customItemsEnabled) this._bindMagicItemsPanel();
+                    }
                 }, {}, 'settings');
             });
+            if (this.state.settings.customItemsEnabled) {
+                const panel = document.getElementById('b6-magic-panel');
+                if (panel) { panel.style.display = ''; this._bindMagicItemsPanel(); }
+            }
 
             document.querySelectorAll('#assist-group .b-sel-btn').forEach(btn => {
                 Game.EventManager.on(btn, 'click', () => {
@@ -1056,7 +1075,19 @@ document.addEventListener('DOMContentLoaded', () => {
             g.activeStall = Object.keys(_currentStalls)[0];
             g.phase       = 'shopping';
             g.paidAmount  = 0;
-            g.customItems = []; // 自訂購物項目
+            // 注入魔法商品到對應攤位（普通/困難模式）
+            const _diff = this.state.settings.difficulty;
+            if (_diff !== 'easy') {
+                const magic = this.state.settings.magicItems || [];
+                if (magic.length > 0) {
+                    _currentStalls = JSON.parse(JSON.stringify(_currentStalls));
+                    magic.forEach(mi => {
+                        if (_currentStalls[mi.stallKey]) {
+                            _currentStalls[mi.stallKey].items.push({ ...mi });
+                        }
+                    });
+                }
+            }
             g.p1HintMode   = false;  // 提示模式旗標
             g.p1HintItems  = [];     // [{stall, id}] 提示建議商品
             g.p1ErrorCount = 0;      // 普通模式錯誤計數（3次自動提示）
@@ -1589,10 +1620,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                 </div><!-- /.b6-market-checkout-row -->
-
-                <!-- 自訂購物項目 -->
-                <div id="b6-custom-items-list"></div>
-                ${this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy' ? this._renderCustomItemsPanel() : ''}
             </div>`;
 
             this._bindShoppingEvents();
@@ -1634,53 +1661,270 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
-        _renderCustomItemsPanel() {
+        _renderMagicItemsPanel() {
+            const s       = this.state.settings;
+            const items   = s.magicItems || [];
+            const mktKey  = s.marketType && s.marketType !== 'random' ? s.marketType : null;
+            const stalls  = mktKey ? B6_MARKETS[mktKey]?.stalls : null;
+
+            const listHTML = items.map((mi, idx) => {
+                const stallInfo = stalls?.[mi.stallKey];
+                return `
+                <div class="b6-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b6-mp-item-icon">${b6IconHTML(mi)}</span>
+                    <span class="b6-mp-item-stall">${stallInfo?.icon || '✨'}</span>
+                    <span class="b6-mp-item-name">${mi.name}</span>
+                    <button class="b6-mp-item-price" data-mp-price-idx="${idx}">${mi.price}元</button>
+                    <button class="b6-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`;
+            }).join('');
+
+            const stallBtnsHTML = stalls
+                ? Object.entries(stalls).map(([key, info], i) =>
+                    `<button class="b6-mp-stall-btn${i === 0 ? ' active' : ''}" data-mp-stall="${key}">${info.icon} ${info.name}</button>`
+                  ).join('')
+                : '';
+
             return `
-            <div class="b6-custom-items-panel" id="b6-cip-panel">
-                <div class="b6-cip-header">🛍️ 自訂購物項目</div>
-                <div class="b6-cip-add-row">
-                    <input type="text" id="b6-cip-name-input" placeholder="商品名稱" maxlength="8" class="b6-cip-input">
-                    <input type="number" id="b6-cip-price-input" placeholder="金額" min="1" max="9999" class="b6-cip-input b6-cip-price-inp">
-                    <button class="b6-cip-add-btn" id="b6-cip-add-btn">＋ 新增</button>
-                </div>
+            <div id="b6-magic-panel" style="display:${s.customItemsEnabled ? '' : 'none'};margin-top:10px;">
+                <div style="font-size:11px;color:#6b7280;margin-bottom:6px;">最多 5 個魔法商品（普通/困難模式有效）</div>
+                <div id="b6-mp-list">${listHTML}</div>
+                ${stalls ? `
+                <div class="b6-mp-add-box">
+                    <div class="b6-mp-row" id="b6-mp-stall-row">
+                        <span class="b6-mp-label">攤位：</span>
+                        ${stallBtnsHTML}
+                    </div>
+                    <div class="b6-mp-row">
+                        <input type="file" id="b6-mp-file" accept="image/*" style="display:none">
+                        <button class="b6-mp-upload-btn" id="b6-mp-upload-btn" title="上傳圖片（選填）">📷</button>
+                        <img id="b6-mp-preview" class="b6-mp-img-preview" style="display:none" alt="">
+                        <input type="text" id="b6-mp-name" class="b6-cip-input" placeholder="名稱（最多6字）" maxlength="6" style="flex:1;">
+                        <button class="b6-cip-input b6-cip-price-inp b6-mp-price-btn" id="b6-mp-price-btn" type="button">金額</button>
+                        <div class="b6-mp-unit-wrap"><button class="b6-cip-input b6-mp-unit-btn" id="b6-mp-unit-btn" type="button">個</button></div>
+                        <button class="b6-cip-add-btn" id="b6-mp-add-btn">＋</button>
+                    </div>
+                </div>` : `<div style="margin-top:6px;color:#d97706;font-size:12px;">⚠️ 請先選擇固定市場類型（非隨機）才能新增魔法商品</div>`}
             </div>`;
         },
 
-        _bindCustomItemsPanel() {
-            const g = this.state.game;
-            const addBtn = document.getElementById('b6-cip-add-btn');
-            if (!addBtn) return;
-            Game.EventManager.on(addBtn, 'click', () => {
-                const nameEl  = document.getElementById('b6-cip-name-input');
-                const priceEl = document.getElementById('b6-cip-price-input');
-                const name  = nameEl?.value.trim();
-                const price = parseInt(priceEl?.value);
-                if (!name || !price || price < 1) return;
-                const newItem = { name, price, icon: '🛍️', _deleted: false };
-                g.customItems.push(newItem);
-                const ci  = g.customItems.length - 1;
-                const list = document.getElementById('b6-custom-items-list');
-                const row = document.createElement('div');
-                row.className = 'b6-list-item b6-cip-custom-row';
-                row.id = `b6-custom-item-${ci}`;
-                row.innerHTML = `<span class="b6-list-icon">${newItem.icon}</span><span class="b6-list-name">${name} <span style="color:#6b7280;font-size:12px;">${price}元</span></span><button class="b6-cip-del-btn" data-custom-idx="${ci}">✕</button>`;
-                list.appendChild(row);
-                const delBtn = row.querySelector('[data-custom-idx]');
-                Game.EventManager.on(delBtn, 'click', (e) => {
+        _bindMagicItemsPanel() {
+            const s = this.state.settings;
+            if (!s.magicItems) s.magicItems = [];
+            const mktKey = s.marketType && s.marketType !== 'random' ? s.marketType : null;
+            const stalls = mktKey ? B6_MARKETS[mktKey]?.stalls : null;
+            if (!stalls) return;
+
+            const uploadBtn0 = document.getElementById('b6-mp-upload-btn');
+            if (!uploadBtn0 || uploadBtn0._b6MpBound) return;
+            uploadBtn0._b6MpBound = true;
+            let pendingImageUrl = null;
+            let selectedPrice   = 0;
+            let selectedUnit    = '個';
+            let selectedStall   = document.querySelector('.b6-mp-stall-btn.active')?.dataset.mpStall
+                                  || Object.keys(stalls)[0];
+
+            // 金額數字鍵盤
+            const priceBtn = document.getElementById('b6-mp-price-btn');
+            if (priceBtn) {
+                Game.EventManager.on(priceBtn, 'click', () => {
+                    this._showMpPriceNumpad(selectedPrice, (n) => {
+                        selectedPrice = n;
+                        priceBtn.textContent = `${n} 元`;
+                        priceBtn.classList.add('b6-mp-price-btn--set');
+                    });
+                }, {}, 'settings');
+            }
+
+            // 單位下拉選單
+            const unitBtn = document.getElementById('b6-mp-unit-btn');
+            if (unitBtn) {
+                Game.EventManager.on(unitBtn, 'click', (e) => {
                     e.stopPropagation();
-                    g.customItems[ci]._deleted = true;
-                    row.remove();
-                    // 更新購物籃小計
-                    const basketTotalEl = document.querySelector('.b6-basket-total');
-                    if (basketTotalEl) basketTotalEl.textContent = this._calcMissionTotal();
-                }, {}, 'gameUI');
-                if (nameEl) nameEl.value = '';
-                if (priceEl) priceEl.value = '';
-                // 更新購物籃小計
-                const basketTotalEl = document.querySelector('.b6-basket-total');
-                if (basketTotalEl) basketTotalEl.textContent = this._calcMissionTotal();
-                this.audio.play('click');
-            }, {}, 'gameUI');
+                    this._showUnitDropdown(unitBtn, (unit) => {
+                        selectedUnit = unit;
+                        unitBtn.textContent = unit;
+                    });
+                }, {}, 'settings');
+            }
+
+            document.querySelectorAll('.b6-mp-stall-btn').forEach(btn => {
+                Game.EventManager.on(btn, 'click', () => {
+                    document.querySelectorAll('.b6-mp-stall-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedStall = btn.dataset.mpStall;
+                }, {}, 'settings');
+            });
+
+            const fileInput = document.getElementById('b6-mp-file');
+            const uploadBtn = document.getElementById('b6-mp-upload-btn');
+            const preview   = document.getElementById('b6-mp-preview');
+            if (uploadBtn && fileInput) {
+                Game.EventManager.on(uploadBtn, 'click', () => fileInput.click(), {}, 'settings');
+                Game.EventManager.on(fileInput, 'change', () => {
+                    const file = fileInput.files?.[0];
+                    if (!file) return;
+                    this._compressMagicImage(file, (url) => {
+                        pendingImageUrl = url;
+                        if (preview) { preview.src = url; preview.style.display = ''; }
+                    });
+                }, {}, 'settings');
+            }
+
+            const addBtn = document.getElementById('b6-mp-add-btn');
+            if (addBtn) {
+                Game.EventManager.on(addBtn, 'click', () => {
+                    if (s.magicItems.length >= 5) { alert('最多新增 5 個魔法商品'); return; }
+                    const name = document.getElementById('b6-mp-name')?.value.trim();
+                    if (!name) { alert('請輸入商品名稱'); return; }
+                    if (!selectedPrice || selectedPrice < 1) { alert('請輸入金額'); return; }
+                    s.magicItems.push({
+                        id: `magic-b6-${Date.now()}`,
+                        name, price: selectedPrice, unit: selectedUnit,
+                        icon: '✨',
+                        imageUrl: pendingImageUrl || null,
+                        stallKey: selectedStall,
+                        isCustom: true,
+                    });
+                    pendingImageUrl = null;
+                    selectedPrice = 0;
+                    selectedUnit = '個';
+                    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+                    document.getElementById('b6-mp-name').value = '';
+                    const pb = document.getElementById('b6-mp-price-btn');
+                    if (pb) { pb.textContent = '金額'; pb.classList.remove('b6-mp-price-btn--set'); }
+                    const ub = document.getElementById('b6-mp-unit-btn');
+                    if (ub) ub.textContent = '個';
+                    if (fileInput) fileInput.value = '';
+                    this._refreshB6MagicItemsList();
+                }, {}, 'settings');
+            }
+
+            const list = document.getElementById('b6-mp-list');
+            if (list) {
+                Game.EventManager.on(list, 'click', (e) => {
+                    const priceBtn = e.target.closest('[data-mp-price-idx]');
+                    if (priceBtn) {
+                        const idx = parseInt(priceBtn.dataset.mpPriceIdx);
+                        this._showMpPriceNumpad(s.magicItems[idx].price, (n) => {
+                            s.magicItems[idx].price = n;
+                            this._refreshB6MagicItemsList();
+                        });
+                        return;
+                    }
+                    const delBtn = e.target.closest('[data-mp-del]');
+                    if (!delBtn) return;
+                    s.magicItems.splice(parseInt(delBtn.dataset.mpDel), 1);
+                    this._refreshB6MagicItemsList();
+                }, {}, 'settings');
+            }
+        },
+
+        _refreshB6MagicItemsList() {
+            const list   = document.getElementById('b6-mp-list');
+            if (!list) return;
+            const s      = this.state.settings;
+            const mktKey = s.marketType && s.marketType !== 'random' ? s.marketType : null;
+            const stalls = mktKey ? B6_MARKETS[mktKey]?.stalls : null;
+            list.innerHTML = (s.magicItems || []).map((mi, idx) => {
+                const stallInfo = stalls?.[mi.stallKey];
+                return `
+                <div class="b6-mp-item-row" data-mp-idx="${idx}">
+                    <span class="b6-mp-item-icon">${b6IconHTML(mi)}</span>
+                    <span class="b6-mp-item-stall">${stallInfo?.icon || '✨'}</span>
+                    <span class="b6-mp-item-name">${mi.name}</span>
+                    <button class="b6-mp-item-price" data-mp-price-idx="${idx}">${mi.price}元</button>
+                    <button class="b6-mp-del-btn" data-mp-del="${idx}">✕</button>
+                </div>`;
+            }).join('');
+        },
+
+        _showMpPriceNumpad(currentPrice, onConfirm) {
+            document.getElementById('b-mp-price-numpad')?.remove();
+            let val = currentPrice > 0 ? String(currentPrice) : '';
+            const overlay = document.createElement('div');
+            overlay.id = 'b-mp-price-numpad';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10200;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:20px 24px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;">💰 輸入金額</div>
+                    <div id="b-mppnp-disp" style="font-size:2rem;font-weight:bold;text-align:center;padding:10px;background:#f3f4f6;border-radius:10px;margin-bottom:12px;">${currentPrice > 0 ? currentPrice : '---'}</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                        ${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k => `<button style="padding:12px;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;font-weight:600;" data-mppnpk="${k}">${k}</button>`).join('')}
+                    </div>
+                    <button id="b-mppnp-cancel" style="width:100%;padding:8px;border:none;background:#f3f4f6;border-radius:8px;cursor:pointer;font-size:14px;color:#6b7280;">取消</button>
+                </div>`;
+            document.body.appendChild(overlay);
+            const disp = overlay.querySelector('#b-mppnp-disp');
+            const update = () => { disp.textContent = val || '---'; };
+            overlay.querySelectorAll('[data-mppnpk]').forEach(npBtn => {
+                npBtn.addEventListener('click', () => {
+                    const k = npBtn.dataset.mppnpk;
+                    if (k === '⌫') { val = val.slice(0, -1); }
+                    else if (k === '✓') {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 9999) { overlay.remove(); onConfirm(n); return; }
+                        disp.style.color = '#ef4444';
+                        setTimeout(() => { disp.style.color = ''; }, 500);
+                        val = '';
+                    } else {
+                        const next = val + k;
+                        if (parseInt(next) <= 9999) val = next;
+                    }
+                    update();
+                });
+            });
+            overlay.querySelector('#b-mppnp-cancel').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        },
+
+        _showUnitDropdown(anchor, onSelect) {
+            document.getElementById('b6-mp-unit-dropdown')?.remove();
+            const units = ['個','顆','條','包','支','組','斤','把','片','袋','罐','瓶','盒','串','塊'];
+            const drop = document.createElement('div');
+            drop.id = 'b6-mp-unit-dropdown';
+            drop.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1.5px solid #d1d5db;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:10100;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;min-width:220px;';
+            drop.innerHTML = units.map(u =>
+                `<button style="padding:7px 4px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;cursor:pointer;font-size:14px;font-weight:600;color:#374151;" data-unit="${u}">${u}</button>`
+            ).join('');
+            const wrap = anchor.closest('.b6-mp-unit-wrap') || anchor.parentElement;
+            wrap.style.position = 'relative';
+            wrap.appendChild(drop);
+            drop.querySelectorAll('[data-unit]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    btn.style.background = '#d1fae5';
+                    setTimeout(() => {
+                        onSelect(btn.dataset.unit);
+                        drop.remove();
+                    }, 120);
+                });
+            });
+            const close = (e) => {
+                if (!drop.contains(e.target) && e.target !== anchor) {
+                    drop.remove();
+                    document.removeEventListener('click', close);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', close), 0);
+        },
+
+        _compressMagicImage(file, cb) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const size   = 200;
+                    const scale  = Math.min(size / img.width, size / img.height, 1);
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = Math.round(img.width  * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    cb(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         },
 
         _bindShoppingEvents() {
@@ -2024,10 +2268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     this._b6P1ShowHint();
                 }, {}, 'gameUI');
             }
-            // 自訂購物項目面板
-            if (this.state.settings.customItemsEnabled && this.state.settings.difficulty !== 'easy') {
-                this._bindCustomItemsPanel();
-            }
         },
 
         // ── 局部更新購物 UI（不全重繪，只更新任務卡/結帳列/商品狀態）──
@@ -2333,14 +2573,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         _calcMissionTotal() {
             const g = this.state.game;
-            const baseTotal = (g.selectedItems || []).reduce((sum, { stall, id }) => {
+            return (g.selectedItems || []).reduce((sum, { stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 return sum + (item ? item.price : 0);
             }, 0);
-            const customTotal = (g.customItems || [])
-                .filter(i => !i._deleted)
-                .reduce((sum, i) => sum + i.price, 0);
-            return baseTotal + customTotal;
         },
 
         // 所有攤位配額都達到且總額不超過預算
@@ -2446,9 +2682,6 @@ document.addEventListener('DOMContentLoaded', () => {
             (g.selectedItems || []).forEach(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (item) allItems.push({ icon: item.icon || '', imageUrl: item.imageUrl, name: item.name, price: item.price });
-            });
-            (g.customItems || []).filter(i => !i._deleted).forEach(i => {
-                allItems.push({ icon: '📦', name: i.name, price: i.price });
             });
             return `
             <div class="b6p2-ref-card">
@@ -3081,9 +3314,6 @@ document.addEventListener('DOMContentLoaded', () => {
             (g.selectedItems || []).forEach(({ stall, id }) => {
                 const item = (_currentStalls[stall]?.items || []).find(i => i.id === id);
                 if (item) _changeAllItems.push({ icon: item.icon || '', imageUrl: item.imageUrl, name: item.name, price: item.price });
-            });
-            (g.customItems || []).filter(i => !i._deleted).forEach(i => {
-                _changeAllItems.push({ icon: '📦', name: i.name, price: i.price });
             });
 
             // ── 建構完整頁面 ─────────────────────────────────────────
