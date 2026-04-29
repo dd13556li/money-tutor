@@ -1661,11 +1661,22 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         },
 
+        _b6MagicMinBudget(mktKey) {
+            const mkt = mktKey ? B6_MARKETS[mktKey] : null;
+            if (!mkt) return 9999;
+            const budgets = [
+                ...(mkt.missions.normal || []),
+                ...(mkt.missions.hard   || []),
+            ].map(m => m.budget);
+            return budgets.length ? Math.min(...budgets) : 9999;
+        },
+
         _renderMagicItemsPanel() {
             const s       = this.state.settings;
             const items   = s.magicItems || [];
             const mktKey  = s.marketType && s.marketType !== 'random' ? s.marketType : null;
             const stalls  = mktKey ? B6_MARKETS[mktKey]?.stalls : null;
+            const minBudget = mktKey ? this._b6MagicMinBudget(mktKey) : null;
 
             const listHTML = items.map((mi, idx) => {
                 const stallInfo = stalls?.[mi.stallKey];
@@ -1704,6 +1715,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="b6-mp-unit-wrap"><button class="b6-cip-input b6-mp-unit-btn" id="b6-mp-unit-btn" type="button">個</button></div>
                         <button class="b6-cip-add-btn" id="b6-mp-add-btn">＋</button>
                     </div>
+                    ${minBudget ? `<div style="font-size:11px;color:#6b7280;margin-top:2px;">💡 此市場任務最低預算 <strong style="color:#059669;">${minBudget} 元</strong>，建議金額不超過此值</div>` : ''}
                 </div>` : `<div style="margin-top:6px;color:#d97706;font-size:12px;">⚠️ 請先選擇固定市場類型（非隨機）才能新增魔法商品</div>`}
             </div>`;
         },
@@ -1778,6 +1790,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = document.getElementById('b6-mp-name')?.value.trim();
                     if (!name) { alert('請輸入商品名稱'); return; }
                     if (!selectedPrice || selectedPrice < 1) { alert('請輸入金額'); return; }
+                    const minBudget = this._b6MagicMinBudget(mktKey);
+                    if (selectedPrice > minBudget) {
+                        alert(`金額 ${selectedPrice} 元超過此市場最低任務預算（${minBudget} 元），\n在某些關卡中學生將永遠無法選購此商品，請調低金額。`);
+                        return;
+                    }
                     s.magicItems.push({
                         id: `magic-b6-${Date.now()}`,
                         name, price: selectedPrice, unit: selectedUnit,
@@ -1807,6 +1824,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (priceBtn) {
                         const idx = parseInt(priceBtn.dataset.mpPriceIdx);
                         this._showMpPriceNumpad(s.magicItems[idx].price, (n) => {
+                            const minBudget = this._b6MagicMinBudget(mktKey);
+                            if (n > minBudget) {
+                                alert(`金額 ${n} 元超過此市場最低任務預算（${minBudget} 元），請調低金額。`);
+                                return;
+                            }
                             s.magicItems[idx].price = n;
                             this._refreshB6MagicItemsList();
                         });
