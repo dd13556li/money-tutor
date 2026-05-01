@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 /**
  * @file a2_barber_shop_kiosk.js
  * @description A2 理髮店售票機模擬學習單元 - 配置驅動版本
@@ -889,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="kiosk-screen" style="position: relative;">
                         ${showHintBtn ? `
                             <div style="position:absolute;right:0;top:15px;z-index:5;display:flex;align-items:center;gap:6px;">
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button class="hint-btn-screen" onclick="BarberKiosk.showHintButtonClick()" style="
                                 padding: 15px 20px;
                                 background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -1462,6 +1462,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 🆕 清理計時器和事件監聽器
             this.TimerManager.clearAll();
             this.EventManager.removeByCategory('gameUI');
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             // 解鎖設定頁面滾動（A4 架構：只操作 #app）
             app.style.overflowY = 'auto';
@@ -1482,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A2：理髮店售票機</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">體驗理髮店售票機操作，學習選擇理髮服務與投幣付款的流程</p>
@@ -2112,6 +2116,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // 重置已完成訂單數
             this.state.gameState.completedOrders = 0;
             this.state.gameState.startTime = Date.now();
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _bk = this;
+                TutorContext.getLiveData = () => {
+                    const gs = _bk.state.gameState;
+                    const svc = gs.selectedService;
+                    return {
+                        serviceName: svc?.name   || null,
+                        price:       svc?.price  ?? null,
+                        inserted:    gs.insertedAmount ?? 0,
+                        wallet:      _bk.state.settings.walletType || null,
+                    };
+                };
+            }
             BarberKiosk.Debug.log('init', ' 重置已完成訂單數為 0');
 
             // 🔧 [新增] 重置全局交易狀態
@@ -5051,6 +5070,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 累計錯誤次數
                 this.state.gameState.normalMode.errorCount++;
                 this.state.gameState.normalMode.totalErrors++;
+                if (window.TutorContext) TutorContext.update({ errorCount: this.state.gameState.normalMode.errorCount });
 
                 this.Debug.log('flow', `[Normal Mode] Step ${currentStep} 錯誤: ${actionType}, 累計: ${this.state.gameState.normalMode.errorCount}`);
 
@@ -5601,6 +5621,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.gameState.selectedService = service;
             this.state.gameState.requiredAmount = service.price;
             this.state.gameState.currentScene = 'payment';
+            if (window.TutorContext) TutorContext.update({ phase: 'payment' });
             this.state.gameState.currentStep = 2;
 
             // 簡單模式：進入步驟2
@@ -7536,6 +7557,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             this._completionScreenShown = true;
+            if (window.TutorContext) TutorContext.update({ screen: 'result' });
             document.getElementById('click-exec-overlay')?.remove();
             // 停用輔助點擊模式（完成畫面不需要輔助）
             const gs = this.state.gameState;
@@ -7569,7 +7591,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

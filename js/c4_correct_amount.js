@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file c4_correct_amount.js
  * @description C4 正確的金額 - 配置驅動版本
  * @unit C4 - 正確的金額
@@ -692,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元C4：正確的金額</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">學習拿出正確的金錢組合，達到指定金額，培養付款能力</p>
@@ -2148,7 +2148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="section-header-with-hint">
                             <h2 class="section-title unit4-normal-section-title">兌換區</h2>
                             <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;">
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button id="hint-total-btn" class="hint-total-btn" style="position:static;transform:none;">💡 提示</button>
                             </div>
                         </div>
@@ -2235,7 +2235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="section-header-with-hint">
                             <h2 class="section-title unit4-hard-section-title">兌換區</h2>
                             <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;">
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button id="hint-total-btn" class="hint-total-btn" style="position:static;transform:none;">💡 提示</button>
                             </div>
                         </div>
@@ -5032,7 +5032,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>

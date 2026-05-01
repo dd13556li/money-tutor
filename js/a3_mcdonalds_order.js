@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 /**
  * @file a3_mcdonalds_order.js
  * @description A3 美式速食自助點餐系統 - 配置驅動版本
@@ -1448,7 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 困難模式/普通模式+指定餐點：在類別按鈕後方添加提示按鈕
                 const hintButton = isHardOrNormalAssigned ? `
                     <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                         <button class="hint-btn" onclick="McDonald.showHardModeHint()" style="
                         background: linear-gradient(135deg, #4caf50, #45a049);
                         color: white;
@@ -1652,6 +1652,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             // 🔧 [Phase 3] 清除遊戲 UI 事件監聽器
             this.EventManager.removeByCategory('gameUI');
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             this.unbindClickModeHandler();
 
@@ -1666,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content" style="text-align: center;">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A3：美式速食自助點餐</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">透過自助點餐系統練習選購餐點、計算總價與完成付款</p>
@@ -2861,6 +2865,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 🔧 [修正] 記錄測驗開始時間（修正完成時間顯示為0秒的問題）
             this.state.gameState.startTime = Date.now();
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _mc = this;
+                TutorContext.getLiveData = () => {
+                    const gs = _mc.state.gameState;
+                    const items = gs.assignedItems || [];
+                    const total = items.reduce((s, i) => s + (i.price || 0), 0);
+                    return {
+                        orderItems:  items.map(i => i.name).join('、') || null,
+                        totalPrice:  total || null,
+                        wallet:      _mc.state.settings.walletAmount ?? null,
+                    };
+                };
+            }
 
             // 初始化遊戲資料
             this.initializeGameData();
@@ -5058,7 +5077,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 困難模式/普通模式：付款區提示按鈕
             const paymentHintButton = (isHardMode || isNormalMode) ? `
                 <div style="display:flex;align-items:center;gap:6px;">
-                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                 <button id="payment-hint-btn" onclick="McDonald.showPaymentHint()" style="
                     background: linear-gradient(135deg, #4caf50, #45a049);
                     color: white;
@@ -7732,7 +7751,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="a3c-info-right" style="flex-direction:row;min-width:unset;">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a3c-mascot a3c-mascot-bounce" onerror="this.style.display='none'">
+                            <img src="../images/common/hint_detective.png" alt="" class="a3c-mascot a3c-mascot-bounce" onerror="this.style.display='none'">
                             <button class="a3c-hint-btn" id="a3c-hint-btn">💡 提示</button>
                         </div>
                     </div>
@@ -10014,6 +10033,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🎯 第一階段：顯示餐點內容
         showPickupComplete() {
             window.speechSynthesis.cancel();
+            if (window.TutorContext) TutorContext.update({ screen: 'result' });
             // 注意：pickup queue 已在 startOrderNumberAnimation 按鈕顯示時建立
             // 此處不需要重複建立
 
@@ -10458,7 +10478,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

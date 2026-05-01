@@ -1,4 +1,4 @@
-// =============================================================
+﻿// =============================================================
 // FILE: js/b3_savings_plan.js — B3 存錢計畫
 // =============================================================
 'use strict';
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="unit-welcome">
         <div class="welcome-content">
             <div class="settings-title-row">
-                <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                <img src="../images/common/hint_detective.png" alt="金錢小助手"
                      class="settings-mascot-img" onerror="this.style.display='none'">
                 <h1>單元B3：存錢計畫</h1>
             </div>
@@ -1305,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${modeLabel}</div>
     <div class="b-header-right">
         <button class="b-reward-btn" onclick="if(typeof RewardLauncher!=='undefined'){RewardLauncher.open();}else{window.open('../reward/index.html','RewardSystem','width=1200,height=800');}">🎁 獎勵</button>
@@ -1349,7 +1349,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="b3-daily-header-row">
                 <span class="b3-daily-header">今日可存金錢</span>
                 <div class="b3-daily-hint-wrap" id="b3-daily-hint-wrap" style="display:none">
-                    <img src="../images/index/educated_money_bag_character.png" class="b3-daily-hint-mascot" alt="" onerror="this.style.display='none'">
+                    <img src="../images/common/hint_detective.png" class="b3-daily-hint-mascot" alt="" onerror="this.style.display='none'">
                     <button class="b3-daily-hint-btn" id="b3-daily-hint-btn">💡 提示</button>
                 </div>
             </div>
@@ -2512,7 +2512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 存錢成功！🎉</h1>
                 <span class="b-res-mascot-spacer"></span>
@@ -2713,7 +2713,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span>
+                    <img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span>
                 </div>
                 <div class="b-header-center">${{ easy: '簡單模式', normal: '普通模式', hard: '困難模式' }[diff] || ''}</div>
                 <div class="b-header-right">
@@ -3260,7 +3260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── 第一頁：省錢清單 ──
             app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${diffLabel}${catLabel} · 省錢清單</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b3-res1-reward-btn">🎁 獎勵</button>
@@ -3305,7 +3305,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ── 第二頁：測驗總結 ──
                 app.innerHTML = `
 <div class="b-header">
-    <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
+    <div class="b-header-left"><img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🐷 存錢計畫</span></div>
     <div class="b-header-center">${diffLabel} · 測驗總結</div>
     <div class="b-header-right">
         <button class="b-reward-btn" id="b3-res2-reward-btn">🎁 獎勵</button>
@@ -3317,7 +3317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 存錢達人 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>

@@ -1,4 +1,4 @@
-// =============================================================
+﻿// =============================================================
 // FILE: js/b2_allowance_diary.js — B2 零用錢日記
 // =============================================================
 'use strict';
@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
                         <h1>單元B2：零用錢日記</h1>
                     </div>
@@ -1005,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b2-diary-title">本週零用錢記錄</span>
                         <button class="b-inline-replay" id="replay-speech-btn" title="重播語音">🔊</button>
                         <span class="b2-hint-wrap" style="display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b2-hint-mascot" onerror="this.style.display='none'">
+                            <img src="../images/common/hint_detective.png" alt="" class="b2-hint-mascot" onerror="this.style.display='none'">
                             <button class="b2-hint-btn" id="b2-hint-btn" title="提示">💡 提示</button>
                         </span>
                     </div>
@@ -2602,7 +2602,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${effectiveAnswer} 元
                     </span>
                     <div class="b2-ref-hint-wrap b2-ref-hint-inline">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b2-ref-hint-mascot" onerror="this.style.display='none'">
+                        <img src="../images/common/hint_detective.png" alt="" class="b2-ref-hint-mascot" onerror="this.style.display='none'">
                         <button class="b2-ref-hint-btn" id="b2-wallet-hint-btn" title="提示">💡 提示</button>
                     </div>
                 </div>
@@ -3566,7 +3566,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 記帳達人 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>

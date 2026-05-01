@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 /**
  * @file a6_train_ticket.js
  * @description A6 模擬火車購票 - 基於 A4 架構
@@ -2844,6 +2844,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // [Phase 2/3] 返回設定時清除計時器和事件監聽器
             this.TimerManager.clearAll();
             this.EventManager.removeAll();
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             const app = document.getElementById('app');
             const { taskType, difficulty, walletMode, walletAmount, questionCount, clickMode } = this.state.settings;
@@ -2854,7 +2858,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <!-- 單元標題和說明（移到白框內） -->
                         <div class="settings-header" style="margin-bottom: 30px;">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A6：模擬火車購票</h1>
                         </div>
                             <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 0; line-height: 1.6;">學習火車購票流程，包含選擇出發站、抵達站、車種與張數</p>
@@ -3511,6 +3515,22 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.score = 0;
             this.state.quiz.startTime = Date.now();
             this._completionScreenShown = false;
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _a6 = this;
+                TutorContext.getLiveData = () => {
+                    const tx = _a6.state.gameState.currentTransaction || {};
+                    return {
+                        fromStation:  tx.startStation  || null,
+                        toStation:    tx.endStation    || null,
+                        ticketType:   tx.trainType     || null,
+                        count:        tx.ticketCount   ?? null,
+                        totalPrice:   tx.totalCost     ?? null,
+                        wallet:       _a6.state.gameState.walletTotal ?? null,
+                    };
+                };
+            }
 
             // 🔧 [新增] 重置輔助點擊模式狀態
             if (this.state.gameState.clickModeState) {
@@ -5172,7 +5192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             ${(this.state.settings.difficulty === 'hard' || this.state.settings.difficulty === 'normal') && this.state.settings.taskType === 'preset' &&
                               ['askStart', 'askEnd', 'askType', 'askCount'].includes(step) ? `
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button class="npc-hint-btn" id="npc-hint-btn" onclick="Game.showStepHint('${step}')">
                                     💡 提示
                                 </button>
@@ -7032,6 +7052,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 渲染付款場景UI（參考 A4 滿版面設計）
         renderPaymentSceneUI() {
+            if (window.TutorContext) TutorContext.update({ phase: 'payment' });
             // 🆕 輔助點擊模式：建立付款動作佇列
             if (this.state.settings.clickMode && this.state.gameState.clickModeState.enabled) {
                 this.ClickMode.buildActionQueue('payment');
@@ -7075,7 +7096,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <img src="../images/a6/train_clerk.png" alt="火車站售票員" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
                             ${(this.state.settings.difficulty === 'hard' || this.state.settings.difficulty === 'normal') ? `
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;margin-top:14px;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;margin-top:14px;">
                                 <button class="npc-hint-btn" id="npc-payment-hint-btn" onclick="Game.showPaymentHint()">
                                     💡 提示
                                 </button>
@@ -9219,7 +9240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p class="npc-dialogue-text" style="margin:0;">找您 ${change} 元</p>
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                                <img src="../images/index/educated_money_bag_character.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
+                                <img src="../images/common/hint_detective.png" alt="" style="width:40px;height:auto;animation:settingsBounce 2.5s ease-in-out infinite;" onerror="this.style.display='none'">
                                 <button class="a6c-hint-btn" id="a6c-hint-btn">💡 提示</button>
                             </div>
                         </div>
@@ -10988,6 +11009,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showCompletionScreen() {
             if (this._completionScreenShown) return;
             this._completionScreenShown = true;
+            if (window.TutorContext) TutorContext.update({ screen: 'result' });
             // 停用輔助點擊模式（完成畫面不需要輔助）
             const gs = this.state.gameState;
             document.getElementById('click-exec-overlay')?.remove();
@@ -11015,7 +11037,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

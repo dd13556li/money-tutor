@@ -1,4 +1,4 @@
-// =============================================================
+﻿// =============================================================
 // FILE: js/b1_daily_budget.js — B1 今天帶多少錢
 // 建立日期：2026-03-14
 // =============================================================
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
                         <h1>單元B1：今天帶多少錢</h1>
                     </div>
@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const showHint = diff === 'normal' || diff === 'hard';
             const hintWrap = showHint
                 ? `<div class="b1-pr-hint-wrap b1-pr-hint-abs">
-                       <img src="../images/index/educated_money_bag_character.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
+                       <img src="../images/common/hint_detective.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
                        <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
                    </div>`
                 : '';
@@ -1963,7 +1963,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 提示按鈕（絕對定位於卡片右上角，non-easy 模式）
             const hintWrap = (showHintBtn && !isEasyMode)
                 ? `<div class="b1-schedule-hint-wrap" id="b1-hint-wrap">
-                       <img src="../images/index/educated_money_bag_character.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
+                       <img src="../images/common/hint_detective.png" alt="" class="b1-hint-mascot" onerror="this.style.display='none'">
                        <button class="b1-hint-btn" id="hint-btn" title="提示">💡 提示</button>
                    </div>`
                 : '';
@@ -2967,7 +2967,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 帶錢小達人 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>

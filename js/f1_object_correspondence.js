@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 // FILE: js/f1_object_correspondence.js
 // DESC: F1 物件對應 - 配置驅動版本
 // 最後修正：2025.08.31 下午8:50 - 修正普通/困難模式物品放置位置和雙向拖拽功能
@@ -2084,7 +2084,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="unit-welcome">
                         <div class="welcome-content">
                             <div class="settings-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                                <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                                 <h1>單元F1：數量與物品的對應</h1>
                             </div>
                             <div class="page-header">
@@ -3601,7 +3601,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="header-with-hint">
                     <h3>對應框 (請放置 ${totalPlacementSlots} 個物品到正確位置)</h3>
                     ${config.uiElements.showHintButton ? `
-                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                         <button class="modern-hint-btn" onclick="Game.handleHintClick()">
                             <span class="hint-icon">💡</span>
                             <span class="hint-text">提示</span>
@@ -5308,7 +5308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file c3_money_exchange.js
  * @description C3 金錢面額的兌換 - 配置驅動版本
  * @unit C3 - 金錢面額的兌換
@@ -3941,7 +3941,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>${this.gameData.title}</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">${this.gameData.subtitle}</p>
@@ -6173,7 +6173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>
@@ -8564,7 +8564,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="unit3-normal-money-section">
                                 <div style="display:flex;align-items:center;gap:10px;border-bottom:3px solid #e74c3c;padding-bottom:10px;margin-bottom:15px;">
                                     <h2 class="unit3-normal-section-title" style="flex:1;margin:0;border-bottom:none;padding-bottom:0;">我的金錢 目前共<span class="count-highlight">${countInfo.myMoneyCount}個${countInfo.myMoneyUnit}</span></h2>
-                                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                     <button id="c3-normal-hint-btn" onclick="MoneyExchange3.showNormalModeHint()" class="c3-hint-btn">💡 提示</button>
                                 </div>
                                 <div id="my-money-area" class="unit3-normal-money-source"></div>
@@ -8606,7 +8606,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="unit3-hard-money-section">
                                 <div style="display:flex;align-items:center;gap:10px;border-bottom:3px solid #e74c3c;padding-bottom:10px;margin-bottom:15px;">
                                     <h2 class="unit3-hard-section-title" style="flex:1;margin:0;border-bottom:none;padding-bottom:0;">我的金錢 目前共<span class="count-highlight">${countInfo.myMoneyCount}個${countInfo.myMoneyUnit}</span></h2>
-                                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                     <button id="c3-hard-hint-btn" onclick="MoneyExchange3.showHardModeHint()" class="c3-hint-btn">💡 提示</button>
                                 </div>
                                 <div id="my-money-area" class="unit3-hard-money-source"></div>

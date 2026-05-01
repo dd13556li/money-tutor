@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 /**
  * @file a5_atm_simulator.js
  * @description A5 提款機模擬學習單元 - 配置驅動版本
@@ -2303,7 +2303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                     <!-- 🔧 [新增] 提示按鈕（普通/困難模式）- 位於 atm-lower-section 右側 -->
                                     <div id="hint-btn-wrapper" style="display:none; grid-column:3; justify-self:end; align-self:center; align-items:center; gap:6px;">
-                                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                         <button class="hint-request-btn" id="hint-request-btn" style="grid-column:unset; justify-self:unset;">
                                             <span class="hint-icon">💡</span>
                                             <span class="hint-text">提示</span>
@@ -2325,6 +2325,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // 🔧 [Phase 5] 清除所有計時器（返回設定時清除上一輪殘留計時器）
             this.TimerManager.clearAll();
             this.EventManager.removeByCategory('settings');
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             // 🔧 [新增] 重置普通模式狀態（返回設定時清除上一輪狀態）
             this.resetNormalModeState();
@@ -2341,7 +2345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="settings-content">
                         <div class="settings-header">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A5：ATM提款機</h1>
                         </div>
                             <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">學習ATM操作流程，包含插卡、輸入密碼、選擇功能與提領現金</p>
@@ -3678,6 +3682,19 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.gameState.isProcessing = false;
             this.state.gameState.showingModal = false;
             this.state.gameState.currentScene = null;
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _atm = this;
+                TutorContext.getLiveData = () => {
+                    const gs = _atm.state.gameState;
+                    return {
+                        sessionType:   _atm.getActualSessionType?.() || _atm.state.settings.sessionType,
+                        targetAmount:  gs.targetAmount  ?? null,
+                        inputAmount:   gs.transactionAmount ?? 0,
+                    };
+                };
+            }
             this.state.gameState.currentStep = 0;
             this.state.gameState.currentFlowStep = null;
             this.state.gameState.isSubFlowActive = false;
@@ -4004,6 +4021,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.updateTitleBar(5, '列印中');
                     break;
                 case 'final-complete':
+                    if (window.TutorContext) TutorContext.update({ screen: 'result' });
                     screenContent.innerHTML = this.generateFinalCompleteScreen();
                     this.updateTitleBar(5, '交易完成');
                     break;
@@ -5232,7 +5250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="complete-header">
                         <div class="complete-icon">✅</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h2 style="color: white;">交易完成</h2>
                             <span class="results-mascot-spacer"></span>
                         </div>
@@ -13382,7 +13400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

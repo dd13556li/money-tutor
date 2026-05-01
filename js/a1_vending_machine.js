@@ -1,4 +1,4 @@
-// A1 - 自動販賣機測驗程式
+﻿// A1 - 自動販賣機測驗程式
 // 完整重構版本 - 參考 A1 架構
 //
 // ========================================
@@ -810,6 +810,10 @@
             this.TimerManager.clearAll();
             // 🔧 [Phase 3] 清除遊戲 UI 事件監聽器
             this.EventManager.removeByCategory('gameUI');
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             // 🔧 [Phase 1] 重置普通/困難模式狀態
             this.state.gameState.normalMode = {
@@ -828,7 +832,7 @@
                 <div class="unit-welcome">
                     <div class="welcome-content">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A1：自動飲料販賣機</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">模擬自動販賣機購物流程，練習投幣、選購商品與收取找零</p>
@@ -1814,6 +1818,22 @@
 
             // 重置魔法商品使用次數統計
             this.state.gameState.customProductsUsageCount = {};
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _vm = this;
+                TutorContext.getLiveData = () => {
+                    const gs = _vm.state.gameState;
+                    const target = gs.targetProduct || gs.selectedProduct;
+                    return {
+                        itemName: target?.name    || null,
+                        price:    target?.price   ?? null,
+                        inserted: gs.insertedAmount  ?? 0,
+                        change:   gs.changeAmount    ?? 0,
+                        wallet:   _vm.state.settings.walletAmount ?? null,
+                    };
+                };
+            }
 
             // 簡單模式魔法商品：設定動態價格
             if (this.state.settings.difficulty === 'easy' &&
@@ -2967,7 +2987,7 @@
                             <h1>自動販賣機</h1>
                             ${(this.state.settings.difficulty === 'hard' || this.state.settings.difficulty === 'normal') ? `
                                 <div style="position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;">
-                                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                     <button class="hint-button" style="position:static;transform:none;" onclick="VendingMachine.showHint()" title="顯示提示">
                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
@@ -3288,6 +3308,7 @@
             this.state.gameState.selectedProduct = product;
             this.highlightProduct(productId);
             this.updateAmounts();
+            if (window.TutorContext) TutorContext.update({ phase: 'payment' });
 
             // 調試日志：記錄最終選擇的商品信息
             VendingMachine.Debug.log('product', ' 最終選擇的商品:', product.name, '價格:', product.price);
@@ -3695,6 +3716,7 @@
             if (isWrongAction) {
                 // 累計錯誤次數
                 this.state.gameState.normalMode.errorCount++;
+                if (window.TutorContext) TutorContext.update({ errorCount: this.state.gameState.normalMode.errorCount });
                 VendingMachine.Debug.log('flow', ` ${currentStep} 錯誤操作: ${actionType}, 累計錯誤: ${this.state.gameState.normalMode.errorCount}`);
 
                 // 播放錯誤音效
@@ -5552,6 +5574,7 @@
             const product = this.state.gameState.selectedProduct;
             const insertedAmount = this.state.gameState.insertedAmount;
             const change = insertedAmount - product.price;
+            if (window.TutorContext) TutorContext.update({ phase: change > 0 ? 'change' : 'pickup' });
 
             // 標記已出貨
             this.state.gameState.productVended = true;
@@ -6182,6 +6205,7 @@
             }
             document.getElementById('click-exec-overlay')?.remove();
             this.unbindClickModeHandler();
+            if (window.TutorContext) TutorContext.update({ screen: 'result' });
 
             const app = document.getElementById('app');
             const completedCount = this.state.gameState.completedQuestions;
@@ -6200,7 +6224,7 @@
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

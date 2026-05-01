@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file f6_number_composition.js
  * @description F6 數的合成與分解 - 配置驅動版本
  * @unit F6 - 數的合成與分解
@@ -738,7 +738,7 @@ const Game = {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                         <h1>${NumberCompositionConfig.game.title}</h1>
                     </div>
                     <div class="page-header">
@@ -2021,7 +2021,7 @@ const Game = {
                 </div>
                 <!-- 提示按鈕（困難模式） -->
                 <div style="display:flex; justify-content:flex-end; align-items:center; padding:4px 20px 0 20px;">
-                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                     <button id="f6-hint-btn" onclick="Game.showHardHint()" style="position:relative; background:linear-gradient(45deg,#4CAF50,#45a049); color:white; border:none; border-radius:25px; padding:8px 18px; font-size:14px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 15px rgba(76,175,80,0.3); transition:all 0.3s;">
                         <span style="font-size:16px;">💡</span><span>提示</span>
                     </button>
@@ -2117,7 +2117,7 @@ const Game = {
                 </div>
                 <!-- 提示按鈕（困難模式） -->
                 <div style="display:flex; justify-content:flex-end; align-items:center; padding:4px 20px 0 20px;">
-                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                     <button id="f6-hint-btn" onclick="Game.showHardHint()" style="position:relative; background:linear-gradient(45deg,#4CAF50,#45a049); color:white; border:none; border-radius:25px; padding:8px 18px; font-size:14px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 15px rgba(76,175,80,0.3); transition:all 0.3s;">
                         <span style="font-size:16px;">💡</span><span>提示</span>
                     </button>
@@ -2468,7 +2468,7 @@ const Game = {
                 </div>
                 <!-- 提示按鈕（困難模式） -->
                 <div style="display:flex; justify-content:flex-end; align-items:center; padding:4px 20px 0 20px;">
-                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                     <button id="f6-hint-btn" onclick="Game.showHardHint()" style="position:relative; background:linear-gradient(45deg,#4CAF50,#45a049); color:white; border:none; border-radius:25px; padding:8px 18px; font-size:14px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 15px rgba(76,175,80,0.3); transition:all 0.3s;">
                         <span style="font-size:16px;">💡</span><span>提示</span>
                     </button>
@@ -5238,7 +5238,7 @@ const Game = {
                 <div class="results-header">
                     <div class="trophy-icon">🏆</div>
                     <div class="results-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                        <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                         <h1 class="results-title">🎉 測驗結束 🎉</h1>
                         <span class="results-mascot-spacer"></span>
                     </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file f5_quantity_comparison.js
  * @description F5 數量大小比較 - 配置驅動版本
  * @unit F5 - 數量大小的比較
@@ -933,7 +933,7 @@ const QuantityComparisonTemplates = {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                         <h1>${config.gameTitle}</h1>
                     </div>
                     <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">比較不同數量的多寡，了解大於、小於、等於的概念</p>
@@ -1017,7 +1017,7 @@ const QuantityComparisonTemplates = {
                 </div>
                 ${config.isHardMode ? `
                 <div style="display:flex; justify-content:flex-end; align-items:center; padding:4px 20px 0 20px;">
-                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                     <button id="f5-hint-btn" onclick="Game.showHardModeHint()" style="position:relative; background:linear-gradient(45deg,#4CAF50,#45a049); color:white; border:none; border-radius:25px; padding:8px 18px; font-size:14px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 15px rgba(76,175,80,0.3); transition:all 0.3s; overflow:hidden;">
                         <span style="font-size:16px;">💡</span><span>提示</span>
                     </button>
@@ -1479,7 +1479,7 @@ const QuantityComparisonTemplates = {
                 <div class="results-header">
                     <div class="trophy-icon">🏆</div>
                     <div class="results-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                        <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                         <h1 class="results-title">🎉 測驗結束 🎉</h1>
                         <span class="results-mascot-spacer"></span>
                     </div>

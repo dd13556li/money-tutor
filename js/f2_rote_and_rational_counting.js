@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file f2_rote_and_rational_counting.js
  * @description F2 數量與點數 - 配置驅動版本
  * @unit F2 - 數量與點數
@@ -1515,7 +1515,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="unit-welcome">
                         <div class="welcome-content">
                             <div class="settings-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                                <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                                 <h1>${Game.gameData.title}</h1>
                             </div>
                             <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">透過唱數與計數練習，學習正確的數數方法，建立數序概念</p>
@@ -1894,7 +1894,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hintBoxContainer() {
                 return `
                     <div class="standalone-hint-container" style="display:flex;flex-direction:row;align-items:center;gap:6px;">
-                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;pointer-events:none;">
+                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;pointer-events:none;">
                         ${this.hintBox()}
                     </div>
                 `;
@@ -2958,7 +2958,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 測驗結束 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

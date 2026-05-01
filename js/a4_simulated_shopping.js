@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 /**
  * @file a4_simulated_shopping.js
  * @description A4 模擬購物 - 配置驅動版本
@@ -1505,6 +1505,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.TimerManager.clearAll();
             this.EventManager.removeByCategory('gameUI');
             this.EventManager.removeByCategory('settings');
+            if (window.TutorContext) {
+                TutorContext.update({ screen: 'settings' });
+                TutorContext.getLiveData = null;
+            }
 
             // 重置上一題的商品ID（重新開始遊戲時）
             this.state.gameState.previousTargetItemId = null;
@@ -1535,7 +1539,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content" style="text-align: center;">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元A4：模擬購物</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">在虛擬商店中選購商品，練習計算總價、付款與收取零錢</p>
@@ -3131,6 +3135,20 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.quiz.currentQuestion = 0;
             this.state.quiz.score = 0;
             this.state.quiz.startTime = Date.now();
+            if (window.TutorContext) {
+                TutorContext.reset();
+                TutorContext.update({ screen: 'game', phase: 'selectItem', difficulty: this.state.settings.difficulty, totalQuestions: this.state.settings.questionCount, questionIndex: 0 });
+                const _a4 = this;
+                TutorContext.getLiveData = () => {
+                    const gs = _a4.state.gameState;
+                    const item = gs.selectedItem || gs.currentTransaction?.targetItem;
+                    return {
+                        itemName: item?.name  || null,
+                        price:    item?.price ?? null,
+                        wallet:   _a4.state.settings.walletAmount ?? null,
+                    };
+                };
+            }
 
             // 🎯 [新增] 重設動態價格系統
             this.storeData.resetAllPrices();
@@ -6361,6 +6379,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 選擇成功
             this.state.gameState.selectedItem = selectedItem;
             this.state.gameState.currentTransaction.totalCost = selectedItem.price;
+            if (window.TutorContext) TutorContext.update({ phase: 'payment' });
             // 🔧 [新增] 標記用戶已成功選擇商品，啟用防重複機制
             this.state.gameState.hasUserSelectedProduct = true;
             
@@ -6558,7 +6577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${(difficulty === 'hard' || difficulty === 'normal') ? `
                                 <!-- 提示按鈕（最右側） -->
                                 <div style="position:absolute;right:0;display:flex;align-items:center;gap:6px;">
-                                    <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                    <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                     <button class="hint-btn" id="total-hint-btn"
                                             style="padding: 8px 16px; font-size: 14px;"
                                             onclick="Game.showTotalHint()"
@@ -7323,7 +7342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </span>
                                 ${(difficulty === 'hard' || difficulty === 'normal') ? `
                                     <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;">
-                                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                         <button class="payment-hint-btn" onclick="Game.showPaidAmountHint()" title="顯示已付金額">
                                             💡<span class="hint-text">提示</span>
                                         </button>
@@ -9369,7 +9388,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="a4c-task-right" style="flex-direction:row;min-width:unset;">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="a4c-mascot a4c-mascot-bounce" onerror="this.style.display='none'">
+                            <img src="../images/common/hint_detective.png" alt="" class="a4c-mascot a4c-mascot-bounce" onerror="this.style.display='none'">
                             <button class="a4c-hint-btn" id="a4c-hint-btn">💡 提示</button>
                         </div>
                     </div>
@@ -14062,6 +14081,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             this.state.gameState.isTransitioning = true;
+            if (window.TutorContext) TutorContext.update({ screen: 'result' });
 
             // 🔧 [修復] 立即清除所有定時器和語音，防止殘留回調干擾
             if (window.speechSynthesis) {
@@ -14229,7 +14249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="results-header">
                             <div class="trophy-icon">🏆</div>
                             <div class="results-title-row">
-                                <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                                <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                                 <h1 class="results-title">🎉 完成挑戰 🎉</h1>
                                 <span class="results-mascot-spacer"></span>
                             </div>

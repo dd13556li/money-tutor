@@ -1,4 +1,4 @@
-// =============================================================
+﻿// =============================================================
 // FILE: js/b6_market_shopping.js — B6 菜市場買菜
 // =============================================================
 'use strict';
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
                         <h1>單元B6：菜市場買菜</h1>
                     </div>
@@ -1563,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b6-task-hdr-right">
-                            <img src="../images/index/educated_money_bag_character.png" class="b6-task-mascot" onerror="this.style.display='none'" alt="">
+                            <img src="../images/common/hint_detective.png" class="b6-task-mascot" onerror="this.style.display='none'" alt="">
                             <button class="b6-p1-hint-btn" id="b6-p1-hint-btn">💡 提示</button>
                         </div>
                     </div>
@@ -2711,7 +2711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="b6p2-ref-icon">${mkt.icon}</span>
                     <span class="b6p2-ref-title">${mkt.name}</span>
                     <span class="b6-p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
+                        <img src="../images/common/hint_detective.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
                         <button class="b-hint-btn" id="b6-p2-hint-btn">💡 提示</button>
                     </span>
                 </div>
@@ -3343,7 +3343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app.innerHTML = `
             <div class="b-header">
                 <div class="b-header-left">
-                    <img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
+                    <img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'">
                     <span class="b-header-unit">${mkt.icon} ${mkt.name}</span>
                 </div>
                 <div class="b-header-center">${diffLabel}</div>
@@ -3359,7 +3359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b6p2-ref-icon">${mkt.icon}</span>
                         <span class="b6p2-ref-title">${mkt.name}</span>
                         <span class="b6-p2-hint-wrap">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
+                            <img src="../images/common/hint_detective.png" alt="" class="b6-task-mascot" onerror="this.style.display='none'">
                             <button class="b-hint-btn" id="b6c-hint-btn">💡 提示</button>
                         </span>
                     </div>
@@ -4029,7 +4029,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="b-header">
-                <div class="b-header-left"><img src="../images/index/educated_money_bag_character.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🛒 菜市場買菜</span></div>
+                <div class="b-header-left"><img src="../images/common/hint_detective.png" alt="" class="b-header-mascot" onerror="this.style.display='none'"><span class="b-header-unit">🛒 菜市場買菜</span></div>
                 <div class="b-header-center">困難模式</div>
                 <div class="b-header-right">
                     <span class="b-progress">第 ${g.currentRound + 1} 關 / 共 ${g.totalRounds} 關</span>
@@ -4425,7 +4425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 採購達人 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>

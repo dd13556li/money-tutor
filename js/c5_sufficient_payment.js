@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 // FILE: js/c5_sufficient_payment.js - 單元C5：足額付款
 //// 🚨🚨🚨 【重開機後修改前必讀】🚨🚨🚨
 // =====================================================
@@ -993,7 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content" style="text-align: center;">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元C5：足額付款</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">理解足額付款的概念，了解付出的金錢大於或等於商品價格</p>
@@ -3712,7 +3712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h2 class="section-title unit5-normal-section-title">
                             🛒 購物區
                             <span class="hint-button-wrapper" style="margin-left: auto; display:inline-flex; align-items:center; gap:6px;">
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button id="hint-button" class="hint-toggle-btn">💡 提示</button>
                             </span>
                         </h2>
@@ -3787,7 +3787,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h2 class="section-title unit5-hard-section-title">
                             🛒 購物區
                             <span class="hint-button-wrapper" style="margin-left: auto; display:inline-flex; align-items:center; gap:6px;">
-                                <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                                <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                                 <button id="hint-button" class="hint-toggle-btn">💡 提示</button>
                             </span>
                         </h2>
@@ -4273,7 +4273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>

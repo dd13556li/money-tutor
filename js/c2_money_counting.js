@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file c2_money_counting.js
  * @description C2 金錢的點數與加總 - 配置驅動版本
  * @unit C2 - 金錢的點數與加總
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>${this.gameData.title}</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">${this.gameData.subtitle}</p>
@@ -1315,7 +1315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 普通模式：顯示總計，有提示按鈕（提示按鈕獨立於 total-hint-box）
                 hintBoxHtml = `
                     <div style="position:absolute;right:10px;top:10px;display:flex;align-items:center;gap:6px;z-index:100;">
-                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                         <button class="hint-button" onclick="Game.showTotalHint()" title="顯示總計金額">
                             💡 <span class="hint-text">提示</span>
                         </button>
@@ -1333,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 困難模式：顯示總計，有提示按鈕（提示按鈕獨立於 total-hint-box）
                 hintBoxHtml = `
                     <div style="position:absolute;right:10px;top:10px;display:flex;align-items:center;gap:6px;z-index:100;">
-                        <img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
+                        <img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;">
                         <button class="hint-button" onclick="Game.showTotalHint()" title="顯示總計金額">
                             💡 <span class="hint-text">提示</span>
                         </button>
@@ -1976,7 +1976,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>

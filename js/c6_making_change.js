@@ -1,4 +1,4 @@
-// =================================================================
+﻿// =================================================================
 // FILE: js/c6_making_change.js - 單元C6：找零與計算
 //// 🚨🚨🚨 【重開機後修改前必讀】🚨🚨🚨
 // =====================================================
@@ -1100,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="unit-welcome">
                     <div class="welcome-content" style="text-align: center;">
                         <div class="settings-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                            <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                             <h1>單元C6：找零與計算</h1>
                         </div>
                         <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">學習計算找零金額，理解付款與找零的關係，培養實際交易中的找零能力</p>
@@ -3607,7 +3607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="item-payment-section">
                             <div class="ip-title-row">
                                 <h2 class="section-title" style="margin:0;">🛍️ 商品付款</h2>
-                                ${difficulty === 'hard' ? '<div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
+                                ${difficulty === 'hard' ? '<div style="display:flex;align-items:center;gap:6px;"><img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>' : ''}
                             </div>
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
@@ -3701,7 +3701,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="item-payment-section">
                             <div class="ip-title-row">
                                 <h2 class="section-title" style="margin:0;">🛍️ 商品付款</h2>
-                                <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
+                                <div style="display:flex;align-items:center;gap:6px;"><img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button class="hint-btn" id="c6-payment-hint-btn" style="font-size:14px;padding:8px 16px;">💡 提示</button></div>
                             </div>
                             <div class="item-info-compact">
                                 <span class="iic-img">${this.getItemImg(item, '180px')}</span>
@@ -4118,7 +4118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="results-header">
                         <div class="trophy-icon">🏆</div>
                         <div class="results-title-row">
-                            <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                            <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                             <h1 class="results-title">🎉 測驗結束 🎉</h1>
                             <span class="results-mascot-spacer"></span>
                         </div>
@@ -6156,7 +6156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="c6-purchase-info">
                     <div class="ip-title-row">
                         <h2 class="section-title" style="margin:0;">🛍️ 購買物品</h2>
-                        <div style="display:flex;align-items:center;gap:6px;"><img src="../images/index/educated_money_bag_character.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button id="c6-amount-hint-btn" class="c6-hint-btn" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; cursor: pointer;">💡 提示</button></div>
+                        <div style="display:flex;align-items:center;gap:6px;"><img src="../images/common/hint_detective.png" style="height:48px;width:auto;object-fit:contain;animation:settingsBounce 2.5s ease-in-out infinite;flex-shrink:0;"><button id="c6-amount-hint-btn" class="c6-hint-btn" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; cursor: pointer;">💡 提示</button></div>
                     </div>
                     <div class="item-info-compact">
                         <span class="iic-img">${this.getItemImg(item, '180px')}</span>

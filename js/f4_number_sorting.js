@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file f4_number_sorting.js
  * @description F4 數字排序 - 配置驅動版本
  * @unit F4 - 數字排序
@@ -454,7 +454,7 @@ const NumberSortingTemplates = {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手" class="settings-mascot-img">
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手" class="settings-mascot-img">
                         <h1>${config.gameTitle}</h1>
                     </div>
                     <p style="font-size: 1em; color: #666; margin-top: 15px; margin-bottom: 25px; line-height: 1.6;">理解數字的大小順序關係，學習將數字由小到大排序</p>
@@ -708,7 +708,7 @@ const NumberSortingTemplates = {
                 <div class="results-header">
                     <div class="trophy-icon">🏆</div>
                     <div class="results-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" class="results-mascot-img" alt="金錢小助手">
+                        <img src="../images/common/hint_detective.png" class="results-mascot-img" alt="金錢小助手">
                         <h1 class="results-title">🎉 測驗結束 🎉</h1>
                         <span class="results-mascot-spacer"></span>
                     </div>

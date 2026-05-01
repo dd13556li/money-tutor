@@ -1,4 +1,4 @@
-// =============================================================
+﻿// =============================================================
 // FILE: js/b5_party_budget.js — B5 生日派對預算
 // =============================================================
 'use strict';
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="unit-welcome">
                 <div class="welcome-content">
                     <div class="settings-title-row">
-                        <img src="../images/index/educated_money_bag_character.png" alt="金錢小助手"
+                        <img src="../images/common/hint_detective.png" alt="金錢小助手"
                              class="settings-mascot-img" onerror="this.style.display='none'">
                         <h1>單元B5：派對活動採購</h1>
                     </div>
@@ -1082,7 +1082,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="b5-task-hdr-right">
-                            <img src="../images/index/educated_money_bag_character.png" class="b5-task-mascot" onerror="this.style.display='none'" alt="">
+                            <img src="../images/common/hint_detective.png" class="b5-task-mascot" onerror="this.style.display='none'" alt="">
                             <button class="b5-p1-hint-btn" id="b5-p1-hint-btn">💡 提示</button>
                         </div>
                     </div>
@@ -2156,7 +2156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="b5p2-ref-title">${themeData.name}</span>
                     </div>
                     <span class="b5-p2-hint-wrap">
-                        <img src="../images/index/educated_money_bag_character.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
+                        <img src="../images/common/hint_detective.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
                         <button class="b5-p1-hint-btn" id="b5-p2-hint-btn">💡 提示</button>
                     </span>
                 </div>
@@ -2766,7 +2766,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="b5p2-ref-title">${themeData.name}</span>
                         </div>
                         <span class="b5-p2-hint-wrap">
-                            <img src="../images/index/educated_money_bag_character.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
+                            <img src="../images/common/hint_detective.png" alt="" class="b5-task-mascot" onerror="this.style.display='none'">
                             <button class="b5-p1-hint-btn" id="b5c-hint-btn">💡 提示</button>
                         </span>
                     </div>
@@ -3574,7 +3574,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="b-res-header">
             <div class="b-res-trophy">🏆</div>
             <div class="b-res-title-row">
-                <img src="../images/index/educated_money_bag_character.png"
+                <img src="../images/common/hint_detective.png"
                      class="b-res-mascot" alt="金錢小助手" onerror="this.style.display='none'">
                 <h1 class="b-res-title">🎉 派對規劃大師 🎉</h1>
                 <span class="b-res-mascot-spacer"></span>
